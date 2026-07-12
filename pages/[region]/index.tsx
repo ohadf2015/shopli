@@ -181,35 +181,6 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
           </div>
         </section>
 
-        {/* MOOD BOARDS */}
-        {/* MOOD BOARDS — Complete Looks */}
-        <section className="py-10 bg-orange-50/50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <h2 className="text-xl md:text-2xl font-bold mb-2" style={{ color: 'var(--shopli-navy)' }}>
-              {rtl ? 'ערכות שלמות — בנו מראה מושלם' : 'Complete Looks — Build the Perfect Outfit'}
-            </h2>
-            <p className="text-sm mb-6" style={{ color: 'var(--shopli-warm-gray)' }}>
-              {rtl ? 'כל פריט בערכה בונה מראה שלם. מתאים במיוחד לפורים, ליל הקדושים, מסיבות ועוד.' : 'Each item in a board combines into a complete look. Perfect for Purim, Halloween, parties and more.'}
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {[
-                { link: 'jack-sparrow', titleEn: 'Pirate Jack Sparrow', titleHe: 'פיראט ג׳ק ספארו', descEn: 'Complete pirate costume under €30', descHe: 'תחפושת פיראט שלמה ב-₪120' },
-                { link: 'queen-esther', titleEn: 'Queen Esther', titleHe: 'אסתר המלכה', descEn: 'Royal Purim costume under €25', descHe: 'תחפושת מלכותית לפורים ב-₪100' },
-                { link: 'pikachu', titleEn: 'Pikachu Cosplay', titleHe: 'פיקאצ׳ו', descEn: 'Cute Pokemon cosplay under €20', descHe: 'קוספליי פוקימון חמוד ב-₪80' },
-                { link: 'sushi-night', titleEn: 'Sushi Night Kit', titleHe: 'ערב סושי ביתי', descEn: 'Restaurant-quality sushi under €25', descHe: 'להכין סושי כמו במסעדה ב-₪100' },
-                { link: 'mechanical-keyboard', titleEn: 'Mech Keyboard Build', titleHe: 'מקלדת מכנית', descEn: 'Custom keyboard setup under €70', descHe: 'מקלדת מותאמת אישית ב-₪300' },
-                { link: 'home-bar', titleEn: 'Home Bar Starter', titleHe: 'בר ביתי', descEn: 'Mix cocktails like a bartender under €35', descHe: 'לערבב קוקטיילים כמו ברמן ב-₪140' },
-              ].map(b => (
-                <a key={b.link} href={`/${region}/mood/${b.link}`}
-                  className="p-4 rounded-xl border border-orange-200 bg-white hover:shadow-md transition-all">
-                  <div className="font-bold text-sm mb-1" style={{ color: 'var(--shopli-navy)' }}>{rtl ? b.titleHe : b.titleEn}</div>
-                  <p className="text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>{rtl ? b.descHe : b.descEn}</p>
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* MOOD BOARDS — Complete Looks & Room Designs */}
         <section className="py-10 bg-orange-50/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -279,6 +250,34 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
           </div>
         </section>
 
+        {/* COMPARISONS */}
+        <section className="py-10 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+            <h2 className="text-xl md:text-2xl font-bold mb-2" style={{ color: 'var(--shopli-navy)' }}>
+              {rtl ? 'השוואות מוצרים' : 'Product Comparisons'}
+            </h2>
+            <p className="text-sm mb-6" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {rtl ? 'לא בטוחים מה לבחור? ההשוואות שלנו עוזרות להחליט' : 'Not sure what to pick? Our comparisons help you decide.'}
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                { slug: 'french-press-vs-drip', titleEn: 'French Press vs Drip Maker', titleHe: 'פרנץ׳ פרס מול פילטר', descEn: 'Which brew method wins?' },
+                { slug: 'resistance-bands-vs-dumbbells', titleEn: 'Bands vs Dumbbells', titleHe: 'רצועות מול משקולות', descEn: 'Best home gym gear' },
+                { slug: 'ring-light-vs-softbox', titleEn: 'Ring Light vs Softbox', titleHe: 'רינג לייט מול סופטבוקס', descEn: 'Perfect lighting choice' },
+              ].map(c => (
+                <a key={c.slug} href={`/${region}/compare/${c.slug}`}
+                  className="p-5 rounded-xl border border-gray-100 hover:border-orange-200 hover:shadow-md transition-all bg-white">
+                  <h3 className="font-bold text-sm mb-1" style={{ color: 'var(--shopli-navy)' }}>{rtl ? c.titleHe : c.titleEn}</h3>
+                  <p className="text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>{rtl ? c.descHe : c.descEn}</p>
+                  <span className="text-xs font-semibold mt-2 inline-block" style={{ color: 'var(--shopli-orange)' }}>
+                    {rtl ? 'קראו השוואה →' : 'Read comparison →'}
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* CTA */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
           <div className="rounded-2xl p-8 md:p-12 text-center" style={{ background: 'var(--shopli-navy)', color: 'white' }}>
@@ -310,7 +309,7 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
           <div className="flex gap-4">
             <a href={`/${region}/collection/home-gym`} className="hover:underline">{rtl ? 'אימונים' : 'Workout'}</a>
             <a href={`/${region}/collection/coffee-ritual`} className="hover:underline">{rtl ? 'קפה' : 'Coffee'}</a>
-            <a href={`/${region}/mood/jack-sparrow`} className="hover:underline">{rtl ? 'תחפוpartner' : 'Costumes'}</a>
+            <a href={`/${region}/mood/jack-sparrow`} className="hover:underline">{rtl ? 'תחפושות' : 'Costumes'}</a>
           </div>
         </div>
       </footer>
