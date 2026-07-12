@@ -1,263 +1,161 @@
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import Head from 'next/head';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { getRegionConfig, RegionConfig, getFlag } from '../../../lib/regions';
-import { getComparison, getAllComparisonSlugs, ComparisonArticle } from '../../../lib/comparisons';
-import { searchAliExpress } from '../../../lib/aliexpress';
+import Header from '../../../components/Header';
+import Icon from '../../../components/icons';
+import { getRegion } from '../../../lib/regions';
+import { getComparison } from '../../../lib/comparisons';
 
-interface Props {
-  comparison: ComparisonArticle;
-  region: RegionConfig;
-  langData: Record<string, string>;
-  product1Items: any[];
-  product2Items: any[];
-}
+export default function ComparisonPage({ region, config, comparison, prod1Items, prod2Items, rtl, error }: any) {
+  if (error) {
+    return <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>Error: {error}</div>;
+  }
 
-export default function ComparisonPage({ comparison, region, langData, product1Items, product2Items }: Props) {
-  const router = useRouter();
-  const isRtl = region.dir === 'rtl';
-  const lang = region.lang;
-  const t = langData;
+  const lang = config?.lang || 'en';
+  const t = (obj: any) => obj?.[lang] || obj?.en || '';
 
-  const title = comparison.title[lang] || comparison.title.en;
-  const desc = comparison.metaDesc[lang] || comparison.metaDesc.en;
-  const introText = comparison.intro[lang] || comparison.intro.en;
-  const verdict = comparison.verdict[lang] || comparison.verdict.en;
-
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://shopli-neon.vercel.app';
+  const c = comparison;
+  if (!c) return null;
 
   return (
-    <div dir={isRtl ? 'rtl' : 'ltr'} className={isRtl ? 'font-hebrew' : ''}>
+    <>
       <Head>
-        <title>{title} | Shopli</title>
-        <meta name="description" content={desc} />
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={desc} />
-        <meta property="og:type" content="article" />
-        <meta property="og:url" content={`${siteUrl}/${region.slug}/compare/${comparison.slug}`} />
-        <meta property="og:site_name" content="Shopli" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <link rel="canonical" href={`${siteUrl}/${region.slug}/compare/${comparison.slug}`} />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Article',
-              headline: title,
-              description: desc,
-              author: { '@type': 'Organization', name: 'Shopli' },
-              about: {
-                '@type': 'Thing',
-                name: comparison.product1.name + ' vs ' + comparison.product2.name,
-              },
-              mainEntityOfPage: {
-                '@type': 'WebPage',
-                '@id': `${siteUrl}/${region.slug}/compare/${comparison.slug}`,
-              },
-            }),
-          }}
-        />
+        <title>{t(c.title)} | Shopli</title>
+        <meta name="description" content={t(c.metaDesc)} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: t(c.title),
+            description: t(c.metaDesc),
+            mainEntityOfPage: { '@type': 'WebPage', '@id': `https://shopli-neon.vercel.app/${region}/compare/${c.slug}` }
+          })
+        }} />
       </Head>
+      <Header currentRegion={region} dir={config?.direction} />
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+        <div className="flex items-center gap-2 text-xs mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
+          <a href={`/${region}`}>{rtl ? 'דף הבית' : 'Home'}</a> <span>/</span>
+          <span style={{ color: 'var(--shopli-navy)' }}>{t(c.title)}</span>
+        </div>
 
-      <div className="min-h-screen bg-gray-50">
-        <header className="bg-white shadow-sm sticky top-0 z-50">
-          <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-            <Link href={`/${region.slug}`} className="text-xl font-bold text-orange-600">
-              {getFlag(region.slug)} Shopli
-            </Link>
-            <nav className="flex gap-4 text-sm text-gray-600">
-              <Link href={`/${region.slug}`} className="hover:text-orange-600">{t.home}</Link>
-              <Link href={`/${region.slug}#comparisons`} className="hover:text-orange-600">{t.comparisons}</Link>
-            </nav>
-          </div>
-        </header>
+        <h1 className="text-2xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--shopli-navy)' }}>{t(c.title)}</h1>
+        <p className="max-w-3xl text-base leading-relaxed mb-8" style={{ color: 'var(--shopli-warm-gray)' }}>{t(c.intro)}</p>
 
-        <main className="max-w-4xl mx-auto px-4 py-8">
-          <Link href={`/${region.slug}`} className="text-orange-600 hover:underline text-sm mb-6 inline-block">
-            &larr; {t.backToHome}
-          </Link>
+        {/* Side-by-side comparison */}
+        <div className="grid md:grid-cols-2 gap-6 mb-10">
+          {[c.product1, c.product2].map((prod: any, pi: number) => {
+            const items = pi === 0 ? prod1Items : prod2Items;
+            return (
+              <div key={pi} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--shopli-navy)' }}>{prod.name}</h2>
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">{title}</h1>
-          <p className="text-gray-600 leading-relaxed mb-8">{introText}</p>
-
-          {/* Side-by-side comparison */}
-          <div className="grid md:grid-cols-2 gap-6 mb-10">
-            {/* Product 1 */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-3">{comparison.product1.name}</h2>
-              <div className="space-y-3 text-sm">
-                <h3 className="font-semibold text-green-700">{t.pros}</h3>
-                <ul className="space-y-1">
-                  {comparison.product1.pros.map((p, i) => (
-                    <li key={i} className="flex items-start gap-2 text-gray-700">
-                      <span className="text-green-500 mt-0.5">+</span> {p}
-                    </li>
-                  ))}
-                </ul>
-                <h3 className="font-semibold text-red-700 mt-3">{t.cons}</h3>
-                <ul className="space-y-1">
-                  {comparison.product1.cons.map((c, i) => (
-                    <li key={i} className="flex items-start gap-2 text-gray-700">
-                      <span className="text-red-500 mt-0.5">−</span> {c}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Product 1 items */}
-              {product1Items.length > 0 && (
-                <div className="mt-4 pt-4 border-t">
-                  <h3 className="text-sm font-semibold text-gray-800 mb-3">{t.shopProducts} {comparison.product1.name}</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {product1Items.slice(0, 4).map((item: any, i: number) => (
-                      <a key={i} href={item.affiliateLink} target="_blank" rel="nofollow sponsored"
-                        className="block bg-gray-50 rounded-lg p-2 hover:shadow transition">
-                        <img src={item.image} alt={item.title} className="w-full h-24 object-contain mb-2"
-                          loading="lazy" />
-                        <p className="text-xs text-gray-800 line-clamp-2">{item.title}</p>
-                        <p className="text-xs font-bold text-orange-600 mt-1">{item.price}</p>
-                      </a>
+                <div className="mb-4">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-green-700 mb-2">
+                    {rtl ? 'יתרונות' : 'Pros'}
+                  </h3>
+                  <ul className="space-y-1">
+                    {prod.pros.map((p: string, i: number) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                        <span className="text-green-500 shrink-0">+</span> {p}
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
-              )}
-            </div>
 
-            {/* Product 2 */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-3">{comparison.product2.name}</h2>
-              <div className="space-y-3 text-sm">
-                <h3 className="font-semibold text-green-700">{t.pros}</h3>
-                <ul className="space-y-1">
-                  {comparison.product2.pros.map((p, i) => (
-                    <li key={i} className="flex items-start gap-2 text-gray-700">
-                      <span className="text-green-500 mt-0.5">+</span> {p}
-                    </li>
-                  ))}
-                </ul>
-                <h3 className="font-semibold text-red-700 mt-3">{t.cons}</h3>
-                <ul className="space-y-1">
-                  {comparison.product2.cons.map((c, i) => (
-                    <li key={i} className="flex items-start gap-2 text-gray-700">
-                      <span className="text-red-500 mt-0.5">−</span> {c}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Product 2 items */}
-              {product2Items.length > 0 && (
-                <div className="mt-4 pt-4 border-t">
-                  <h3 className="text-sm font-semibold text-gray-800 mb-3">{t.shopProducts} {comparison.product2.name}</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {product2Items.slice(0, 4).map((item: any, i: number) => (
-                      <a key={i} href={item.affiliateLink} target="_blank" rel="nofollow sponsored"
-                        className="block bg-gray-50 rounded-lg p-2 hover:shadow transition">
-                        <img src={item.image} alt={item.title} className="w-full h-24 object-contain mb-2"
-                          loading="lazy" />
-                        <p className="text-xs text-gray-800 line-clamp-2">{item.title}</p>
-                        <p className="text-xs font-bold text-orange-600 mt-1">{item.price}</p>
-                      </a>
+                <div className="mb-6">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-red-700 mb-2">
+                    {rtl ? 'חסרונות' : 'Cons'}
+                  </h3>
+                  <ul className="space-y-1">
+                    {prod.cons.map((c: string, i: number) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                        <span className="text-red-500 shrink-0">−</span> {c}
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
-              )}
-            </div>
-          </div>
 
-          {/* Verdict */}
-          <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-6 mb-10 border border-orange-100">
-            <h2 className="text-xl font-bold text-gray-900 mb-3">{t.verdict}</h2>
-            <p className="text-gray-700 leading-relaxed">{verdict}</p>
-          </div>
+                {/* Product items from AliExpress */}
+                {items?.length > 0 && (
+                  <div className="border-t pt-4">
+                    <h3 className="text-xs font-semibold mb-3" style={{ color: 'var(--shopli-warm-gray)' }}>
+                      {rtl ? `מוצרים מ-AliExpress` : `Shop ${prod.name} on AliExpress`}
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      {items.slice(0, 4).map((item: any, i: number) => (
+                        <a key={i} href={item.affiliateLink} target="_blank" rel="nofollow sponsored"
+                          className="block bg-gray-50 rounded-lg p-2 hover:shadow transition">
+                          <img src={item.image} alt={item.title} className="w-full h-20 object-contain mb-1" loading="lazy" />
+                          <p className="text-xs text-gray-700 line-clamp-2">{item.title}</p>
+                          <p className="text-xs font-bold mt-1" style={{ color: 'var(--shopli-orange)' }}>{item.price}</p>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
 
-          {/* FAQ */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-10">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">{t.faq}</h2>
+        {/* Verdict */}
+        <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-6 mb-10 border border-orange-100">
+          <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--shopli-navy)' }}>
+            {rtl ? 'פסק הדין' : 'The Verdict'}
+          </h2>
+          <p className="text-gray-700 leading-relaxed text-sm">{t(c.verdict)}</p>
+        </div>
+
+        {/* FAQ */}
+        {c.faq?.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--shopli-navy)' }}>
+              {rtl ? 'שאלות נפוצות' : 'FAQ'}
+            </h2>
             <div className="space-y-4">
-              {comparison.faq.map((item, i) => {
-                const q = item.q[lang] || item.q.en;
-                const a = item.a[lang] || item.a.en;
-                return (
-                  <div key={i} className="pb-4 border-b last:border-0">
-                    <h3 className="font-semibold text-gray-800 mb-2">{q}</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">{a}</p>
-                  </div>
-                );
-              })}
+              {c.faq.map((item: any, i: number) => (
+                <div key={i} className="pb-4 border-b last:border-0">
+                  <h3 className="font-semibold text-sm text-gray-800 mb-2">{t(item.q)}</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">{t(item.a)}</p>
+                </div>
+              ))}
             </div>
           </div>
+        )}
+      </main>
 
-          {/* Related comparisons */}
-          <div className="mt-12">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">{t.moreComparisons}</h2>
-            <p className="text-gray-500">{t.browseMore}</p>
-          </div>
-        </main>
-
-        <footer className="bg-gray-900 text-gray-400 py-8 mt-12">
-          <div className="max-w-6xl mx-auto px-4 text-center text-sm">
-            <p>{new Date().getFullYear()} Shopli. {t.footerAffiliate}</p>
-          </div>
-        </footer>
-      </div>
-    </div>
+      <footer className="border-t border-gray-100 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-3 text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
+          <div className="font-semibold" style={{ color: 'var(--shopli-navy)' }}>shopli</div>
+          <div>&copy; {new Date().getFullYear()} {rtl ? 'כל הזכויות שמורות' : 'All rights reserved.'}</div>
+        </div>
+      </footer>
+    </>
   );
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const { regions } = await import('../../../lib/regions');
-  const slugs = getAllComparisonSlugs();
-  const paths = regions.flatMap(r => slugs.map(s => ({ params: { region: r.slug, slug: s } })));
-  return { paths, fallback: 'blocking' };
-};
-
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const slug = params?.slug as string;
-  const regionSlug = params?.region as string;
+  const region = (params?.region as string) || 'eu';
+  const config = getRegion(region);
+  const rtl = config.direction === 'rtl';
+
   const comparison = getComparison(slug);
   if (!comparison) return { notFound: true };
 
-  const { getRegionConfig, defaultLangData } = await import('../../../lib/regions');
-  const region = getRegionConfig(regionSlug);
-  if (!region) return { notFound: true };
-
-  const lang = region.lang;
-
-  const langData: Record<string, string> = {
-    home: defaultLangData(region)['home'] || 'Home',
-    comparisons: lang === 'he' ? 'השוואות' : 'Comparisons',
-    backToHome: lang === 'he' ? 'חזרה לדף הבית' : `← Back to ${region.currency} Shopli`,
-    pros: lang === 'he' ? 'יתרונות' : 'Pros',
-    cons: lang === 'he' ? 'חסרונות' : 'Cons',
-    verdict: lang === 'he' ? 'פסק הדין' : 'The Verdict',
-    faq: lang === 'he' ? 'שאלות נפוצות' : 'FAQ',
-    shopProducts: lang === 'he' ? 'קנו מוצרי' : 'Shop',
-    moreComparisons: lang === 'he' ? 'עוד השוואות' : 'More Comparisons',
-    browseMore: lang === 'he' ? 'עיינו במדורי ההשוואות שלנו לעוד תוכן מועיל.' : 'Browse our comparison section for more helpful content.',
-    footerAffiliate: lang === 'he' ? 'אתר שותפים. חלק מהקישורים הם קישורי שותפים.' : 'Affiliate site. Some links are affiliate links.',
-  };
-
-  const { searchAliExpress } = await import('../../../lib/aliexpress');
-
-  let product1Items: any[] = [];
-  let product2Items: any[] = [];
-
+  let prod1Items: any[] = [];
+  let prod2Items: any[] = [];
   try {
+    const { searchAliExpress } = await import('../../../lib/aliexpress');
     const [p1, p2] = await Promise.all([
-      searchAliExpress(comparison.product1.keyword, regionSlug, 4),
-      searchAliExpress(comparison.product2.keyword, regionSlug, 4),
+      searchAliExpress(comparison.product1.keyword, region, 4),
+      searchAliExpress(comparison.product2.keyword, region, 4),
     ]);
-    product1Items = p1 || [];
-    product2Items = p2 || [];
-  } catch (e) {
-    // Products are optional — page still renders without them
-  }
+    prod1Items = p1 || [];
+    prod2Items = p2 || [];
+  } catch {}
 
   return {
-    props: { comparison, region, langData, product1Items, product2Items },
-    revalidate: 3600,
+    props: { region, config, comparison, prod1Items, prod2Items, rtl },
   };
 };

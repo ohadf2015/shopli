@@ -261,9 +261,9 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
-                { slug: 'french-press-vs-drip', titleEn: 'French Press vs Drip Maker', titleHe: 'פרנץ׳ פרס מול פילטר', descEn: 'Which brew method wins?' },
-                { slug: 'resistance-bands-vs-dumbbells', titleEn: 'Bands vs Dumbbells', titleHe: 'רצועות מול משקולות', descEn: 'Best home gym gear' },
-                { slug: 'ring-light-vs-softbox', titleEn: 'Ring Light vs Softbox', titleHe: 'רינג לייט מול סופטבוקס', descEn: 'Perfect lighting choice' },
+                { slug: 'french-press-vs-drip', titleEn: 'French Press vs Drip Maker', titleHe: 'פרנץ׳ פרס מול פילטר', descEn: 'Which brew method wins?', descHe: 'איזו שיטת חליטה עדיפה?' },
+                { slug: 'resistance-bands-vs-dumbbells', titleEn: 'Bands vs Dumbbells', titleHe: 'רצועות מול משקולות', descEn: 'Best home gym gear', descHe: 'איזה ציוד כושר עדיף?' },
+                { slug: 'ring-light-vs-softbox', titleEn: 'Ring Light vs Softbox', titleHe: 'רינג לייט מול סופטבוקס', descEn: 'Perfect lighting choice', descHe: 'בחירת התאורה המושלמת' },
               ].map(c => (
                 <a key={c.slug} href={`/${region}/compare/${c.slug}`}
                   className="p-5 rounded-xl border border-gray-100 hover:border-orange-200 hover:shadow-md transition-all bg-white">

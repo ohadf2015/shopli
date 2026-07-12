@@ -8,9 +8,9 @@ function xmlEncode(s: string): string {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
-  const { getAllCollections } = await import('../../lib/collections');
-  const { getAllMoodboardSlugs } = await import('../../lib/moodboards');
-  const { getAllComparisonSlugs } = await import('../../lib/comparisons');
+  const { getAllCollections } = await import('../lib/collections').catch(() => ({ getAllCollections: () => [] }));
+  const { getAllMoodboardSlugs } = await import('../lib/moodboards').catch(() => ({ getAllMoodboardSlugs: () => [] }));
+  const { getAllComparisonSlugs } = await import('../lib/comparisons').catch(() => ({ getAllComparisonSlugs: () => [] }));
 
   const collectionSlugs = getAllCollections().map(c => c.slug);
   const moodSlugs = getAllMoodboardSlugs();

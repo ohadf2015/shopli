@@ -473,3 +473,7 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
 export function getMoodBoardsByTag(tag: string): MoodBoard[] {
   return Object.values(MOOD_BOARDS).filter(b => b.tags.includes(tag));
 }
+
+export function getAllMoodboardSlugs(): string[] {
+  return Object.keys(MOOD_BOARDS);
+}
