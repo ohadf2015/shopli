@@ -77,6 +77,34 @@ export const COLLECTIONS: CollectionDef[] = [
     desc: { en: 'Desk lamps, LED strips & ambient lights for any space', he: 'מנורות שולחן, פסי לד ותאורת אווירה', fr: 'Lampes de bureau, bandeaux LED', de: 'Schreibtischlampen, LED-Streifen', es: 'Lámparas, tiras LED', it: 'Lampade, strip LED' },
     icon: 'lamp',
   },
+  {
+    slug: 'coffee-ritual',
+    keywords: ['french press stainless steel', 'burr coffee grinder', 'milk frother handheld', 'reusable coffee cup'],
+    name: { en: 'Coffee Ritual', he: 'פולחן קפה', fr: 'Rituel Café', de: 'Kaffeeritual', es: 'Ritual del Café', it: 'Rituale del Caffè' },
+    desc: { en: 'Brew barista-quality coffee at home under €60', he: 'קפה באיכות בריסטה בבית בפחות מ-₪250', fr: 'Café de barista à domicile à moins de 60€', de: 'Barista-Qualität zu Hause unter 60€', es: 'Café de barista en casa por menos de 60€', it: 'Caffè da bar a casa sotto i 60€' },
+    icon: 'chef',
+  },
+  {
+    slug: 'content-creator',
+    keywords: ['wireless lavalier microphone', 'ring light with tripod', 'phone gimbal stabilizer', 'LED ring light 10'],
+    name: { en: 'Content Creator Kit', he: 'ערכת קריאייטיב', fr: 'Kit Créateur', de: 'Creator-Set', es: 'Kit Creador', it: 'Kit Creator' },
+    desc: { en: 'Start recording like a pro with mic, light & gimbal under €80', he: 'להקליט כמו מקצוען עם מיקרופון, תאורה וגימבל בפחות מ-₪350', fr: 'Enregistrez comme un pro avec micro, lumière et gimbal à moins de 80€', de: 'Professionell aufnehmen mit Mikro, Licht & Gimbal unter 80€', es: 'Graba como un pro con mic, luz y gimbal por menos de 80€', it: 'Registra come un pro con microfono, luce e gimbal sotto 80€' },
+    icon: 'camera',
+  },
+  {
+    slug: 'balcony-garden',
+    keywords: ['vertical garden planter', 'grow bag fabric', 'solar drip irrigation', 'self watering plant pot'],
+    name: { en: 'Balcony Garden', he: 'גינת מרפסת', fr: 'Jardin Balcon', de: 'Balkongarten', es: 'Jardín Balcón', it: 'Giardino Balcone' },
+    desc: { en: 'Grow herbs & veggies on your balcony under €40', he: 'לגדל עשבי תיבול במרפסת בפחות מ-₪160', fr: 'Cultivez herbes et légumes sur votre balcon à moins de 40€', de: 'Kräuter & Gemüse auf dem Balkon unter 40€', es: 'Cultiva hierbas y verduras en tu balcón por menos de 40€', it: 'Coltiva erbe e verdure sul balcone sotto 40€' },
+    icon: 'sun',
+  },
+  {
+    slug: 'sleep-sanctuary',
+    keywords: ['silk sleep mask', 'weighted eye pillow', 'aromatherapy diffuser ultrasonic', 'memory foam contour pillow'],
+    name: { en: 'Sleep Sanctuary', he: 'פינת שינה', fr: 'Sanctuaire du Sommeil', de: 'Schlaf-Oase', es: 'Santuario del Sueño', it: 'Santuario del Sonno' },
+    desc: { en: 'Natural sleep aids for better rest under €40', he: 'עזרי שינה טבעיים לשינה טובה יותר בפחות מ-₪150', fr: 'Aides au sommeil naturelles pour mieux dormir à moins de 40€', de: 'Natürliche Schlafhilfen für besseren Schlaf unter 40€', es: 'Ayudas naturales para dormir mejor por menos de 40€', it: 'Aiuti naturali per dormire meglio sotto 40€' },
+    icon: 'moon',
+  },
 ];
 
 export function getAllCollections() {

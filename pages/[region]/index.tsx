@@ -4,7 +4,6 @@ import Header from '../../components/Header';
 import Icon from '../../components/icons';
 import { getRegion, RegionCode } from '../../lib/regions';
 import { getAllCollections } from '../../lib/collections';
-import { searchCollection } from '../../lib/aliexpress';
 import type { RegionConfig } from '../../lib/regions';
 import type { Product } from '../../lib/types';
 
@@ -27,7 +26,8 @@ interface HomePageProps {
 
 async function fetchCollectionProducts(region: string, keywords: string[], limit = 4): Promise<FlatProduct[]> {
   try {
-    return (await searchCollection(region, keywords, limit)) as any;
+    const { searchCollection: sc } = await import('../../lib/aliexpress');
+    return (await sc(region, keywords, limit)) as any;
   } catch { return []; }
 }
 
@@ -221,11 +221,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
 
   const t = (text: Record<string, string>) => text[config.lang] || text.en || '';
 
-  const collections = getAllCollections();
+  const collections = getAllCollections().slice(0, 6);
   const groups: CollectionGroup[] = [];
 
   for (const coll of collections) {
-    const products = await fetchCollectionProducts(region, coll.keywords, 4);
+    const products = await fetchCollectionProducts(region, [coll.keywords[0]], 4);
     if (products.length > 0) {
       groups.push({
         slug: coll.slug,
