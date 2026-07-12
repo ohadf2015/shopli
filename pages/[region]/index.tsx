@@ -4,6 +4,7 @@ import Header from '../../components/Header';
 import Icon from '../../components/icons';
 import { getRegion, RegionCode } from '../../lib/regions';
 import { getAllCollections } from '../../lib/collections';
+import { searchCollection } from '../../lib/aliexpress';
 import type { RegionConfig } from '../../lib/regions';
 import type { Product } from '../../lib/types';
 
@@ -25,7 +26,6 @@ interface HomePageProps {
 }
 
 async function fetchCollectionProducts(region: string, keywords: string[], limit = 4): Promise<FlatProduct[]> {
-  const { searchCollection } = await import('../../lib/aliexpress');
   try {
     return (await searchCollection(region, keywords, limit)) as any;
   } catch { return []; }

@@ -6,6 +6,7 @@ import { getRegion, RegionCode } from '../../../lib/regions';
 import { getAllCollections, getCollection } from '../../../lib/collections';
 import { COLLECTION_CONTENT, CollectionContent } from '../../../lib/collection-content';
 import type { RegionConfig } from '../../../lib/regions';
+import { searchCollection } from '../../../lib/aliexpress';
 
 interface SectionProducts {
   heading: string;
@@ -24,7 +25,6 @@ interface PageProps {
 }
 
 async function searchProducts(region: string, keywords: string[], limit = 4): Promise<any[]> {
-  const { searchCollection } = await import('../../../lib/aliexpress');
   try {
     return await searchCollection(region, keywords, limit);
   } catch { return []; }
