@@ -11,10 +11,12 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   const { getAllCollections } = await import('../lib/collections').catch(() => ({ getAllCollections: () => [] }));
   const { getAllMoodboardSlugs } = await import('../lib/moodboards').catch(() => ({ getAllMoodboardSlugs: () => [] }));
   const { getAllComparisonSlugs } = await import('../lib/comparisons').catch(() => ({ getAllComparisonSlugs: () => [] }));
+  const { getAllBlogSlugs } = await import('../lib/blog').catch(() => ({ getAllBlogSlugs: () => [] }));
 
   const collectionSlugs = getAllCollections().map(c => c.slug);
   const moodSlugs = getAllMoodboardSlugs();
   const compareSlugs = getAllComparisonSlugs();
+  const blogSlugs = getAllBlogSlugs();
 
   const urls: string[] = [];
 
@@ -41,6 +43,13 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   for (const region of REGIONS) {
     for (const slug of compareSlugs) {
       urls.push(`/${region}/compare/${slug}`);
+    }
+  }
+
+  // Blog posts
+  for (const region of REGIONS) {
+    for (const slug of blogSlugs) {
+      urls.push(`/${region}/blog/${slug}`);
     }
   }
 
