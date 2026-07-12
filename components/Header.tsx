@@ -49,7 +49,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             {rtl ? 'בית' : 'Home'}
           </Link>
           <Link
-            href={`/${currentRegion}/categories`}
+            href={`/${currentRegion}/collection/home-gym`}
             className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors"
             style={{ color: 'var(--shopli-navy)' }}
           >
@@ -133,7 +133,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             {rtl ? 'בית' : 'Home'}
           </Link>
           <Link
-            href={`/${currentRegion}/categories`}
+            href={`/${currentRegion}/collection/home-gym`}
             className="block px-3 py-2.5 rounded-lg font-medium text-sm hover:bg-gray-100"
             onClick={() => setMenuOpen(false)}
           >

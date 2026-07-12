@@ -63,7 +63,7 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
               {heroDesc}
             </p>
             <div className="flex flex-wrap gap-3">
-              <a href={`/${region}/deals`} className="btn-primary">
+              <a href={`/${region}/collection/home-gym`} className="btn-primary">
                 <Icon name="tag" size={16} />
                 {rtl ? 'כל המבצעים' : 'Browse All Deals'}
               </a>
