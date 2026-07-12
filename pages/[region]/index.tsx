@@ -24,22 +24,11 @@ interface HomePageProps {
   rtl: boolean;
 }
 
-const SEARCH_URL = (region: string) =>
-  `https://shopli-neon.vercel.app/api/products/search?region=${region}&limit=4`;
-
 async function fetchCollectionProducts(region: string, keywords: string[], limit = 4): Promise<FlatProduct[]> {
-  const all: FlatProduct[] = [];
-  for (const kw of keywords.slice(0, 3)) {
-    try {
-      const url = `${SEARCH_URL(region)}&q=${encodeURIComponent(kw)}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      if (data.products?.length) {
-        all.push(...data.products.slice(0, Math.ceil(limit / keywords.length)));
-      }
-    } catch { /* ignore */ }
-  }
-  return all.slice(0, limit);
+  const { searchCollection } = await import('../../lib/aliexpress');
+  try {
+    return (await searchCollection(region, keywords, limit)) as any;
+  } catch { return []; }
 }
 
 export default function HomePage({ region, config, groups, rtl }: HomePageProps) {
