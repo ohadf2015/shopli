@@ -92,7 +92,7 @@ export async function searchAliExpress(keywords: string, region: string, pageSiz
     categoryPath: (p.first_level_category_name || '') + ' > ' + (p.second_level_category_name || ''),
     shopName: p.shop_name || '',
     shopId: String(p.shop_id || ''),
-    discount: p.discount || '',
+    discount: p.discount && !p.discount.startsWith('0') ? p.discount : '',
     commissionRate: parseFloat(String(p.commission_rate || '0').replace('%', '')),
     freeShipping: false,
   }));
