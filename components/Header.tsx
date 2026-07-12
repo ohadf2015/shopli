@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Icon from './icons';
 import { ALL_REGIONS, getRegion, RegionCode } from '../lib/regions';
 
-export default function Header({ currentRegion }: { currentRegion: RegionCode }) {
+export default function Header({ currentRegion, dir }: { currentRegion: RegionCode; dir?: string }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [regionOpen, setRegionOpen] = useState(false);
   const regionRef = useRef<HTMLDivElement>(null);

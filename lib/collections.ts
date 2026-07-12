@@ -1,232 +1,86 @@
-export interface CollectionTheme {
-  id: string;
+export interface CollectionDef {
   slug: string;
-  name: Record<string, string>; // locale -> name
-  description: Record<string, string>;
-  image: string;
-  searches: string[];          // keywords to search
-  style: 'essentials' | 'outfit' | 'setup' | 'kit' | 'comparison';
+  keywords: string[];
+  name: Record<string, string>;
+  desc: Record<string, string>;
+  icon: string;
 }
 
-// Curated collections — these are the *actual* product, not a generic feed
-export const COLLECTIONS: CollectionTheme[] = [
-  // ===== ENSEMBLES / OUTFITS =====
+export const COLLECTIONS: CollectionDef[] = [
   {
-    id: 'halloween-costume',
-    slug: 'halloween-costume',
-    name: {
-      en: 'Halloween Costume Builder',
-      he: 'בנה תחפושת ליל כל הקדושים',
-      fr: 'Ensemble Costume Halloween',
-      de: 'Halloween-Kostüm-Bausatz',
-      es: 'Disfraz de Halloween Completo',
-      it: 'Costume di Halloween Completo',
-    },
-    description: {
-      en: 'Complete Halloween look — costume, wig, accessories, and makeup all in one place',
-      he: 'מראה שלם לליל כל הקדושים — תחפושת, פאה, אביזרים ואיפור במקום אחד',
-      fr: 'Look Halloween complet — costume, perruque, accessoires et maquillage en un seul endroit',
-      de: 'Kompletter Halloween-Look — Kostüm, Perücke, Accessoires und Make-up an einem Ort',
-      es: 'Look completo de Halloween — disfraz, peluca, accesorios y maquillaje en un solo lugar',
-      it: 'Look Halloween completo — costume, parrucca, accessori e trucco in un unico posto',
-    },
-    image: 'halloween',
-    searches: ['halloween costume', 'cosplay wig', 'halloween makeup', 'halloween accessories'],
-    style: 'outfit',
+    slug: 'halloween',
+    keywords: ['halloween costume', 'cosplay wig', 'halloween accessories', 'halloween makeup'],
+    name: { en: 'Halloween Costumes', he: 'תחפושות ליל כל הקדושים', fr: 'Costumes Halloween', de: 'Halloween Kostüme', es: 'Disfraces Halloween', it: 'Costumi Halloween' },
+    desc: { en: 'Complete your look — costume, wig, makeup & accessories', he: 'תחפושת שלמה עם פאה, איפור ואביזרים', fr: 'Look Halloween complet — costume, perruque, maquillage', de: 'Kompletter Look — Kostüm, Perücke, Make-up', es: 'Look completo — disfraz, peluca, maquillaje', it: 'Look completo — costume, parrucca, trucco' },
+    icon: 'mask',
   },
   {
-    id: 'fitness-outfit',
-    slug: 'fitness-outfit',
-    name: {
-      en: 'Home Gym Essentials',
-      he: 'ציוד כושר לבית',
-      fr: 'Équipement de Sport à Domicile',
-      de: 'Fitnessausrüstung für Zuhause',
-      es: 'Equipo de Gimnasio en Casa',
-      it: 'Attrezzatura da Palestra a Casa',
-    },
-    description: {
-      en: 'Everything you need for a home gym — from resistance bands to yoga mats to smart jump ropes',
-      he: 'כל מה שצריך לחדר כושר ביתי — מרצועות התנגדות ועד מזרני יוגה',
-      fr: 'Tout ce qu\'il faut pour une salle de sport à la maison',
-      de: 'Alles für Ihr Heim-Fitnessstudio',
-    },
-    image: 'fitness',
-    searches: ['fitness resistance bands', 'yoga mat', 'home gym equipment', 'jump rope smart'],
-    style: 'essentials',
+    slug: 'home-gym',
+    keywords: ['fitness resistance bands', 'yoga mat', 'home gym equipment', 'jump rope'],
+    name: { en: 'Home Gym', he: 'חדר כושר ביתי', fr: 'Salle de Sport', de: 'Heim-Fitness', es: 'Gimnasio en Casa', it: 'Palestra in Casa' },
+    desc: { en: 'Resistance bands, yoga mats & gear for your home workouts', he: 'רצועות התנגדות, מזרני יוגה ועוד לאימון ביתי', fr: 'Élastiques, tapis de yoga et équipement pour chez vous', de: 'Widerstandsbänder, Yogamatten & mehr', es: 'Bandas, tapetes y equipo para tu casa', it: 'Fascia, tappetino e attrezzatura per casa' },
+    icon: 'run',
   },
   {
-    id: 'home-office',
     slug: 'home-office',
-    name: {
-      en: 'Home Office Power Setup',
-      he: 'משימה ביתית — הסטודיו המושלם',
-      fr: 'Set Up Bureau à Domicile',
-      de: 'Home-Office-Komplettlösung',
-      es: 'Setup de Oficina en Casa',
-      it: 'Configurazione Ufficio a Casa',
-    },
-    description: {
-      en: 'Ergonomic desk, cable management, monitor stand — build a workspace you actually enjoy',
-      he: 'שולחן ארגונומי, ניהול כבלים, מעמד למסך — בנה מרחב עבודה שכיף להיות בו',
-      fr: 'Bureau ergonomique, gestion des câbles, support d\'écran',
-      de: 'Ergonomischer Schreibtisch, Kabelmanagement, Monitorständer',
-    },
-    image: 'desk',
-    searches: ['desk lamp LED', 'cable management desk', 'monitor stand', 'desk organizer', 'wireless charging pad', 'ergonomic wrist rest'],
-    style: 'setup',
+    keywords: ['desk lamp LED', 'cable management desk', 'monitor stand', 'desk organizer', 'wireless charging pad'],
+    name: { en: 'Desk Setup', he: 'משימה ביתית', fr: 'Bureau Domicile', de: 'Schreibtisch-Setup', es: 'Setup de Escritorio', it: 'Set up Scrivania' },
+    desc: { en: 'Ergonomic desk gear, cable management & lighting', he: 'ציוד ארגונומי, ניהול כבלים ותאורה', fr: 'Équipement ergonomique, gestion des câbles', de: 'Ergonomisch, Kabelmanagement & Beleuchtung', es: 'Equipo ergonómico, gestión de cables', it: 'Attrezzatura ergonomica, gestione cavi' },
+    icon: 'monitor',
   },
   {
-    id: 'kitchen-essentials',
-    slug: 'kitchen-essentials',
-    name: {
-      en: 'Smart Kitchen Kit',
-      he: 'מטבח חכם — כלי עבודה',
-      fr: 'Cuisine Intelligente',
-      de: 'Smarte Küchenhelfer',
-      es: 'Cocina Inteligente',
-      it: 'Cucina Intelligente',
-    },
-    description: {
-      en: 'Gadgets that actually make cooking better — garlic presses, peelers, organizers, and more under €10',
-      he: 'גאדג\'טים שבאמת משפרים את הבישול — מוציאי שום, קולפנים, מארגנים ועוד בלי לשבור חסכון',
-      fr: 'Des gadgets qui améliorent vraiment la cuisine',
-      de: 'Gadgets, die das Kochen wirklich besser machen',
-    },
-    image: 'kitchen',
-    searches: ['kitchen gadgets vegetable', 'garlic press', 'kitchen organizer', 'fruit peeler'],
-    style: 'essentials',
+    slug: 'smart-home',
+    keywords: ['Tuya smart plug EU', 'wireless doorbell', 'smart sensor WiFi', 'smart LED strip'],
+    name: { en: 'Smart Home', he: 'בית חכם', fr: 'Maison Connectée', de: 'Smart Home', es: 'Hogar Inteligente', it: 'Casa Intelligente' },
+    desc: { en: 'WiFi plugs, sensors & smart lighting to automate your home', he: 'שקעי WiFi, חיישנים ותאורה חכמה', fr: 'Prises WiFi, capteurs, éclairage connecté', de: 'WLAN-Steckdosen, Sensoren, smarte Beleuchtung', es: 'Enchufes WiFi, sensores, iluminación', it: 'Prese WiFi, sensori, illuminazione smart' },
+    icon: 'bulb',
   },
   {
-    id: 'smart-home-starter',
-    slug: 'smart-home-starter',
-    name: {
-      en: 'Smart Home Starter Pack',
-      he: 'ערכת בית חכם למתחילים',
-      fr: 'Pack Maison Connectée',
-      de: 'Smart-Home-Einsteigerpaket',
-      es: 'Pack Hogar Inteligente',
-      it: 'Pacchetto Casa Intelligente',
-    },
-    description: {
-      en: 'Start your smart home — WiFi plugs, doorbells, sensors, all under €30 total',
-      he: 'התחל בית חכם — שקעי WiFi, פעמון דלת, חיישנים — הכל בפחות מ-₪100',
-      fr: 'Démarrez votre maison connectée',
-      de: 'Starten Sie Ihr Smart Home',
-    },
-    image: 'smarthome',
-    searches: ['Tuya smart plug EU', 'wireless doorbell', 'smart sensor WiFi', 'smart LED strip'],
-    style: 'kit',
+    slug: 'kitchen',
+    keywords: ['kitchen gadgets', 'garlic press', 'kitchen organizer', 'fruit peeler'],
+    name: { en: 'Kitchen Gadgets', he: 'גאדג\'טים למטבח', fr: 'Gadgets Cuisine', de: 'Küchenhelfer', es: 'Gadgets de Cocina', it: 'Gadget da Cucina' },
+    desc: { en: 'Smart tools under €10 that actually improve your cooking', he: 'כלי מטבח חכמים בפחות מ-₪40', fr: 'Outils malins à moins de 10€', de: 'Clevere Helfer unter 10€', es: 'Herramientas inteligentes por menos de 10€', it: 'Strumenti intelligenti sotto i 10€' },
+    icon: 'chef',
   },
   {
-    id: 'travel-kit',
-    slug: 'travel-kit',
-    name: {
-      en: 'Smart Travel Kit',
-      he: 'ערכת טיולים חכמה',
-      fr: 'Kit Voyage Malin',
-      de: 'Smartes Reiseset',
-      es: 'Kit de Viaje Inteligente',
-      it: 'Kit da Viaggio Intelligente',
-    },
-    description: {
-      en: 'Packing cubes, travel adapters, portable charger, and everything else for stress-free trips',
-      he: 'קוביות אריזה, מתאם נסיעות, מטען נייד ועוד — לטיול בלי דאגות',
-      fr: 'Cubes de rangement, adaptateur voyage, chargeur portable',
-      de: 'Packwürfel, Reiseadapter, Powerbank',
-    },
-    image: 'travel',
-    searches: ['travel adapter universal', 'packing cubes', 'portable charger 20000mAh', 'travel organizer'],
-    style: 'kit',
+    slug: 'travel',
+    keywords: ['travel adapter universal', 'packing cubes', 'portable charger', 'travel organizer'],
+    name: { en: 'Travel Kit', he: 'ערכת טיולים', fr: 'Kit Voyage', de: 'Reiseset', es: 'Kit de Viaje', it: 'Kit da Viaggio' },
+    desc: { en: 'Packing cubes, adapters & chargers for stress-free trips', he: 'קוביות אריזה, מתאמים ומטענים לטיול', fr: 'Cubes, adaptateurs et chargeurs pour voyager', de: 'Packwürfel, Adapter & Ladegeräte', es: 'Cubos, adaptadores y cargadores', it: 'Cubi, adattatori e caricabatterie' },
+    icon: 'plane',
   },
   {
-    id: 'camping-gear',
-    slug: 'camping-gear',
-    name: {
-      en: 'Camping Kit Under €50',
-      he: 'ציוד קמפינג בפחות מ-₪200',
-      fr: 'Kit Camping à Moins de 50€',
-      de: 'Camping-Set unter 50€',
-      es: 'Kit de Camping por menos de 50€',
-      it: 'Kit da Campeggio sotto i 50€',
-    },
-    description: {
-      en: 'Portable tent, sleeping bag, camping fan, headlamp — everything you need for a night under the stars',
-      he: 'אוהל נייד, שק שינה, מאוורר קמפינג, פנס ראש — כל מה שצריך ללילה תחת הכוכבים',
-      fr: 'Tente portable, sac de couchage, ventilateur de camping',
-      de: 'Tragbares Zelt, Schlafsack, Campingventilator',
-    },
-    image: 'camping',
-    searches: ['camping tent 2 person', 'sleeping bag portable', 'camping fan', 'headlamp rechargeable'],
-    style: 'kit',
+    slug: 'camping',
+    keywords: ['camping tent 2 person', 'sleeping bag portable', 'camping fan', 'headlamp rechargeable'],
+    name: { en: 'Camping Gear', he: 'ציוד קמפינג', fr: 'Camping', de: 'Camping-Ausrüstung', es: 'Equipo de Camping', it: 'Attrezzatura da Campeggio' },
+    desc: { en: 'Tent, sleeping bag & essentials for under the stars', he: 'אוהל, שק שינה ועוד ללילה תחת הכוכבים', fr: 'Tente, sac de couchage pour la belle étoile', de: 'Zelt, Schlafsack für unter dem Sternenhimmel', es: 'Tienda, saco de dormir', it: 'Tenda, sacco a pelo' },
+    icon: 'tent',
   },
   {
-    id: 'car-accessories',
-    slug: 'car-accessories',
-    name: {
-      en: 'Car Gadgets Under €10',
-      he: 'גאדג\'טים לרכב בפחות מ-₪40',
-      fr: 'Gadgets Auto à Moins de 10€',
-      de: 'Auto-Gadgets unter 10€',
-      es: 'Gadgets para Coche por menos de 10€',
-      it: 'Gadget per Auto sotto i 10€',
-    },
-    description: {
-      en: 'Phone holder, cleaning kit, trunk organizer — small upgrades that make a huge difference',
-      he: 'מחזיק פלאפון, ערכת ניקוי, מארגן תא מטען',
-      fr: 'Support téléphone, kit nettoyage, organiseur de coffre',
-    },
-    image: 'car',
-    searches: ['car phone holder', 'microfiber cleaning cloth car', 'car trunk organizer', 'car interior cleaner'],
-    style: 'essentials',
+    slug: 'pet',
+    keywords: ['dog leash strong', 'cat toy interactive', 'pet grooming brush', 'dog poop bags'],
+    name: { en: 'Pet Care', he: 'חיות מחמד', fr: 'Animaux', de: 'Haustiere', es: 'Mascotas', it: 'Animali Domestici' },
+    desc: { en: 'Leashes, toys & grooming tools for your furry friend', he: 'רצועות, צעצועים וכלי טיפוח', fr: 'Laisse, jouets et outils de toilettage', de: 'Leinen, Spielzeug & Pflegewerkzeuge', es: 'Correas, juguetes y herramientas', it: 'Guinzagli, giocattoli e strumenti' },
+    icon: 'paw',
   },
   {
-    id: 'pet-essentials',
-    slug: 'pet-essentials',
-    name: {
-      en: 'Pet Care Essentials',
-      he: 'ציוד לחיות מחמד',
-      fr: 'Essentiels pour Animaux',
-      de: 'Haustier-Zubehör',
-      es: 'Esenciales para Mascotas',
-      it: 'Essenziali per Animali Domestici',
-    },
-    description: {
-      en: 'Leashes, toys, grooming tools, and poop bags — everything your furry friend needs',
-      he: 'רצועות, צעצועים, כלי טיפוח',
-    },
-    image: 'pet',
-    searches: ['dog leash strong', 'cat toy interactive', 'pet grooming brush', 'dog poop bags'],
-    style: 'essentials',
+    slug: 'car',
+    keywords: ['car phone holder', 'car trunk organizer', 'microfiber cleaning cloth car', 'car accessories interior'],
+    name: { en: 'Car Gadgets', he: 'גאדג\'טים לרכב', fr: 'Gadgets Auto', de: 'Auto Zubehör', es: 'Accesorios Coche', it: 'Accessori Auto' },
+    desc: { en: 'Phone mounts, organizers & cleaning kits under €15', he: 'מחזיקים, מארגנים וערכות ניקוי בפחות מ-₪60', fr: 'Supports, organiseurs et kits nettoyage', de: 'Halte, Organizer & Reinigungskits', es: 'Soportes, organizadores y kits', it: 'Supporti, organizer e kit pulizia' },
+    icon: 'car',
   },
   {
-    id: 'desk-lighting',
-    slug: 'desk-lighting',
-    name: {
-      en: 'Desk Lighting & Ambience',
-      he: 'תאורה אווירה לשולחן',
-      fr: 'Éclairage de Bureau',
-      de: 'Schreibtischbeleuchtung',
-      es: 'Iluminación de Escritorio',
-      it: 'Illuminazione da Scrivania',
-    },
-    description: {
-      en: 'LED desk lamps, smart light strips, monitor backlights — set the perfect mood for work or gaming',
-      he: 'מנורות לד, פסי תאורה חכמים, תאורה אחורית למסך',
-    },
-    image: 'lighting',
-    searches: ['LED desk lamp USB', 'monitor backlight LED', 'smart LED light strip', 'ambient light bedroom'],
-    style: 'essentials',
+    slug: 'lighting',
+    keywords: ['LED desk lamp USB', 'monitor backlight LED', 'smart LED light strip', 'ambient light bedroom'],
+    name: { en: 'Lighting', he: 'תאורה', fr: 'Éclairage', de: 'Beleuchtung', es: 'Iluminación', it: 'Illuminazione' },
+    desc: { en: 'Desk lamps, LED strips & ambient lights for any space', he: 'מנורות שולחן, פסי לד ותאורת אווירה', fr: 'Lampes de bureau, bandeaux LED', de: 'Schreibtischlampen, LED-Streifen', es: 'Lámparas, tiras LED', it: 'Lampade, strip LED' },
+    icon: 'lamp',
   },
 ];
 
-export function getCollections(locale: string) {
-  return COLLECTIONS.map(c => ({
-    ...c,
-    name: c.name[locale] || c.name.en,
-    description: c.description[locale] || c.description.en,
-    searchQueries: c.searches,
-  }));
+export function getAllCollections() {
+  return COLLECTIONS;
 }
 
 export function getCollection(slug: string) {
