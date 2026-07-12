@@ -446,9 +446,10 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
     totalEstimate: { en: 'Full kit: ~€15-25', he: 'ערכה מלאה: ~₪60-100' },
   },
 
+
   'home-gym-pro': {
     slug: 'home-gym-pro',
-    metaTitle: { en: 'Home Gym Pro: Serious Workout Setup Under €80', he: 'חדר כופר ביתי מקצועי: מתקדם בפחות מ-₪320' },
+    metaTitle: { en: 'Home Gym Pro: Serious Workout Setup Under €80', he: 'חדר כושר ביתי מקצועי: מתקדם בפחות מ-₪320' },
     metaDesc: { en: 'Level up your home gym: adjustable dumbbells, pull-up bar, battle ropes, ab roller, foam roller, and jump rope pro.', he: 'לשדרג את חדר הכושר הביתי: משקולות מתכווננות, מוט מתח, חבלי קרב, גלגל בטן, רולר וחבל קפיצה מקצועי.' },
     h1: { en: 'Serious Home Gym Setup Under €80', he: 'חדר כושר ביתי רציני בפחות מ-₪320' },
     intro: { en: 'You do not need a gym membership to get in great shape. Adjustable dumbbells, a pull-up bar, and battle ropes give you a full-body workout in your living room.', he: 'לא צריך מנוי לחדר כושר כדי להיות בכושר מעולה. משקולות מתכווננות, מוט מתח וחבלי קרב נותנים אימון גוף מלא בסלון.' },
@@ -464,9 +465,67 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
     totalEstimate: { en: 'Full setup: ~€50-80', he: 'ציוד מלא: ~₪200-320' },
   },
 
+// ====== NEW: KITCHEN, NURSERY, CRAFT ROOM ======
 
+  'kitchen-makeover': {
+    slug: 'kitchen-makeover',
+    metaTitle: { en: 'Kitchen Makeover: Functional & Beautiful Under €50', he: 'מהפך מטבח: פונקציונלי ויפה בפחות מ-₪200' },
+    metaDesc: { en: 'Upgrade your kitchen: magnetic knife strip, spice jars, utensil crock, cutting board, countertop organizer & dish rack.', he: 'לשדרג את המטבח: פס מגנטי לסכינים, צנצנות תבלינים, כלי כפות, קרש חיתוך, מארגן משטח ומתקן ייבוש.' },
+    h1: { en: 'Kitchen Makeover: Beautiful & Functional Under €50', he: 'מהפך מטבח: יפה ופונקציונלי בפחות מ-₪200' },
+    intro: { en: 'A great kitchen is organized, efficient, and a joy to cook in. Magnetic strips, uniform jars, and smart storage transform any kitchen — rental or owned.', he: 'מטבח מעולה הוא מסודר, יעיל וכיף לבשל בו. פסים מגנטיים, צנצנות אחידות ואחסון חכם משנים כל מטבח — שכור או בבעלות.' },
+    tags: ['room-design', 'kitchen', 'organization'],
+    items: [
+      { keywords: ['magnetic knife strip', 'magnetic knife holder wall'], caption: { en: 'Magnetic Knife Strip', he: 'פס מגנטי לסכינים' } },
+      { keywords: ['spice jar set uniform', 'glass spice jars labels'], caption: { en: 'Uniform Spice Jars (12-16pk)', he: 'צנצנות תבלינים אחידות (12-16)' } },
+      { keywords: ['utensil crock ceramic', 'kitchen utensil holder'], caption: { en: 'Utensil Crock / Holder', he: 'כלי כפות / מארגן' } },
+      { keywords: ['cutting board bamboo', 'large chopping board'], caption: { en: 'Large Bamboo Cutting Board', he: 'קרש חיתוך במבוק גדול' } },
+      { keywords: ['countertop organizer', 'kitchen shelf tiered'], caption: { en: 'Tiered Countertop Organizer', he: 'מארגן משטח מדורג' } },
+      { keywords: ['dish drying rack', 'foldable dish drainer'], caption: { en: 'Foldable Dish Drying Rack', he: 'מתקן ייבוש כלים מתקפל' } },
+    ],
+    totalEstimate: { en: 'Full makeover: ~€35-50', he: 'מהפך מלא: ~₪140-200' },
+  },
 
-};export function getMoodBoard(slug: string): MoodBoard | undefined {
+  'nursery-room': {
+    slug: 'nursery-room',
+    metaTitle: { en: 'Nursery Room Setup: Sweet Baby Space Under €60', he: 'עיצוב חדר תינוקות: חלל מתוק לקטנטנים בפחות מ-₪240' },
+    metaDesc: { en: 'Everything for a cozy nursery: crib mobile, night light, sound machine, storage baskets, changing caddy & wall decals.', he: 'כל מה שצריך לחדר תינוקות נעים: מובייל לעריסה, מנורת לילה, מכונת צליל, סלי אחסון, תיק החתלה ומדבקות קיר.' },
+    h1: { en: 'Nursery Room: Sweet & Practical Under €60', he: 'חדר תינוקות: מתוק ופרקטי בפחות מ-₪240' },
+    intro: { en: 'Designing a nursery is about calm, safety, and functionality. Soft lighting, gentle sounds, and smart storage create a space both baby and parents love.', he: 'עיצוב חדר תינוקות זה רוגע, בטיחות ופונקציונליות. תאורה רכה, צלילים עדינים ואחסון חכם יוצרים חלל שאהבים גם התינוק וגם ההורים.' },
+    tags: ['room-design', 'nursery', 'baby'],
+    items: [
+      { keywords: ['baby crib mobile', 'musical mobile crib'], caption: { en: 'Crib Mobile (Musical)', he: 'מובייל מוזיקלי לעריסה' } },
+      { keywords: ['baby night light', 'nursery night lamp'], caption: { en: 'Soft Night Light', he: 'מנורת לילה רכה' } },
+      { keywords: ['white noise machine baby', 'sound machine nursery'], caption: { en: 'White Noise / Sound Machine', he: 'מכונת צליל / רעש לבן' } },
+      { keywords: ['nursery storage baskets', 'fabric storage bins'], caption: { en: 'Fabric Storage Baskets (3pk)', he: 'סלי אחסון מבד (3 יחידות)' } },
+      { keywords: ['diaper caddy organizer', 'changing table organizer'], caption: { en: 'Diaper Changing Caddy', he: 'מארגן החתלה' } },
+      { keywords: ['wall decals nursery', 'removable wall stickers'], caption: { en: 'Removable Wall Decals', he: 'מדבקות קיר ניתנות להסרה' } },
+    ],
+    totalEstimate: { en: 'Full nursery: ~€40-60', he: 'חדר שלם: ~₪160-240' },
+    faq: [
+      { q: { en: 'When should I set up the nursery?', he: 'מתי להקים את החדר?' }, a: { en: 'Most parents set up 2-3 months before due date. Gives time to air out any new furniture.', he: 'רוב ההורים מקימים 2-3 חודשים לפני הלידה. נותן זמן לאוורר רהיטים חדשים.' } },
+    ],
+  },
+
+  'craft-room': {
+    slug: 'craft-room',
+    metaTitle: { en: 'Craft Room Organization: Creative Studio Under €50', he: 'חדר יצירה מאורגן: סטודיו יצירתי בפחות מ-₪200' },
+    metaDesc: { en: 'Organize your craft space: pegboard wall, thread organizer, ribbon dispenser, paper storage, label maker & rolling cart.', he: 'לארגן את חדר היצירה: לוח פגבורד, מארגן חוטים, מתקן סרטים, אחסון נייר, מכונת תוויות ועגלה ניידת.' },
+    h1: { en: 'Dream Craft Room Organization Under €70', he: 'חדר יצירה מאורגן בפחות מ-₪280' },
+    intro: { en: 'A well-organized craft space lets you focus on creating instead of hunting for supplies. Pegboard walls, dedicated organizers for thread/ribbon/paper, a label maker, and a mobile cart keep everything visible and accessible.', he: 'חדר יצירה מאורגן נותן לכם להתמקד ביצירה במקום בחיפוש חומרים. קירות פגבורד, מארגנים ייעודיים לחוטים/סרטים/נייר, מכונת תוויות ועגלה ניידת שומרים הכל גלוי ונגיש.' },
+    tags: ['craft', 'organization', 'room-design'],
+    items: [
+      { keywords: ['pegboard wall organizer', 'tool pegboard panel'], caption: { en: 'Pegboard Wall Organizer', he: 'לוח פגבורד לקיר' } },
+      { keywords: ['thread organizer rack', 'embroidery floss organizer'], caption: { en: 'Thread / Floss Organizer', he: 'מארגן חוטים / פלוס' } },
+      { keywords: ['ribbon dispenser organizer', 'ribbon storage box'], caption: { en: 'Ribbon Dispenser Box', he: 'מתקן סרטים' } },
+      { keywords: ['paper storage vertical', 'scrapbook paper organizer'], caption: { en: 'Vertical Paper Storage', he: 'אחסון נייר אנכי' } },
+      { keywords: ['label maker portable', 'thermal label printer'], caption: { en: 'Portable Label Maker', he: 'מכונת תוויות ניידת' } },
+      { keywords: ['rolling cart 3 tier', 'utility cart craft room'], caption: { en: '3-Tier Rolling Cart', he: 'עגלה ניידת 3 מדפים' } },
+    ],
+    totalEstimate: { en: 'Full craft room: ~€40-70', he: 'חדר מלא: ~₪160-280' },
+  },
+
+};
+export function getMoodBoard(slug: string): MoodBoard | undefined {
   return MOOD_BOARDS[slug];
 }
 
