@@ -52,12 +52,27 @@ export default function CollectionPage({ region, config, collection, content, se
                   {section.products.slice(0, 4).map((p: any) => (
                     <a key={p.id} href={p.affiliateLink} target="_blank" rel="noopener noreferrer sponsored"
                       className="bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md">
-                      <div className="aspect-square bg-gray-100 overflow-hidden">
+                      <div className="aspect-square bg-gray-100 overflow-hidden relative">
                         {p.imageUrl ? <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover" loading="lazy" /> : <div className="w-full h-full flex items-center justify-center"><Icon name="package" size={24} /></div>}
+                        {p.discount && (
+                          <span className="absolute top-1 right-1 text-[9px] font-bold px-1.5 py-0.5 rounded"
+                            style={{ background: 'oklch(65% 0.2 45)', color: 'white' }}
+                          >{p.discount}</span>
+                        )}
                       </div>
                       <div className="p-2">
                         <div className="text-xs font-semibold leading-tight line-clamp-2 mb-1" style={{ color: 'var(--shopli-navy)' }}>{p.title}</div>
-                        <div className="font-bold text-xs" style={{ color: 'var(--shopli-teal)' }}>{config?.currencySymbol || '€'}{p.price?.toFixed(2)}</div>
+                        <div className="flex items-baseline gap-1 mb-0.5">
+                          <span className="font-bold text-xs" style={{ color: 'var(--shopli-teal)' }}>{config?.currencySymbol || '€'}{p.price?.toFixed(2)}</span>
+                          {p.originalPrice && p.originalPrice > p.price && (
+                            <span className="text-[9px] line-through" style={{ color: 'var(--shopli-warm-gray)' }}>{config?.currencySymbol || '€'}{p.originalPrice.toFixed(2)}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-[9px]" style={{ color: 'var(--shopli-warm-gray)' }}>
+                            {p.rating >= 90 ? '★' : ''}{p.volume > 0 ? ` ${p.volume > 1000 ? (p.volume/1000).toFixed(1) + 'k' : p.volume} sold` : ''}
+                          </span>
+                        </div>
                       </div>
                     </a>
                   ))}

@@ -12,6 +12,7 @@ export interface Product {
   commissionRate: number;
   rating: number;
   reviewCount: number;
+  volume: number;
   tags: string[];
   category: string;
   region: string;

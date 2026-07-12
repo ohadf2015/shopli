@@ -134,6 +134,11 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
                         <span className="text-[0.65rem] font-medium" style={{ color: 'var(--shopli-warm-gray)' }}>
                           {product.rating}
                         </span>
+                        {product.volume > 0 && (
+                          <span className="text-[0.6rem]" style={{ color: 'var(--shopli-warm-gray)' }}>
+                            {product.volume > 999 ? `${(product.volume / 1000).toFixed(1)}k` : product.volume}sold
+                          </span>
+                        )}
                         {product.reviewCount > 0 && (
                           <span className="text-[0.6rem]" style={{ color: 'var(--shopli-warm-gray)' }}>
                             ({product.reviewCount > 999 ? `${(product.reviewCount / 1000).toFixed(1)}k` : product.reviewCount})

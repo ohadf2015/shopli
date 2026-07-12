@@ -5,8 +5,13 @@ import Icon from '../../../components/icons';
 import { getRegion } from '../../../lib/regions';
 import { getMoodBoard, getMoodBoardsByTag } from '../../../lib/moodboards';
 
-interface Product { id: string; title: string; price: number; currency: string; imageUrl: string; affiliateLink: string; rating: number; }
+interface Product { id: string; title: string; price: number; originalPrice: number | null; currency: string; imageUrl: string; affiliateLink: string; rating: number; reviewCount: number; volume: number; shopName: string; discount: string; }
 interface ItemGroup { caption: string; note: string; products: Product[]; }
+
+function Stars({ rating, size = 10 }: { rating: number; size?: number }) {
+  const full = Math.round(rating / 20);
+  return <span style={{ color: 'oklch(70% 0.15 70)' }}>{'★'.repeat(Math.max(0, full))}{'☆'.repeat(Math.max(0, 5 - full))}</span>;
+}
 
 export default function MoodPage({ region, config, board, itemGroups, related, rtl, error }: any) {
   if (error) return <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>Error: {error}</div>;
@@ -94,7 +99,7 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
                 {group.products.slice(0, 4).map((p: Product) => (
                   <a key={p.id} href={p.affiliateLink} target="_blank" rel="noopener noreferrer sponsored"
                     className="bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">
-                    <div className="aspect-square bg-gray-100 overflow-hidden">
+                    <div className="aspect-square bg-gray-100 overflow-hidden relative">
                       {p.imageUrl ? (
                         <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover hover:scale-105 transition-transform" loading="lazy" />
                       ) : (
@@ -102,13 +107,31 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
                           <Icon name="package" size={24} />
                         </div>
                       )}
+                      {p.discount && (
+                        <span className="absolute top-1 right-1 text-[9px] font-bold px-1.5 py-0.5 rounded"
+                          style={{ background: 'oklch(65% 0.2 45)', color: 'white' }}
+                        >-{p.discount.replace('%', '')}%</span>
+                      )}
                     </div>
                     <div className="p-2">
-                      <div className="text-[0.65rem] font-semibold leading-tight line-clamp-2 mb-1" style={{ color: 'var(--shopli-navy)' }}>
+                      <div className="text-[0.6rem] font-semibold leading-tight line-clamp-2 mb-1" style={{ color: 'var(--shopli-navy)' }}>
                         {p.title}
                       </div>
-                      <div className="font-bold text-xs" style={{ color: 'var(--shopli-teal)' }}>
-                        {config?.currencySymbol || '€'}{p.price?.toFixed(2)}
+                      <div className="flex items-baseline gap-1 mb-0.5">
+                        <span className="font-bold text-xs" style={{ color: 'var(--shopli-teal)' }}>
+                          {config?.currencySymbol || '€'}{p.price?.toFixed(2)}
+                        </span>
+                        {p.originalPrice && p.originalPrice > p.price && (
+                          <span className="text-[9px] line-through" style={{ color: 'var(--shopli-warm-gray)' }}>
+                            {config?.currencySymbol || '€'}{p.originalPrice.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Stars rating={p.rating} size={8} />
+                        <span className="text-[9px]" style={{ color: 'var(--shopli-warm-gray)' }}>
+                          {p.volume > 0 ? (p.volume > 1000 ? `${(p.volume/1000).toFixed(1)}k` : p.volume) + (rtl ? ' נמכרו' : ' sold') : ''}
+                        </span>
                       </div>
                     </div>
                   </a>
@@ -175,8 +198,10 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
         caption: item.caption?.[config.lang] || item.caption?.en || '',
         note: item.note?.[config.lang] || item.note?.en || '',
         products: products.map((p: any) => ({
-          id: p.id, title: p.title, price: p.price, currency: p.currency,
-          imageUrl: p.imageUrl, affiliateLink: p.affiliateLink, rating: p.rating,
+          id: p.id, title: p.title, price: p.price, originalPrice: p.originalPrice,
+          currency: p.currency, imageUrl: p.imageUrl, affiliateLink: p.affiliateLink,
+          rating: p.rating, reviewCount: p.reviewCount, volume: p.volume,
+          shopName: p.shopName, discount: p.discount,
         })),
       });
     }

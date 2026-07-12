@@ -32,6 +32,7 @@ function signParams(params: Record<string, string>, secret: string): string {
 
 export interface SearchProduct {
   id: string;
+  sku: string;
   title: string;
   price: number;
   originalPrice: number | null;
@@ -39,11 +40,15 @@ export interface SearchProduct {
   imageUrl: string;
   images: string[];
   affiliateLink: string;
-  rating: number;
+  rating: number;           // 0-100 (evaluate_rate %)
   reviewCount: number;
+  volume: number;            // lastest_volume (total sold)
   category: string;
+  categoryPath: string;      // first > second level
   shopName: string;
+  shopId: string;
   discount: string;
+  commissionRate: number;    // 0-100%
   freeShipping: boolean;
 }
 
@@ -72,6 +77,7 @@ export async function searchAliExpress(keywords: string, region: string, pageSiz
   const products = result?.products?.product || [];
   return products.map((p: any) => ({
     id: String(p.product_id),
+    sku: p.sku_id || '',
     title: p.product_title || 'Product',
     price: parseFloat(p.target_sale_price || '0'),
     originalPrice: p.target_original_price ? parseFloat(p.target_original_price) : null,
@@ -79,23 +85,36 @@ export async function searchAliExpress(keywords: string, region: string, pageSiz
     imageUrl: p.product_main_image_url || '',
     images: p.product_small_image_urls?.string || [],
     affiliateLink: p.promotion_link || p.product_detail_url || '',
-    rating: parseFloat(p.evaluate_rate || '0'),
-    reviewCount: p.last_5_days_trade_count || 0,
+    rating: parseFloat(String(p.evaluate_rate || '0').replace('%', '')),
+    reviewCount: typeof p.last_5_days_trade_count === 'string' ? parseInt(p.last_5_days_trade_count) : (p.last_5_days_trade_count || 0),
+    volume: parseInt(p.lastest_volume || '0'),
     category: p.first_level_category_name || '',
+    categoryPath: (p.first_level_category_name || '') + ' > ' + (p.second_level_category_name || ''),
     shopName: p.shop_name || '',
+    shopId: String(p.shop_id || ''),
     discount: p.discount || '',
+    commissionRate: parseFloat(String(p.commission_rate || '0').replace('%', '')),
     freeShipping: false,
   }));
 }
 
 export async function searchCollection(region: string, keywords: string[], limit = 4): Promise<SearchProduct[]> {
   const all: SearchProduct[] = [];
+  const seen = new Set<string>();
   for (const kw of keywords.slice(0, 3)) {
     try {
-      const products = await searchAliExpress(kw, region, Math.ceil(limit / 2));
-      all.push(...products);
+      const products = await searchAliExpress(kw, region, Math.ceil(limit * 1.5));
+      for (const p of products) {
+        if (!seen.has(p.id) && !seen.has(p.sku)) {
+          seen.add(p.id);
+          if (p.sku) seen.add(p.sku);
+          all.push(p);
+        }
+      }
     } catch { /* ignore */ }
   }
+  // Sort by volume (most sold), then rating, then commission
+  all.sort((a, b) => (b.volume * 10 + b.rating * 3 + b.commissionRate) - (a.volume * 10 + a.rating * 3 + a.commissionRate));
   return all.slice(0, limit);
 }
 
