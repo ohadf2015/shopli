@@ -205,6 +205,75 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
           </div>
         </section>
 
+        {/* MOOD BOARDS — Complete Looks & Room Designs */}
+        <section className="py-10 bg-orange-50/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+            <h2 className="text-xl md:text-2xl font-bold mb-2" style={{ color: 'var(--shopli-navy)' }}>
+              {rtl ? 'ערכות שלמות — מראה, חדר, ערכת' : 'Complete Looks, Rooms & Kits'}
+            </h2>
+            <p className="text-sm mb-6" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {rtl ? 'כל ערכה מחברת מספר פריטים ליצירת מראה שלם, עיצוב חדר או ערכת שלמה' : 'Each board combines multiple products into a complete look, room design, or kit.'}
+            </p>
+
+            <h3 className="text-xs font-semibold uppercase tracking-widest mb-3 mt-4" style={{ color: 'var(--shopli-orange)' }}>{rtl ? 'תחפושות לפורים / הלווין' : 'PURIM & HALLOWEEN COSTUMES'}</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+              {[
+                { link: 'jack-sparrow', titleEn: 'Pirate Jack Sparrow', titleHe: 'פיראט ג׳ק ספארו', descEn: 'Complete pirate costume €30', descHe: 'תחפושת פיראט ₪120' },
+                { link: 'queen-esther', titleEn: 'Queen Esther', titleHe: 'אסתר המלכה', descEn: 'Royal costume €25', descHe: 'תחפושת מלכותית ₪100' },
+                { link: 'pikachu', titleEn: 'Pikachu Cosplay', titleHe: 'פיקאצ׳ו', descEn: 'Cute Pokemon cosplay €20', descHe: 'קוספליי פוקימון ₪80' },
+                { link: 'spiderman', titleEn: 'Spider-Man', titleHe: 'ספיידרמן', descEn: 'Superhero costume €25', descHe: 'תחפושת גיבור על ₪100' },
+                { link: 'wonder-woman', titleEn: 'Wonder Woman', titleHe: 'ונדר וומן', descEn: 'Amazon warrior €30', descHe: 'לוחמת אמזונות ₪120' },
+                { link: 'ninja-turtle', titleEn: 'Ninja Turtle', titleHe: 'צב נינג׳ה', descEn: 'Hero in a half shell €20', descHe: 'גיבור חצי קליפה ₪80' },
+                { link: 'superman', titleEn: 'Superman', titleHe: 'סופרמן', descEn: 'Man of Steel €25', descHe: 'איש הפלדה ₪100' },
+              ].map(b => (                <a key={b.link} href={`/${region}/mood/${b.link}`}
+                  className="p-3 rounded-xl border border-orange-200 bg-white hover:shadow-md transition-all">
+                  <div className="font-semibold text-sm mb-0.5" style={{ color: 'var(--shopli-navy)' }}>{rtl ? b.titleHe : b.titleEn}</div>
+                  <p className="text-[0.6rem]" style={{ color: 'var(--shopli-warm-gray)' }}>{rtl ? b.descHe : b.descEn}</p>
+                </a>
+              ))}
+            </div>
+
+            <h3 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--shopli-orange)' }}>{rtl ? 'עיצובי חדרים' : 'ROOM DESIGN'}</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+              {[
+                { link: 'japandi-office', titleEn: 'Japandi Office', titleHe: 'משרד יפנדי', descEn: 'Minimalist serene workspace €80', descHe: 'מרחב עבודה שלו ₪320' },
+                { link: 'gamer-den', titleEn: 'RGB Gamer Den', titleHe: 'פינת גיימרינג', descEn: 'Ultimate gaming setup €120', descHe: 'עמדת משחק אולטימטיבית ₪480' },
+                { link: 'boho-bedroom', titleEn: 'Boho Bedroom', titleHe: 'חדר בוהו', descEn: 'Cozy aesthetic bedroom €50', descHe: 'חדר נעים בסגנון בוהמי ₪200' },
+                { link: 'scandinavian-reading-nook', titleEn: 'Reading Nook', titleHe: 'פינת קריאה', descEn: 'Hygge cozy corner €60', descHe: 'פינה הייג׳ית נעימה ₪240' },
+                { link: 'indoor-jungle', titleEn: 'Indoor Jungle', titleHe: 'ג׳ונגל ביתי', descEn: 'Plant corner €40', descHe: 'פינת צמחים שופעת ₪160' },
+              ].map(b => (                <a key={b.link} href={`/${region}/mood/${b.link}`}
+                  className="p-3 rounded-xl border border-orange-200 bg-white hover:shadow-md transition-all">
+                  <div className="font-semibold text-sm mb-0.5" style={{ color: 'var(--shopli-navy)' }}>{rtl ? b.titleHe : b.titleEn}</div>
+                  <p className="text-[0.6rem]" style={{ color: 'var(--shopli-warm-gray)' }}>{rtl ? b.descHe : b.descEn}</p>
+                </a>
+              ))}
+            </div>
+
+            <h3 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--shopli-orange)' }}>{rtl ? 'ערכות מתוייבות' : 'CURATED KITS'}</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {[
+                { link: 'sushi-night', titleEn: 'Sushi Night', titleHe: 'ערב סושי', descEn: 'Kitchen kit under €25', descHe: 'ערכת סושי ₪100' },
+                { link: 'mechanical-keyboard', titleEn: 'Mech Keyboard', titleHe: 'מקלדת מכנית', descEn: 'Custom build under €70', descHe: 'מקלדת מותאמת ₪300' },
+                { link: 'home-bar', titleEn: 'Home Bar', titleHe: 'בר ביתי', descEn: 'Cocktail kit under €35', descHe: 'ערכת קוקטיילים ₪140' },
+                { link: 'digital-nomad', titleEn: 'Digital Nomad', titleHe: 'נווד דיגיטלי', descEn: 'Work anywhere under €60', descHe: 'לעבוד מכל מקום ₪240' },
+                { link: 'streaming-setup', titleEn: 'Streaming Setup', titleHe: 'עמדת סטרימינג', descEn: 'Go live under €60', descHe: 'לשדר בשידור חי ₪240' },
+                { link: 'dessert-baking', titleEn: 'Baking Kit', titleHe: 'ערכת אפייה', descEn: 'Bake like a pro under €30', descHe: 'אפייה מקצועית ₪120' },
+                { link: 'home-gym-pro', titleEn: 'Home Gym Pro', titleHe: 'חדר כושר מתקדם', descEn: 'Serious setup under €80', descHe: 'ציוד מתקדם ₪320' },
+                { link: 'jewelry-making', titleEn: 'Jewelry Making', titleHe: 'תכשיטנות', descEn: 'DIY jewelry under €25', descHe: 'תכשיטים בעבודת יד ₪100' },
+                { link: 'camping-coffee', titleEn: 'Camping Coffee', titleHe: 'קפה בקמפינג', descEn: 'Brew in the wild under €20', descHe: 'קפה בשטח ₪80' },
+                { link: 'study-corner', titleEn: 'Study Corner', titleHe: 'פינת לימוד', descEn: 'Focus workspace under €40', descHe: 'מרחב לימוד ממוקד ₪160' },
+                { link: 'morning-routine', titleEn: 'Morning Routine', titleHe: 'ערכת בוקר', descEn: 'Start your day under €25', descHe: 'בוקר מושלם ₪100' },
+                { link: 'beach-day', titleEn: 'Beach Day', titleHe: 'יום חוף', descEn: 'Stress-free kit under €30', descHe: 'ערכת חוף ₪120' },
+              ].map(b => (                <a key={b.link} href={`/${region}/mood/${b.link}`}
+                  className="p-3 rounded-xl border border-orange-200 bg-white hover:shadow-md transition-all">
+                  <div className="font-semibold text-sm mb-0.5" style={{ color: 'var(--shopli-navy)' }}>{rtl ? b.titleHe : b.titleEn}</div>
+                  <p className="text-[0.6rem]" style={{ color: 'var(--shopli-warm-gray)' }}>{rtl ? b.descHe : b.descEn}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* CTA */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
           <div className="rounded-2xl p-8 md:p-12 text-center" style={{ background: 'var(--shopli-navy)', color: 'white' }}>
