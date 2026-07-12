@@ -1,3 +1,4 @@
+import { getCollection } from '../../../lib/collections';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import crypto from 'crypto';
 
@@ -16,6 +17,7 @@ const REGION_MAP: Record<string, { language: string; currency: string; shipToCou
   es: { language: 'ES', currency: 'EUR', shipToCountry: 'ES' },
   it: { language: 'IT', currency: 'EUR', shipToCountry: 'IT' },
 };
+
 
 const ALIE_KEY = process.env.ALIEXPRESS_APP_KEY || '';
 const ALIE_SECRET = process.env.ALIEXPRESS_APP_SECRET || '';
@@ -84,11 +86,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const config = REGION_MAP[region as string] || REGION_MAP.eu;
   const pageSize = Math.min(parseInt(limit as string, 10) || 5, 10);
 
-  const { getCollection } = await import('../../../lib/collections');
   const collectionDef = getCollection(collection as string);
 
-  if (!collectionDef || !collectionDef.searches.length) {
-    return res.status(200).json({ success: false, error: 'Unknown collection', products: [], groups: [] });
+  if (!collectionDef) {
+    return res.status(404).json({ success: false, error: `Unknown collection: ${collection}`, products: [], groups: [] });
   }
 
   try {
