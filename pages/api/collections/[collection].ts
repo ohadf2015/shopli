@@ -76,7 +76,6 @@ function mapProduct(p: any, currency: string): any {
     shopName: p.shop_name || '',
     discount: p.discount || '',
     freeShipping: false,
-    searchKeyword: this?.currentKeyword || '',
   };
 }
 
@@ -85,7 +84,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const config = REGION_MAP[region as string] || REGION_MAP.eu;
   const pageSize = Math.min(parseInt(limit as string, 10) || 5, 10);
 
-  // Dynamically import collections to check slugs
   const { getCollection } = await import('../../../lib/collections');
   const collectionDef = getCollection(collection as string);
 
