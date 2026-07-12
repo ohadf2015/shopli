@@ -278,18 +278,62 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
           </div>
         </section>
 
-        {/* CTA */}
+        {/* CTA — Newsletter + Telegram */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
           <div className="rounded-2xl p-8 md:p-12 text-center" style={{ background: 'var(--shopli-navy)', color: 'white' }}>
             <h2 className="text-xl md:text-2xl font-bold mb-3">
               {rtl ? 'רוצים לקבל עדכונים שווים?' : 'Want the Best Deals First?'}
             </h2>
             <p className="mb-6 max-w-md mx-auto text-sm" style={{ color: 'oklch(70% 0.02 80)' }}>
-              {rtl ? 'הצטרפו לערוץ הטלגרם וקבלו המלצות חמות ישירות לנייד' : 'Join our Telegram channel for hot deals straight to your phone'}
+              {rtl ? 'הירשמו לניוזלטר וקבלו מבצעים חמים ישירות למייל' : 'Subscribe for hot deals straight to your inbox'}
             </p>
+            
+            {/* Newsletter form */}
+            <div className="max-w-sm mx-auto mb-6">
+              <form id="newsletter-form" data-region={region} onSubmit={async (e) => {
+                e.preventDefault();
+                const input = e.currentTarget.querySelector('input') as HTMLInputElement;
+                const btn = e.currentTarget.querySelector('button') as HTMLButtonElement;
+                const status = e.currentTarget.querySelector('.status') as HTMLElement;
+                const formRegion = e.currentTarget.getAttribute('data-region') || 'eu';
+                if (!input.value) return;
+                btn.disabled = true;
+                btn.textContent = rtl ? 'נרשם...' : 'Subscribing...';
+                try {
+                  const res = await fetch('/api/newsletter', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email: input.value, region: formRegion }),
+                  });
+                  const data = await res.json();
+                  status.textContent = data.message;
+                  status.style.display = 'block';
+                  if (data.ok) input.value = '';
+                } catch {
+                  status.textContent = rtl ? 'שגיאה, נסו שוב' : 'Error, try again';
+                  status.style.display = 'block';
+                }
+                btn.disabled = false;
+                btn.textContent = rtl ? 'הצטרפו' : 'Subscribe';
+              }} className="flex gap-2">
+                <input type="email" required placeholder={rtl ? 'האימייל שלך' : 'your@email.com'}
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm text-gray-900 placeholder-gray-400 border-0 focus:outline-none focus:ring-2 focus:ring-orange-400" />
+                <button type="submit"
+                  className="px-5 py-2.5 rounded-xl font-bold text-sm cursor-pointer"
+                  style={{ background: 'var(--shopli-orange)', color: 'white' }}>
+                  {rtl ? 'הצטרפו' : 'Subscribe'}
+                </button>
+              </form>
+              <p className="status text-xs mt-2 hidden" style={{ color: 'oklch(80% 0.05 130)' }}></p>
+            </div>
+
+            <div className="text-xs" style={{ color: 'oklch(70% 0.02 80)' }}>
+              {rtl ? 'או' : 'or'}
+            </div>
+
             {config.tgChannel && (
               <a href={`https://t.me/${config.tgChannel}`} target="_blank" rel="noopener"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm mt-4"
                 style={{ background: 'var(--shopli-orange)', color: 'white' }}>
                 <Icon name="telegram" size={18} />
                 {rtl ? 'הצטרפו לטלגרם' : 'Join Telegram'}
