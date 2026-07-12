@@ -1,7 +1,7 @@
 import { Product } from './types';
 import { getRegion, RegionCode } from './regions';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://shopli-neon.vercel.app';
 
 export async function fetchProducts(region: RegionCode, options?: {
   category?: string;
@@ -9,25 +9,20 @@ export async function fetchProducts(region: RegionCode, options?: {
   page?: number;
   limit?: number;
 }): Promise<Product[]> {
-  const config = getRegion(region);
   const params = new URLSearchParams();
-
-  if (options?.query) params.set('q', options.query);
-  if (options?.category) params.set('category', options.category);
+  params.set('region', region);
   if (options?.page) params.set('page', String(options.page));
   if (options?.limit) params.set('limit', String(options.limit));
-
-  params.set('language', config.lang.toUpperCase());
-  params.set('currency', config.currency);
-  params.set('shipToCountry', config.defaultShipTo);
+  if (options?.category) params.set('category', options.category);
 
   try {
-    const res = await fetch(`${API_BASE}/products/hot?${params}`, {
-      next: { revalidate: 3600 },
+    const res = await fetch(`${API_BASE}/api/products/hot?${params}`, {
+      next: { revalidate: 300 },
     });
     if (!res.ok) return [];
     const data = await res.json();
-    return mapProducts(data.data || [], region);
+    if (!data.success || !data.products) return [];
+    return mapProducts(data.products, region);
   } catch {
     return getFallbackProducts(region);
   }
