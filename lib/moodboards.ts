@@ -524,7 +524,25 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
     totalEstimate: { en: 'Full craft room: ~€40-70', he: 'חדר מלא: ~₪160-280' },
   },
 
+  'back-to-school': {
+    slug: 'back-to-school',
+    metaTitle: { en: 'Back to School Supplies Under €20', he: 'ציוד לבית הספר בפחות מ-₪80' },
+    metaDesc: { en: 'Everything students need for the new school year: backpack, stationery, lunch box, calculator, and more.', he: 'כל מה שצריך לתלמידים: תיק, כלי כתיבה, קופסת אוכל, מחשבון ועוד.' },
+    h1: { en: 'Back to School: Complete Student Kit Under €20', he: 'חזרה לבית הספר: ערכת תלמיד מלאה בפחות מ-₪80' },
+    intro: { en: 'Get ready for the new school year without breaking the bank. From backpacks to calculators, here are the best deals on AliExpress.', he: 'התכוננו לשנת הלימודים החדשה בלי לשבור את הכיס.' },
+    tags: ['school', 'kids', 'education'],
+    items: [
+      { keywords: ['school backpack bags', 'student backpack'], caption: { en: 'School Backpack', he: 'תיק גב לבית הספר' } },
+      { keywords: ['mechanical pencil set', 'drafting pencils'], caption: { en: 'Mechanical Pencil Set', he: 'ערכת עפרונות מכניים' } },
+      { keywords: ['bento lunch box', 'kids lunch container'], caption: { en: 'Bento Lunch Box', he: 'קופסת אוכל בנטו' } },
+      { keywords: ['sports water bottle', 'insulated water flask'], caption: { en: 'Insulated Water Bottle', he: 'בקבוק מים מבודד' } },
+      { keywords: ['scientific calculator', 'basic calculator'], caption: { en: 'Scientific Calculator', he: 'מחשבון מדעי' } },
+      { keywords: ['pencil case large capacity', 'pen bag organizer'], caption: { en: 'Large Pencil Case', he: 'קלמר גדול' } },
+    ],
+    totalEstimate: { en: 'Complete kit: ~€15-25', he: 'ערכה מלאה: ~₪60-100' },
+  },
 };
+
 export function getMoodBoard(slug: string): MoodBoard | undefined {
   return MOOD_BOARDS[slug];
 }
