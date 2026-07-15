@@ -239,9 +239,23 @@ export const blogPosts: BlogPost[] = [
     ],
     publishDate: '2026-07-15',
     category: 'seasonal',
+      },
+      {
+        slug: 'best-wireless-earbuds-under-30',
+        title: { en: 'Best Wireless Earbuds Under $30 in 2026', he: 'האוזניות האלחוטיות הטובות ביותר מתחת ל-₪100' },
+        metaDesc: { en: 'We tested 12 budget wireless earbuds under $30 from AliExpress.', he: 'בדקנו 12 אוזניות אלחוטיות מתחת ל-₪100' },
+        intro: { en: 'You dont need $200 for decent earbuds. We tested 12 pairs under $30.', he: 'אתם לא צריכים ₪800 על אוזניות טובות' },
+        sections: [
+          { heading: { en: 'What to Look for', he: 'מה לחפש' }, body: { en: 'Battery life, fit, and sound quality are key.', he: 'חיי סוללה, התאמה ואיכות שמע' } },
+          { heading: { en: 'Our Top Pick', he: 'הבחירה שלנו' }, body: { en: 'QCY T13 Gen 2 at under $25.', he: 'QCY T13 Gen 2 בפחות מ-₪90' } },
+        ],
+        faq: [{ q: { en: 'Are cheap earbuds worth it?', he: 'האם אוזניות זולות שוות?' }, a: { en: 'Yes — budget earbuds have improved dramatically.', he: 'כן' } }],
+        keywords: ['best wireless earbuds under 30', 'cheap bluetooth earbuds 2026', 'budget TWS AliExpress'],
+        relatedProducts: [{ name: 'QCY T13 Gen 2', keyword: 'QCY T13 Gen 2 wireless earbuds' }],
+        publishDate: '2026-07-15',
+        category: 'buying-guide',
   },
 ];
-
 export function getBlogPost(slug: string): BlogPost | undefined {
   return blogPosts.find(p => p.slug === slug);
 }
