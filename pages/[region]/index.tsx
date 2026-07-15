@@ -240,6 +240,9 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
                 { link: 'study-corner', titleEn: 'Study Corner', titleHe: 'פינת לימוד', descEn: 'Focus workspace under €40', descHe: 'מרחב לימוד ממוקד ₪160' },
                 { link: 'morning-routine', titleEn: 'Morning Routine', titleHe: 'ערכת בוקר', descEn: 'Start your day under €25', descHe: 'בוקר מושלם ₪100' },
                 { link: 'beach-day', titleEn: 'Beach Day', titleHe: 'יום חוף', descEn: 'Stress-free kit under €30', descHe: 'ערכת חוף ₪120' },
+                { link: 'wireless-audio', titleEn: 'Wireless Audio', titleHe: 'אודיו אלחוטי', descEn: 'Earbuds, headphones & speaker €60', descHe: 'אוזניות ורמקולים ₪240' },
+                { link: 'phone-accessories', titleEn: 'Phone Kit', titleHe: 'אביזרים לטלפון', descEn: 'Protect, charge & mount €25', descHe: 'הגנה וטעינה ₪100' },
+                { link: 'summer-essentials', titleEn: 'Summer Survival', titleHe: 'קיץ הכרחי', descEn: 'Beat the heat kit under €25', descHe: 'ערכת הישרדות ₪100' },
               ].map(b => (                <a key={b.link} href={`/${region}/mood/${b.link}`}
                   className="p-3 rounded-xl border border-orange-200 bg-white hover:shadow-md transition-all">
                   <div className="font-semibold text-sm mb-0.5" style={{ color: 'var(--shopli-navy)' }}>{rtl ? b.titleHe : b.titleEn}</div>

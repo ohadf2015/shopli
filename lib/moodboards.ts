@@ -541,6 +541,73 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
     ],
     totalEstimate: { en: 'Complete kit: ~€15-25', he: 'ערכה מלאה: ~₪60-100' },
   },
+
+  // ====== NEW: WIRELESS AUDIO SETUP ======
+  'wireless-audio': {
+    slug: 'wireless-audio',
+    metaTitle: { en: 'Ultimate Wireless Audio Setup: Earbuds, Headphones & Speakers Under €60', he: 'מערך אודיו אלחוטי מושלם: אוזניות ורמקולים בפחות מ-₪240' },
+    metaDesc: { en: 'Build the perfect wireless audio kit: TWS earbuds, over-ear headphones, bluetooth speaker, charging station, and carry case.', he: 'בנו ערכת אודיו אלחוטית מושלמת: אוזניות TWS, אוזניות קשת, רמקול בלוטוס, עמדת טעינה ונרתיק.' },
+    h1: { en: 'Build the Ultimate Wireless Audio Setup Under €60', he: 'מערך אודיו אלחוטי אולטימטיבי בפחות מ-₪240' },
+    intro: { en: 'From commuting earbuds to home speakers and over-ear headphones for deep focus — here is the complete wireless audio kit that covers every listening scenario. No wires, no compromises.', he: 'מאוזניות לנסיעה ועד רמקולים ביתיים ואוזניות קשת לריכוז עמוק — הנה ערכת האודיו האלחוטית השלמה שמכסה כל תרחיש האזנה. בלי חוטים, בלי פשרות.' },
+    tags: ['tech', 'desk', 'audio'],
+    items: [
+      { keywords: ['TWS earbuds wireless', 'true wireless earbuds noise cancelling'], caption: { en: 'TWS Noise-Cancelling Earbuds', he: 'אוזניות TWS מבטלות רעשים' }, note: { en: 'Look for ANC and 30h+ battery life', he: 'חפשו ANC וסוללה 30+ שעות' } },
+      { keywords: ['over ear bluetooth headphones', 'wireless headphones foldable'], caption: { en: 'Over-Ear Bluetooth Headphones', he: 'אוזניות קשת בלוטוס' }, note: { en: 'Get the foldable ones for travel', he: 'קחו מתקפלות לנסיעות' } },
+      { keywords: ['portable bluetooth speaker', 'mini wireless speaker'], caption: { en: 'Portable Bluetooth Speaker', he: 'רמקול בלוטוס נייד' } },
+      { keywords: ['wireless charging station', 'multi device charger stand'], caption: { en: 'Multi-Device Charging Station', he: 'עמדת טעינה למספר מכשירים' } },
+      { keywords: ['earbuds carrying case', 'hard shell earbuds case'], caption: { en: 'Hard Shell Earbuds Case', he: 'נרתיק קשיח לאוזניות' } },
+      { keywords: ['USB C to aux adapter', 'bluetooth transmitter receiver'], caption: { en: 'Bluetooth Transmitter / Adapter', he: 'מתאם בלוטוס / משדר' } },
+    ],
+    totalEstimate: { en: 'Full setup: ~€40-60', he: 'מערך מלא: ~₪160-240' },
+    faq: [
+      { q: { en: 'Which is better: TWS earbuds or over-ear headphones?', he: 'מה עדיף: אוזניות TWS או קשת?' }, a: { en: 'Both serve different needs. Earbuds are portable and great for commuting/gym. Over-ear headphones offer better soundstage and ANC for office/home. Best to have both for different scenarios.', he: 'שתיהן משרתות צרכים שונים. אוזניות TWS ניידות ומעולות לנסיעה/כושר. אוזניות קשת מציעות במת סאונד רחבה יותר ו-ANC טוב יותר למשרד/בית.' } },
+    ],
+  },
+
+  // ====== NEW: PHONE ACCESSORIES KIT ======
+  'phone-accessories': {
+    slug: 'phone-accessories',
+    metaTitle: { en: 'Complete Phone Accessories Kit: Protect, Charge & Mount Under €25', he: 'ערכת אביזרים מלאה לטלפון: הגנה, טעינה והרכבה בפחות מ-₪100' },
+    metaDesc: { en: 'Everything your phone needs: protective case, tempered glass, car mount, power bank, fast charger cable, pop socket & wireless charger.', he: 'כל מה שהטלפון צריך: כיסוי מגן, זכוכית מחוסמת, אוחז לרכב, בנק כוח, כבל טעינה מהיר, פופ סוקט ומטען אלחוטי.' },
+    h1: { en: 'Complete Phone Accessories Kit Under €25', he: 'ערכת אביזרים מלאה לטלפון בפחות מ-₪100' },
+    intro: { en: 'Your phone is your most-used device — protect it, charge it faster, and mount it everywhere. This complete accessories kit covers every need from morning alarm to midnight scroll.', he: 'הטלפון הוא המכשיר הכי בשימוש שלכם — הגנו עליו, טענו אותו מהר יותר, והרכיבו אותו בכל מקום. ערכת האביזרים המלאה הזו מכסה כל צורך משעון מעורר בבוקר ועד גלילה בחצות.' },
+    tags: ['tech', 'travel', 'gadgets'],
+    items: [
+      { keywords: ['phone case shockproof', 'silicone phone case'], caption: { en: 'Shockproof Phone Case', he: 'כיסוי מגן מפני נפילות' } },
+      { keywords: ['tempered glass screen protector', 'privacy screen protector'], caption: { en: 'Tempered Glass Screen Protector', he: 'זכוכית מחוסמת למסך' }, note: { en: '2-pack recommended', he: 'חבילת 2 מומלצת' } },
+      { keywords: ['car phone mount holder', 'car air vent phone holder'], caption: { en: 'Car Phone Mount', he: 'אוחז לטלפון לרכב' } },
+      { keywords: ['power bank 10000mAh', 'portable charger fast charging'], caption: { en: '10000mAh Power Bank', he: 'בנק כוח 10000mAh' } },
+      { keywords: ['USB C braided cable', 'fast charging cable 2m'], caption: { en: 'Braided USB-C Cable (2m)', he: 'כבל USB-C קלוע (2 מטר)' } },
+      { keywords: ['pop socket grip', 'phone stand grip'], caption: { en: 'Pop Socket / Phone Grip', he: 'פופ סוקט / אחיזת טלפון' } },
+    ],
+    totalEstimate: { en: 'Full kit: ~€15-25', he: 'ערכה מלאה: ~₪60-100' },
+    faq: [
+      { q: { en: 'Do I need a screen protector if I have a case?', he: 'האם צריך מגן מסך אם יש כיסוי?' }, a: { en: 'Yes — a case protects the edges and back, while a tempered glass protector prevents screen cracks from direct impacts. The two work as a team and are both essential.', he: 'כן — כיסוי מגן על השוליים והגב, בעוד מגן מסך מזכוכית מחוסמת מונע סדקים במסך מפגיעות ישירות. השניים עובדים כצוות ושניהם חיוניים.' } },
+      { q: { en: 'What power bank capacity do I need?', he: 'איזה קיבולת בנק כוח צריך?' }, a: { en: '10000mAh charges a modern phone 2-3 times. For travel or longer days, 20000mAh gives 4-5 charges. The sweet spot is 10000mAh for daily carry.', he: '10000mAh מטעין טלפון מודרני 2-3 פעמים. לנסיעות או ימים ארוכים יותר, 20000mAh נותן 4-5 טעינות. הנקודה המתוקה היא 10000mAh לנשיאה יומית.' } },
+    ],
+  },
+
+  // ====== NEW: SUMMER ESSENTIALS SURVIVAL KIT ======
+  'summer-essentials': {
+    slug: 'summer-essentials',
+    metaTitle: { en: 'Summer Essentials Survival Kit: Beat the Heat Under €25', he: 'ערכת הישרדות קיץ: לנצח את החום בפחות מ-₪100' },
+    metaDesc: { en: 'Your complete summer survival kit: portable fan, cooling towel, insulated water bottle, UV umbrella, sunscreen, and beach bag.', he: 'ערכת ההישרדות השלמה לקיץ: מאוורר נייד, מגבת קירור, בקבוק מים מבודד, מטריית UV, קרם הגנה ותיק חוף.' },
+    h1: { en: 'Summer Essentials: Complete Heat Survival Kit Under €25', he: 'קיץ הכרחי: ערכת הישרדות מחום מלאה בפחות מ-₪100' },
+    intro: { en: 'Summer heat can be brutal — especially during heatwaves. This survival kit keeps you cool, hydrated, and protected. Perfect for commutes, outdoor events, beach days, and the daily walk in the sun.', he: 'חום הקיץ יכול להיות אכזרי — במיוחד בגלי חום. ערכת ההישרדות הזו שומרת עליכם קרירים, לחות ומוגנים. מושלם לנסיעות, אירועים בחוץ, ימי חוף וההליכה היומית בשמש.' },
+    tags: ['summer', 'travel', 'outdoor', 'wellness'],
+    items: [
+      { keywords: ['portable electric fan', 'handheld fan rechargeable'], caption: { en: 'Rechargeable Portable Fan', he: 'מאוורר נייד נטען' }, note: { en: 'Get USB rechargeable, runs 4-8 hours', he: 'קחו נטען USB, עובד 4-8 שעות' } },
+      { keywords: ['cooling towel', 'instant cooling towel'], caption: { en: 'Cooling Towel', he: 'מגבת קירור מיידית' } },
+      { keywords: ['insulated water bottle', 'vacuum flask cold'], caption: { en: 'Insulated Water Bottle (1L)', he: 'בקבוק מים מבודד (1 ליטר)' } },
+      { keywords: ['UV umbrella', 'sun umbrella folding'], caption: { en: 'UV Protection Umbrella', he: 'מטריית הגנה מקרינת UV' } },
+      { keywords: ['beach bag large', 'straw beach tote'], caption: { en: 'Large Beach Tote Bag', he: 'תיק חוף גדול' } },
+      { keywords: ['sunglasses UV400', 'polarized sunglasses men women'], caption: { en: 'UV400 Polarized Sunglasses', he: 'משקפי שמש UV400 מקטבים' } },
+    ],
+    totalEstimate: { en: 'Full survival kit: ~€18-30', he: 'ערכת הישרדות מלאה: ~₪72-120' },
+    faq: [
+      { q: { en: 'What cooling method works best without electricity?', he: 'איזו שיטת קירור עובדת הכי טוב בלי חשמל?' }, a: { en: 'A cooling towel soaked in water works instantly — evaporation drops the temperature by 15-20°F. Pair with an insulated bottle for ice-cold water all day.', he: 'מגבת קירור טבולה במים עובדת מיידית — האידוי מוריד את הטמפרטורה ב-8-10 מעלות. שלבו עם בקבוק מבודד למים קרים כקרח כל היום.' } },
+    ],
+  },
 };
 
 export function getMoodBoard(slug: string): MoodBoard | undefined {
