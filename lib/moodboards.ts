@@ -627,6 +627,46 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
     ],
     tags: ['gaming', 'setup', 'desk'],
   },
+  'minimalist-desk': {
+    slug: 'minimalist-desk',
+    metaTitle: { en: 'Minimalist Desk Setup: Clean & Productive Workspace Under €50', he: 'שולחן עבודה מינימליסטי: מרחב עבודה נקי ופרודוקטיבי בפחות מ-₪200' },
+    metaDesc: { en: 'Build a distraction-free minimalist desk: monitor arm, desk mat, cable tray, wooden pen holder, desk lamp, and plant.', he: 'בנו שולחן עבודה מינימליסטי נטול הסחות: זרוע מסך, משטח שולחן, תעלת כבלים, עפרון עץ, מנורת שולחן ועציץ.' },
+    h1: { en: 'Design a Minimalist Desk Setup Under €50', he: 'שולחן עבודה מינימליסטי בפחות מ-₪200' },
+    intro: { en: 'A clean desk is a clear mind. Minimalist desk design reduces visual clutter, improves focus, and makes you actually want to sit down and work. Here\'s everything you need for a clean, functional workspace — with nothing unnecessary.', he: 'שולחן נקי = ראש נקי. עיצוב מינימליסטי מפחית עומס ויזואלי, משפר ריכוז וגורם לכם ממש לרצות לשבת ולעבוד. הנה כל מה שצריך למרחב עבודה נקי ופונקציונלי — בלי שום דבר מיותר.' },
+    tags: ['room-design', 'desk', 'home-office', 'minimalist'],
+    items: [
+      { keywords: ['monitor arm gas spring', 'single monitor mount desk'], caption: { en: 'Monitor Arm (Gas Spring)', he: 'זרוע מסך (גז)' }, note: { en: 'Frees up desk space instantly', he: 'משחרר מקום על השולחן מיידית' } },
+      { keywords: ['large desk mat', 'leather desk pad'], caption: { en: 'Large Desk Mat / Pad', he: 'משטח שולחן גדול' }, note: { en: 'Fabric or leather, choose neutral colors', he: 'בד או עור, בחרו צבעים ניטרליים' } },
+      { keywords: ['cable management tray', 'under desk cable organizer'], caption: { en: 'Under-Desk Cable Tray', he: 'תעלת כבלים מתחת לשולחן' } },
+      { keywords: ['wooden pen holder', 'desk organizer bamboo'], caption: { en: 'Wooden Desk Organizer', he: 'מארגן שולחן מעץ' } },
+      { keywords: ['LED desk lamp USB', 'minimalist desk lamp'], caption: { en: 'Minimalist LED Desk Lamp', he: 'מנורת שולחן לד מינימליסטית' } },
+      { keywords: ['small desk plant', 'succulent pot ceramic'], caption: { en: 'Small Desk Plant', he: 'עציץ קטן לשולחן' } },
+    ],
+    totalEstimate: { en: 'Full desk setup: ~€30-50', he: 'שולחן שלם: ~₪120-200' },
+    faq: [
+      { q: { en: 'What colors work for a minimalist desk?', he: 'איזה צבעים מתאימים לשולחן מינימליסטי?' }, a: { en: 'White, black, warm wood tones, and a single accent color (green from a plant). Keep everything monochrome — the desk mat, organizer, lamp, and accessories should match.', he: 'לבן, שחור, גווני עץ חמים, וצבע מבטא אחד (ירוק מהצמח). שמרו הכל מונוכרומטי.' } },
+    ],
+  },
+  'pet-corner': {
+    slug: 'pet-corner',
+    metaTitle: { en: 'Pet Corner Setup: Complete Dog & Cat Station Under €40', he: 'פינת חיית מחמד: עמדה שלמה לכלב או חתול בפחות מ-₪160' },
+    metaDesc: { en: 'Everything for a dedicated pet corner: bed, feeding station, toy storage, grooming station, water fountain, and mat.', he: 'כל מה שצריך לפינת חיית מחמד: מיטה, עמדת האכלה, אחסון צעצועים, עמדת טיפוח, מזרקת מים ומשטח.' },
+    h1: { en: 'Build the Perfect Pet Corner Under €40', he: 'פינת חיית מחמד מושלמת בפחות מ-₪160' },
+    intro: { en: 'A dedicated pet corner keeps your furry friend\'s things organized and your home tidy. No more stepping on toys or searching for the leash. Here\'s the complete setup — from feeding to grooming to play — all in one spot.', he: 'פינת חיית מחמד ייעודית שומרת על החפצים של החבר הפרוותי מסודרים ועל הבית נקי. בלי לדרוך על צעצועים או לחפש רצועה. הנה הערכה השלמה — מהאכלה לטיפוח למשחק — הכל במקום אחד.' },
+    tags: ['pet', 'organization', 'room-design'],
+    items: [
+      { keywords: ['pet bed orthopedic', 'dog bed washable'], caption: { en: 'Orthopedic Pet Bed', he: 'מיטת חיות מחמד אורטופדית' }, note: { en: 'Washable cover is essential', he: 'כיסוי ניתן לכביסה זה חיוני' } },
+      { keywords: ['pet water fountain', 'stainless steel pet fountain'], caption: { en: 'Pet Water Fountain', he: 'מזרקת מים לחיות מחמד' } },
+      { keywords: ['raised pet bowls', 'elevated dog feeder'], caption: { en: 'Elevated Feeding Station', he: 'עמדת האכלה מוגבהת' } },
+      { keywords: ['pet toy storage bin', 'pet toy basket'], caption: { en: 'Toy Storage Bin', he: 'סל אחסון צעצועים' } },
+      { keywords: ['pet grooming brush kit', 'pet grooming glove'], caption: { en: 'Grooming Tool Kit', he: 'ערכת כלי טיפוח' } },
+      { keywords: ['pet feeding mat', 'waterproof pet mat'], caption: { en: 'Waterproof Feeding Mat', he: 'משטח האכלה עמיד מים' } },
+    ],
+    totalEstimate: { en: 'Complete pet corner: ~€25-40', he: 'פינה שלמה: ~₪100-160' },
+    faq: [
+      { q: { en: 'Where should I put the pet corner?', he: 'איפה למקם את פינת חיית המחמד?' }, a: { en: 'A quiet corner of the kitchen or living room — away from heavy foot traffic and loud appliances. Make sure it\'s not in direct sunlight or drafty areas. Cats prefer elevated spots; dogs prefer ground level.', he: 'פינה שקטה במטבח או בסלון — הרחק מתנועה כבדה ומכשירים רועשים. וודאו שזה לא בשמש ישירה או בטיוטות.' } },
+    ],
+  },
 };
 
 export function getMoodBoard(slug: string): MoodBoard | undefined {

@@ -148,6 +148,13 @@ export const COLLECTIONS: CollectionDef[] = [
     ],
     affiliateKeywords: ['gaming mouse', 'mechanical keyboard', 'gaming headset', 'gaming accessories', 'budget gaming setup'],
   },
+  {
+    slug: 'gadgets-under-10',
+    keywords: ['kitchen gadgets under 10', 'useful gadgets cheap', 'home gadgets', 'organization tools', 'small kitchen tools'],
+    name: { en: 'Gadgets Under €10', he: 'גאדג\'טים ב-₪40', fr: 'Gadgets à Moins de 10€', de: 'Gadgets unter 10€', es: 'Gadgets por menos de 10€', it: 'Gadget Sotto i 10€' },
+    desc: { en: 'Smart little tools under €10 that make daily life easier', he: 'כלים קטנים וחכמים בפחות מ-₪40 שמקלים על החיים', fr: 'Petits outils malins à moins de 10€', de: 'Clevere kleine Helfer unter 10€', es: 'Pequeñas herramientas inteligentes por menos de 10€', it: 'Piccoli strumenti intelligenti sotto 10€' },
+    icon: 'bulb',
+  },
 ];
 
 export function getAllCollections() {

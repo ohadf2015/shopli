@@ -445,8 +445,60 @@ export const comparisons: ComparisonArticle[] = [
       { q: { en: 'Is the Kindle Paperwhite worth it over the basic Kindle?', he: 'האם קינדל פייפרווייט שווה את התוספת על הקינדל הבסיסי?', fr: 'Le Kindle Paperwhite vaut-il le coup?', de: 'Lohnt sich der Kindle Paperwhite?', es: '¿Vale la pena el Kindle Paperwhite?', it: 'Vale la pena il Kindle Paperwhite?' }, a: { en: 'Yes — the front light lets you read in bed without a lamp, 300 PPI is noticeably sharper, and it\'s waterproof. The basic Kindle has no light and 167 PPI.', he: 'כן — התאורה הקדמית מאפשרת קריאה במיטה בלי מנורה, 300 PPI חד משמעותית, ועמיד למים. הקינדל הבסיסי אין תאורה ו-167 PPI.', fr: 'Oui — la lumière frontale, 300 PPI plus net, et étanche. Le basique n\'a pas de lumière.', de: 'Ja — Frontlicht, 300 PPI schärfer, wasserdicht. Das Basis-Modell hat kein Licht.', es: 'Sí — luz frontal, 300 PPI más nítido, resistente al agua. El básico no tiene luz.', it: 'Sì — luce frontale, 300 PPI più nitido, impermeabile. Il base non ha luce.' } },
     ],
     keywords: ['kindle vs tablet reading', 'e-reader vs tablet', 'kindle paperwhite vs ipad', 'best device for reading books'],
-  },
-
+      },
+      {
+        slug: 'smart-plug-vs-smart-bulb',
+        title: {
+          en: 'Smart Plug vs Smart Bulb: Which Should You Buy First?',
+          he: 'שקע חכם מול נורה חכמה: מה כדאי לקנות קודם?',
+        },
+        metaDesc: {
+          en: 'Smart plug vs smart bulb — compare use cases, cost, installation, and automation. Find the right first step into smart home automation.',
+          he: 'שקע חכם מול נורה חכמה — השוואת שימושים, מחיר, התקנה ואוטומציה. מצאו את הצעד הראשון הנכון לבית חכם.',
+        },
+        intro: {
+          en: 'Building a smart home often starts with one question: plug or bulb? Both are affordable entry points, but they serve different needs. A smart plug turns any dumb appliance into a smart one. A smart bulb adds color, dimming, and scheduling to your lighting. This guide helps you choose the right first step — and when to add the other.',
+          he: 'בניית בית חכם מתחילה לעתים קרובות בשאלה אחת: שקע או נורה? שניהם נקודות כניסה משתלמות, אבל משרתים צרכים שונים. שקע חכם הופך כל מכשיר רגיל לחכם. נורה חכמה מוסיפה צבע, עמעום ולוחות זמנים לתאורה.',
+        },
+        product1: { name: 'Smart Plug', keyword: 'smart plug wifi tuya', pros: ['Works with any device (lamp, fan, coffee maker)', 'No rewiring or bulbs needed', 'Energy monitoring on some models', 'Cheaper per device (€3-8)', 'Can automate appliances, not just lights', 'Works with existing lamps/fixtures'], cons: ['Only on/off control — no dimming', 'Bulky — can block adjacent outlet', 'Limited to plugged-in devices', 'No color or temperature control'] },
+        product2: { name: 'Smart Bulb', keyword: 'smart wifi bulb rgb', pros: ['Dimmable white and 16M colors', 'Mood lighting for any room', 'No hub needed (WiFi models)', 'Scheduling and automation', 'Voice control compatible', 'Creates atmosphere, not just light'], cons: ['More expensive per bulb (€5-15)', 'Switch must always be on', 'Need 2-3 bulbs for a room effect', 'Not all fixtures support smart bulbs', 'Can\'t control non-light devices'] },
+        verdict: {
+          en: 'Start with a smart plug if you want to automate your existing setup cheaply — coffee maker, fan, lamp, space heater. Start with a smart bulb if you want atmosphere, color, and dimming control. Best combo: 1-2 smart plugs for appliances + 2-3 smart bulbs for living room lighting. Total: ~€15-25.',
+          he: 'התחילו עם שקע חכם אם אתם רוצים להפוך לאוטומטיים את המכשירים הקיימים בזול — מכונת קפה, מאוורר, מנורה, תנור. התחילו עם נורה חכמה אם אתם רוצים אווירה, צבע ועמעום. השילוב הטוב: 1-2 שקעים חכמים למכשירים + 2-3 נורות חכמות לתאורת הסלון.',
+        },
+        faq: [
+          { q: { en: 'Can I use a smart plug with a smart bulb?', he: 'האם אפשר להשתמש בשקע חכם עם נורה חכמה?' }, a: { en: 'Yes — but it\'s redundant. A smart plug on a smart bulb gives you no additional control. Better to use the plug for a non-smart lamp and the bulb for a fixture you can\'t plug in.', he: 'כן — אבל זה מיותר. שקע חכם על נורה חכמה לא נותן שליטה נוספת. עדיף להשתמש בשקע למנורה לא חכמה ובנורה לגוף שלא ניתן לחבר.' } },
+          { q: { en: 'Do smart bulbs work with dimmer switches?', he: 'האם נורות חכמות עובדות עם דימרים?' }, a: { en: 'No — smart bulbs need constant power to stay connected to WiFi. Using a dimmer switch will cut power or damage the bulb. Keep the wall switch on at all times and control brightness via app or voice.', he: 'לא — נורות חכמות צריכות חשמל קבוע כדי להישאר מחוברות ל-WiFi. שימוש בדימר ינתק חשמל או יפגע בנורה. השאירו את המתג דולק תמיד ושלטו בעוצמה דרך האפליקציה.' } },
+        ],
+        keywords: ['smart plug vs smart bulb', 'smart home starter', 'smart plug or bulb first', 'home automation beginner'],
+      },
+      {
+        slug: 'usb-c-hub-vs-docking-station',
+        title: {
+          en: 'USB-C Hub vs Docking Station: Which One for Your Laptop?',
+          he: 'האב USB-C מול עגינה (Docking Station): מה מתאים למחשב שלך?',
+        },
+        metaDesc: {
+          en: 'USB-C hub vs docking station — compare ports, power delivery, video output, and price. Find the best way to expand your laptop connectivity.',
+          he: 'האב USB-C מול תחנת עגינה — השוואת יציאות, הספקת חשמל, יציאות וידאו ומחיר. מצאו את הדרך הטובה ביותר להרחיב את החיבורים של המחשב.',
+        },
+        intro: {
+          en: 'Modern laptops come with fewer ports than ever — often just 2-3 USB-C ports. A hub or docking station is essential, but which one? Hubs are compact and cheap. Docks are powerful and expensive. This guide breaks down the real differences so you pick the right one without wasting money on features you don\'t need.',
+          he: 'מחשבים ניידים מודרניים מגיעים עם פחות יציאות מאי פעם — לעתים קרובות רק 2-3 יציאות USB-C. אב או תחנת עגינה חיוניים, אבל איזה מהם? אבים קומפקטיים וזולים. תחנות עגינה חזקות ויקרות. המדריך הזה מפרק את ההבדלים האמיתיים.',
+        },
+        product1: { name: 'USB-C Hub', keyword: 'usb c hub multiport adapter', pros: ['Compact and portable', 'Affordable ($15-40)', 'Plug-and-play, no drivers', 'Great for travel', 'Most have HDMI + USB-A + SD card'], cons: ['Limited power delivery (60-85W)', 'No Ethernet on cheap models', 'Can overheat with heavy use', 'Short cable (10-20cm)', 'No displayport on most models'] },
+        product2: { name: 'Docking Station', keyword: 'usb c docking station dual monitor', pros: ['Full power delivery (100W+)', 'Dual/triple monitor support', 'Built-in Ethernet (Gigabit)', 'More ports (USB-A, USB-C, audio)', 'Stays on desk — one cable to laptop', 'Better cooling and build quality'], cons: ['Expensive ($60-200)', 'Bulky — not portable', 'External power brick needed', 'Overkill for single monitor', 'May need specific drivers'] },
+        verdict: {
+          en: 'Get a USB-C hub if you travel frequently, use a single external monitor, and need basic port expansion. Get a docking station if you have a permanent desk setup, use dual monitors, need Ethernet, and want to connect/disconnect with one cable. Many people use both: a hub for travel and a dock for the desk.',
+          he: 'קנו אב USB-C אם אתם נוסעים לעתים קרובות, משתמשים במסך חיצוני אחד, וצריכים הרחבת יציאות בסיסית. קנו תחנת עגינה אם יש לכם עמדת עבודה קבועה, משתמשים בשני מסכים, צריכים Ethernet, ורוצים להתחבר/לנתק בכבל אחד.',
+        },
+        faq: [
+          { q: { en: 'Can I use a USB-C hub with a docking station?', he: 'האם אפשר להשתמש באב USB-C עם תחנת עגינה?' }, a: { en: 'No — you wouldn\'t need to. A dock already does everything a hub does and more. If you have a hub and need more ports, upgrade to a dock instead of stacking them.', he: 'לא — לא תצטרכו. תחנת עגינה כבר עושה כל מה שאב עושה ועוד. אם יש לכם אב וצריכים עוד יציאות, שדרגו לתחנת עגינה במקום לערום אותם.' } },
+          { q: { en: 'Does a USB-C hub charge my laptop?', he: 'האם אב USB-C מטעין את המחשב?' }, a: { en: 'Some do — via USB-C Power Delivery (PD). Check the hub\'s PD rating: 60W is enough for most ultrabooks, 85-100W for larger laptops. Without PD, the hub is data-only and you\'ll need a separate charger.', he: 'חלקם כן — דרך USB-C Power Delivery (PD). בדקו את דירוג ה-PD של האב: 60W מספיק לרוב האולטרבוקים, 85-100W למחשבים גדולים יותר. בלי PD, האב לטרנספר נתונים בלבד.' } },
+        ],
+        keywords: ['usb c hub vs docking station', 'laptop hub or dock', 'best usb c hub', 'docking station for laptop', 'macbook hub vs dock'],
+      },
+    ];
 ];
 
 export function getComparison(slug: string): ComparisonArticle | undefined {
