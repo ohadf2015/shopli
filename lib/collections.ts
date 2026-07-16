@@ -131,7 +131,22 @@ export const COLLECTIONS: CollectionDef[] = [
     keywords: ['silk sleep mask', 'weighted eye pillow', 'aromatherapy diffuser ultrasonic', 'memory foam contour pillow'],
     name: { en: 'Sleep Sanctuary', he: 'פינת שינה', fr: 'Sanctuaire du Sommeil', de: 'Schlaf-Oase', es: 'Santuario del Sueño', it: 'Santuario del Sonno' },
     desc: { en: 'Natural sleep aids for better rest under €40', he: 'עזרי שינה טבעיים לשינה טובה יותר בפחות מ-₪150', fr: 'Aides au sommeil naturelles pour mieux dormir à moins de 40€', de: 'Natürliche Schlafhilfen für besseren Schlaf unter 40€', es: 'Ayudas naturales para dormir mejor por menos de 40€', it: 'Aiuti naturali per dormire meglio sotto 40€' },
-    icon: 'moon',
+    affiliateKeywords: ['back to school supplies', 'school supplies bulk', 'stationery set', 'college dorm essentials', 'school backpack'],
+  },
+  {
+    slug: 'gaming-gear',
+    tag: { en: 'Gaming Gear', he: 'ציוד גיימינג' },
+    metaTitle: { en: 'Best Budget Gaming Gear Under $30', he: 'ציוד גיימינג במחירי רצפה' },
+    metaDesc: { en: 'Mouse, keyboard, headset and more — gaming gear that won\'t break the bank.', he: 'עכבר, מקלדת, אוזניות ועוד — ציוד גיימינג שלא ירושש אתכם' },
+    image: '/collections/gaming-gear.jpg',
+    items: [
+      { name: 'Gaming Mouse', keyword: 'gaming mouse rgb wired 6400 dpi', minPrice: 8, maxPrice: 25 },
+      { name: 'Mechanical Keyboard', keyword: 'mechanical keyboard 60% rgb wired', minPrice: 15, maxPrice: 35 },
+      { name: 'Gaming Headset', keyword: 'gaming headset 7.1 surround sound', minPrice: 12, maxPrice: 30 },
+      { name: 'Mouse Pad XL', keyword: 'gaming mouse pad xxl extended', minPrice: 5, maxPrice: 15 },
+      { name: 'USB Microphone', keyword: 'condenser microphone usb podcast', minPrice: 10, maxPrice: 28 },
+    ],
+    affiliateKeywords: ['gaming mouse', 'mechanical keyboard', 'gaming headset', 'gaming accessories', 'budget gaming setup'],
   },
 ];
 
