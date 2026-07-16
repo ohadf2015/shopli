@@ -445,9 +445,9 @@ export const comparisons: ComparisonArticle[] = [
       { q: { en: 'Is the Kindle Paperwhite worth it over the basic Kindle?', he: 'האם קינדל פייפרווייט שווה את התוספת על הקינדל הבסיסי?', fr: 'Le Kindle Paperwhite vaut-il le coup?', de: 'Lohnt sich der Kindle Paperwhite?', es: '¿Vale la pena el Kindle Paperwhite?', it: 'Vale la pena il Kindle Paperwhite?' }, a: { en: 'Yes — the front light lets you read in bed without a lamp, 300 PPI is noticeably sharper, and it\'s waterproof. The basic Kindle has no light and 167 PPI.', he: 'כן — התאורה הקדמית מאפשרת קריאה במיטה בלי מנורה, 300 PPI חד משמעותית, ועמיד למים. הקינדל הבסיסי אין תאורה ו-167 PPI.', fr: 'Oui — la lumière frontale, 300 PPI plus net, et étanche. Le basique n\'a pas de lumière.', de: 'Ja — Frontlicht, 300 PPI schärfer, wasserdicht. Das Basis-Modell hat kein Licht.', es: 'Sí — luz frontal, 300 PPI más nítido, resistente al agua. El básico no tiene luz.', it: 'Sì — luce frontale, 300 PPI più nitido, impermeabile. Il base non ha luce.' } },
     ],
     keywords: ['kindle vs tablet reading', 'e-reader vs tablet', 'kindle paperwhite vs ipad', 'best device for reading books'],
-      },
-      {
-        slug: 'smart-plug-vs-smart-bulb',
+  },
+  {
+    slug: 'smart-plug-vs-smart-bulb',
         title: {
           en: 'Smart Plug vs Smart Bulb: Which Should You Buy First?',
           he: 'שקע חכם מול נורה חכמה: מה כדאי לקנות קודם?',
@@ -499,7 +499,6 @@ export const comparisons: ComparisonArticle[] = [
         keywords: ['usb c hub vs docking station', 'laptop hub or dock', 'best usb c hub', 'docking station for laptop', 'macbook hub vs dock'],
       },
     ];
-];
 
 export function getComparison(slug: string): ComparisonArticle | undefined {
   return comparisons.find(c => c.slug === slug);

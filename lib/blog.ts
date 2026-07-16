@@ -271,18 +271,15 @@ export const blogPosts: BlogPost[] = [
     },
     sections: [
       {
-        heading: { en: 'Smart Plugs — The Easiest Entry Point', he: 'שקעים חכמים — נקודת הכניסה הקלה ביותר' },
-        body: { en: 'A WiFi smart plug turns any dumb appliance into a smart one. Plug in your lamp, coffee maker, or fan — then control it from your phone, set schedules, or use voice commands via Alexa/Google. Tuya-based plugs cost €3-8 and work with the Smart Life app. Look for EU plugs with power monitoring (shows energy usage). Start with 2-3: one for your bedside lamp (sunrise alarm), one for the coffee maker (morning auto-brew), and one for a living room lamp (evening auto-on).', he: 'שקע WiFi חכם הופך כל מכשיר רגיל לחכם. חברו מנורה, מכונת קפה או מאוורר — שלטו מהטלפון, קבעו לוחות זמנים, או השתמשו בפקודות קוליות. שקעי Tuya עולים €3-8 ועובדים עם אפליקציית Smart Life.' },
-        keywords: ['smart plug wifi', 'Tuya smart plug EU', 'smart plug alexa', 'wi-fi plug socket'] },
-      {
-        heading: { en: 'Smart Bulbs — Instant Atmosphere', he: 'נורות חכמות — אווירה מיידית' },
-        body: { en: 'Smart bulbs let you dim lights, change colors, and set schedules without rewiring. RGB bulbs create mood lighting for movies, parties, or relaxation. Look for WiFi bulbs (no hub needed) with 16M colors and dimmable white range (2700K-6500K). A 2-pack covers your living room and bedroom. Pair with a motion sensor in the hallway for lights that turn on automatically when you walk by at night.', he: 'נורות חכמות מאפשרות לעמעם, לשנות צבעים ולקבוע לוחות זמנים בלי להתקין חשמל. נורות RGB יוצרות אווירה לסרטים, מסיבות או הרפיה. חפשו נורות WiFi (בלי רכזת) עם 16M צבעים.' },
-        keywords: ['smart wifi bulb rgb', 'led smart bulb alexa', 'rgb light bulb wifi', 'smart light bulb color'] },
-      {
-        heading: { en: 'Sensors & Automation — Make It Automatic', he: 'חיישנים ואוטומציה — להפוך לאוטומטי' },
-        body: { en: 'The real magic of a smart home is automation that happens without you. A door/window sensor sends an alert when opened. A motion sensor triggers lights when you enter a room. A temperature sensor adjusts your smart plug space heater. These sensors cost €2-8 each and create the \"if-this-then-that\" logic that makes a house feel intelligent. Start with a door sensor on the front door + a motion sensor in the hallway.', he: 'הקסם האמיתי של בית חכם הוא אוטומציה שקורית בלי ידכם. חיישן דלת/חלון שולח התראה כשנפתח. חיישן תנועה מפעיל אורות כשנכנסים לחדר. חיישני טמפרטורה מכוונים תנור חכם. חיישנים אלה עולים €2-8 כל אחד.' },
-        keywords: ['motion sensor wifi', 'door window sensor', 'temperature sensor wifi', 'smart home sensor kit'] },
-    ],
+              heading: { en: 'Smart Plugs — The Easiest Entry Point', he: 'שקעים חכמים — נקודת הכניסה הקלה ביותר' },
+              body: { en: 'A WiFi smart plug turns any dumb appliance into a smart one. Plug in your lamp, coffee maker, or fan — then control it from your phone, set schedules, or use voice commands via Alexa/Google. Tuya-based plugs cost €3-8 and work with the Smart Life app. Look for EU plugs with power monitoring (shows energy usage). Start with 2-3: one for your bedside lamp (sunrise alarm), one for the coffee maker (morning auto-brew), and one for a living room lamp (evening auto-on).', he: 'שקע WiFi חכם הופך כל מכשיר רגיל לחכם. חברו מנורה, מכונת קפה או מאוורר — שלטו מהטלפון, קבעו לוחות זמנים, או השתמשו בפקודות קוליות. שקעי Tuya עולים €3-8 ועובדים עם אפליקציית Smart Life.' } },
+            {
+              heading: { en: 'Smart Bulbs — Instant Atmosphere', he: 'נורות חכמות — אווירה מיידית' },
+              body: { en: 'Smart bulbs let you dim lights, change colors, and set schedules without rewiring. RGB bulbs create mood lighting for movies, parties, or relaxation. Look for WiFi bulbs (no hub needed) with 16M colors and dimmable white range (2700K-6500K). A 2-pack covers your living room and bedroom. Pair with a motion sensor in the hallway for lights that turn on automatically when you walk by at night.', he: 'נורות חכמות מאפשרות לעמעם, לשנות צבעים ולקבוע לוחות זמנים בלי להתקין חשמל. נורות RGB יוצרות אווירה לסרטים, מסיבות או הרפיה. חפשו נורות WiFi (בלי רכזת) עם 16M צבעים.' } },
+            {
+              heading: { en: 'Sensors & Automation — Make It Automatic', he: 'חיישנים ואוטומציה — להפוך לאוטומטי' },
+              body: { en: 'The real magic of a smart home is automation that happens without you. A door/window sensor sends an alert when opened. A motion sensor triggers lights when you enter a room. A temperature sensor adjusts your smart plug space heater. These sensors cost €2-8 each and create the "if-this-then-that" logic that makes a house feel intelligent. Start with a door sensor on the front door + a motion sensor in the hallway.', he: 'הקסם האמיתי של בית חכם הוא אוטומציה שקורית בלי ידכם. חיישן דלת/חלון שולח התראה כשנפתח. חיישן תנועה מפעיל אורות כשנכנסים לחדר. חיישני טמפרטורה מכוונים תנור חכם. חיישנים אלה עולים €2-8 כל אחד.' } },
+          ],
     faq: [
       { q: { en: 'Do I need a hub or bridge for smart home devices?', he: 'האם צריך רכזת (Hub) למכשירי בית חכם?' }, a: { en: 'Not for WiFi-based devices (Tuya/Smart Life). They connect directly to your home WiFi and are controlled via app. Zigbee or Z-Wave devices need a hub (like a Philips Hue bridge or Sonoff hub). For beginners, stick with WiFi devices — no hub needed.', he: 'לא למכשירי WiFi (Tuya/Smart Life). הם מתחברים ישירות ל-WiFi הביתי ונשלטים באפליקציה. מכשירי Zigbee או Z-Wave צריכים רכזת. למתחילים, היצמדו למכשירי WiFi.' } },
       { q: { en: 'Can I use voice control without a smart speaker?', he: 'האם אפשר להשתמש בשליטה קולית בלי רמקול חכם?' }, a: { en: 'Yes — the Smart Life app has a widget on your phone, and you can schedule automations from the app. But a cheap Echo Dot or Google Nest Mini (€20-30 on AliExpress) adds voice control and makes the experience much better.', he: 'כן — לאפליקציית Smart Life יש ווידג\'ט בטלפון, ואפשר לקבוע אוטומציות מהאפליקציה. אבל רמקול חכם זול (€20-30) מוסיף שליטה קולית.' } },
@@ -315,15 +312,15 @@ export const blogPosts: BlogPost[] = [
       {
         heading: { en: 'Feeding & Hydration', he: 'האכלה והידרציה' },
         body: { en: 'A slow feeder bowl prevents bloat and makes mealtime last longer — especially important for dogs that inhale food. A pet water fountain with a carbon filter encourages cats to drink more (prevents kidney issues). Look for stainless steel or ceramic bowls — they\'re hygienic and don\'t harbor bacteria like plastic. An automatic feeder with a timer is a game-changer for busy pet parents: it dispenses measured portions at set times.', he: 'קערת האכלה איטית מונעת נפיחות ומאריכה את זמן הארוחה — חשוב במיוחד לכלבים שבולעים אוכל. מזרקת מים עם פילטר פחם מעודדת חתולים לשתות יותר (מונעת בעיות כליות).' },
-        keywords: ['slow feeder dog', 'pet water fountain', 'automatic pet feeder', 'stainless steel dog bowl'] },
+      },
       {
         heading: { en: 'Grooming Tools', he: 'כלי טיפוח' },
         body: { en: 'Regular grooming keeps your pet healthy and your home clean. A deshedding brush (like a FURminator-style) removes loose undercoat and reduces shedding by 90%. A nail grinder is safer than clippers — no risk of cutting the quick. A grooming glove doubles as a petting session and hair removal tool. For cats, a self-grooming brush that mounts on the wall lets them groom themselves on demand. For bathing, a silicone pet brush with shampoo dispenser makes bath time easier.', he: 'טיפוח קבוע שומר על חיית המחמד בריאה ועל הבית נקי. מברשת נשירה מסירה פרווה תחתונה רופפת ומפחיתה נשירה ב-90%. משחקת ציפורניים בטוחה יותר ממספריים.' },
-        keywords: ['pet grooming brush', 'deshedding tool', 'nail grinder pet', 'grooming glove', 'self grooming cat brush'] },
+      },
       {
         heading: { en: 'Walking & Outdoor Gear', he: 'ציוד טיולים וחוץ' },
         body: { en: 'A hands-free leash with a waist belt is perfect for jogging with your dog or managing multiple dogs. A reflective harness with a handle gives you control and visibility at night. LED collar lights make your dog visible in the dark. Poop bag dispensers with a built-in holder clip to the leash so you\'re never caught without bags. A car seat cover protects your seats from mud, fur, and scratches.', he: 'רצועה ידיים-חופשיות עם חגורת מותניים מושלמת לריצה עם הכלב או לניהול מספר כלבים. רתמה מחזירת אור עם ידית נותנת שליטה ונראות בלילה. קולר LED הופך את הכלב לגלוי בחושך.' },
-        keywords: ['hands free dog leash', 'dog harness reflective', 'led dog collar', 'poop bag dispenser', 'car seat cover dog'] },
+      },
     ],
     faq: [
       { q: { en: 'Are AliExpress pet products safe?', he: 'האם מוצרים לחיות מחמד מאליאקספרס בטוחים?' }, a: { en: 'Yes — look for BPA-free, food-grade silicone, and stainless steel materials. Avoid cheap plastic that can crack or leach chemicals. Check reviews for \"pet safe\" and stick to sellers with 95%+ positive feedback. The same factories that make branded pet products also sell on AliExpress.', he: 'כן — חפשו חומרים נטולי BPA, סיליקון באיכות מזון, ונירוסטה. הימנעו מפלסטיק זוק שיכול להיסדק. בדקו ביקורות והיצמדו למוכרים עם 95%+ משוב חיובי.' } },
@@ -357,15 +354,15 @@ export const blogPosts: BlogPost[] = [
       {
         heading: { en: 'Packing Organization', he: 'ארגון אריזה' },
         body: { en: 'Compression packing cubes are the #1 travel hack. They squeeze the air out of your clothes, fitting 2x more in your suitcase. Get a set of 4-6 cubes in different sizes. A hanging toiletry bag with a hook keeps your bathroom essentials organized and visible. Shoe bags keep dirty soles away from clean clothes. A travel jewelry organizer with individual compartments prevents tangles.', he: 'קוביות אריזה דחיסה הן הטריק מספר 1 לטיולים. הן סוחטות את האוויר מבגדים, ומכניסות פי 2 יותר למזוודה. קחו סט של 4-6 קוביות בגדלים שונים. תיק טואלט תלוי עם וו שומר על מוצרי רחצה מסודרים.' },
-        keywords: ['compression packing cubes', 'travel toiletry bag', 'shoe bag travel', 'jewelry organizer travel'] },
+      },
       {
         heading: { en: 'Tech & Charging on the Go', he: 'טק וטעינה בדרכים' },
         body: { en: 'A universal travel adapter with multiple USB ports is essential — look for one with US/EU/UK/AU plugs, USB-C PD (Power Delivery) for fast charging, and surge protection. A 10000mAh power bank charges your phone 2-3 times. A cable organizer case keeps chargers, cables, and adapters from tangling. A magnetic USB-C cable with detachable tips works for both iPhone and Android — carry one cable for everything.', he: 'מתאם נסיעות אוניברסלי עם שקעי USB מרובים הוא חיוני — חפשו עם תקעי US/EU/UK/AU, USB-C PD לטעינה מהירה, והגנת נחשולי מתח.' },
-        keywords: ['universal travel adapter', 'power bank 10000mAh', 'cable organizer case', 'magnetic usb c cable'] },
+      },
       {
         heading: { en: 'Comfort & Security', he: 'נוחות וביטחון' },
         body: { en: 'A travel neck pillow with memory foam and a washable cover makes long flights bearable. A sleep mask with contoured eye cups allows you to blink naturally while blocking 100% of light. A TSA-approved combination lock secures your luggage. A door lock alarm adds security to hotel rooms. A portable luggage scale prevents overweight baggage fees. An RFID-blocking passport wallet protects your data from digital theft.', he: 'כרית צוואר לנסיעות עם קצף זיכרון וכיסוי ניתן לכביסה הופכת טיסות ארוכות לנסבלות. מסכת שינה עם כוסות עיניים מעוצבות מאפשרת למצמץ באופן טבעי תוך חסימת 100% אור.' },
-        keywords: ['travel neck pillow', 'sleep mask contoured', 'tsa lock', 'portable luggage scale', 'rfid blocking wallet'] },
+      },
     ],
     faq: [
       { q: { en: 'Do compression packing cubes really work?', he: 'האם קוביות דחיסה באמת עובדות?' }, a: { en: 'Yes — they use a second zipper to compress the cube, reducing volume by 30-50%. Clothes come out wrinkled but not as bad as vacuum bags. They\'re better than rolling for maximizing space, and the organization benefit alone is worth it.', he: 'כן — הן משתמשות ברוכסן שני כדי לדחוס את הקובייה, ומפחיתות נפח ב-30-50%. בגדים יוצאים מקומטים אבל פחות גרוע משקיות ואקום.' } },
