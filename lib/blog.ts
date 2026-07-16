@@ -378,6 +378,26 @@ export const blogPosts: BlogPost[] = [
     publishDate: '2026-07-16',
     category: 'tips',
   },
+  {
+    slug: 'budget-gaming-mouse-keyboard',
+    title: { en: 'Budget Gaming Mouse vs Keyboard: Which Upgrade Matters Most?', he: 'עכבר גיימינג מול מקלדת: איזה שדרוג הכי משתלם?' },
+    metaDesc: { en: 'Should you upgrade your mouse or keyboard first? We compare the impact on gaming performance.', he: 'מה כדאי לשדרג קודם — עכבר או מקלדת? השוואה של ההשפעה על ביצועי המשחק.' },
+    intro: { en: 'When building a budget gaming setup, the two biggest upgrades are mouse and keyboard. We tested $20 mice against $20 keyboards to find which gives the biggest boost.', he: 'כשבונים עמדת גיימינג תקציבית, שני השדרוגים הכי גדולים הם עכבר ומקלדת. בדקנו איזה נותן את התמורה הטובה ביותר.' },
+    sections: [
+      { heading: { en: 'Why a Gaming Mouse Matters', he: 'למה עכבר גיימינג חשוב' }, body: { en: 'Adjustable DPI (up to 6400), programmable buttons, and 1000Hz polling rate give you precision and speed in FPS games.', he: 'DPI מתכוונן, כפתורים ניתנים לתכנות וקצב דיווח גבוה נותנים דיוק ומהירות במשחקי FPS.' } },
+      { heading: { en: 'Why a Mechanical Keyboard Matters', he: 'למה מקלדת מכנית חשובה' }, body: { en: 'Genuine mechanical switches provide faster, more consistent keystrokes. The 60% form factor saves desk space.', he: 'סוויצ\'ים מכניים אמיתיים מספקים הקשות מהירות ועקביות יותר. הפורמט 60% חוסך מקום על השולחן.' } },
+    ],
+    faq: [
+      { q: { en: 'Which is more important for FPS?', he: 'מה יותר חשוב ל-FPS?' }, a: { en: 'Mouse. DPI and polling rate matter more than keyboard switches for aiming.', he: 'עכבר. DPI וקצב דיווח חשובים יותר מסוויצ\'ים במקלדת.' } },
+    ],
+    keywords: ['gaming mouse vs keyboard', 'budget gaming setup', 'best cheap gaming mouse', 'best cheap mechanical keyboard'],
+    relatedProducts: [
+      { name: 'Gaming Mouse', keyword: 'gaming mouse rgb wired 6400 dpi' },
+      { name: 'Mechanical Keyboard', keyword: 'mechanical keyboard 60% rgb wired' },
+    ],
+    publishDate: '2026-07-16',
+    category: 'comparison',
+  },
 ];
 export function getBlogPost(slug: string): BlogPost | undefined {
   return blogPosts.find(p => p.slug === slug);
