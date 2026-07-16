@@ -30,7 +30,7 @@ export const REGIONS: Record<string, RegionConfig> = {
       title: 'שופלי — המוצרים הכי שווים מאליאקספרס',
       description: 'AI בוחר את המוצרים הכי שווים מאליאקספרס במיוחד בשבילך. מחירים מטורפים, משלוח חינם, איכות מובטחת.',
     },
-    tgChannel: 'shopli_il',
+    tgChannel: 'shoppingisraelnew',
   },
   eu: {
     code: 'eu',

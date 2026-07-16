@@ -56,7 +56,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             {rtl ? 'קטגוריות' : 'Categories'}
           </Link>
           <a
-            href={rtl ? 'https://t.me/shopli_il' : 'https://t.me/shopli_eu'}
+            href={rtl ? 'https://t.me/shoppingisraelnew' : 'https://t.me/shoppingisraelnew'}
             target="_blank"
             rel="noopener"
             className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-1.5"
@@ -140,7 +140,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             {rtl ? 'קטגוריות' : 'Categories'}
           </Link>
           <a
-            href={rtl ? 'https://t.me/shopli_il' : 'https://t.me/shopli_eu'}
+            href={rtl ? 'https://t.me/shoppingisraelnew' : 'https://t.me/shoppingisraelnew'}
             target="_blank"
             rel="noopener"
             className="flex items-center gap-2 px-3 py-2.5 rounded-lg font-medium text-sm hover:bg-gray-100"
