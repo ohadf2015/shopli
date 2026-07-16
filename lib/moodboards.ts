@@ -608,6 +608,25 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
       { q: { en: 'What cooling method works best without electricity?', he: 'איזו שיטת קירור עובדת הכי טוב בלי חשמל?' }, a: { en: 'A cooling towel soaked in water works instantly — evaporation drops the temperature by 15-20°F. Pair with an insulated bottle for ice-cold water all day.', he: 'מגבת קירור טבולה במים עובדת מיידית — האידוי מוריד את הטמפרטורה ב-8-10 מעלות. שלבו עם בקבוק מבודד למים קרים כקרח כל היום.' } },
     ],
   },
+  'budget-gaming-setup': {
+    slug: 'budget-gaming-setup',
+    metaTitle: { en: 'Budget Gaming Setup Under $100 — Mouse, Keyboard, Headset & More', he: 'עמדת גיימינג תקציבית בפחות מ-₪400' },
+    metaDesc: { en: 'Everything you need for a complete gaming setup: mouse, keyboard, headset, mousepad, mic. All under $100 from AliExpress.', he: 'כל מה שצריך לעמדת גיימינג שלמה: עכבר, מקלדת, אוזניות, משטח עכבר, מיקרופון. הכל בפחות מ-₪400 מאליאקספרס.' },
+    h1: { en: 'Build a Complete Gaming Setup Under $100', he: 'עמדת גיימינג מלאה בפחות מ-₪400' },
+    intro: { en: 'You dont need to spend thousands on a gaming setup. Here is every piece you need for a complete budget-friendly gaming station, all sourced from AliExpress for under $100.', he: 'אתם לא צריכים להוציא אלפי שקלים על עמדת גיימינג. הנה כל חלק שאתם צריכים לעמדת גיימינג תקציבית מלאה, הכל מאליאקספרס בפחות מ-₪400.' },
+    items: [
+      { keywords: ['gaming mouse rgb wired 6400 dpi'], caption: { en: 'RGB Gaming Mouse', he: 'עכבר גיימינג RGB' } },
+      { keywords: ['mechanical keyboard 60% rgb wired'], caption: { en: '60% Mechanical Keyboard', he: 'מקלדת מכנית 60%' } },
+      { keywords: ['gaming headset 7.1 surround sound'], caption: { en: '7.1 Surround Headset', he: 'אוזניות גיימינג 7.1' } },
+      { keywords: ['gaming mouse pad xxl extended'], caption: { en: 'XXL Mouse Pad', he: 'משטח עכבר XXL' } },
+      { keywords: ['condenser microphone usb podcast'], caption: { en: 'USB Condenser Mic', he: 'מיקרופון קונדנסר USB' } },
+    ],
+    totalEstimate: { en: '~$25-75', he: '~₪100-280' },
+    faq: [
+      { q: { en: 'Do I need a gaming mouse?', he: 'האם אני צריך עכבר גיימינג?' }, a: { en: 'A gaming mouse has higher DPI (precision) and extra programmable buttons. For FPS and MOBA games, it makes a real difference.', he: 'לעכבר גיימינג יש DPI גבוה יותר (דיוק) וכפתורים ניתנים לתכנות. למשחקי FPS ו-MOBA, זה עושה הבדל משמעותי.' } },
+    ],
+    tags: ['gaming', 'setup', 'desk'],
+  },
 };
 
 export function getMoodBoard(slug: string): MoodBoard | undefined {
