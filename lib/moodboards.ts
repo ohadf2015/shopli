@@ -360,7 +360,7 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
     metaTitle: { en: 'Superman Costume: Classic Man of Steel Under €25', he: 'תחפושת סופרמן: איש הפלדה הקלאסי בפחות מ-₪100' },
     metaDesc: { en: 'Complete Superman costume: bodysuit, cape, chest emblem, boots, belt and cuffs. The iconic look.', he: 'תחפושת סופרמן מלאה: חליפה, גלימה, סמל חזה, מגפיים, חגורה וצמידים. המראה האייקוני.' },
     h1: { en: 'Superman: The Complete Man of Steel Under €25', he: 'סופרמן: איש הפלדה השלם בפחות מ-₪100' },
-    intro: { en: 'There is no more iconic superhero than Superman. Build the full look — blue bodysuit, red cape, and the famous \u2018S\u2019 shield — and fly into Purim.', he: 'אין גיבור על אייקוני יותר מסופרמן. בנו את המראה המלא — חליפה כחולה, גלימה אדומה ומגן ה-S המפורסם — ועפו לתוך פורים.' },
+    intro: { en: 'There is no more iconic superhero than Superman. Build the full look — blue bodysuit, red cape, and the famous \'S\' shield — and fly into Purim.', he: 'אין גיבור על אייקוני יותר מסופרמן. בנו את המראה המלא — חליפה כחולה, גלימה אדומה ומגן ה-S המפורסם — ועפו לתוך פורים.' },
     tags: ['purim', 'costume', 'superhero', 'halloween'],
     items: [
       { keywords: ['superman costume men', 'superman suit spandex'], caption: { en: 'Superman Bodysuit', he: 'חליפת סופרמן' } },
@@ -400,7 +400,7 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
     intro: { en: 'Starting a stream does not require a huge budget. Ring light for pro lighting, USB mic for clear audio, and a capture card for console gameplay. Here is everything you need.', he: 'כדי להתחיל לשדר לא צריך תקציב ענק. תאורת טבעת לתאורה מקצועית, מיקרופון USB לאודיו נקי וכרטיס לכידה לקונסולה. הנה כל מה שצריך.' },
     tags: ['desk', 'gaming', 'tech'],
     items: [
-      { keywords: ['ring light 10 inch', 'professional ring light stand'], caption: { en: 'Ring Light (10\u201d + Tripod)', he: 'תאורת טבעת 10" + חצובה' } },
+      { keywords: ['ring light 10 inch', 'professional ring light stand'], caption: { en: 'Ring Light (10" + Tripod)', he: 'תאורת טבעת 10" + חצובה' } },
       { keywords: ['USB microphone condenser', 'podcast mic gaming'], caption: { en: 'USB Condenser Mic', he: 'מיקרופון קונדנסר USB' }, note: { en: 'Dynamic mic is better if your room is noisy', he: 'מיקרופון דינמי עדיף אם החדר רועש' } },
       { keywords: ['phone tripod stand', 'flexible phone holder'], caption: { en: 'Phone Tripod / Stand', he: 'חצובת פלאפון' } },
       { keywords: ['HDMI capture card', 'USB video capture'], caption: { en: 'HDMI Capture Card', he: 'כרטיס לכידה HDMI' } },
@@ -664,8 +664,24 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
     ],
     totalEstimate: { en: 'Complete pet corner: ~€25-40', he: 'פינה שלמה: ~₪100-160' },
     faq: [
-      { q: { en: 'Where should I put the pet corner?', he: 'איפה למקם את פינת חיית המחמד?' }, a: { en: 'A quiet corner of the kitchen or living room — away from heavy foot traffic and loud appliances. Make sure it\'s not in direct sunlight or drafty areas. Cats prefer elevated spots; dogs prefer ground level.', he: 'פינה שקטה במטבח או בסלון — הרחק מתנועה כבדה ומכשירים רועשים. וודאו שזה לא בשמש ישירה או בטיוטות.' } },
+      { q: { en: 'Where should I put the pet corner?', he: 'איפה למקם את פינת חיית המחמד?' }, a: { en: "A quiet corner of the kitchen or living room — away from heavy foot traffic and loud appliances. Make sure it's not in direct sunlight or drafty areas. Cats prefer elevated spots; dogs prefer ground level.", he: 'פינה שקטה במטבח או בסלון — הרחק מתנועה כבדה ומכשירים רועשים. וודאו שזה לא בשמש ישירה או בטיוטות.' } },
     ],
+  },
+  'streaming-setup': {
+    slug: 'streaming-setup',
+    metaTitle: { en: 'Budget Streaming Setup Under $50 — Mic, Light, Camera', he: 'עמדת סטרימינג תקציבית בפחות מ-₪200' },
+    metaDesc: { en: 'Everything you need to start streaming: USB mic, ring light, webcam, and pop filter. Complete budget setup from AliExpress.', he: 'כל מה שצריך כדי להתחיל להזרים: מיקרופון USB, רינג לייט, מצלמת רשת ופילטר פופ. עמדת סטרימינג מלאה מאליאקספרס.' },
+    h1: { en: 'Build a Complete Streaming Setup Under $50', he: 'עמדת סטרימינג מלאה בפחות מ-₪200' },
+    intro: { en: "You don't need a $500 microphone to start streaming. Here is every piece you need for a clean, professional-looking streaming setup, all from AliExpress for under $50.", he: 'אתם לא צריכים מיקרופון של ₪2000 כדי להתחיל להזרים. הנה כל חלק שאתם צריכים לעמדת סטרימינג מקצועית, הכל מאליאקספרס בפחות מ-₪200.' },
+    items: [
+      { keywords: ['usb condenser microphone podcast'], caption: { en: 'USB Condenser Mic', he: 'מיקרופון קונדנסר USB' } },
+      { keywords: ['ring light 10 inch with tripod'], caption: { en: '10" Ring Light with Tripod', he: 'רינג לייט 10" עם חצובה' } },
+      { keywords: ['webcam 1080p usb'], caption: { en: '1080p USB Webcam', he: 'מצלמת רשת 1080p USB' } },
+      { keywords: ['pop filter microphone'], caption: { en: 'Pop Filter', he: 'פילטר פופ' } },
+      { keywords: ['microphone arm stand'], caption: { en: 'Microphone Scissor Arm', he: 'זרוע מיקרופון' } },
+    ],
+    totalEstimate: { en: '~$30-50', he: '~₪120-200' },
+    tags: ['streaming', 'setup', 'content-creator'],
   },
 };
 
