@@ -667,22 +667,6 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
       { q: { en: 'Where should I put the pet corner?', he: 'איפה למקם את פינת חיית המחמד?' }, a: { en: "A quiet corner of the kitchen or living room — away from heavy foot traffic and loud appliances. Make sure it's not in direct sunlight or drafty areas. Cats prefer elevated spots; dogs prefer ground level.", he: 'פינה שקטה במטבח או בסלון — הרחק מתנועה כבדה ומכשירים רועשים. וודאו שזה לא בשמש ישירה או בטיוטות.' } },
     ],
   },
-  'streaming-setup': {
-    slug: 'streaming-setup',
-    metaTitle: { en: 'Budget Streaming Setup Under $50 — Mic, Light, Camera', he: 'עמדת סטרימינג תקציבית בפחות מ-₪200' },
-    metaDesc: { en: 'Everything you need to start streaming: USB mic, ring light, webcam, and pop filter. Complete budget setup from AliExpress.', he: 'כל מה שצריך כדי להתחיל להזרים: מיקרופון USB, רינג לייט, מצלמת רשת ופילטר פופ. עמדת סטרימינג מלאה מאליאקספרס.' },
-    h1: { en: 'Build a Complete Streaming Setup Under $50', he: 'עמדת סטרימינג מלאה בפחות מ-₪200' },
-    intro: { en: "You don't need a $500 microphone to start streaming. Here is every piece you need for a clean, professional-looking streaming setup, all from AliExpress for under $50.", he: 'אתם לא צריכים מיקרופון של ₪2000 כדי להתחיל להזרים. הנה כל חלק שאתם צריכים לעמדת סטרימינג מקצועית, הכל מאליאקספרס בפחות מ-₪200.' },
-    items: [
-      { keywords: ['usb condenser microphone podcast'], caption: { en: 'USB Condenser Mic', he: 'מיקרופון קונדנסר USB' } },
-      { keywords: ['ring light 10 inch with tripod'], caption: { en: '10" Ring Light with Tripod', he: 'רינג לייט 10" עם חצובה' } },
-      { keywords: ['webcam 1080p usb'], caption: { en: '1080p USB Webcam', he: 'מצלמת רשת 1080p USB' } },
-      { keywords: ['pop filter microphone'], caption: { en: 'Pop Filter', he: 'פילטר פופ' } },
-      { keywords: ['microphone arm stand'], caption: { en: 'Microphone Scissor Arm', he: 'זרוע מיקרופון' } },
-    ],
-    totalEstimate: { en: '~$30-50', he: '~₪120-200' },
-    tags: ['streaming', 'setup', 'content-creator'],
-  },
 };
 
 export function getMoodBoard(slug: string): MoodBoard | undefined {
