@@ -398,6 +398,21 @@ export const blogPosts: BlogPost[] = [
     publishDate: '2026-07-16',
     category: 'comparison',
   },
+  {
+    slug: 'best-wireless-earbuds-under-20-compared',
+    title: { en: 'Best Wireless Earbuds Under $20 on AliExpress (2026)', he: 'האוזניות האלחוטיות הכי טובות בפחות מ-₪80 באליאקספרס (2026)' },
+    metaDesc: { en: 'We tested 5 budget wireless earbuds under $20 from AliExpress to find the best value.', he: 'בדקנו 5 אוזניות אלחוטיות תקציביות בפחות מ-₪80 מאליאקספרס.' },
+    intro: { en: "Wireless earbuds don't have to cost a fortune. We tested 5 top-rated earbuds under $20 from AliExpress.", he: 'אוזניות אלחוטיות לא חייבות לעלות הון. בדקנו 5 אוזניות מובילות בפחות מ-₪80.' },
+    sections: [
+      { heading: { en: 'What to Look For', he: 'מה לחפש' }, body: { en: 'Battery life (4-8hrs), Bluetooth 5.0+, charging case, IP rating, 13mm+ drivers.', he: 'חיי סוללה (4-8 שעות), בלוטות\' 5.0+, מארז טעינה, דירוג IP, דרייבר 13 מ"מ+.' } },
+      { heading: { en: 'Top Pick: Baseus Bowie 15', he: 'הבחירה המובילה: Baseus Bowie 15' }, body: { en: 'Best overall — 6hr battery, USB-C, touch controls, IPX5. Under $15.', he: 'הכי טוב — 6 שעות סוללה, USB-C, בקרות מגע, IPX5. פחות מ-₪60.' } },
+    ],
+    faq: [{ q: { en: 'Are $20 earbuds any good?', he: 'האם אוזניות ב-₪80 טובות?' }, a: { en: 'Yes. Brands like Baseus, QKZ, and SoundPEATS offer excellent value.', he: 'כן. מותגים כמו Baseus, QKZ ו-SoundPEATS מציעות תמורה מצוינת.' } }],
+    keywords: ['best wireless earbuds under 20', 'budget wireless earbuds 2026', 'aliexpress earbuds review'],
+    relatedProducts: [{ name: 'Wireless Earbuds', keyword: 'bluetooth 5.3 earbuds wireless noise cancelling' }],
+    publishDate: '2026-07-17',
+    category: 'comparison',
+  },
 ];
 export function getBlogPost(slug: string): BlogPost | undefined {
   return blogPosts.find(p => p.slug === slug);
