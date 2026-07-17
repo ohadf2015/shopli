@@ -82,17 +82,17 @@ export const blogPosts: BlogPost[] = [
     },
     intro: {
       en: 'Good coffee at home doesn\'t require a $500 espresso machine. The biggest flavor gains come from fresh beans, proper grind, and consistent ratio — not pressure. This guide shows the minimum gear for maximum flavor.',
-      he: 'קפה טוב בבית לא דורש מכונת אספרסו ב-500$. הרווחי הטעם הגדולים מגיעים מפולים טריים, טחינה נכונה, ויחס עקבי — לא מלחץ.',
+      he: 'קפה טוב בבית לא דורש מכונת אספרסו ב-500$. השיפורים המשמעותיים בטעם מגיעים מפולים טריים, טחינה נכונה, ויחס עקבי — לא מלחץ.',
       fr: 'Le bon café à la maison ne nécessite pas une machine espresso à 500$. Les plus gros gains de saveur viennent de grains frais, mouture correcte et ratio constant.',
       de: 'Guter Kaffee zu Hause braucht keine 500$-Espressomaschine. Die größten Geschmacksgewinne kommen von frischen Bohnen, richtigem Mahlgrad und konstantem Verhältnis.',
       es: 'El buen café en casa no requiere una máquina de espresso de $500. Las mayores ganancias de sabor vienen de granos frescos, molienda correcta y proporción constante.',
       it: 'Il buon caffè a casa non richiede una macchina espresso da 500$. I maggiori guadagni di sapore vengono da chicchi freschi, macinatura corretta e rapporto costante.',
     },
     sections: [
-      { heading: { en: '1. Burr Grinder (Non-Negotiable)', he: '1. מטחנת דסקיות (חובה)' }, body: { en: 'Blade grinders chop unevenly = bitter + sour in same cup. Entry hand grinder ($25) beats electric blade. Electric burr starts at $80.', he: 'מטחנות להב קוצצות לא אחיד = מר + חמוץ באותה כוס. מטחנת יד בסיסית ($25) מנצחת חשמלית להב. חשמלית דסקיות מ-$80.' } },
+      { heading: { en: '1. Burr Grinder (Non-Negotiable)', he: '1. מטחנת בור (חובה)' }, body: { en: 'Blade grinders chop unevenly = bitter + sour in same cup. Entry hand grinder ($25) beats electric blade. Electric burr starts at $80.', he: 'מטחנות להב קוצצות לא אחיד = מר + חמוץ באותה כוס. מטחנת יד בסיסית ($25) מנצחת חשמלית להב. מטחנת בור חשמלית מ-$80.' } },
       { heading: { en: '2. French Press or AeroPress', he: '2. פרנץ׳ פרס או אירופרס' }, body: { en: 'Both under $30. French press = richer, more body. AeroPress = cleaner, faster, travel-friendly. Pick one.', he: 'שניהם מתחת ל-$30. פרנץ׳ פרס = עשיר יותר, יותר גוף. אירופרס = נקי יותר, מהיר, ידידותי לנסיעות. בחרו אחד.' } },
       { heading: { en: '3. Digital Scale (0.1g)', he: '3. משקל דיגיטלי (0.1ג)' }, body: { en: 'Eyeballing ratios = inconsistent coffee. $15 scale gives repeatable 1:16 ratio every time. Essential.', he: 'ניחוש יחסים = קפה לא עקבי. משקל $15 נותן יחס 1:16 חוזר בכל פעם. חובה.' } },
-      { heading: { en: '4. Gooseneck Kettle', he: '4. קומקום צוואר אווז' }, body: { en: 'Controls pour rate for even extraction. Stovetop ($20) or electric with temp control ($60). Variable temp matters for light roasts.', he: 'שולט בקצב מזיגה למיצוי אחיד. כיריים ($20) או חשמלי עם בקרת טמפרטורה ($60). טמפרטורה משתנה חשובה לקלילות קלות.' } },
+      { heading: { en: '4. Gooseneck Kettle', he: '4. קומקום צוואר אווז' }, body: { en: 'Controls pour rate for even extraction. Stovetop ($20) or electric with temp control ($60). Variable temp matters for light roasts.', he: 'שולט בקצב מזיגה למיצוי אחיד. כיריים ($20) או חשמלי עם בקרת טמפרטורה ($60). טמפרטורה משתנה חשובה לקלייה קלה.' } },
     ],
     faq: [
       { q: { en: 'Do I need a scale for French press?', he: 'האם צריך משקל לפרנץ׳ פרס?' }, a: { en: 'Yes — 1:15 to 1:17 ratio is the sweet spot. Without a scale you\'re guessing. $15 scale pays for itself in saved beans.', he: 'כן — יחס 1:15 עד 1:17 זה הנקודה המתוקה. בלי משקל אתם מנחשים. משקל $15 מחזיר את עצמו בפולים שנחסכו.' } },
@@ -402,7 +402,7 @@ export const blogPosts: BlogPost[] = [
     slug: 'best-wireless-earbuds-under-20-compared',
     title: { en: 'Best Wireless Earbuds Under $20 on AliExpress (2026)', he: 'האוזניות האלחוטיות הכי טובות בפחות מ-₪80 באליאקספרס (2026)' },
     metaDesc: { en: 'We tested 5 budget wireless earbuds under $20 from AliExpress to find the best value.', he: 'בדקנו 5 אוזניות אלחוטיות תקציביות בפחות מ-₪80 מאליאקספרס.' },
-    intro: { en: "Wireless earbuds don't have to cost a fortune. We tested 5 top-rated earbuds under $20 from AliExpress.", he: 'אוזניות אלחוטיות לא חייבות לעלות הון. בדקנו 5 אוזניות מובילות בפחות מ-₪80.' },
+    intro: { en: "Wireless earbuds don't have to cost a fortune. We tested 5 top-rated earbuds under $20 from AliExpress.", he: 'אוזניות אלחוטיות לא חייבות להיות יקרות. בדקנו 5 אוזניות מובילות בפחות מ-₪80.' },
     sections: [
       { heading: { en: 'What to Look For', he: 'מה לחפש' }, body: { en: 'Battery life (4-8hrs), Bluetooth 5.0+, charging case, IP rating, 13mm+ drivers.', he: 'חיי סוללה (4-8 שעות), בלוטות\' 5.0+, מארז טעינה, דירוג IP, דרייבר 13 מ"מ+.' } },
       { heading: { en: 'Top Pick: Baseus Bowie 15', he: 'הבחירה המובילה: Baseus Bowie 15' }, body: { en: 'Best overall — 6hr battery, USB-C, touch controls, IPX5. Under $15.', he: 'הכי טוב — 6 שעות סוללה, USB-C, בקרות מגע, IPX5. פחות מ-₪60.' } },
