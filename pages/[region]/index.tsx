@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Header from '../../components/Header';
 import Icon from '../../components/icons';
 import { getRegion, RegionCode } from '../../lib/regions';
+import { getSeoHead } from '../../lib/seo';
 import { getAllCollections } from '../../lib/collections';
 import type { RegionConfig } from '../../lib/regions';
 import type { Product } from '../../lib/types';
@@ -39,11 +40,19 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
     ? 'אנחנו בוחרים מוצרים לפי טרנדים, עונה ואיכות. אתם קונים במחירים הכי נמוכים עם קישור partnerפים ישיר.'
     : 'We pick products by trends, season & quality. You buy at the lowest price with direct affiliate links.';
 
+  const seo = getSeoHead({ region: region as RegionCode, path: '', title: config.meta.title, description: config.meta.description });
+
   return (
     <>
       <Head>
-        <title>{config.meta.title}</title>
-        <meta name="description" content={config.meta.description} />
+        <title>{seo.title}</title>
+        {seo.meta.map((m: any, i: number) =>
+          m.tag === 'link' ? (
+            <link key={i} rel={m.rel} hrefLang={m.hrefLang} href={m.href} />
+          ) : (
+            <meta key={i} name={m.name || m.property} content={m.content} property={m.property} />
+          )
+        )}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <Header currentRegion={region} dir={config.direction} />
