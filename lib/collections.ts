@@ -1,9 +1,15 @@
 export interface CollectionDef {
   slug: string;
-  keywords: string[];
-  name: Record<string, string>;
-  desc: Record<string, string>;
-  icon: string;
+  keywords?: string[];
+  name?: Record<string, string>;
+  desc?: Record<string, string>;
+  icon?: string;
+  affiliateKeywords?: string[];
+  tag?: Record<string, string>;
+  metaTitle?: Record<string, string>;
+  metaDesc?: Record<string, string>;
+  image?: string;
+  items?: Array<{ name: string; keyword: string; minPrice: number; maxPrice: number }>;
 }
 
 export const COLLECTIONS: CollectionDef[] = [
