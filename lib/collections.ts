@@ -4,6 +4,12 @@ export interface CollectionDef {
   name: Record<string, string>;
   desc: Record<string, string>;
   icon: string;
+  affiliateKeywords?: string[];
+  tag?: Record<string, string>;
+  metaTitle?: Record<string, string>;
+  metaDesc?: Record<string, string>;
+  image?: string;
+  items?: { name: string; keyword: string; minPrice: number; maxPrice: number }[];
 }
 
 export const COLLECTIONS: CollectionDef[] = [
@@ -131,10 +137,15 @@ export const COLLECTIONS: CollectionDef[] = [
     keywords: ['silk sleep mask', 'weighted eye pillow', 'aromatherapy diffuser ultrasonic', 'memory foam contour pillow'],
     name: { en: 'Sleep Sanctuary', he: 'פינת שינה', fr: 'Sanctuaire du Sommeil', de: 'Schlaf-Oase', es: 'Santuario del Sueño', it: 'Santuario del Sonno' },
     desc: { en: 'Natural sleep aids for better rest under €40', he: 'עזרי שינה טבעיים לשינה טובה יותר בפחות מ-₪150', fr: 'Aides au sommeil naturelles pour mieux dormir à moins de 40€', de: 'Natürliche Schlafhilfen für besseren Schlaf unter 40€', es: 'Ayudas naturales para dormir mejor por menos de 40€', it: 'Aiuti naturali per dormire meglio sotto 40€' },
+    icon: 'moon',
     affiliateKeywords: ['back to school supplies', 'school supplies bulk', 'stationery set', 'college dorm essentials', 'school backpack'],
   },
   {
     slug: 'gaming-gear',
+    keywords: ['gaming mouse', 'gaming keyboard', 'gaming headset', 'gaming accessories'],
+    name: { en: 'Gaming Gear', he: 'ציוד גיימינג', fr: 'Équipement Gaming', de: 'Gaming-Zubehör', es: 'Equipo Gaming', it: 'Attrezzatura Gaming' },
+    desc: { en: 'Mouse, keyboard, headset and more — gaming gear that won\'t break the bank.', he: 'עכבר, מקלדת, אוזניות ועוד — ציוד גיימינג שלא ירושש אתכם', fr: 'Souris, clavier, casque — du matériel gaming qui ne ruine pas.', de: 'Maus, Tastatur, Headset — Gaming-Zubehör das die Bank nicht sprengt.', es: 'Ratón, teclado, auriculares — equipo gaming que no arruinará.', it: 'Mouse, tastiera, cuffie — attrezzatura gaming che non vi rovinerà.' },
+    icon: 'monitor',
     tag: { en: 'Gaming Gear', he: 'ציוד גיימינג' },
     metaTitle: { en: 'Best Budget Gaming Gear Under $30', he: 'ציוד גיימינג במחירי רצפה' },
     metaDesc: { en: 'Mouse, keyboard, headset and more — gaming gear that won\'t break the bank.', he: 'עכבר, מקלדת, אוזניות ועוד — ציוד גיימינג שלא ירושש אתכם' },

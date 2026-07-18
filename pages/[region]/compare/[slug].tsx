@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
+import ShareButton from '../../../components/ShareButton';
 import { getRegion } from '../../../lib/regions';
 import { getComparison } from '../../../lib/comparisons';
 
@@ -40,6 +41,10 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
 
         <h1 className="text-2xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--shopli-navy)' }}>{t(c.title)}</h1>
         <p className="max-w-3xl text-base leading-relaxed mb-8" style={{ color: 'var(--shopli-warm-gray)' }}>{t(c.intro)}</p>
+
+        <div className="mb-8">
+          <ShareButton title={t(c.title)} description={t(c.metaDesc)} />
+        </div>
 
         {/* Side-by-side comparison */}
         <div className="grid md:grid-cols-2 gap-6 mb-10">

@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
+import ShareButton from '../../../components/ShareButton';
 import { getRegion } from '../../../lib/regions';
 import { getAllCollections, getCollection } from '../../../lib/collections';
 import { COLLECTION_CONTENT } from '../../../lib/collection-content';
@@ -39,6 +40,10 @@ export default function CollectionPage({ region, config, collection, content, se
           {content ? get(content.h1) : collection.name}
         </h1>
         {content && <p className="max-w-2xl text-base leading-relaxed mb-8" style={{ color: 'var(--shopli-warm-gray)' }}>{get(content.intro)}</p>}
+
+        <div className="mb-8">
+          <ShareButton title={content ? get(content.h1) : collection.name} description={content ? get(content.desc) : collection.desc} />
+        </div>
 
         {sections.map((section: any, i: number) => (
           <section key={i} className={`py-8 ${i % 2 === 1 ? 'bg-white' : 'bg-gray-50/50'} -mx-4 sm:-mx-6 px-4 sm:px-6`}>
