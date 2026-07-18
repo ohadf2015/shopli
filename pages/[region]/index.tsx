@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Header from '../../components/Header';
 import Icon from '../../components/icons';
+import WhatsAppShare from '../../components/WhatsAppShare';
 import { getRegion, RegionCode } from '../../lib/regions';
 import { getSeoHead } from '../../lib/seo';
 import { getAllCollections } from '../../lib/collections';
@@ -82,6 +83,14 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
                   {rtl ? 'ערוץ טלגרם' : 'Telegram Channel'}
                 </a>
               )}
+              <WhatsAppShare
+                title={rtl ? 'שופלי — הדילים הכי שווים מאליאקספרס' : 'Shopli — The Best AliExpress Deals'}
+                url={`https://shopli-neon.vercel.app/${region}`}
+                description={heroDesc}
+                locale={config.lang}
+                size="md"
+                className="btn-secondary"
+              />
             </div>
           </div>
         </section>

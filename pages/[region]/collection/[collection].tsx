@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
+import WhatsAppShare from '../../../components/WhatsAppShare';
 import { getRegion } from '../../../lib/regions';
 import { getAllCollections, getCollection } from '../../../lib/collections';
 import { COLLECTION_CONTENT } from '../../../lib/collection-content';
@@ -73,6 +74,14 @@ export default function CollectionPage({ region, config, collection, content, se
                             {p.rating >= 90 ? '★' : ''}{p.volume > 0 ? ` ${p.volume > 1000 ? (p.volume/1000).toFixed(1) + 'k' : p.volume} sold` : ''}
                           </span>
                         </div>
+                        <div className="mt-1.5">
+                          <WhatsAppShare
+                            title={p.title}
+                            url={p.affiliateLink || `https://shopli-neon.vercel.app/${region}/collection/${collection.slug}`}
+                            locale={lang}
+                            size="sm"
+                          />
+                        </div>
                       </div>
                     </a>
                   ))}
@@ -93,6 +102,22 @@ export default function CollectionPage({ region, config, collection, content, se
             ))}
           </section>
         )}
+
+        {/* Share this collection */}
+        <section className="py-6 border-t border-gray-100">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-sm font-medium" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {rtl ? 'אהבתם את האוסף? שתפו עם חברים' : 'Like this collection? Share it with friends'}
+            </p>
+            <WhatsAppShare
+              title={rtl ? `אוסף ${collection.name} — שופלי` : `${collection.name} collection — Shopli`}
+              url={`https://shopli-neon.vercel.app/${region}/collection/${collection.slug}`}
+              description={get(collection.desc || '')}
+              locale={lang}
+              size="md"
+            />
+          </div>
+        </section>
       </main>
     </>
   );
