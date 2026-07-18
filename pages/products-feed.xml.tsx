@@ -118,6 +118,7 @@ ${items}
 
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
   res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+  res.setHeader('Vercel-CDN-Cache-Control', 'public, s-maxage=3600');
   res.write(xml);
   res.end();
 
