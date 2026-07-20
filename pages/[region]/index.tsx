@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Header from '../../components/Header';
 import Icon from '../../components/icons';
+import ProductCard from '../../components/ProductCard';
 import WhatsAppShare from '../../components/WhatsAppShare';
 import { getRegion, RegionCode } from '../../lib/regions';
 import { getSeoHead } from '../../lib/seo';
@@ -117,54 +118,15 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                 {group.products.map((product) => (
-                  <a key={product.id} href={product.affiliateLink} target="_blank" rel="noopener noreferrer sponsored"
-                    className="bg-white rounded-xl border border-gray-100 overflow-hidden transition-all hover:shadow-md hover:-translate-y-0.5 group">
-                    <div className="aspect-square bg-gray-100 overflow-hidden relative">
-                      {product.imageUrl ? (
-                        <img src={product.imageUrl} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          loading="lazy" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center" style={{ color: 'var(--shopli-warm-gray)' }}>
-                          <Icon name="package" size={32} />
-                        </div>
-                      )}
-                      {product.discount && (
-                        <span className="absolute top-2 right-2 text-[0.6rem] font-bold px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-sm"
-                          style={{ color: 'var(--shopli-orange)' }}>-{product.discount}</span>
-                      )}
-                    </div>
-                    <div className="p-3">
-                      <h3 className="text-xs font-semibold leading-tight mb-1 line-clamp-2" style={{ color: 'var(--shopli-navy)' }}>
-                        {product.title}
-                      </h3>
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <span className="font-bold text-sm" style={{ color: 'var(--shopli-teal)' }}>
-                          {config.currencySymbol}{product.price.toFixed(2)}
-                        </span>
-                        {product.originalPrice && product.originalPrice > product.price && (
-                          <span className="text-xs line-through" style={{ color: 'var(--shopli-warm-gray)' }}>
-                            {config.currencySymbol}{product.originalPrice.toFixed(2)}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Icon name="star" size={11} className="text-yellow-500" />
-                        <span className="text-[0.65rem] font-medium" style={{ color: 'var(--shopli-warm-gray)' }}>
-                          {product.rating}
-                        </span>
-                        {product.volume > 0 && (
-                          <span className="text-[0.6rem]" style={{ color: 'var(--shopli-warm-gray)' }}>
-                            {product.volume > 999 ? `${(product.volume / 1000).toFixed(1)}k` : product.volume}sold
-                          </span>
-                        )}
-                        {product.reviewCount > 0 && (
-                          <span className="text-[0.6rem]" style={{ color: 'var(--shopli-warm-gray)' }}>
-                            ({product.reviewCount > 999 ? `${(product.reviewCount / 1000).toFixed(1)}k` : product.reviewCount})
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </a>
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    region={region}
+                    currencySymbol={config.currencySymbol}
+                    rtl={rtl}
+                    lang={config.lang || 'en'}
+                    size="md"
+                  />
                 ))}
               </div>
             </div>
