@@ -1,9 +1,10 @@
 import { GetServerSideProps } from 'next';
-import Head from 'next/head';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
-import { getRegion } from '../../../lib/regions';
+import SeoHead from '../../../components/SeoHead';
+import { getRegion, RegionCode } from '../../../lib/regions';
 import { getComparison } from '../../../lib/comparisons';
+import { articleJsonLd, breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
 
 export default function ComparisonPage({ region, config, comparison, prod1Items, prod2Items, rtl, error }: any) {
   if (error) {
@@ -16,21 +17,52 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
   const c = comparison;
   if (!c) return null;
 
+  const pageUrl = `${SITE_URL}/${region}/compare/${c.slug}`;
+  const title = `${t(c.title)} | Shopli`;
+  const description = t(c.metaDesc);
+
+  const structuredData: Record<string, unknown>[] = [
+    breadcrumbJsonLd([
+      { name: rtl ? 'דף הבית' : 'Home', url: `${SITE_URL}/${region}` },
+      { name: rtl ? 'השוואות' : 'Comparisons', url: `${SITE_URL}/${region}/compare/french-press-vs-drip` },
+      { name: t(c.title), url: pageUrl },
+    ]),
+    articleJsonLd({
+      headline: t(c.title),
+      description,
+      url: pageUrl,
+    }),
+  ];
+
+  // Product schema for the first item of each comparison side
+  for (const item of [prod1Items?.[0], prod2Items?.[0]]) {
+    if (item?.title) {
+      structuredData.push(
+        productJsonLd({
+          title: item.title,
+          description: item.title,
+          image: item.image,
+          url: item.affiliateLink || pageUrl,
+          brand: item.shopName,
+          price: item.price,
+          currency: config?.currency,
+          ratingValue: item.rating ? item.rating / 20 : undefined,
+          reviewCount: item.reviewCount,
+        })
+      );
+    }
+  }
+
   return (
     <>
-      <Head>
-        <title>{t(c.title)} | Shopli</title>
-        <meta name="description" content={t(c.metaDesc)} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Article',
-            headline: t(c.title),
-            description: t(c.metaDesc),
-            mainEntityOfPage: { '@type': 'WebPage', '@id': `https://shopli-neon.vercel.app/${region}/compare/${c.slug}` }
-          })
-        }} />
-      </Head>
+      <SeoHead
+        region={region as RegionCode}
+        path={`/compare/${c.slug}`}
+        title={title}
+        description={description}
+        ogType="article"
+        jsonLd={structuredData}
+      />
       <Header currentRegion={region} dir={config?.direction} />
       <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         <div className="flex items-center gap-2 text-xs mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
@@ -85,7 +117,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
                       {items.slice(0, 4).map((item: any, i: number) => (
                         <a key={i} href={item.affiliateLink} target="_blank" rel="nofollow sponsored"
                           className="block bg-gray-50 rounded-lg p-2 hover:shadow transition">
-                          <img src={item.image} alt={item.title} className="w-full h-20 object-contain mb-1" loading="lazy" />
+                          <img src={item.image} alt={item.title} className="w-full h-20 object-contain mb-1" loading="lazy" decoding="async" />
                           <p className="text-xs text-gray-700 line-clamp-2">{item.title}</p>
                           <p className="text-xs font-bold mt-1" style={{ color: 'var(--shopli-orange)' }}>{item.price}</p>
                         </a>

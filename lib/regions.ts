@@ -5,7 +5,7 @@ export interface RegionConfig {
   currency: string;
   currencySymbol: string;
   flag: string;
-  lang: 'he' | 'en' | 'fr' | 'de' | 'es' | 'it';
+  lang: 'he' | 'en' | 'fr' | 'de' | 'es' | 'it' | 'ru';
   defaultShipTo: string;
   direction: 'rtl' | 'ltr';
   meta: {
@@ -139,6 +139,22 @@ export const REGIONS: Record<string, RegionConfig> = {
       description: 'Recomendaciones de productos con IA desde AliExpress. Ofertas seleccionadas, envío gratis, calidad garantizada.',
     },
   },
+  ru: {
+    code: 'ru',
+    label: 'Русский (Israel)',
+    locale: 'ru-IL',
+    currency: 'ILS',
+    currencySymbol: '₪',
+    flag: 'ru-flag',
+    lang: 'ru',
+    defaultShipTo: 'IL',
+    direction: 'ltr',
+    meta: {
+      title: 'Shopli — Лучшие предложения AliExpress, подобранные ИИ',
+      description: 'Рекомендации товаров с AliExpress на основе ИИ. Подобранные предложения, бесплатная доставка, гарантия качества.',
+    },
+    tgChannel: 'shoppingisraelnew',
+  },
 } as const;
 
 export type RegionCode = keyof typeof REGIONS;
@@ -154,6 +170,7 @@ export const LOCALE_LABELS: Record<string, string> = {
   'de': 'Deutsch',
   'es': 'Español',
   'it': 'Italiano',
+  'ru': 'Русский',
 };
 
 export const ALL_REGIONS = Object.entries(REGIONS).map(([code, config]) => ({

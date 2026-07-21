@@ -1,9 +1,10 @@
 import { GetServerSideProps } from 'next';
-import Head from 'next/head';
 import Link from 'next/link';
 import Header from '../../../components/Header';
-import { getRegion } from '../../../lib/regions';
+import SeoHead from '../../../components/SeoHead';
+import { getRegion, RegionCode } from '../../../lib/regions';
 import { getBlogPost } from '../../../lib/blog';
+import { blogPostingJsonLd, breadcrumbJsonLd, SITE_URL } from '../../../lib/seo';
 
 export default function BlogPostPage({ region, config, post, rtl, error }: any) {
   if (error) {
@@ -16,24 +17,37 @@ export default function BlogPostPage({ region, config, post, rtl, error }: any) 
   const p = post;
   if (!p) return null;
 
+  const pageUrl = `${SITE_URL}/${region}/blog/${p.slug}`;
+  const title = `${t(p.title)} | Shopli Blog`;
+  const description = t(p.metaDesc);
+
+  const structuredData = [
+    breadcrumbJsonLd([
+      { name: rtl ? 'דף הבית' : 'Home', url: `${SITE_URL}/${region}` },
+      { name: rtl ? 'בלוג' : 'Blog', url: `${SITE_URL}/${region}/blog` },
+      { name: t(p.title), url: pageUrl },
+    ]),
+    blogPostingJsonLd({
+      headline: t(p.title),
+      description,
+      url: pageUrl,
+      datePublished: p.publishDate,
+      dateModified: p.publishDate,
+    }),
+  ];
+
   return (
     <>
-      <Head>
-        <title>{t(p.title)} | Shopli Blog</title>
-        <meta name="description" content={t(p.metaDesc)} />
-        <meta property="article:published_time" content={p.publishDate} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'BlogPosting',
-            headline: t(p.title),
-            description: t(p.metaDesc),
-            datePublished: p.publishDate,
-            author: { '@type': 'Organization', name: 'Shopli' },
-            mainEntityOfPage: { '@type': 'WebPage', '@id': `https://shopli-neon.vercel.app/${region}/blog/${p.slug}` }
-          })
-        }} />
-      </Head>
+      <SeoHead
+        region={region as RegionCode}
+        path={`/blog/${p.slug}`}
+        title={title}
+        description={description}
+        ogType="article"
+        articlePublishedTime={p.publishDate}
+        articleModifiedTime={p.publishDate}
+        jsonLd={structuredData}
+      />
       <Header currentRegion={region} dir={config?.direction} />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         <Link href={`/${region}/blog`} className="text-orange-600 hover:underline text-sm mb-6 inline-block">
@@ -51,6 +65,9 @@ export default function BlogPostPage({ region, config, post, rtl, error }: any) 
             <p className="max-w-2xl text-base leading-relaxed" style={{ color: 'var(--shopli-warm-gray)' }}>
               {t(p.intro)}
             </p>
+            <time className="text-xs mt-3 block" style={{ color: 'var(--shopli-warm-gray)' }} dateTime={p.publishDate}>
+              {new Date(p.publishDate).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </time>
           </header>
 
           <div className="prose prose-gray max-w-none" style={{ color: 'var(--shopli-navy)' }}>

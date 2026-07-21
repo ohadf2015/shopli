@@ -1,11 +1,11 @@
 import { GetServerSideProps } from 'next';
-import Head from 'next/head';
 import Header from '../../components/Header';
 import Icon from '../../components/icons';
 import WhatsAppShare from '../../components/WhatsAppShare';
+import SeoHead from '../../components/SeoHead';
 import { getRegion, RegionCode } from '../../lib/regions';
-import { getSeoHead } from '../../lib/seo';
 import { getAllCollections } from '../../lib/collections';
+import { breadcrumbJsonLd } from '../../lib/seo';
 import type { RegionConfig } from '../../lib/regions';
 import type { Product } from '../../lib/types';
 
@@ -34,28 +34,27 @@ async function fetchCollectionProducts(region: string, keywords: string[], limit
 }
 
 export default function HomePage({ region, config, groups, rtl }: HomePageProps) {
-  const t = (text: Record<string, string>) => text[config.lang] || text.en || '';
+  const t = (text?: Record<string, string> | null) => text?.[config.lang] || text?.en || '';
 
   const heroTitle = rtl ? 'מצאו את הדילים הכי שווים מאליאקספרס' : 'The Best AliExpress Deals, Curated for You';
   const heroDesc = rtl
     ? 'אנחנו בוחרים מוצרים לפי טרנדים, עונה ואיכות. אתם קונים במחירים הכי נמוכים עם קישור partnerפים ישיר.'
     : 'We pick products by trends, season & quality. You buy at the lowest price with direct affiliate links.';
 
-  const seo = getSeoHead({ region: region as RegionCode, path: '', title: config.meta.title, description: config.meta.description });
+  const pageUrl = `https://shopli-neon.vercel.app/${region}`;
+  const homeBreadcrumb = breadcrumbJsonLd([
+    { name: rtl ? 'דף הבית' : 'Home', url: pageUrl },
+  ]);
 
   return (
     <>
-      <Head>
-        <title>{seo.title}</title>
-        {seo.meta.map((m: any, i: number) =>
-          m.tag === 'link' ? (
-            <link key={i} rel={m.rel} hrefLang={m.hrefLang} href={m.href} />
-          ) : (
-            <meta key={i} name={m.name || m.property} content={m.content} property={m.property} />
-          )
-        )}
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Head>
+      <SeoHead
+        region={region as RegionCode}
+        path=""
+        title={config.meta.title}
+        description={config.meta.description}
+        jsonLd={homeBreadcrumb}
+      />
       <Header currentRegion={region} dir={config.direction} />
 
       <main style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}>
@@ -181,7 +180,7 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
               {rtl ? 'מוצרים מקובצים לפי נושא — בחרו מה שמעניין אתכם' : 'Products grouped by theme — pick what interests you'}
             </p>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              {getAllCollections().map(coll => {
+              {getAllCollections().filter(coll => coll.name).map(coll => {
                 const name = t(coll.name);
                 const desc = t(coll.desc);
                 return (

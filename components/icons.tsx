@@ -3,7 +3,7 @@ import React from 'react';
 type IconName = 'search' | 'cart' | 'star' | 'truck' | 'shield' | 'globe' | 'chevron-down' | 'chevron-right' | 'chevron-left'
   | 'close' | 'menu' | 'arrow-right' | 'arrow-left' | 'telegram' | 'mail' | 'fire' | 'check' | 'tag' | 'clock' | 'discount'
   | 'tech' | 'electronics' | 'home' | 'sports' | 'fashion' | 'auto' | 'outdoor' | 'kids'
-  | 'il-flag' | 'eu-flag' | 'us-flag' | 'uk-flag' | 'fr-flag' | 'de-flag' | 'es-flag' | 'it-flag' | 'language'
+  | 'il-flag' | 'eu-flag' | 'us-flag' | 'uk-flag' | 'fr-flag' | 'de-flag' | 'es-flag' | 'it-flag' | 'ru-flag' | 'language'
   | 'mask' | 'run' | 'monitor' | 'bulb' | 'chef' | 'plane' | 'tent' | 'paw' | 'car' | 'lamp' | 'percent' | 'package' | 'heart' | 'thumbs-up' | 'flash' | 'sun' | 'moon' | 'grid' | 'list' | 'share' | 'external' | 'camera' | 'info';
 
 const SVG = ({ sz = 20, children, viewBox = "0 0 24 24", ...attrs }: { sz?: number; viewBox?: string; children: React.ReactNode; [key: string]: any }) =>
@@ -46,6 +46,7 @@ const icons: Record<IconName, (p: { size?: number }) => React.ReactNode> = {
   'de-flag': ({ size = 20 }) => <SVG sz={size} fill="none" stroke="none" viewBox="0 0 24 24"><rect y="0" width="24" height="8" rx="2" fill="#000"/><rect y="8" width="24" height="8" fill="#DD0000"/><rect y="16" width="24" height="8" rx="2" fill="#FFCE00"/></SVG>,
   'es-flag': ({ size = 20 }) => <SVG sz={size} fill="none" stroke="none" viewBox="0 0 24 24"><rect y="6" width="24" height="12" fill="#C60B1E"/><rect y="0" width="24" height="6" rx="2" fill="#FFC400"/><rect y="18" width="24" height="6" rx="2" fill="#FFC400"/></SVG>,
   'it-flag': ({ size = 20 }) => <SVG sz={size} fill="none" stroke="none" viewBox="0 0 24 24"><rect x="0" width="8" height="24" rx="2" fill="#009246"/><rect x="8" width="8" height="24" fill="#fff"/><rect x="16" width="8" height="24" rx="2" fill="#CE2B37"/></SVG>,
+  'ru-flag': ({ size = 20 }) => <SVG sz={size} fill="none" stroke="none" viewBox="0 0 24 24"><rect y="0" width="24" height="8" rx="2" fill="#fff"/><rect y="8" width="24" height="8" fill="#0039A6"/><rect y="16" width="24" height="8" rx="2" fill="#D52B1E"/></SVG>,
   language: ({ size = 20 }) => <SVG sz={size} strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></SVG>,
 
   // New collection icons

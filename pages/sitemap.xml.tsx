@@ -1,10 +1,31 @@
 import { GetServerSideProps } from 'next';
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://shopli-neon.vercel.app';
-const REGIONS = ['eu', 'il', 'us', 'uk', 'de', 'fr', 'es', 'it'];
+import { REGIONS } from '../lib/regions';
+import { SITE_URL } from '../lib/seo';
 
 function xmlEncode(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+
+interface SitemapUrl {
+  loc: string;
+  changefreq: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
+  priority: number;
+  lastmod?: string;
+  images?: string[];
+}
+
+function buildUrlEntry(u: SitemapUrl): string {
+  const imageTags = (u.images || [])
+    .filter(img => img)
+    .map(img => `    <image:image><image:loc>${xmlEncode(img)}</image:loc></image:image>`)
+    .join('\n');
+
+  return `  <url>
+    <loc>${xmlEncode(u.loc)}</loc>
+    <lastmod>${u.lastmod || new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority.toFixed(1)}</priority>${imageTags ? '\n' + imageTags : ''}
+  </url>`;
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
@@ -13,57 +34,93 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   const { getAllComparisonSlugs } = await import('../lib/comparisons').catch(() => ({ getAllComparisonSlugs: () => [] }));
   const { getAllBlogSlugs } = await import('../lib/blog').catch(() => ({ getAllBlogSlugs: () => [] }));
 
-  const collectionSlugs = getAllCollections().map(c => c.slug);
+  const today = new Date().toISOString().split('T')[0];
+  const regionCodes = Object.keys(REGIONS);
+
+  const collectionSlugs = getAllCollections().map(c => ({ slug: c.slug, image: c.image }));
   const moodSlugs = getAllMoodboardSlugs();
   const compareSlugs = getAllComparisonSlugs();
   const blogSlugs = getAllBlogSlugs();
 
-  const urls: string[] = [];
+  const urls: SitemapUrl[] = [];
 
-  // Home pages
-  for (const region of REGIONS) {
-    urls.push(`/${region}`);
+  // Regional homepages
+  for (const region of regionCodes) {
+    urls.push({
+      loc: `${SITE_URL}/${region}`,
+      changefreq: 'daily',
+      priority: 1.0,
+      lastmod: today,
+    });
   }
 
-  // Collections
-  for (const region of REGIONS) {
-    for (const slug of collectionSlugs) {
-      urls.push(`/${region}/collection/${slug}`);
+  // Blog index pages
+  for (const region of regionCodes) {
+    urls.push({
+      loc: `${SITE_URL}/${region}/blog`,
+      changefreq: 'weekly',
+      priority: 0.8,
+      lastmod: today,
+    });
+  }
+
+  // Collection pages
+  for (const region of regionCodes) {
+    for (const coll of collectionSlugs) {
+      const images = coll.image ? [`${SITE_URL}${coll.image}`] : undefined;
+      urls.push({
+        loc: `${SITE_URL}/${region}/collection/${coll.slug}`,
+        changefreq: 'daily',
+        priority: 0.8,
+        lastmod: today,
+        images,
+      });
     }
   }
 
-  // Mood boards
-  for (const region of REGIONS) {
+  // Mood board pages
+  for (const region of regionCodes) {
     for (const slug of moodSlugs) {
-      urls.push(`/${region}/mood/${slug}`);
+      urls.push({
+        loc: `${SITE_URL}/${region}/mood/${slug}`,
+        changefreq: 'weekly',
+        priority: 0.7,
+        lastmod: today,
+      });
     }
   }
 
-  // Comparisons
-  for (const region of REGIONS) {
+  // Comparison pages
+  for (const region of regionCodes) {
     for (const slug of compareSlugs) {
-      urls.push(`/${region}/compare/${slug}`);
+      urls.push({
+        loc: `${SITE_URL}/${region}/compare/${slug}`,
+        changefreq: 'weekly',
+        priority: 0.6,
+        lastmod: today,
+      });
     }
   }
 
   // Blog posts
-  for (const region of REGIONS) {
+  for (const region of regionCodes) {
     for (const slug of blogSlugs) {
-      urls.push(`/${region}/blog/${slug}`);
+      urls.push({
+        loc: `${SITE_URL}/${region}/blog/${slug}`,
+        changefreq: 'monthly',
+        priority: 0.6,
+        lastmod: today,
+      });
     }
   }
 
-  // Build XML
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map(url => `  <url>
-    <loc>${xmlEncode(SITE_URL + url)}</loc>
-    <changefreq>weekly</changefreq>
-    <priority>${url === `/${url.split('/')[1]}` ? '0.9' : url.includes('/collection/') || url.includes('/mood/') ? '0.7' : '0.6'}</priority>
-  </url>`).join('\n')}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${urls.map(buildUrlEntry).join('\n')}
 </urlset>`;
 
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
   res.write(xml);
   res.end();
 
