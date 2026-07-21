@@ -112,10 +112,10 @@ export function getSeoHead(props: SeoProps) {
     meta.push({ tag: 'meta', property: 'article:modified_time', content: articleModifiedTime });
   }
 
-  // hreflang + canonical
+  // hreflang + canonical (prefer explicit canonical when provided, e.g. share URLs with query params)
   for (const t of getHreflangTags(region, path)) {
     if (t.rel === 'canonical') {
-      meta.push({ tag: 'link', rel: 'canonical', href: t.href });
+      meta.push({ tag: 'link', rel: 'canonical', href: canonical || t.href });
     } else {
       meta.push({ tag: 'link', rel: t.rel, hrefLang: t.hrefLang, href: t.href });
     }
@@ -299,4 +299,75 @@ export function productJsonLd({
 
 export function productListJsonLd(products: ReturnType<typeof productJsonLd>[]) {
   return products;
+}
+
+/**
+ * ProductGroup schema for multi-product comparison pages.
+ * @see https://schema.org/ProductGroup
+ */
+export function productGroupJsonLd({
+  name,
+  description,
+  url,
+  products,
+}: {
+  name: string;
+  description: string;
+  url: string;
+  products: Array<{
+    title: string;
+    description?: string;
+    image?: string;
+    url: string;
+    brand?: string;
+    price?: number;
+    currency?: string;
+    ratingValue?: number;
+    reviewCount?: number;
+  }>;
+}) {
+  const hasVariant = products.map((p) => {
+    const offer =
+      p.price !== undefined && p.currency
+        ? {
+            '@type': 'Offer',
+            url: p.url,
+            priceCurrency: p.currency,
+            price: p.price.toFixed(2),
+            availability: 'https://schema.org/InStock',
+            seller: { '@type': 'Organization', name: p.brand || 'AliExpress' },
+          }
+        : undefined;
+
+    const aggregateRating =
+      p.ratingValue !== undefined && p.reviewCount !== undefined && p.reviewCount > 0
+        ? {
+            '@type': 'AggregateRating',
+            ratingValue: p.ratingValue.toFixed(1),
+            reviewCount: p.reviewCount,
+          }
+        : undefined;
+
+    return {
+      '@type': 'Product',
+      name: p.title,
+      description: p.description || p.title,
+      image: p.image || OG_IMAGE_URL,
+      brand: p.brand ? { '@type': 'Brand', name: p.brand } : undefined,
+      offers: offer,
+      aggregateRating,
+      url: p.url,
+    };
+  });
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ProductGroup',
+    name,
+    description,
+    url,
+    productGroupID: `compare-${products.length}`,
+    variesBy: ['https://schema.org/price', 'https://schema.org/aggregateRating'],
+    hasVariant,
+  };
 }
