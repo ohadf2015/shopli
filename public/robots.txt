@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /*/google-shopping-feed
+
+Sitemap: https://shopli-neon.vercel.app/sitemap.xml

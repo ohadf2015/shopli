@@ -1,20 +1,35 @@
 import { GetServerSideProps } from 'next';
-import Head from 'next/head';
 import Header from '../../../components/Header';
-import { getRegion } from '../../../lib/regions';
-import { blogPosts, getAllBlogSlugs } from '../../../lib/blog';
+import SeoHead from '../../../components/SeoHead';
+import { getRegion, RegionCode } from '../../../lib/regions';
+import { blogPosts } from '../../../lib/blog';
 import Link from 'next/link';
+import { breadcrumbJsonLd, SITE_URL } from '../../../lib/seo';
 
 export default function BlogIndexPage({ region, config, posts, rtl }: any) {
   const lang = config?.lang || 'en';
-  const t = (obj: any) => obj?.[lang] || obj?.en || '';
+
+  const title = rtl ? 'בלוג שופלי — מדריכי קנייה והשוואות' : 'Shopli Blog — Buying Guides & Comparisons';
+  const description = rtl
+    ? 'מדריכי קנייה מומחים, השוואות מוצרים, וטיפים לחיסכון בקניות מאליאקספרס'
+    : 'Expert buying guides, product comparisons, and money-saving tips for AliExpress shopping';
+
+  const pageUrl = `${SITE_URL}/${region}/blog`;
+  const structuredData = breadcrumbJsonLd([
+    { name: rtl ? 'דף הבית' : 'Home', url: `${SITE_URL}/${region}` },
+    { name: rtl ? 'בלוג' : 'Blog', url: pageUrl },
+  ]);
 
   return (
     <>
-      <Head>
-        <title>{rtl ? 'בלוג שופלי — מדריכי קנייה והשוואות' : 'Shopli Blog — Buying Guides & Comparisons'}</title>
-        <meta name="description" content={rtl ? 'מדריכי קנייה מומחים, השוואות מוצרים, וטיפים לחיסכון בקניות מאליאקספרס' : 'Expert buying guides, product comparisons, and money-saving tips for AliExpress shopping'} />
-      </Head>
+      <SeoHead
+        region={region as RegionCode}
+        path="/blog"
+        title={title}
+        description={description}
+        ogType="website"
+        jsonLd={structuredData}
+      />
       <Header currentRegion={region} dir={config?.direction} />
       <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         <div className="mb-12">
@@ -44,11 +59,11 @@ export default function BlogIndexPage({ region, config, posts, rtl }: any) {
                   </div>
                   <Link href={`/${region}/blog/${post.slug}`}>
                     <h2 className="text-xl md:text-2xl font-bold mb-3 hover:text-orange-600 transition-colors" style={{ color: 'var(--shopli-navy)' }}>
-                      {t(post.title)}
+                      {post.title?.[lang] || post.title?.en || ''}
                     </h2>
                   </Link>
                   <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
-                    {t(post.intro).substring(0, 180)}...
+                    {(post.intro?.[lang] || post.intro?.en || '').substring(0, 180)}...
                   </p>
                   <Link href={`/${region}/blog/${post.slug}`} className="text-sm font-semibold text-orange-600 hover:underline inline-flex items-center gap-1">
                     {rtl ? 'קראו עוד' : 'Read more'}

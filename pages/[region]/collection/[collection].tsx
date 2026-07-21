@@ -1,11 +1,17 @@
 import { GetServerSideProps } from 'next';
-import Head from 'next/head';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
 import WhatsAppShare from '../../../components/WhatsAppShare';
-import { getRegion } from '../../../lib/regions';
+import SeoHead from '../../../components/SeoHead';
+import { getRegion, RegionCode } from '../../../lib/regions';
 import { getAllCollections, getCollection } from '../../../lib/collections';
 import { COLLECTION_CONTENT } from '../../../lib/collection-content';
+import {
+  articleJsonLd,
+  breadcrumbJsonLd,
+  productJsonLd,
+  SITE_URL,
+} from '../../../lib/seo';
 
 export default function CollectionPage({ region, config, collection, content, sections, rtl, error }: any) {
   if (error) {
@@ -14,30 +20,71 @@ export default function CollectionPage({ region, config, collection, content, se
   const lang = config?.lang || 'en';
   const get = (obj: any) => obj?.[lang] || obj?.en || '';
 
+  const pageUrl = `${SITE_URL}/${region}/collection/${collection.slug}`;
+  const title = content ? `${get(content.metaTitle)} | Shopli` : `${collection.name} | Shopli`;
+  const description = content ? get(content.metaDesc) : collection.desc;
+  const headline = content ? get(content.h1) : collection.name;
+
+  const structuredData: Record<string, unknown>[] = [];
+
+  // BreadcrumbList: Home > Collection
+  structuredData.push(
+    breadcrumbJsonLd([
+      { name: rtl ? 'דף הבית' : 'Home', url: `${SITE_URL}/${region}` },
+      { name: collection.name, url: pageUrl },
+    ])
+  );
+
+  // Article schema when editorial content exists
+  if (content) {
+    structuredData.push(
+      articleJsonLd({
+        headline,
+        description,
+        url: pageUrl,
+        image: content.image ? `${SITE_URL}${content.image}` : undefined,
+      })
+    );
+  }
+
+  // Product schema for visible AliExpress products
+  for (const section of sections || []) {
+    for (const p of section.products?.slice(0, 4) || []) {
+      if (p.title) {
+        structuredData.push(
+          productJsonLd({
+            title: p.title,
+            description: p.title,
+            image: p.imageUrl,
+            url: p.affiliateLink || pageUrl,
+            brand: p.shopName,
+            price: p.price,
+            currency: config?.currency,
+            ratingValue: p.rating ? p.rating / 20 : undefined,
+            reviewCount: p.reviewCount,
+          })
+        );
+      }
+    }
+  }
+
   return (
     <>
-      <Head>
-        <title>{content ? get(content.metaTitle) : collection.name} | Shopli</title>
-        <meta name="description" content={content ? get(content.metaDesc) : collection.desc} />
-        {content && (
-          <script type="application/ld+json" dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Article',
-              headline: get(content.h1),
-              description: get(content.metaDesc),
-              mainEntityOfPage: { '@type': 'WebPage', '@id': `https://shopli-neon.vercel.app/${region}/collection/${collection.slug}` }
-            })
-          }} />
-        )}
-      </Head>
+      <SeoHead
+        region={region as RegionCode}
+        path={`/collection/${collection.slug}`}
+        title={title}
+        description={description}
+        ogType="article"
+        jsonLd={structuredData}
+      />
       <Header currentRegion={region} dir={config?.direction} />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         <div className="flex items-center gap-2 text-xs mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
           <a href={`/${region}`}>Home</a> <span>/</span> <span style={{ color: 'var(--shopli-navy)' }}>{collection.name}</span>
         </div>
         <h1 className="text-2xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--shopli-navy)' }}>
-          {content ? get(content.h1) : collection.name}
+          {headline}
         </h1>
         {content && <p className="max-w-2xl text-base leading-relaxed mb-8" style={{ color: 'var(--shopli-warm-gray)' }}>{get(content.intro)}</p>}
 
@@ -54,7 +101,7 @@ export default function CollectionPage({ region, config, collection, content, se
                     <a key={p.id} href={p.affiliateLink} target="_blank" rel="noopener noreferrer sponsored"
                       className="bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md">
                       <div className="aspect-square bg-gray-100 overflow-hidden relative">
-                        {p.imageUrl ? <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover" loading="lazy" /> : <div className="w-full h-full flex items-center justify-center"><Icon name="package" size={24} /></div>}
+                        {p.imageUrl ? <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover" loading="lazy" decoding="async" /> : <div className="w-full h-full flex items-center justify-center"><Icon name="package" size={24} /></div>}
                         {p.discount && (
                           <span className="absolute top-1 right-1 text-[9px] font-bold px-1.5 py-0.5 rounded"
                             style={{ background: 'oklch(65% 0.2 45)', color: 'white' }}
@@ -77,7 +124,7 @@ export default function CollectionPage({ region, config, collection, content, se
                         <div className="mt-1.5">
                           <WhatsAppShare
                             title={p.title}
-                            url={p.affiliateLink || `https://shopli-neon.vercel.app/${region}/collection/${collection.slug}`}
+                            url={p.affiliateLink || pageUrl}
                             locale={lang}
                             size="sm"
                           />
@@ -111,7 +158,7 @@ export default function CollectionPage({ region, config, collection, content, se
             </p>
             <WhatsAppShare
               title={rtl ? `אוסף ${collection.name} — שופלי` : `${collection.name} collection — Shopli`}
-              url={`https://shopli-neon.vercel.app/${region}/collection/${collection.slug}`}
+              url={pageUrl}
               description={get(collection.desc || '')}
               locale={lang}
               size="md"

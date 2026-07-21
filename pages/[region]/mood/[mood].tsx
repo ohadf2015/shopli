@@ -1,9 +1,10 @@
 import { GetServerSideProps } from 'next';
-import Head from 'next/head';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
-import { getRegion } from '../../../lib/regions';
+import SeoHead from '../../../components/SeoHead';
+import { getRegion, RegionCode } from '../../../lib/regions';
 import { getMoodBoard, getMoodBoardsByTag } from '../../../lib/moodboards';
+import { articleJsonLd, breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
 
 interface Product { id: string; title: string; price: number; originalPrice: number | null; currency: string; imageUrl: string; affiliateLink: string; rating: number; reviewCount: number; volume: number; shopName: string; discount: string; }
 interface ItemGroup { caption: string; note: string; products: Product[]; }
@@ -19,26 +20,51 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
   const get = (o: any) => o?.[lang] || o?.en || '';
 
   const relatedBoards = related?.filter((r: any) => r.slug !== board?.slug)?.slice(0, 3) || [];
+  const pageUrl = `${SITE_URL}/${region}/mood/${board.slug}`;
+
+  const structuredData: Record<string, unknown>[] = [
+    breadcrumbJsonLd([
+      { name: rtl ? 'דף הבית' : 'Home', url: `${SITE_URL}/${region}` },
+      { name: rtl ? 'ערכות' : 'Mood Boards', url: `${SITE_URL}/${region}/mood/jack-sparrow` },
+      { name: get(board.h1), url: pageUrl },
+    ]),
+    articleJsonLd({
+      headline: get(board.h1),
+      description: get(board.metaDesc),
+      url: pageUrl,
+    }),
+  ];
+
+  // Product schema for the first product in each group (avoids bloating the page)
+  for (const group of itemGroups || []) {
+    const p = group.products?.[0];
+    if (p?.title) {
+      structuredData.push(
+        productJsonLd({
+          title: p.title,
+          description: p.title,
+          image: p.imageUrl,
+          url: p.affiliateLink || pageUrl,
+          brand: p.shopName,
+          price: p.price,
+          currency: config?.currency,
+          ratingValue: p.rating ? p.rating / 20 : undefined,
+          reviewCount: p.reviewCount,
+        })
+      );
+    }
+  }
 
   return (
     <>
-      <Head>
-        <title>{get(board.metaTitle)} | Shopli</title>
-        <meta name="description" content={get(board.metaDesc)} />
-        <meta property="og:title" content={get(board.h1)} />
-        <meta property="og:description" content={get(board.metaDesc)} />
-        <meta property="og:type" content="article" />
-        <link rel="canonical" href={`https://shopli-neon.vercel.app/${region}/mood/${board.slug}`} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Article',
-            headline: get(board.h1),
-            description: get(board.metaDesc),
-            mainEntityOfPage: { '@type': 'WebPage', '@id': `https://shopli-neon.vercel.app/${region}/mood/${board.slug}` }
-          })
-        }} />
-      </Head>
+      <SeoHead
+        region={region as RegionCode}
+        path={`/mood/${board.slug}`}
+        title={`${get(board.metaTitle)} | Shopli`}
+        description={get(board.metaDesc)}
+        ogType="article"
+        jsonLd={structuredData}
+      />
       <Header currentRegion={region} dir={config?.direction} />
 
       <main className="pb-16" style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}>
@@ -101,7 +127,7 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
                     className="bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">
                     <div className="aspect-square bg-gray-100 overflow-hidden relative">
                       {p.imageUrl ? (
-                        <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover hover:scale-105 transition-transform" loading="lazy" />
+                        <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover hover:scale-105 transition-transform" loading="lazy" decoding="async" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center" style={{ color: 'var(--shopli-warm-gray)' }}>
                           <Icon name="package" size={24} />

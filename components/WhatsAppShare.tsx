@@ -8,7 +8,7 @@ interface WhatsAppShareProps {
   /** Optional description */
   description?: string;
   /** Locale for button text */
-  locale?: 'he' | 'en' | 'fr' | 'de' | 'es' | 'it';
+  locale?: 'he' | 'en' | 'fr' | 'de' | 'es' | 'it' | 'ru';
   /** Optional className override */
   className?: string;
   /** Size variant */
@@ -22,6 +22,7 @@ const LABELS: Record<string, string> = {
   de: 'Auf WhatsApp teilen',
   es: 'Compartir en WhatsApp',
   it: 'Condividi su WhatsApp',
+  ru: 'Поделиться в WhatsApp',
 };
 
 export default function WhatsAppShare({

@@ -1,21 +1,22 @@
 import { GetServerSideProps } from 'next';
-import Head from 'next/head';
 import Header from '../../components/Header';
-import { getRegion } from '../../lib/regions';
+import SeoHead from '../../components/SeoHead';
+import { getRegion, RegionCode } from '../../lib/regions';
 import type { RegionConfig } from '../../lib/regions';
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://shopli-neon.vercel.app';
+import { SITE_URL } from '../../lib/seo';
 
 export default function GoogleShoppingFeedPage({ region, config, rtl }: { region: string; config: RegionConfig; rtl: boolean }) {
   const feedUrl = `${SITE_URL}/products-feed.xml`;
 
   return (
     <>
-      <Head>
-        <title>Google Shopping Feed | Shopli</title>
-        <meta name="description" content="Shopli Google Shopping product feed — submit to Google Merchant Center for free product listing ads." />
-        <meta name="robots" content="noindex, follow" />
-      </Head>
+      <SeoHead
+        region={region as RegionCode}
+        path="/google-shopping-feed"
+        title="Google Shopping Feed | Shopli"
+        description="Shopli Google Shopping product feed — submit to Google Merchant Center for free product listing ads."
+        noindex
+      />
       <Header currentRegion={region} dir={config?.direction} />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         <div className="flex items-center gap-2 text-xs mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
