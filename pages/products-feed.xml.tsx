@@ -59,6 +59,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     brand: string;
     collectionSlug: string;
     collectionName: string;
+    googleCategory: string;
   }> = [];
 
   // Fetch products from all collections
@@ -78,6 +79,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
           brand: p.shopName || 'AliExpress',
           collectionSlug: coll.slug,
           collectionName: name,
+          googleCategory: coll.googleCategory || GOOGLE_CATEGORY_MAP[coll.slug] || '488',
         });
       }
     } catch {
@@ -87,7 +89,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
 
   // Build XML feed
   const items = allProducts.map(p => {
-    const googleCategory = GOOGLE_CATEGORY_MAP[p.collectionSlug] || '488';
+    const googleCategory = p.googleCategory || '488';
     const productUrl = `${SITE_URL}/il/collection/${p.collectionSlug}`;
 
     return `  <item>
