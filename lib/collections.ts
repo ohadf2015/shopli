@@ -579,3 +579,15 @@ export function getAllCollections() {
 export function getCollection(slug: string) {
   return COLLECTIONS.find(c => c.slug === slug);
 }
+
+/** Lightweight list for nav menus (avoids shipping full collection defs to the client). */
+export function getCollectionNavItems(lang = 'en'): Array<{ slug: string; name: string }> {
+  return COLLECTIONS.filter((c) => c.name || c.tag)
+    .map((c) => ({
+      slug: c.slug,
+      name:
+        (c.name || c.tag || {})[lang] ||
+        (c.name || c.tag || {}).en ||
+        c.slug,
+    }));
+}

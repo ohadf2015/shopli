@@ -145,20 +145,58 @@ export function organizationJsonLd() {
   };
 }
 
-export function websiteJsonLd(searchTargetUrl?: string) {
+export function websiteJsonLd(searchTargetUrl?: string, region: RegionCode = 'eu') {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: SITE_NAME,
     url: SITE_URL,
+    inLanguage: REGIONS[region]?.locale || 'en',
     potentialAction: {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: searchTargetUrl || `${SITE_URL}/eu/collection/{{search_term_string}}`,
+        urlTemplate:
+          searchTargetUrl ||
+          `${SITE_URL}/${region}/search?q={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
+  };
+}
+
+/** Absolute OG image URL for a collection/category (dynamic 1200×630). */
+export function getCollectionOgImage(
+  slug: string,
+  title?: string,
+  lang?: string
+): string {
+  const params = new URLSearchParams();
+  if (title) params.set('title', title);
+  if (lang) params.set('lang', lang);
+  const qs = params.toString();
+  return `${SITE_URL}/api/og/${encodeURIComponent(slug)}${qs ? `?${qs}` : ''}`;
+}
+
+/** ItemList schema for product grids (collection / home sections). */
+export function itemListJsonLd(
+  name: string,
+  url: string,
+  items: Array<{ name: string; url: string; image?: string; position?: number }>
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name,
+    url,
+    numberOfItems: items.length,
+    itemListElement: items.map((item, i) => ({
+      '@type': 'ListItem',
+      position: item.position ?? i + 1,
+      name: item.name,
+      url: item.url,
+      ...(item.image ? { image: item.image } : {}),
+    })),
   };
 }
 
@@ -252,6 +290,9 @@ export function productJsonLd({
   availability = 'https://schema.org/InStock',
   ratingValue,
   reviewCount,
+  sku,
+  region,
+  priceValidUntil,
 }: {
   title: string;
   description?: string;
@@ -263,24 +304,57 @@ export function productJsonLd({
   availability?: string;
   ratingValue?: number;
   reviewCount?: number;
+  sku?: string;
+  /** Region code for localized shipping/seller hints (e.g. 'il') */
+  region?: string;
+  /** ISO date YYYY-MM-DD; defaults to +30 days for deal freshness */
+  priceValidUntil?: string;
 }) {
-  const offer = price !== undefined && currency
-    ? {
-        '@type': 'Offer',
-        url,
-        priceCurrency: currency,
-        price: price.toFixed(2),
-        availability,
-        seller: { '@type': 'Organization', name: brand || 'AliExpress' },
-      }
-    : undefined;
+  const validUntil =
+    priceValidUntil ||
+    new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+  const shipCountry =
+    region && REGIONS[region as RegionCode]
+      ? REGIONS[region as RegionCode].defaultShipTo
+      : undefined;
+
+  const offer =
+    price !== undefined && currency
+      ? {
+          '@type': 'Offer',
+          url,
+          priceCurrency: currency,
+          price: Number(price).toFixed(2),
+          availability,
+          priceValidUntil: validUntil,
+          itemCondition: 'https://schema.org/NewCondition',
+          seller: { '@type': 'Organization', name: brand || 'AliExpress' },
+          ...(shipCountry
+            ? {
+                shippingDetails: {
+                  '@type': 'OfferShippingDetails',
+                  shippingDestination: {
+                    '@type': 'DefinedRegion',
+                    addressCountry: shipCountry,
+                  },
+                },
+              }
+            : {}),
+        }
+      : undefined;
 
   const aggregateRating =
-    ratingValue !== undefined && reviewCount !== undefined && reviewCount > 0
+    ratingValue !== undefined &&
+    reviewCount !== undefined &&
+    reviewCount > 0 &&
+    ratingValue > 0
       ? {
           '@type': 'AggregateRating',
-          ratingValue: ratingValue.toFixed(1),
+          ratingValue: Number(ratingValue).toFixed(1),
           reviewCount,
+          bestRating: '5',
+          worstRating: '1',
         }
       : undefined;
 
@@ -291,6 +365,7 @@ export function productJsonLd({
     description: description || title,
     image: image || OG_IMAGE_URL,
     brand: brand ? { '@type': 'Brand', name: brand } : undefined,
+    sku: sku || undefined,
     offers: offer,
     aggregateRating,
     url,
@@ -326,6 +401,10 @@ export function productGroupJsonLd({
     reviewCount?: number;
   }>;
 }) {
+  const validUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split('T')[0];
+
   const hasVariant = products.map((p) => {
     const offer =
       p.price !== undefined && p.currency
@@ -333,18 +412,25 @@ export function productGroupJsonLd({
             '@type': 'Offer',
             url: p.url,
             priceCurrency: p.currency,
-            price: p.price.toFixed(2),
+            price: Number(p.price).toFixed(2),
             availability: 'https://schema.org/InStock',
+            priceValidUntil: validUntil,
+            itemCondition: 'https://schema.org/NewCondition',
             seller: { '@type': 'Organization', name: p.brand || 'AliExpress' },
           }
         : undefined;
 
     const aggregateRating =
-      p.ratingValue !== undefined && p.reviewCount !== undefined && p.reviewCount > 0
+      p.ratingValue !== undefined &&
+      p.reviewCount !== undefined &&
+      p.reviewCount > 0 &&
+      p.ratingValue > 0
         ? {
             '@type': 'AggregateRating',
-            ratingValue: p.ratingValue.toFixed(1),
+            ratingValue: Number(p.ratingValue).toFixed(1),
             reviewCount: p.reviewCount,
+            bestRating: '5',
+            worstRating: '1',
           }
         : undefined;
 

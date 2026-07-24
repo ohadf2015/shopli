@@ -18,7 +18,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
   if (!c) return null;
 
   const pageUrl = `${SITE_URL}/${region}/compare/${c.slug}`;
-  const title = `${t(c.title)} | Shopli`;
+  const title = `${t(c.title)} | ${rtl ? 'שופלי' : 'Shopli'}`;
   const description = t(c.metaDesc);
 
   const structuredData: Record<string, unknown>[] = [
@@ -34,20 +34,22 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
     }),
   ];
 
-  // Product schema for the first item of each comparison side
+  // Product schema with Offers for comparison sides
   for (const item of [prod1Items?.[0], prod2Items?.[0]]) {
     if (item?.title) {
       structuredData.push(
         productJsonLd({
           title: item.title,
           description: item.title,
-          image: item.image,
+          image: item.imageUrl || item.image,
           url: item.affiliateLink || pageUrl,
           brand: item.shopName,
-          price: item.price,
-          currency: config?.currency,
-          ratingValue: item.rating ? item.rating / 20 : undefined,
-          reviewCount: item.reviewCount,
+          price: typeof item.price === 'number' ? item.price : parseFloat(item.price) || undefined,
+          currency: item.currency || config?.currency,
+          ratingValue: item.rating > 0 ? item.rating / 20 : undefined,
+          reviewCount: item.reviewCount || undefined,
+          sku: item.id,
+          region,
         })
       );
     }
@@ -115,11 +117,20 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
                     </h3>
                     <div className="grid grid-cols-2 gap-2">
                       {items.slice(0, 4).map((item: any, i: number) => (
-                        <a key={i} href={item.affiliateLink} target="_blank" rel="nofollow sponsored"
+                        <a key={i} href={item.affiliateLink} target="_blank" rel="nofollow sponsored noopener noreferrer"
                           className="block bg-gray-50 rounded-lg p-2 hover:shadow transition">
-                          <img src={item.image} alt={item.title} className="w-full h-20 object-contain mb-1" loading="lazy" decoding="async" />
+                          <img
+                            src={item.imageUrl || item.image}
+                            alt={item.title}
+                            className="w-full h-20 object-contain mb-1"
+                            loading="lazy"
+                            decoding="async"
+                          />
                           <p className="text-xs text-gray-700 line-clamp-2">{item.title}</p>
-                          <p className="text-xs font-bold mt-1" style={{ color: 'var(--shopli-orange)' }}>{item.price}</p>
+                          <p className="text-xs font-bold mt-1 tabular-nums" style={{ color: 'var(--shopli-orange)' }} dir="ltr">
+                            {config?.currencySymbol || ''}
+                            {typeof item.price === 'number' ? item.price.toFixed(2) : item.price}
+                          </p>
                         </a>
                       ))}
                     </div>

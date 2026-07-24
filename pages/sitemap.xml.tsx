@@ -1,9 +1,14 @@
 import { GetServerSideProps } from 'next';
 import { REGIONS } from '../lib/regions';
-import { SITE_URL } from '../lib/seo';
+import { SITE_URL, getCollectionOgImage } from '../lib/seo';
 
 function xmlEncode(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
 }
 
 interface SitemapUrl {
@@ -16,8 +21,11 @@ interface SitemapUrl {
 
 function buildUrlEntry(u: SitemapUrl): string {
   const imageTags = (u.images || [])
-    .filter(img => img)
-    .map(img => `    <image:image><image:loc>${xmlEncode(img)}</image:loc></image:image>`)
+    .filter((img) => img)
+    .map(
+      (img) =>
+        `    <image:image><image:loc>${xmlEncode(img)}</image:loc></image:image>`
+    )
     .join('\n');
 
   return `  <url>
@@ -29,15 +37,25 @@ function buildUrlEntry(u: SitemapUrl): string {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
-  const { getAllCollections } = await import('../lib/collections').catch(() => ({ getAllCollections: () => [] }));
-  const { getAllMoodboardSlugs } = await import('../lib/moodboards').catch(() => ({ getAllMoodboardSlugs: () => [] }));
-  const { getAllComparisonSlugs } = await import('../lib/comparisons').catch(() => ({ getAllComparisonSlugs: () => [] }));
-  const { getAllBlogSlugs } = await import('../lib/blog').catch(() => ({ getAllBlogSlugs: () => [] }));
+  const { getAllCollections } = await import('../lib/collections').catch(() => ({
+    getAllCollections: () => [] as Array<{ slug: string; name?: Record<string, string>; image?: string }>,
+  }));
+  const { getAllMoodboardSlugs } = await import('../lib/moodboards').catch(() => ({
+    getAllMoodboardSlugs: () => [] as string[],
+  }));
+  const { getAllComparisonSlugs } = await import('../lib/comparisons').catch(() => ({
+    getAllComparisonSlugs: () => [] as string[],
+  }));
+  const { getAllBlogSlugs } = await import('../lib/blog').catch(() => ({
+    getAllBlogSlugs: () => [] as string[],
+  }));
 
-  const today = new Date().toISOString().split('T')[0];
+  // Fresh lastmod on every generation (hourly revalidation via Cache-Control)
+  const now = new Date();
+  const today = now.toISOString().split('T')[0];
   const regionCodes = Object.keys(REGIONS);
 
-  const collectionSlugs = getAllCollections().map(c => ({ slug: c.slug, image: c.image }));
+  const collections = getAllCollections();
   const moodSlugs = getAllMoodboardSlugs();
   const compareSlugs = getAllComparisonSlugs();
   const blogSlugs = getAllBlogSlugs();
@@ -52,6 +70,19 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       priority: 1.0,
       lastmod: today,
     });
+    // Search landing (noindex when empty; still useful for discovery of path)
+    urls.push({
+      loc: `${SITE_URL}/${region}/search`,
+      changefreq: 'weekly',
+      priority: 0.4,
+      lastmod: today,
+    });
+    urls.push({
+      loc: `${SITE_URL}/${region}/compare`,
+      changefreq: 'weekly',
+      priority: 0.5,
+      lastmod: today,
+    });
   }
 
   // Blog index pages
@@ -64,16 +95,27 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     });
   }
 
-  // Collection pages
+  // Collection pages — include per-category OG image
   for (const region of regionCodes) {
-    for (const coll of collectionSlugs) {
-      const images = coll.image ? [`${SITE_URL}${coll.image}`] : undefined;
+    const lang = REGIONS[region]?.lang || 'en';
+    for (const coll of collections) {
+      const name =
+        coll.name?.[lang] ||
+        coll.name?.en ||
+        (coll as any).tag?.[lang] ||
+        (coll as any).tag?.en ||
+        coll.slug;
+      const og = getCollectionOgImage(coll.slug, name, lang);
+      const staticImg =
+        coll.image && !coll.image.startsWith('http')
+          ? `${SITE_URL}${coll.image}`
+          : coll.image;
       urls.push({
         loc: `${SITE_URL}/${region}/collection/${coll.slug}`,
         changefreq: 'daily',
         priority: 0.8,
         lastmod: today,
-        images,
+        images: [og, staticImg].filter(Boolean) as string[],
       });
     }
   }
@@ -120,11 +162,15 @@ ${urls.map(buildUrlEntry).join('\n')}
 </urlset>`;
 
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+  // Fresh sitemap: revalidate hourly, serve stale for a day
   res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+  res.setHeader('X-Robots-Tag', 'noindex');
   res.write(xml);
   res.end();
 
   return { props: {} };
 };
 
-export default function SitemapPage() { return null; }
+export default function SitemapPage() {
+  return null;
+}
