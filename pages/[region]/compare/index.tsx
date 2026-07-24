@@ -242,7 +242,7 @@ export default function ProductComparePage({
           )}
         </div>
 
-        {/* ID input */}
+        {/* ID input + keyword search shortcut */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-5 mb-8">
           <label
             htmlFor="compare-ids"
@@ -268,7 +268,7 @@ export default function ProductComparePage({
             <button
               type="button"
               onClick={applyIds}
-              className="btn-primary whitespace-nowrap"
+              className="btn-primary whitespace-nowrap min-h-[44px]"
             >
               <Icon name="search" size={16} />
               {rtl ? 'השווה' : 'Compare'}
@@ -281,8 +281,15 @@ export default function ProductComparePage({
           )}
           <p className="mt-2 text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
             {rtl
-              ? 'טיפ: מזהה המוצר מופיע בכתובת הדף של AliExpress (item/1234567890.html).'
-              : 'Tip: the product ID is in the AliExpress URL (item/1234567890.html).'}
+              ? 'טיפ: חפשו מוצר בעמוד החיפוש, לחצו «השווה» על כרטיס, והוסיפו מזהים נוספים כאן.'
+              : 'Tip: search a product, hit Compare on a card, then add more IDs here.'}{' '}
+            <a
+              href={`/${region}/search`}
+              className="font-semibold underline"
+              style={{ color: 'var(--shopli-orange)' }}
+            >
+              {rtl ? 'לחיפוש מוצרים' : 'Search products'}
+            </a>
           </p>
         </div>
 

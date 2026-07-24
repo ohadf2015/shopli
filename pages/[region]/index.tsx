@@ -1,11 +1,12 @@
 import { GetServerSideProps } from 'next';
 import Header from '../../components/Header';
 import Icon from '../../components/icons';
+import ProductCard from '../../components/ProductCard';
 import WhatsAppShare from '../../components/WhatsAppShare';
 import SeoHead from '../../components/SeoHead';
 import { getRegion, RegionCode } from '../../lib/regions';
 import { getAllCollections } from '../../lib/collections';
-import { breadcrumbJsonLd } from '../../lib/seo';
+import { breadcrumbJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
 import type { RegionConfig } from '../../lib/regions';
 import type { Product } from '../../lib/types';
 
@@ -41,10 +42,11 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
     ? 'אנחנו בוחרים מוצרים לפי טרנדים, עונה ואיכות. אתם קונים במחירים הכי נמוכים עם קישור partnerפים ישיר.'
     : 'We pick products by trends, season & quality. You buy at the lowest price with direct affiliate links.';
 
-  const pageUrl = `https://shopli-neon.vercel.app/${region}`;
-  const homeBreadcrumb = breadcrumbJsonLd([
-    { name: rtl ? 'דף הבית' : 'Home', url: pageUrl },
-  ]);
+  const pageUrl = `${SITE_URL}/${region}`;
+  const structuredData = [
+    breadcrumbJsonLd([{ name: rtl ? 'דף הבית' : 'Home', url: pageUrl }]),
+    websiteJsonLd(`${SITE_URL}/${region}/search?q={search_term_string}`, region as RegionCode),
+  ];
 
   return (
     <>
@@ -53,14 +55,14 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
         path=""
         title={config.meta.title}
         description={config.meta.description}
-        jsonLd={homeBreadcrumb}
+        jsonLd={structuredData}
       />
       <Header currentRegion={region} dir={config.direction} />
 
       <main style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}>
 
         {/* HERO */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-12 md:pt-32 md:pb-16">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-12 md:pt-32 md:pb-16">
           <div className="max-w-3xl">
             <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: 'var(--shopli-orange)' }}>
               {rtl ? 'שופלי — המלצות חכמות' : 'SHOPLI — SMART PICKS'}
@@ -84,7 +86,7 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
               )}
               <WhatsAppShare
                 title={rtl ? 'שופלי — הדילים הכי שווים מאליאקספרס' : 'Shopli — The Best AliExpress Deals'}
-                url={`https://shopli-neon.vercel.app/${region}`}
+                url={`${SITE_URL}/${region}`}
                 description={heroDesc}
                 locale={config.lang}
                 size="md"
@@ -116,54 +118,15 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                 {group.products.map((product) => (
-                  <a key={product.id} href={product.affiliateLink} target="_blank" rel="noopener noreferrer sponsored"
-                    className="bg-white rounded-xl border border-gray-100 overflow-hidden transition-all hover:shadow-md hover:-translate-y-0.5 group">
-                    <div className="aspect-square bg-gray-100 overflow-hidden relative">
-                      {product.imageUrl ? (
-                        <img src={product.imageUrl} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          loading="lazy" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center" style={{ color: 'var(--shopli-warm-gray)' }}>
-                          <Icon name="package" size={32} />
-                        </div>
-                      )}
-                      {product.discount && (
-                        <span className="absolute top-2 right-2 text-[0.6rem] font-bold px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-sm"
-                          style={{ color: 'var(--shopli-orange)' }}>-{product.discount}</span>
-                      )}
-                    </div>
-                    <div className="p-3">
-                      <h3 className="text-xs font-semibold leading-tight mb-1 line-clamp-2" style={{ color: 'var(--shopli-navy)' }}>
-                        {product.title}
-                      </h3>
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <span className="font-bold text-sm" style={{ color: 'var(--shopli-teal)' }}>
-                          {config.currencySymbol}{product.price.toFixed(2)}
-                        </span>
-                        {product.originalPrice && product.originalPrice > product.price && (
-                          <span className="text-xs line-through" style={{ color: 'var(--shopli-warm-gray)' }}>
-                            {config.currencySymbol}{product.originalPrice.toFixed(2)}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Icon name="star" size={11} className="text-yellow-500" />
-                        <span className="text-[0.65rem] font-medium" style={{ color: 'var(--shopli-warm-gray)' }}>
-                          {product.rating}
-                        </span>
-                        {product.volume > 0 && (
-                          <span className="text-[0.6rem]" style={{ color: 'var(--shopli-warm-gray)' }}>
-                            {product.volume > 999 ? `${(product.volume / 1000).toFixed(1)}k` : product.volume}sold
-                          </span>
-                        )}
-                        {product.reviewCount > 0 && (
-                          <span className="text-[0.6rem]" style={{ color: 'var(--shopli-warm-gray)' }}>
-                            ({product.reviewCount > 999 ? `${(product.reviewCount / 1000).toFixed(1)}k` : product.reviewCount})
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </a>
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    currencySymbol={config.currencySymbol}
+                    rtl={rtl}
+                    locale={config.lang}
+                    region={region}
+                    showCompareLink
+                  />
                 ))}
               </div>
             </div>
@@ -171,7 +134,7 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
         ))}
 
         {/* FULL COLLECTIONS LIST */}
-        <section className="py-14 bg-white">
+        <section id="categories" className="py-14 bg-white scroll-mt-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <h2 className="text-xl md:text-2xl font-bold mb-2" style={{ color: 'var(--shopli-navy)' }}>
               {rtl ? 'כל הקטגוריות' : 'All Collections'}

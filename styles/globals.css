@@ -50,12 +50,36 @@ body {
     background: oklch(96% 0.005 80);
   }
   .product-card {
-    @apply bg-white rounded-xl overflow-hidden shadow-sm transition-all cursor-pointer;
+    @apply bg-white rounded-xl overflow-hidden shadow-sm transition-all;
     box-shadow: 0 1px 3px oklch(0% 0 0 / 0.06);
   }
-  .product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px oklch(0% 0 0 / 0.1);
+  @media (hover: hover) {
+    .product-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px oklch(0% 0 0 / 0.1);
+    }
+  }
+  /* Logical padding helpers for search inputs in RTL */
+  .ps-9 {
+    padding-inline-start: 2.25rem;
+  }
+  .pe-3 {
+    padding-inline-end: 0.75rem;
+  }
+  .start-3 {
+    inset-inline-start: 0.75rem;
+  }
+  .end-2 {
+    inset-inline-end: 0.5rem;
+  }
+  .start-2 {
+    inset-inline-start: 0.5rem;
+  }
+  .start-0 {
+    inset-inline-start: 0;
+  }
+  .end-0 {
+    inset-inline-end: 0;
   }
   .section-title {
     font-size: clamp(1.5rem, 3vw, 2rem);

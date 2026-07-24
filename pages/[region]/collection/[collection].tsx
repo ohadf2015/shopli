@@ -1,70 +1,107 @@
 import { GetServerSideProps } from 'next';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
+import ProductCard from '../../../components/ProductCard';
 import WhatsAppShare from '../../../components/WhatsAppShare';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, RegionCode } from '../../../lib/regions';
-import { getAllCollections, getCollection } from '../../../lib/collections';
+import { getCollection } from '../../../lib/collections';
 import { COLLECTION_CONTENT } from '../../../lib/collection-content';
 import {
   articleJsonLd,
   breadcrumbJsonLd,
+  getCollectionOgImage,
+  itemListJsonLd,
   productJsonLd,
   SITE_URL,
 } from '../../../lib/seo';
 
 export default function CollectionPage({ region, config, collection, content, sections, rtl, error }: any) {
   if (error) {
-    return <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>Error: {error}</div>;
+    return (
+      <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>
+        Error: {error}
+      </div>
+    );
   }
   const lang = config?.lang || 'en';
   const get = (obj: any) => obj?.[lang] || obj?.en || '';
 
   const pageUrl = `${SITE_URL}/${region}/collection/${collection.slug}`;
-  const title = content ? `${get(content.metaTitle)} | Shopli` : `${collection.name} | Shopli`;
-  const description = content ? get(content.metaDesc) : collection.desc;
+  // Prefer editorial Hebrew/locale titles; fall back to collection name
+  const metaTitleBase = content
+    ? get(content.metaTitle)
+    : collection.metaTitle
+      ? get(collection.metaTitle)
+      : collection.name;
+  const title = `${metaTitleBase} | ${rtl ? 'שופלי' : 'Shopli'}`;
+  const description = content
+    ? get(content.metaDesc)
+    : collection.metaDesc
+      ? get(collection.metaDesc)
+      : collection.desc;
   const headline = content ? get(content.h1) : collection.name;
+  const ogImage = getCollectionOgImage(collection.slug, metaTitleBase, lang);
 
+  const allProducts = (sections || []).flatMap((s: any) => s.products || []);
   const structuredData: Record<string, unknown>[] = [];
 
-  // BreadcrumbList: Home > Collection
+  // BreadcrumbList: Home > Categories > Collection (Hebrew when rtl)
   structuredData.push(
     breadcrumbJsonLd([
       { name: rtl ? 'דף הבית' : 'Home', url: `${SITE_URL}/${region}` },
+      {
+        name: rtl ? 'קטגוריות' : 'Categories',
+        url: `${SITE_URL}/${region}#categories`,
+      },
       { name: collection.name, url: pageUrl },
     ])
   );
 
-  // Article schema when editorial content exists
   if (content) {
     structuredData.push(
       articleJsonLd({
         headline,
         description,
         url: pageUrl,
-        image: content.image ? `${SITE_URL}${content.image}` : undefined,
+        image: ogImage,
       })
     );
   }
 
-  // Product schema for visible AliExpress products
-  for (const section of sections || []) {
-    for (const p of section.products?.slice(0, 4) || []) {
-      if (p.title) {
-        structuredData.push(
-          productJsonLd({
-            title: p.title,
-            description: p.title,
-            image: p.imageUrl,
-            url: p.affiliateLink || pageUrl,
-            brand: p.shopName,
-            price: p.price,
-            currency: config?.currency,
-            ratingValue: p.rating ? p.rating / 20 : undefined,
-            reviewCount: p.reviewCount,
-          })
-        );
-      }
+  if (allProducts.length > 0) {
+    structuredData.push(
+      itemListJsonLd(
+        headline,
+        pageUrl,
+        allProducts.slice(0, 16).map((p: any, i: number) => ({
+          name: p.title,
+          url: p.affiliateLink || pageUrl,
+          image: p.imageUrl,
+          position: i + 1,
+        }))
+      )
+    );
+  }
+
+  // Product schema with Offers for visible products
+  for (const p of allProducts.slice(0, 12)) {
+    if (p.title) {
+      structuredData.push(
+        productJsonLd({
+          title: p.title,
+          description: p.title,
+          image: p.imageUrl,
+          url: p.affiliateLink || pageUrl,
+          brand: p.shopName,
+          price: p.price,
+          currency: config?.currency,
+          ratingValue: p.rating > 0 ? p.rating / 20 : undefined,
+          reviewCount: p.reviewCount || undefined,
+          sku: p.id,
+          region,
+        })
+      );
     }
   }
 
@@ -75,62 +112,89 @@ export default function CollectionPage({ region, config, collection, content, se
         path={`/collection/${collection.slug}`}
         title={title}
         description={description}
-        ogType="article"
+        image={ogImage}
+        ogType="product"
         jsonLd={structuredData}
       />
       <Header currentRegion={region} dir={config?.direction} />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
-        <div className="flex items-center gap-2 text-xs mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
-          <a href={`/${region}`}>Home</a> <span>/</span> <span style={{ color: 'var(--shopli-navy)' }}>{collection.name}</span>
-        </div>
-        <h1 className="text-2xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--shopli-navy)' }}>
+      <main
+        className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-16"
+        style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}
+      >
+        <nav
+          className="flex items-center gap-2 text-xs mb-4 flex-wrap"
+          style={{ color: 'var(--shopli-warm-gray)' }}
+          aria-label="Breadcrumb"
+        >
+          <a href={`/${region}`} className="hover:underline">
+            {rtl ? 'דף הבית' : 'Home'}
+          </a>
+          <span>/</span>
+          <a href={`/${region}#categories`} className="hover:underline">
+            {rtl ? 'קטגוריות' : 'Categories'}
+          </a>
+          <span>/</span>
+          <span style={{ color: 'var(--shopli-navy)' }}>{collection.name}</span>
+        </nav>
+
+        <h1
+          className="text-2xl md:text-4xl font-extrabold mb-4"
+          style={{ color: 'var(--shopli-navy)' }}
+        >
           {headline}
         </h1>
-        {content && <p className="max-w-2xl text-base leading-relaxed mb-8" style={{ color: 'var(--shopli-warm-gray)' }}>{get(content.intro)}</p>}
+        {content && (
+          <p
+            className="max-w-2xl text-base leading-relaxed mb-8"
+            style={{ color: 'var(--shopli-warm-gray)' }}
+          >
+            {get(content.intro)}
+          </p>
+        )}
+        {!content && collection.desc && (
+          <p
+            className="max-w-2xl text-base leading-relaxed mb-8"
+            style={{ color: 'var(--shopli-warm-gray)' }}
+          >
+            {collection.desc}
+          </p>
+        )}
 
         {sections.map((section: any, i: number) => (
-          <section key={i} className={`py-8 ${i % 2 === 1 ? 'bg-white' : 'bg-gray-50/50'} -mx-4 sm:-mx-6 px-4 sm:px-6`}>
+          <section
+            key={i}
+            className={`py-8 ${i % 2 === 1 ? 'bg-white' : 'bg-gray-50/50'} -mx-4 sm:-mx-6 px-4 sm:px-6`}
+          >
             <div className="max-w-7xl mx-auto">
               <div className="grid md:grid-cols-2 gap-6 items-start">
                 <div>
-                  <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--shopli-navy)' }}>{section.heading}</h2>
-                  <p className="text-sm leading-relaxed" style={{ color: 'var(--shopli-warm-gray)' }}>{section.body}</p>
+                  <h2
+                    className="text-xl font-bold mb-2"
+                    style={{ color: 'var(--shopli-navy)' }}
+                  >
+                    {section.heading}
+                  </h2>
+                  <p
+                    className="text-sm leading-relaxed"
+                    style={{ color: 'var(--shopli-warm-gray)' }}
+                  >
+                    {section.body}
+                  </p>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   {section.products.slice(0, 4).map((p: any) => (
-                    <a key={p.id} href={p.affiliateLink} target="_blank" rel="noopener noreferrer sponsored"
-                      className="bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md">
-                      <div className="aspect-square bg-gray-100 overflow-hidden relative">
-                        {p.imageUrl ? <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover" loading="lazy" decoding="async" /> : <div className="w-full h-full flex items-center justify-center"><Icon name="package" size={24} /></div>}
-                        {p.discount && (
-                          <span className="absolute top-1 right-1 text-[9px] font-bold px-1.5 py-0.5 rounded"
-                            style={{ background: 'oklch(65% 0.2 45)', color: 'white' }}
-                          >{p.discount}</span>
-                        )}
-                      </div>
-                      <div className="p-2">
-                        <div className="text-xs font-semibold leading-tight line-clamp-2 mb-1" style={{ color: 'var(--shopli-navy)' }}>{p.title}</div>
-                        <div className="flex items-baseline gap-1 mb-0.5">
-                          <span className="font-bold text-xs" style={{ color: 'var(--shopli-teal)' }}>{config?.currencySymbol || '€'}{p.price?.toFixed(2)}</span>
-                          {p.originalPrice && p.originalPrice > p.price && (
-                            <span className="text-[9px] line-through" style={{ color: 'var(--shopli-warm-gray)' }}>{config?.currencySymbol || '€'}{p.originalPrice.toFixed(2)}</span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span className="text-[9px]" style={{ color: 'var(--shopli-warm-gray)' }}>
-                            {p.rating >= 90 ? '★' : ''}{p.volume > 0 ? ` ${p.volume > 1000 ? (p.volume/1000).toFixed(1) + 'k' : p.volume} sold` : ''}
-                          </span>
-                        </div>
-                        <div className="mt-1.5">
-                          <WhatsAppShare
-                            title={p.title}
-                            url={p.affiliateLink || pageUrl}
-                            locale={lang}
-                            size="sm"
-                          />
-                        </div>
-                      </div>
-                    </a>
+                    <ProductCard
+                      key={p.id}
+                      product={p}
+                      currencySymbol={config?.currencySymbol || '€'}
+                      rtl={rtl}
+                      locale={lang}
+                      fallbackUrl={pageUrl}
+                      region={region}
+                      showShare
+                      showCompareLink
+                      compact
+                    />
                   ))}
                 </div>
               </div>
@@ -140,17 +204,28 @@ export default function CollectionPage({ region, config, collection, content, se
 
         {content?.faq && (
           <section className="py-8">
-            <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--shopli-navy)' }}>FAQ</h2>
+            <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--shopli-navy)' }}>
+              {rtl ? 'שאלות נפוצות' : 'FAQ'}
+            </h2>
             {content.faq.map((item: any, i: number) => (
-              <details key={i} className="border border-gray-200 rounded-lg mb-2 overflow-hidden">
-                <summary className="p-3 cursor-pointer font-semibold text-sm" style={{ color: 'var(--shopli-navy)' }}>{get(item.q)}</summary>
-                <p className="p-3 pt-0 text-sm" style={{ color: 'var(--shopli-warm-gray)' }}>{get(item.a)}</p>
+              <details
+                key={i}
+                className="border border-gray-200 rounded-lg mb-2 overflow-hidden"
+              >
+                <summary
+                  className="p-3 cursor-pointer font-semibold text-sm"
+                  style={{ color: 'var(--shopli-navy)' }}
+                >
+                  {get(item.q)}
+                </summary>
+                <p className="p-3 pt-0 text-sm" style={{ color: 'var(--shopli-warm-gray)' }}>
+                  {get(item.a)}
+                </p>
               </details>
             ))}
           </section>
         )}
 
-        {/* Share this collection */}
         <section className="py-6 border-t border-gray-100">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-sm font-medium" style={{ color: 'var(--shopli-warm-gray)' }}>
@@ -159,7 +234,7 @@ export default function CollectionPage({ region, config, collection, content, se
             <WhatsAppShare
               title={rtl ? `אוסף ${collection.name} — שופלי` : `${collection.name} collection — Shopli`}
               url={pageUrl}
-              description={get(collection.desc || '')}
+              description={description}
               locale={lang}
               size="md"
             />
@@ -181,19 +256,62 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
     if (!coll) return { notFound: true };
 
     const content = COLLECTION_CONTENT[slug] || null;
-    const resolvedCollection = { slug: coll.slug, name: get(coll.name), desc: get(coll.desc), icon: coll.icon, keywords: coll.keywords };
+    const resolvedCollection = {
+      slug: coll.slug,
+      name: get(coll.name) || get(coll.tag) || coll.slug,
+      desc: get(coll.desc),
+      icon: coll.icon,
+      keywords: coll.keywords,
+      metaTitle: coll.metaTitle || null,
+      metaDesc: coll.metaDesc || null,
+    };
     const sections: any[] = [];
 
     if (content) {
       for (const section of content.sections) {
         const { searchCollection: sc } = await import('../../../lib/aliexpress');
         const products = await sc(region, section.keywords, 4);
-        sections.push({ heading: get(section.heading), body: get(section.body), products });
+        sections.push({
+          heading: get(section.heading),
+          body: get(section.body),
+          products,
+        });
+      }
+    } else if (coll.keywords?.length) {
+      // Collections without editorial content still show products
+      const { searchCollection: sc } = await import('../../../lib/aliexpress');
+      const products = await sc(region, coll.keywords, 8);
+      if (products.length > 0) {
+        sections.push({
+          heading: resolvedCollection.name,
+          body: resolvedCollection.desc || '',
+          products,
+        });
       }
     }
 
-    return { props: { region, config, collection: resolvedCollection, content: content ? JSON.parse(JSON.stringify(content)) : null, sections, rtl: config?.direction === 'rtl', error: null } };
+    return {
+      props: {
+        region,
+        config,
+        collection: resolvedCollection,
+        content: content ? JSON.parse(JSON.stringify(content)) : null,
+        sections: JSON.parse(JSON.stringify(sections)),
+        rtl: config?.direction === 'rtl',
+        error: null,
+      },
+    };
   } catch (e: any) {
-    return { props: { region: 'eu', config: null, collection: { slug: 'error', name: 'Error' }, content: null, sections: [], rtl: false, error: e?.message || String(e) } };
+    return {
+      props: {
+        region: 'eu',
+        config: null,
+        collection: { slug: 'error', name: 'Error' },
+        content: null,
+        sections: [],
+        rtl: false,
+        error: e?.message || String(e),
+      },
+    };
   }
 };
