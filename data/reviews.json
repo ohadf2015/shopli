@@ -1,0 +1,71 @@
+{
+  "1005007001": [
+    {
+      "id": "rev-1005007001-1",
+      "name": "Daniel Cohen",
+      "rating": 5,
+      "text": "Charges my iPhone 15 and Galaxy S23 fast. The magnet aligns perfectly and the build quality feels premium for the price.",
+      "date": "2026-07-10T08:30:00.000Z"
+    },
+    {
+      "id": "rev-1005007001-2",
+      "name": "Sarah L.",
+      "rating": 4,
+      "text": "Great charger, but the LED indicator is a bit bright on the nightstand. Otherwise solid value.",
+      "date": "2026-07-14T18:45:00.000Z"
+    },
+    {
+      "id": "rev-1005007001-3",
+      "name": "Mike Tavor",
+      "rating": 5,
+      "text": "Shipped within a week to Tel Aviv. Works with my case on — very convenient.",
+      "date": "2026-07-20T11:20:00.000Z"
+    }
+  ],
+  "1005007002": [
+    {
+      "id": "rev-1005007002-1",
+      "name": "Emma Roth",
+      "rating": 5,
+      "text": "Surprisingly good bass and the ear hooks stay put during runs. Battery lasts my whole workout week.",
+      "date": "2026-07-08T16:10:00.000Z"
+    },
+    {
+      "id": "rev-1005007002-2",
+      "name": "David Peretz",
+      "rating": 4,
+      "text": "Sound is clear, pairing is instant. The case is a little bulky for pockets but fine for a gym bag.",
+      "date": "2026-07-15T09:55:00.000Z"
+    },
+    {
+      "id": "rev-1005007002-3",
+      "name": "Noa Barak",
+      "rating": 5,
+      "text": "Best budget sport earbuds I have tried. Microphone quality on calls is way better than expected.",
+      "date": "2026-07-22T20:05:00.000Z"
+    }
+  ],
+  "1005007003": [
+    {
+      "id": "rev-1005007003-1",
+      "name": "Alex Goren",
+      "rating": 5,
+      "text": "Perfect for fixing phones and laptops. The magnetic mat keeps screws from disappearing.",
+      "date": "2026-07-05T13:40:00.000Z"
+    },
+    {
+      "id": "rev-1005007003-2",
+      "name": "Yael Mizrahi",
+      "rating": 5,
+      "text": "Bought it for my husband and he uses it constantly. Bits are high quality and the handle is comfortable.",
+      "date": "2026-07-12T07:25:00.000Z"
+    },
+    {
+      "id": "rev-1005007003-3",
+      "name": "Ron Levine",
+      "rating": 4,
+      "text": "Comprehensive kit. Only wish it included a torque driver, but for the price it is unbeatable.",
+      "date": "2026-07-19T15:15:00.000Z"
+    }
+  ]
+}
