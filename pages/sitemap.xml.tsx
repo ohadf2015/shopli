@@ -1,5 +1,6 @@
 import { GetServerSideProps } from 'next';
 import { REGIONS } from '../lib/regions';
+import { DEMO_PRODUCT_IDS } from '../lib/demo-products';
 import { SITE_URL, getCollectionOgImage } from '../lib/seo';
 
 function xmlEncode(s: string): string {
@@ -144,22 +145,10 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     }
   }
 
-  // Product detail pages (static catalog ids + ids with on-site reviews)
-  let reviewProductIds: string[] = [];
-  try {
-    const reviewsRaw = require('fs').readFileSync(
-      require('path').join(process.cwd(), 'data', 'reviews.json'),
-      'utf-8'
-    );
-    reviewProductIds = Object.keys(JSON.parse(reviewsRaw || '{}'));
-  } catch {
-    reviewProductIds = [];
-  }
-  const pdpIds = Array.from(
-    new Set(['1005007001', '1005007002', '1005007003', '1005007005', ...reviewProductIds])
-  );
+  // Product detail pages — exactly the static demo catalog (single source of
+  // truth: lib/demo-products.ts). Dynamic search PDPs are discovered via links.
   for (const region of regionCodes) {
-    for (const pid of pdpIds) {
+    for (const pid of DEMO_PRODUCT_IDS) {
       urls.push({
         loc: `${SITE_URL}/${region}/product/${pid}`,
         changefreq: 'weekly',

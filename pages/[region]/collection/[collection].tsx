@@ -6,6 +6,7 @@ import WhatsAppShare from '../../../components/WhatsAppShare';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, RegionCode } from '../../../lib/regions';
 import { getCollection } from '../../../lib/collections';
+import { listingAggregateFields } from '../../../lib/pdp';
 import { COLLECTION_CONTENT } from '../../../lib/collection-content';
 import {
   articleJsonLd,
@@ -97,8 +98,11 @@ export default function CollectionPage({ region, config, collection, content, se
           brand: p.shopName,
           price: p.price,
           currency: config?.currency,
-          ratingValue: p.rating > 0 ? p.rating / 20 : undefined,
-          reviewCount: p.reviewCount || undefined,
+          // v1: no AggregateRating on on-site PDP URLs (docs/PDP-V1-SPEC.md)
+          ...listingAggregateFields(p, {
+            ratingValue: p.rating > 0 ? p.rating / 20 : undefined,
+            reviewCount: p.reviewCount || undefined,
+          }),
           sku: p.id,
           region,
         })

@@ -7,6 +7,8 @@ import WhatsAppShare from '../../../components/WhatsAppShare';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, RegionCode, RegionConfig } from '../../../lib/regions';
 import type { SearchProduct } from '../../../lib/aliexpress';
+import { getDemoProducts } from '../../../lib/demo-products';
+import { listingAggregateFields } from '../../../lib/pdp';
 import {
   buildCompareRows,
   buildCompareShareUrl,
@@ -93,9 +95,11 @@ export default function ProductComparePage({
           brand: p.shopName,
           price: p.price,
           currency: p.currency || config.currency,
-          // evaluate_rate is 0–100; schema expects ~1–5
-          ratingValue: p.rating > 0 ? p.rating / 20 : undefined,
-          reviewCount: p.reviewCount || p.volume || undefined,
+          // v1: no AggregateRating on on-site PDP URLs (docs/PDP-V1-SPEC.md)
+          ...listingAggregateFields(p, {
+            ratingValue: p.rating > 0 ? p.rating / 20 : undefined,
+            reviewCount: p.reviewCount || p.volume || undefined,
+          }),
         })),
       })
     );
@@ -110,8 +114,11 @@ export default function ProductComparePage({
           brand: p.shopName,
           price: p.price,
           currency: p.currency || config.currency,
-          ratingValue: p.rating > 0 ? p.rating / 20 : undefined,
-          reviewCount: p.reviewCount || undefined,
+          // v1: no AggregateRating on on-site PDP URLs (docs/PDP-V1-SPEC.md)
+          ...listingAggregateFields(p, {
+            ratingValue: p.rating > 0 ? p.rating / 20 : undefined,
+            reviewCount: p.reviewCount || undefined,
+          }),
         })
       );
     }
@@ -692,93 +699,4 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
   };
 };
 
-/** Offline demo catalog aligned with api.ts fallback product IDs */
-function getDemoProducts(region: string, currency: string): SearchProduct[] {
-  const isHe = region === 'il';
-  return [
-    {
-      id: '1005007001',
-      sku: '',
-      title: isHe ? 'מטען אלחוטי מהיר 15W' : '15W Fast Wireless Charger',
-      price: region === 'il' ? 39.9 : 9.9,
-      originalPrice: region === 'il' ? 59.9 : 14.9,
-      currency,
-      imageUrl: '',
-      images: [],
-      affiliateLink: `https://www.aliexpress.com/item/1005007001.html`,
-      rating: 94,
-      reviewCount: 2341,
-      volume: 15000,
-      category: isHe ? 'גאדג\'טים' : 'Gadgets',
-      categoryPath: isHe ? 'אלקטרוניקה > מטענים' : 'Electronics > Chargers',
-      shopName: 'TechHome Store',
-      shopId: '1',
-      discount: '33%',
-      commissionRate: 8,
-      freeShipping: true,
-    },
-    {
-      id: '1005007002',
-      sku: '',
-      title: isHe ? 'אוזניות BT Sport Pro' : 'Sport Bluetooth Earbuds Pro',
-      price: region === 'il' ? 69.9 : 18.9,
-      originalPrice: region === 'il' ? 99.9 : 29.9,
-      currency,
-      imageUrl: '',
-      images: [],
-      affiliateLink: `https://www.aliexpress.com/item/1005007002.html`,
-      rating: 92,
-      reviewCount: 5872,
-      volume: 34000,
-      category: isHe ? 'אלקטרוניקה' : 'Electronics',
-      categoryPath: isHe ? 'אלקטרוניקה > אודיו' : 'Electronics > Audio',
-      shopName: 'AudioMax',
-      shopId: '2',
-      discount: '30%',
-      commissionRate: 8,
-      freeShipping: true,
-    },
-    {
-      id: '1005007003',
-      sku: '',
-      title: isHe ? 'ערכת מברגים מדויקת 48in1' : 'Precision Screwdriver Set 48in1',
-      price: region === 'il' ? 45 : 11.5,
-      originalPrice: region === 'il' ? 65 : 16.9,
-      currency,
-      imageUrl: '',
-      images: [],
-      affiliateLink: `https://www.aliexpress.com/item/1005007003.html`,
-      rating: 98,
-      reviewCount: 3204,
-      volume: 8900,
-      category: isHe ? 'כלים' : 'Tools',
-      categoryPath: isHe ? 'בית > כלי עבודה' : 'Home > Tools',
-      shopName: 'ProTools',
-      shopId: '3',
-      discount: '31%',
-      commissionRate: 6,
-      freeShipping: false,
-    },
-    {
-      id: '1005007005',
-      sku: '',
-      title: isHe ? 'שעון חכם ספורט IP68' : 'IP68 Smart Sports Watch',
-      price: region === 'il' ? 89.9 : 22.9,
-      originalPrice: region === 'il' ? 149.9 : 39.9,
-      currency,
-      imageUrl: '',
-      images: [],
-      affiliateLink: `https://www.aliexpress.com/item/1005007005.html`,
-      rating: 88,
-      reviewCount: 8901,
-      volume: 42000,
-      category: isHe ? 'ספורט' : 'Sports',
-      categoryPath: isHe ? 'ספורט > לביש' : 'Sports > Wearables',
-      shopName: 'FitGear',
-      shopId: '5',
-      discount: '40%',
-      commissionRate: 10,
-      freeShipping: true,
-    },
-  ];
-}
+

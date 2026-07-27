@@ -4,6 +4,7 @@ import Icon from '../../../components/icons';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, RegionCode } from '../../../lib/regions';
 import { getComparison } from '../../../lib/comparisons';
+import { listingAggregateFields } from '../../../lib/pdp';
 import { articleJsonLd, breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
 
 export default function ComparisonPage({ region, config, comparison, prod1Items, prod2Items, rtl, error }: any) {
@@ -46,8 +47,11 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
           brand: item.shopName,
           price: typeof item.price === 'number' ? item.price : parseFloat(item.price) || undefined,
           currency: item.currency || config?.currency,
-          ratingValue: item.rating > 0 ? item.rating / 20 : undefined,
-          reviewCount: item.reviewCount || undefined,
+          // v1: no AggregateRating on on-site PDP URLs (docs/PDP-V1-SPEC.md)
+          ...listingAggregateFields(item, {
+            ratingValue: item.rating > 0 ? item.rating / 20 : undefined,
+            reviewCount: item.reviewCount || undefined,
+          }),
           sku: item.id,
           region,
         })

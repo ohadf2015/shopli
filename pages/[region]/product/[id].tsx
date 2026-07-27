@@ -1,137 +1,35 @@
 import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import type { IncomingMessage } from 'http';
 import Header from '../../../components/Header';
 import SeoHead from '../../../components/SeoHead';
 import Icon from '../../../components/icons';
 import WhatsAppShare from '../../../components/WhatsAppShare';
-import Reviews from '../../../components/Reviews';
 import { getRegion, RegionCode, RegionConfig } from '../../../lib/regions';
 import { getProductsByIds, SearchProduct } from '../../../lib/aliexpress';
-import { addReview, getReviewsByProductId, ReviewsSummary } from '../../../lib/reviews';
+import { getDemoProductById } from '../../../lib/demo-products';
+import {
+  buildPdpDescription,
+  buildPdpSpecs,
+  buildPdpProsCons,
+  buildPdpFaq,
+  relatedCollections,
+  SpecRow,
+  FaqItem,
+} from '../../../lib/pdp';
 import { breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
+import type { CollectionDef } from '../../../lib/collections';
 
 interface ProductPageProps {
   region: RegionCode;
   config: RegionConfig;
   product: SearchProduct | null;
   productId: string;
-  reviews: ReviewsSummary;
   rtl: boolean;
-  thanks?: boolean;
-  error?: string;
-}
-
-function parseUrlEncodedBody(req: IncomingMessage): Promise<Record<string, string>> {
-  return new Promise((resolve, reject) => {
-    let body = '';
-    req.on('data', (chunk) => {
-      body += chunk.toString();
-    });
-    req.on('end', () => {
-      try {
-        const params = new URLSearchParams(body);
-        const result: Record<string, string> = {};
-        params.forEach((value, key) => {
-          result[key] = value;
-        });
-        resolve(result);
-      } catch (e) {
-        reject(e);
-      }
-    });
-    req.on('error', reject);
-  });
-}
-
-function getDemoProductById(id: string, region: string, currency: string): SearchProduct | null {
-  const isHe = region === 'il';
-  const catalog: Record<string, SearchProduct> = {
-    '1005007001': {
-      id: '1005007001',
-      sku: '',
-      title: isHe ? 'מטען אלחוטי מהיר 15W' : '15W Fast Wireless Charger',
-      price: region === 'il' ? 39.9 : 9.9,
-      originalPrice: region === 'il' ? 59.9 : 14.9,
-      currency,
-      imageUrl: '',
-      images: [],
-      affiliateLink: `https://www.aliexpress.com/item/1005007001.html`,
-      rating: 94,
-      reviewCount: 2341,
-      volume: 15000,
-      category: isHe ? 'גאדג\'טים' : 'Gadgets',
-      categoryPath: isHe ? 'אלקטרוניקה > מטענים' : 'Electronics > Chargers',
-      shopName: 'TechHome Store',
-      shopId: '1',
-      discount: '33%',
-      commissionRate: 8,
-      freeShipping: true,
-    },
-    '1005007002': {
-      id: '1005007002',
-      sku: '',
-      title: isHe ? 'אוזניות BT Sport Pro' : 'Sport Bluetooth Earbuds Pro',
-      price: region === 'il' ? 69.9 : 18.9,
-      originalPrice: region === 'il' ? 99.9 : 29.9,
-      currency,
-      imageUrl: '',
-      images: [],
-      affiliateLink: `https://www.aliexpress.com/item/1005007002.html`,
-      rating: 92,
-      reviewCount: 5872,
-      volume: 34000,
-      category: isHe ? 'אלקטרוניקה' : 'Electronics',
-      categoryPath: isHe ? 'אלקטרוניקה > אודיו' : 'Electronics > Audio',
-      shopName: 'AudioMax',
-      shopId: '2',
-      discount: '30%',
-      commissionRate: 8,
-      freeShipping: true,
-    },
-    '1005007003': {
-      id: '1005007003',
-      sku: '',
-      title: isHe ? 'ערכת מברגים מדויקת 48in1' : 'Precision Screwdriver Set 48in1',
-      price: region === 'il' ? 45 : 11.5,
-      originalPrice: region === 'il' ? 65 : 16.9,
-      currency,
-      imageUrl: '',
-      images: [],
-      affiliateLink: `https://www.aliexpress.com/item/1005007003.html`,
-      rating: 98,
-      reviewCount: 3204,
-      volume: 8900,
-      category: isHe ? 'כלים' : 'Tools',
-      categoryPath: isHe ? 'בית > כלי עבודה' : 'Home > Tools',
-      shopName: 'ProTools',
-      shopId: '3',
-      discount: '31%',
-      commissionRate: 6,
-      freeShipping: false,
-    },
-    '1005007005': {
-      id: '1005007005',
-      sku: '',
-      title: isHe ? 'שעון חכם ספורט IP68' : 'IP68 Smart Sports Watch',
-      price: region === 'il' ? 89.9 : 22.9,
-      originalPrice: region === 'il' ? 149.9 : 39.9,
-      currency,
-      imageUrl: '',
-      images: [],
-      affiliateLink: `https://www.aliexpress.com/item/1005007005.html`,
-      rating: 88,
-      reviewCount: 8901,
-      volume: 42000,
-      category: isHe ? 'ספורט' : 'Sports',
-      categoryPath: isHe ? 'ספורט > לביש' : 'Sports > Wearables',
-      shopName: 'FitGear',
-      shopId: '5',
-      discount: '40%',
-      commissionRate: 10,
-      freeShipping: true,
-    },
-  };
-  return catalog[id] || null;
+  description: string;
+  specs: SpecRow[];
+  pros: string[];
+  cons: string[];
+  faq: FaqItem[];
+  related: Array<{ slug: string; name: string }>;
 }
 
 function ratingStars(rating: number): number {
@@ -149,10 +47,13 @@ export default function ProductPage({
   config,
   product,
   productId,
-  reviews,
   rtl,
-  thanks,
-  error,
+  description,
+  specs,
+  pros,
+  cons,
+  faq,
+  related,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const lang = config.lang || 'en';
   const pageUrl = `${SITE_URL}/${region}/product/${productId}`;
@@ -190,10 +91,10 @@ export default function ProductPage({
   }
 
   const title = `${product.title} | Shopli`;
-  const description = product.title;
   const stars = ratingStars(product.rating);
   const originalPrice = product.originalPrice != null && product.originalPrice > product.price ? product.originalPrice : null;
 
+  // v1: no aggregateRating — Shopli has no on-site reviews yet (docs/PDP-V1-SPEC.md).
   const structuredData = [
     breadcrumbJsonLd([
       { name: rtl ? 'דף הבית' : 'Home', url: `${SITE_URL}/${region}` },
@@ -210,8 +111,6 @@ export default function ProductPage({
       availability: 'https://schema.org/InStock',
       sku: product.sku || product.id,
       region,
-      ratingValue: reviews.count > 0 ? reviews.average : undefined,
-      reviewCount: reviews.count > 0 ? reviews.count : undefined,
     }),
   ];
 
@@ -248,18 +147,7 @@ export default function ProductPage({
           </span>
         </nav>
 
-        {thanks && (
-          <div className="mb-6 p-3 rounded-lg bg-green-50 border border-green-100 text-sm text-green-800 fade-in">
-            {rtl ? 'תודה! הביקורת שלך נשלחה לאישור.' : 'Thanks! Your review has been submitted.'}
-          </div>
-        )}
-        {error && (
-          <div className="mb-6 p-3 rounded-lg bg-red-50 border border-red-100 text-sm text-red-800 fade-in">
-            {error}
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 fade-in">
           {/* Image */}
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="aspect-square bg-gray-50 flex items-center justify-center relative">
@@ -380,7 +268,95 @@ export default function ProductPage({
           </div>
         </div>
 
-        <Reviews productId={productId} summary={reviews} rtl={rtl} />
+        {/* Specs */}
+        <section className="mt-10 fade-in" aria-label={rtl ? 'מפרט' : 'Specifications'}>
+          <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--shopli-navy)' }}>
+            {rtl ? 'מפרט' : 'Specifications'}
+          </h2>
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-6">
+            {specs.map((row) => (
+              <div key={row.label} className="flex items-baseline justify-between gap-4 text-sm border-b border-gray-50 pb-2">
+                <dt style={{ color: 'var(--shopli-warm-gray)' }}>{row.label}</dt>
+                <dd className="font-medium text-end" style={{ color: 'var(--shopli-navy)' }}>
+                  {row.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        {/* Pros / Cons */}
+        <section className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 fade-in">
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-6">
+            <h2 className="text-base font-bold mb-3" style={{ color: 'var(--shopli-teal)' }}>
+              {rtl ? 'יתרונות' : 'Pros'}
+            </h2>
+            <ul className="space-y-2 text-sm" style={{ color: 'var(--shopli-navy)' }}>
+              {pros.map((pro) => (
+                <li key={pro} className="flex items-start gap-2">
+                  <span style={{ color: 'var(--shopli-teal)' }}>✓</span>
+                  <span>{pro}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-6">
+            <h2 className="text-base font-bold mb-3" style={{ color: 'var(--shopli-orange)' }}>
+              {rtl ? 'חסרונות' : 'Cons'}
+            </h2>
+            <ul className="space-y-2 text-sm" style={{ color: 'var(--shopli-navy)' }}>
+              {cons.map((con) => (
+                <li key={con} className="flex items-start gap-2">
+                  <span style={{ color: 'var(--shopli-orange)' }}>✗</span>
+                  <span>{con}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="mt-8 fade-in" aria-label="FAQ">
+          <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--shopli-navy)' }}>
+            {rtl ? 'שאלות נפוצות' : 'Frequently asked questions'}
+          </h2>
+          <div className="space-y-3">
+            {faq.map((item) => (
+              <details
+                key={item.q}
+                className="bg-white rounded-xl border border-gray-100 shadow-sm p-4"
+              >
+                <summary className="text-sm font-semibold cursor-pointer" style={{ color: 'var(--shopli-navy)' }}>
+                  {item.q}
+                </summary>
+                <p className="text-sm mt-2 leading-relaxed" style={{ color: 'var(--shopli-warm-gray)' }}>
+                  {item.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        {/* Related collections */}
+        {related.length > 0 && (
+          <section className="mt-8 fade-in" aria-label={rtl ? 'קולקציות קשורות' : 'Related collections'}>
+            <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--shopli-navy)' }}>
+              {rtl ? 'קולקציות שאולי יעניינו אותך' : 'Related collections'}
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {related.map((c) => (
+                <a
+                  key={c.slug}
+                  href={`/${region}/collection/${c.slug}`}
+                  className="text-sm px-3 py-1.5 rounded-full bg-white border border-gray-100 shadow-sm hover:shadow transition-shadow"
+                  style={{ color: 'var(--shopli-navy)' }}
+                >
+                  {c.name}
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
 
       <footer className="border-t border-gray-100 py-6">
@@ -411,33 +387,6 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
     return { notFound: true };
   }
 
-  // Handle review submissions server-side to avoid relying on API route rewrites.
-  if (context.req.method === 'POST') {
-    try {
-      const body = await parseUrlEncodedBody(context.req);
-      if (body.productId === productId) {
-        await addReview(productId, {
-          name: body.name,
-          rating: Number(body.rating),
-          text: body.text,
-        });
-        return {
-          redirect: {
-            destination: `/${region}/product/${encodeURIComponent(productId)}?thanks=1#reviews`,
-            permanent: false,
-          },
-        };
-      }
-    } catch (e: any) {
-      return {
-        redirect: {
-          destination: `/${region}/product/${encodeURIComponent(productId)}?error=${encodeURIComponent(e?.message || 'Failed to submit review')}#reviews`,
-          permanent: false,
-        },
-      };
-    }
-  }
-
   let product: SearchProduct | null = null;
 
   try {
@@ -451,7 +400,14 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
     product = getDemoProductById(productId, region, config.currency);
   }
 
-  const reviews = await getReviewsByProductId(productId);
+  const lang = config.lang || 'en';
+  const collName = (c: CollectionDef) =>
+    c.name?.[lang] || c.name?.en || c.tag?.[lang] || c.tag?.en || c.slug;
+
+  const description = product ? buildPdpDescription(product, rtl) : '';
+  const { pros, cons } = product
+    ? buildPdpProsCons(product, rtl)
+    : { pros: [] as string[], cons: [] as string[] };
 
   return {
     props: {
@@ -459,10 +415,15 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
       config,
       product,
       productId,
-      reviews,
       rtl,
-      thanks: context.query.thanks === '1',
-      error: context.query.error ? String(context.query.error) : undefined,
+      description,
+      specs: product ? buildPdpSpecs(product, rtl) : [],
+      pros,
+      cons,
+      faq: product ? buildPdpFaq(product, rtl) : [],
+      related: product
+        ? relatedCollections(product).map((c) => ({ slug: c.slug, name: collName(c) }))
+        : [],
     },
   };
 };
