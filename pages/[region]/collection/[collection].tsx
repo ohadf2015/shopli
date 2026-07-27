@@ -76,7 +76,8 @@ export default function CollectionPage({ region, config, collection, content, se
         pageUrl,
         allProducts.slice(0, 16).map((p: any, i: number) => ({
           name: p.title,
-          url: p.affiliateLink || pageUrl,
+          // Rich-result URLs must be on-site: link the PDP when we have an id
+          url: p.id ? `${SITE_URL}/${region}/product/${encodeURIComponent(p.id)}` : pageUrl,
           image: p.imageUrl,
           position: i + 1,
         }))
@@ -92,7 +93,7 @@ export default function CollectionPage({ region, config, collection, content, se
           title: p.title,
           description: p.title,
           image: p.imageUrl,
-          url: p.affiliateLink || pageUrl,
+          url: p.id ? `${SITE_URL}/${region}/product/${encodeURIComponent(p.id)}` : pageUrl,
           brand: p.shopName,
           price: p.price,
           currency: config?.currency,
