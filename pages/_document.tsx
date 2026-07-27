@@ -36,6 +36,12 @@ export default class ShopliDocument extends Document<ShopliDocumentProps> {
     return (
       <Html lang={lang} dir={dir}>
         <Head>
+          {/* Google Search Console verification */}
+          <meta
+            name="google-site-verification"
+            content="ZuLzbvi5lsxoWY0XMCM5UfKF7dEgVvkTgN3_xFlVd8E"
+          />
+
           {/* Performance: preconnect to external origins */}
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
