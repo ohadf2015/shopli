@@ -59,7 +59,6 @@ export default function ProductCard({
   region,
   className = '',
 }: ProductCardProps) {
-  const href = product.affiliateLink || fallbackUrl || '#';
   const stars = ratingStars(product.rating || 0);
   const sold = formatSold(product.volume || 0, rtl);
   const price = Number(product.price) || 0;
@@ -68,119 +67,128 @@ export default function ProductCard({
       ? product.originalPrice
       : null;
 
+  const productPageUrl = region && product.id
+    ? `/${region}/product/${encodeURIComponent(product.id)}`
+    : undefined;
+  const externalHref = product.affiliateLink || fallbackUrl || '#';
+  const isExternal = !productPageUrl;
+  const cardHref = productPageUrl || externalHref;
+
   return (
     <article
-      className={`product-card group bg-white rounded-xl border border-gray-100 overflow-hidden flex flex-col h-full ${className}`}
+      className={`product-card group bg-white rounded-xl border border-gray-100 overflow-hidden flex flex-col h-full relative ${className}`}
     >
+      {/* Main link covering the entire card */}
       <a
-        href={href}
-        target={product.affiliateLink ? '_blank' : undefined}
-        rel={product.affiliateLink ? 'noopener noreferrer sponsored' : undefined}
-        className="flex flex-col flex-1 min-h-0"
-      >
-        <div className={`aspect-square bg-gray-50 overflow-hidden relative ${compact ? '' : ''}`}>
-          {product.imageUrl ? (
-            <img
-              src={product.imageUrl}
-              alt={product.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              loading="lazy"
-              decoding="async"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
-            />
-          ) : (
-            <div
-              className="w-full h-full flex items-center justify-center"
-              style={{ color: 'var(--shopli-warm-gray)' }}
-            >
-              <Icon name="package" size={compact ? 24 : 32} />
-            </div>
-          )}
+        href={cardHref}
+        target={isExternal ? '_blank' : undefined}
+        rel={isExternal ? 'noopener noreferrer sponsored' : undefined}
+        className="absolute inset-0 z-0"
+        aria-label={product.title}
+      />
 
-          {product.discount && (
-            <span
-              className="absolute top-2 end-2 text-[0.6rem] sm:text-[0.65rem] font-bold px-2 py-0.5 rounded-full bg-white/95 backdrop-blur-sm shadow-sm"
-              style={{ color: 'var(--shopli-orange)' }}
-            >
-              -{product.discount}
-            </span>
-          )}
-
-          {product.freeShipping && (
-            <span className="badge-shipping absolute bottom-2 start-2 flex items-center gap-0.5">
-              <Icon name="truck" size={10} />
-              {rtl ? 'משלוח חינם' : 'Free ship'}
-            </span>
-          )}
-        </div>
-
-        <div className={`flex flex-col flex-1 ${compact ? 'p-2' : 'p-3'}`}>
-          <h3
-            className={`font-semibold leading-tight line-clamp-2 mb-1.5 ${
-              compact ? 'text-[0.7rem]' : 'text-xs sm:text-sm'
-            }`}
-            style={{ color: 'var(--shopli-navy)' }}
+      <div className={`aspect-square bg-gray-50 overflow-hidden relative ${compact ? '' : ''}`}>
+        {product.imageUrl ? (
+          <img
+            src={product.imageUrl}
+            alt={product.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+            decoding="async"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        ) : (
+          <div
+            className="w-full h-full flex items-center justify-center"
+            style={{ color: 'var(--shopli-warm-gray)' }}
           >
-            {product.title}
-          </h3>
+            <Icon name="package" size={compact ? 24 : 32} />
+          </div>
+        )}
 
-          <div className="flex items-baseline gap-1.5 flex-wrap mb-1">
+        {product.discount && (
+          <span
+            className="absolute top-2 end-2 text-[0.6rem] sm:text-[0.65rem] font-bold px-2 py-0.5 rounded-full bg-white/95 backdrop-blur-sm shadow-sm"
+            style={{ color: 'var(--shopli-orange)' }}
+          >
+            -{product.discount}
+          </span>
+        )}
+
+        {product.freeShipping && (
+          <span className="badge-shipping absolute bottom-2 start-2 flex items-center gap-0.5">
+            <Icon name="truck" size={10} />
+            {rtl ? 'משלוח חינם' : 'Free ship'}
+          </span>
+        )}
+      </div>
+
+      <div className={`flex flex-col flex-1 ${compact ? 'p-2' : 'p-3'}`}>
+        <h3
+          className={`font-semibold leading-tight line-clamp-2 mb-1.5 ${
+            compact ? 'text-[0.7rem]' : 'text-xs sm:text-sm'
+          }`}
+          style={{ color: 'var(--shopli-navy)' }}
+        >
+          {product.title}
+        </h3>
+
+        <div className="flex items-baseline gap-1.5 flex-wrap mb-1">
+          <span
+            className={`font-bold tabular-nums ${compact ? 'text-xs' : 'text-sm sm:text-base'}`}
+            style={{ color: 'var(--shopli-teal)' }}
+            dir="ltr"
+          >
+            {currencySymbol}
+            {price.toFixed(2)}
+          </span>
+          {original != null && (
             <span
-              className={`font-bold tabular-nums ${compact ? 'text-xs' : 'text-sm sm:text-base'}`}
-              style={{ color: 'var(--shopli-teal)' }}
+              className="text-[0.65rem] sm:text-xs line-through tabular-nums"
+              style={{ color: 'var(--shopli-warm-gray)' }}
               dir="ltr"
             >
               {currencySymbol}
-              {price.toFixed(2)}
+              {original.toFixed(2)}
             </span>
-            {original != null && (
-              <span
-                className="text-[0.65rem] sm:text-xs line-through tabular-nums"
-                style={{ color: 'var(--shopli-warm-gray)' }}
-                dir="ltr"
-              >
-                {currencySymbol}
-                {original.toFixed(2)}
-              </span>
-            )}
-          </div>
-
-          <div
-            className="flex items-center gap-1 flex-wrap mt-auto"
-            style={{ color: 'var(--shopli-warm-gray)' }}
-          >
-            {stars > 0 && (
-              <>
-                <Icon name="star" size={11} className="text-yellow-500 shrink-0" />
-                <span className="text-[0.65rem] font-medium tabular-nums">
-                  {ratingDisplay(product.rating || 0)}
-                </span>
-              </>
-            )}
-            {sold && (
-              <span className="text-[0.6rem] sm:text-[0.65rem]">{sold}</span>
-            )}
-            {(product.reviewCount || 0) > 0 && (
-              <span className="text-[0.6rem]">
-                (
-                {(product.reviewCount || 0) > 999
-                  ? `${((product.reviewCount || 0) / 1000).toFixed(1)}k`
-                  : product.reviewCount}
-                )
-              </span>
-            )}
-          </div>
+          )}
         </div>
-      </a>
+
+        <div
+          className="flex items-center gap-1 flex-wrap mt-auto"
+          style={{ color: 'var(--shopli-warm-gray)' }}
+        >
+          {stars > 0 && (
+            <>
+              <Icon name="star" size={11} className="text-yellow-500 shrink-0" />
+              <span className="text-[0.65rem] font-medium tabular-nums">
+                {ratingDisplay(product.rating || 0)}
+              </span>
+            </>
+          )}
+          {sold && (
+            <span className="text-[0.6rem] sm:text-[0.65rem]">{sold}</span>
+          )}
+          {(product.reviewCount || 0) > 0 && (
+            <span className="text-[0.6rem]">
+              (
+              {(product.reviewCount || 0) > 999
+                ? `${((product.reviewCount || 0) / 1000).toFixed(1)}k`
+                : product.reviewCount}
+              )
+            </span>
+          )}
+        </div>
+      </div>
 
       {(showShare || showCompareLink) && (
-        <div className="px-2 pb-2 pt-0 flex items-center gap-1.5">
+        <div className="px-2 pb-2 pt-0 flex items-center gap-1.5 relative z-10">
           {showShare && (
             <WhatsAppShare
               title={product.title}
-              url={href}
+              url={externalHref}
               locale={(locale as 'he' | 'en' | 'fr' | 'de' | 'es' | 'it' | 'ru') || 'en'}
               size="sm"
             />
@@ -188,9 +196,8 @@ export default function ProductCard({
           {showCompareLink && region && product.id && (
             <a
               href={`/${region}/compare?ids=${encodeURIComponent(product.id)}`}
-              className="text-[0.65rem] font-semibold px-2 py-1 rounded-lg border border-gray-100 hover:border-orange-200 hover:bg-orange-50/40 transition-colors"
+              className="text-[0.65rem] font-semibold px-2 py-1 rounded-lg border border-gray-100 hover:border-orange-200 hover:bg-orange-50/40 transition-colors bg-white"
               style={{ color: 'var(--shopli-navy)' }}
-              onClick={(e) => e.stopPropagation()}
             >
               {rtl ? 'השווה' : 'Compare'}
             </a>
