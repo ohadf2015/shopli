@@ -229,9 +229,9 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
 
   'gamer-den': {
     slug: 'gamer-den',
-    metaTitle: { en: 'Ultimate Gamer Den: RGB Gaming Setup Under €120', he: 'פינת גיימרינג אולטימטיבית: עמדת משחק RGB בפחות מ-₪480' },
+    metaTitle: { en: 'Ultimate Gamer Den: RGB Gaming Setup Under €120', he: 'פינת גיימינג אולטימטיבית: עמדת משחק RGB בפחות מ-₪480' },
     metaDesc: { en: 'Build the ultimate gaming setup: RGB LED strips, gaming chair, XL mouse pad, monitor stand, cable sleeve, and desk shelf.', he: 'בנו את עמדת המשחק האולטימטיבית: פסי RGB, כיסא גיימינג, משטח עכבר ענק, מעמד צג, ארגון כבלים ומדף שולחן.' },
-    h1: { en: 'Build the Ultimate RGB Gaming Den Under €120', he: 'פינת גיימרינג RGB מושלמת בפחות מ-₪480' },
+    h1: { en: 'Build the Ultimate RGB Gaming Den Under €120', he: 'פינת גיימינג RGB מושלמת בפחות מ-₪480' },
     intro: { en: 'A proper gaming setup is about atmosphere as much as hardware. RGB lighting, a comfortable chair, and clean cable management turn any corner into a gaming sanctuary.', he: 'עמדת משחק טובה היא עניין של אווירה לא פחות מחומרה. תאורת RGB, כיסא נוח וניהול כבלים מסודר הופכים כל פינה למקדש משחקים.' },
     tags: ['room-design', 'gaming', 'desk', 'tech'],
     items: [
@@ -242,7 +242,7 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
       { keywords: ['cable management sleeve', 'cable raceway kit'], caption: { en: 'Cable Management Kit', he: 'ערכת ניהול כבלים' } },
       { keywords: ['desk shelf riser', 'monitor desk shelf'], caption: { en: 'Desk Shelf / Riser', he: 'מדף שולחן / הגבהה' } },
     ],
-    totalEstimate: { en: 'Full Gamer Den: ~€80-120', he: 'פינת גיימרינג מלאה: ~₪320-480' },
+    totalEstimate: { en: 'Full Gamer Den: ~€80-120', he: 'פינת גיימינג מלאה: ~₪320-480' },
   },
 
   'boho-bedroom': {
@@ -266,9 +266,9 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
   'scandinavian-reading-nook': {
     slug: 'scandinavian-reading-nook',
     metaTitle: { en: 'Scandinavian Reading Nook: Cozy Corner Under €60', he: 'פינת קריאה סקנדינבית: פינה נעימה בפחות מ-₪240' },
-    metaDesc: { en: 'Create a hygge reading corner: floor lamp, armchair, blanket, side table, book stand, and candle holder set.', he: 'יצירת פינת קריאה הייג\'ית: מנורת רצפה, כורסה, שמיכה, שולחן צד, מעמד ספרים וסט פמוטים.' },
+    metaDesc: { en: 'Create a hygge reading corner: floor lamp, armchair, blanket, side table, book stand, and candle holder set.', he: 'יצירת פינת קריאה נעימה בסגנון הייגה: מנורת רצפה, כורסה, שמיכה, שולחן צד, מעמד ספרים וסט פמוטים.' },
     h1: { en: 'Design a Scandinavian Reading Nook Under €60', he: 'פינת קריאה סקנדינבית בפחות מ-₪240' },
-    intro: { en: 'Hygge is about creating warm, cozy corners where you can escape with a book. Soft lighting, a comfortable chair, and natural textures are all you need.', he: 'הייג\'ה זה ליצור פינות חמות ונעימות שאפשר לברוח אליהן עם ספר. תאורה רכה, כיסא נוח ומרקמים טבעיים — זה כל מה שצריך.' },
+    intro: { en: 'Hygge is about creating warm, cozy corners where you can escape with a book. Soft lighting, a comfortable chair, and natural textures are all you need.', he: 'הייגה זו האומנות של ליצור פינות חמות ונעימות שאפשר לברוח אליהן עם ספר. תאורה רכה, כיסא נוח ומרקמים טבעיים — זה כל מה שצריך.' },
     tags: ['room-design', 'scandinavian', 'hygge'],
     items: [
       { keywords: ['floor lamp reading', 'arc floor lamp modern'], caption: { en: 'Arc Floor Lamp', he: 'מנורת קשת רצפה' } },
@@ -509,12 +509,12 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
   'craft-room': {
     slug: 'craft-room',
     metaTitle: { en: 'Craft Room Organization: Creative Studio Under €50', he: 'חדר יצירה מאורגן: סטודיו יצירתי בפחות מ-₪200' },
-    metaDesc: { en: 'Organize your craft space: pegboard wall, thread organizer, ribbon dispenser, paper storage, label maker & rolling cart.', he: 'לארגן את חדר היצירה: לוח פגבורד, מארגן חוטים, מתקן סרטים, אחסון נייר, מכונת תוויות ועגלה ניידת.' },
+    metaDesc: { en: 'Organize your craft space: pegboard wall, thread organizer, ribbon dispenser, paper storage, label maker & rolling cart.', he: 'לארגן את חדר היצירה: לוח תלייה מנוקב, מארגן חוטים, מתקן סרטים, אחסון נייר, מכונת תוויות ועגלה ניידת.' },
     h1: { en: 'Dream Craft Room Organization Under €70', he: 'חדר יצירה מאורגן בפחות מ-₪280' },
-    intro: { en: 'A well-organized craft space lets you focus on creating instead of hunting for supplies. Pegboard walls, dedicated organizers for thread/ribbon/paper, a label maker, and a mobile cart keep everything visible and accessible.', he: 'חדר יצירה מאורגן נותן לכם להתמקד ביצירה במקום בחיפוש חומרים. קירות פגבורד, מארגנים ייעודיים לחוטים/סרטים/נייר, מכונת תוויות ועגלה ניידת שומרים הכל גלוי ונגיש.' },
+    intro: { en: 'A well-organized craft space lets you focus on creating instead of hunting for supplies. Pegboard walls, dedicated organizers for thread/ribbon/paper, a label maker, and a mobile cart keep everything visible and accessible.', he: 'חדר יצירה מאורגן נותן לכם להתמקד ביצירה במקום בחיפוש חומרים. לוחות תלייה מנוקבים, מארגנים ייעודיים לחוטים/סרטים/נייר, מכונת תוויות ועגלה ניידת שומרים הכל גלוי ונגיש.' },
     tags: ['craft', 'organization', 'room-design'],
     items: [
-      { keywords: ['pegboard wall organizer', 'tool pegboard panel'], caption: { en: 'Pegboard Wall Organizer', he: 'לוח פגבורד לקיר' } },
+      { keywords: ['pegboard wall organizer', 'tool pegboard panel'], caption: { en: 'Pegboard Wall Organizer', he: 'לוח תלייה מנוקב לקיר' } },
       { keywords: ['thread organizer rack', 'embroidery floss organizer'], caption: { en: 'Thread / Floss Organizer', he: 'מארגן חוטים / פלוס' } },
       { keywords: ['ribbon dispenser organizer', 'ribbon storage box'], caption: { en: 'Ribbon Dispenser Box', he: 'מתקן סרטים' } },
       { keywords: ['paper storage vertical', 'scrapbook paper organizer'], caption: { en: 'Vertical Paper Storage', he: 'אחסון נייר אנכי' } },
@@ -592,7 +592,7 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
     slug: 'summer-essentials',
     metaTitle: { en: 'Summer Essentials Survival Kit: Beat the Heat Under €25', he: 'ערכת הישרדות קיץ: לנצח את החום בפחות מ-₪100' },
     metaDesc: { en: 'Your complete summer survival kit: portable fan, cooling towel, insulated water bottle, UV umbrella, sunscreen, and beach bag.', he: 'ערכת ההישרדות השלמה לקיץ: מאוורר נייד, מגבת קירור, בקבוק מים מבודד, מטריית UV, קרם הגנה ותיק חוף.' },
-    h1: { en: 'Summer Essentials: Complete Heat Survival Kit Under €25', he: 'קיץ הכרחי: ערכת הישרדות מחום מלאה בפחות מ-₪100' },
+    h1: { en: 'Summer Essentials: Complete Heat Survival Kit Under €25', he: 'מוצרי חובה לקיץ: ערכת הישרדות מהחום בפחות מ-₪100' },
     intro: { en: 'Summer heat can be brutal — especially during heatwaves. This survival kit keeps you cool, hydrated, and protected. Perfect for commutes, outdoor events, beach days, and the daily walk in the sun.', he: 'חום הקיץ יכול להיות אכזרי — במיוחד בגלי חום. ערכת ההישרדות הזו שומרת עליכם קרירים, לחות ומוגנים. מושלם לנסיעות, אירועים בחוץ, ימי חוף וההליכה היומית בשמש.' },
     tags: ['summer', 'travel', 'outdoor', 'wellness'],
     items: [

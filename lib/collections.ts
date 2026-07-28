@@ -31,8 +31,8 @@ export const COLLECTIONS: CollectionDef[] = [
   {
     slug: 'home-office',
     keywords: ['desk lamp LED', 'cable management desk', 'monitor stand', 'desk organizer', 'wireless charging pad'],
-    name: { en: 'Desk Setup', he: 'משימה ביתית', fr: 'Bureau Domicile', de: 'Schreibtisch-Setup', es: 'Setup de Escritorio', it: 'Set up Scrivania' },
-    desc: { en: 'Ergonomic desk gear, cable management & lighting', he: 'ציוד ארגונומי, ניהול כבלים ותאורה', fr: 'Équipement ergonomique, gestion des câbles', de: 'Ergonomisch, Kabelmanagement & Beleuchtung', es: 'Equipo ergonómico, gestión de cables', it: 'Attrezzatura ergonomica, gestione cavi' },
+    name: { en: 'Desk Setup', he: 'עמדת עבודה ביתית', fr: 'Bureau Domicile', de: 'Schreibtisch-Setup', es: 'Setup de Escritorio', it: 'Set up Scrivania' },
+    desc: { en: 'Ergonomic desk gear, cable management & lighting', he: 'ציוד ארגונומי לשולחן, סידור כבלים ותאורה', fr: 'Équipement ergonomique, gestion des câbles', de: 'Ergonomisch, Kabelmanagement & Beleuchtung', es: 'Equipo ergonómico, gestión de cables', it: 'Attrezzatura ergonomica, gestione cavi' },
     icon: 'monitor',
   },
   {
@@ -80,8 +80,8 @@ export const COLLECTIONS: CollectionDef[] = [
   {
     slug: 'summer-essentials',
     keywords: ['portable fan', 'beach towel', 'pool float', 'sunglasses', 'sun hat', 'water bottle'],
-    name: { en: 'Summer Essentials', he: 'קיץ הכרחי', fr: 'Essentiels Ete', de: 'Sommer-Essentials', es: 'Esenciales de Verano', it: 'Essenziali Estivi' },
-    desc: { en: 'Beat the heat — fans, beach gear, hydration & sun protection', he: 'מניפות, ציוד חוף, הידרציה והגנה מהשמש', fr: 'Ventilateurs, plage, hydratation & protection solaire', de: 'Ventilatoren, Strand, Hydration & Sonnenschutz', es: 'Ventiladores, playa, hidratacion', it: 'Ventilatori, spiaggia, idratazione' },
+    name: { en: 'Summer Essentials', he: 'מוצרי חובה לקיץ', fr: 'Essentiels Ete', de: 'Sommer-Essentials', es: 'Esenciales de Verano', it: 'Essenziali Estivi' },
+    desc: { en: 'Beat the heat — fans, beach gear, hydration & sun protection', he: 'מאווררים ניידים, ציוד חוף, שתייה והגנה מהשמש', fr: 'Ventilateurs, plage, hydratation & protection solaire', de: 'Ventilatoren, Strand, Hydration & Sonnenschutz', es: 'Ventiladores, playa, hidratacion', it: 'Ventilatori, spiaggia, idratazione' },
     icon: 'sun',
   },
   {
@@ -115,14 +115,14 @@ export const COLLECTIONS: CollectionDef[] = [
   {
     slug: 'coffee-ritual',
     keywords: ['french press stainless steel', 'burr coffee grinder', 'milk frother handheld', 'reusable coffee cup'],
-    name: { en: 'Coffee Ritual', he: 'פולחן קפה', fr: 'Rituel Café', de: 'Kaffeeritual', es: 'Ritual del Café', it: 'Rituale del Caffè' },
+    name: { en: 'Coffee Ritual', he: 'טקס הקפה', fr: 'Rituel Café', de: 'Kaffeeritual', es: 'Ritual del Café', it: 'Rituale del Caffè' },
     desc: { en: 'Brew barista-quality coffee at home under €60', he: 'קפה באיכות בריסטה בבית בפחות מ-₪250', fr: 'Café de barista à domicile à moins de 60€', de: 'Barista-Qualität zu Hause unter 60€', es: 'Café de barista en casa por menos de 60€', it: 'Caffè da bar a casa sotto i 60€' },
     icon: 'chef',
   },
   {
     slug: 'content-creator',
     keywords: ['wireless lavalier microphone', 'ring light with tripod', 'phone gimbal stabilizer', 'LED ring light 10'],
-    name: { en: 'Content Creator Kit', he: 'ערכת קריאייטיב', fr: 'Kit Créateur', de: 'Creator-Set', es: 'Kit Creador', it: 'Kit Creator' },
+    name: { en: 'Content Creator Kit', he: 'ערכת יוצרי תוכן', fr: 'Kit Créateur', de: 'Creator-Set', es: 'Kit Creador', it: 'Kit Creator' },
     desc: { en: 'Start recording like a pro with mic, light & gimbal under €80', he: 'להקליט כמו מקצוען עם מיקרופון, תאורה וגימבל בפחות מ-₪350', fr: 'Enregistrez comme un pro avec micro, lumière et gimbal à moins de 80€', de: 'Professionell aufnehmen mit Mikro, Licht & Gimbal unter 80€', es: 'Graba como un pro con mic, luz y gimbal por menos de 80€', it: 'Registra come un pro con microfono, luce e gimbal sotto 80€' },
     icon: 'camera',
   },
@@ -158,7 +158,7 @@ export const COLLECTIONS: CollectionDef[] = [
   {
     slug: 'gadgets-under-10',
     keywords: ['kitchen gadgets under 10', 'useful gadgets cheap', 'home gadgets', 'organization tools', 'small kitchen tools'],
-    name: { en: 'Gadgets Under €10', he: 'גאדג\'טים ב-₪40', fr: 'Gadgets à Moins de 10€', de: 'Gadgets unter 10€', es: 'Gadgets por menos de 10€', it: 'Gadget Sotto i 10€' },
+    name: { en: 'Gadgets Under €10', he: 'גאדג׳טים בפחות מ-₪40', fr: 'Gadgets à Moins de 10€', de: 'Gadgets unter 10€', es: 'Gadgets por menos de 10€', it: 'Gadget Sotto i 10€' },
     desc: { en: 'Smart little tools under €10 that make daily life easier', he: 'כלים קטנים וחכמים בפחות מ-₪40 שמקלים על החיים', fr: 'Petits outils malins à moins de 10€', de: 'Clevere kleine Helfer unter 10€', es: 'Pequeñas herramientas inteligentes por menos de 10€', it: 'Piccoli strumenti intelligenti sotto 10€' },
     icon: 'bulb',
   },
@@ -190,7 +190,7 @@ export const COLLECTIONS: CollectionDef[] = [
     slug: 'nail-care',
     keywords: ['UV nail lamp', 'nail drill file', 'nail art stamp kit', 'nail polish set', 'cuticle oil kit'],
     name: { en: 'Nail Art & Care', he: 'טיפוח ציפורניים' },
-    desc: { en: 'DIY nail art tools and care kits for perfect manicures at home', he: 'ערכות טיפוח ציפורניים לעשה זאת בעצמך למניקור מושלם בבית' },
+    desc: { en: 'DIY nail art tools and care kits for perfect manicures at home', he: 'ערכות טיפוח ציפורניים לעשות בעצמכם — מניקור מושלם בבית' },
     icon: 'sun',
     googleCategory: '469',
   },
@@ -213,7 +213,7 @@ export const COLLECTIONS: CollectionDef[] = [
   {
     slug: 'korean-skincare',
     keywords: ['Korean essence', 'snail mucin', 'sheet masks', 'vitamin C brightening', 'centella asiatica'],
-    name: { en: 'K-Beauty Routine', he: 'שגרת קוריאנית' },
+    name: { en: 'K-Beauty Routine', he: 'טיפוח קוריאני' },
     desc: { en: 'Korean skincare step-by-step — essence and sheet masks', he: 'שגרת טיפוח קוריאנית צעד אחר צעד' },
     icon: 'mask',
     googleCategory: '469',
@@ -229,15 +229,15 @@ export const COLLECTIONS: CollectionDef[] = [
   {
     slug: 'acne-care',
     keywords: ['salicylic acid cleanser', 'benzoyl peroxide spot treatment', 'niacinamide serum', 'tea tree oil', 'clay mask'],
-    name: { en: 'Acne Care', he: 'טיפול באקנה' },
-    desc: { en: 'Clear skin solutions for acne-prone skin — spot treatments and cleansers', he: 'פתרונות לעור נוטה לאקנה — טיפולים מקומיים ותכשירי ניקוי' },
+    name: { en: 'Acne Care', he: 'טיפול בפצעונים' },
+    desc: { en: 'Clear skin solutions for acne-prone skin — spot treatments and cleansers', he: 'פתרונות לעור נוטה לפצעונים — טיפולים מקומיים ותכשירי ניקוי' },
     icon: 'mask',
     googleCategory: '469',
   },
   {
     slug: 'facial-tools',
     keywords: ['face roller', 'jade roller', 'gua sha tool', 'facial steamer', 'microcurrent device'],
-    name: { en: 'Facial Tools', he: 'כלי פנים' },
+    name: { en: 'Facial Tools', he: 'כלי טיפוח לפנים' },
     desc: { en: 'Professional facial tools for spa-level skincare at home', he: 'כלי טיפוח מקצועיים ברמת ספא בבית' },
     icon: 'bulb',
     googleCategory: '469',
@@ -309,8 +309,8 @@ export const COLLECTIONS: CollectionDef[] = [
   {
     slug: 'perfume-fragrance',
     keywords: ['perfume oil', 'perfume sample set', 'body mist', 'roll-on fragrance', 'solid perfume'],
-    name: { en: 'Perfume & Fragrance', he: 'בשמים וריחות' },
-    desc: { en: 'Long-lasting perfumes and fragrance oils for every occasion', he: 'בשמים וניחוחות עמידים לכל אירוח' },
+    name: { en: 'Perfume & Fragrance', he: 'בשמים וניחוחות' },
+    desc: { en: 'Long-lasting perfumes and fragrance oils for every occasion', he: 'בשמים וניחוחות עמידים לכל אירוע' },
     icon: 'run',
     googleCategory: '469',
   },
@@ -462,7 +462,7 @@ export const COLLECTIONS: CollectionDef[] = [
     slug: 'hair-coloring',
     keywords: ['ammonia-free hair dye', 'hair bleach kit', 'hair color brush', 'hair developer', 'toning shampoo'],
     name: { en: 'Hair Coloring', he: 'צביעת שיער' },
-    desc: { en: 'DIY hair coloring kits and tools for salon results at home', he: 'ערכות צביעת שיער לעשה זאת בעצמך לתוצאות כמו במספרה' },
+    desc: { en: 'DIY hair coloring kits and tools for salon results at home', he: 'ערכות צביעת שיער ביתיות לתוצאות כמו במספרה' },
     icon: 'run',
     googleCategory: '469',
   },
@@ -549,7 +549,7 @@ export const COLLECTIONS: CollectionDef[] = [
   {
     slug: 'tanning-bronzing',
     keywords: ['self tanner mousse', 'tanning drops', 'bronzing powder', 'tanning mitt', 'gradual tan lotion'],
-    name: { en: 'Tanning & Bronzing', he: 'שיזוף ושיזוף מלאכותי' },
+    name: { en: 'Tanning & Bronzing', he: 'שיזוף עצמי וברונזרים' },
     desc: { en: 'Self-tanning products and bronzers for a sun-kissed glow', he: 'מוצרי שיזוף עצמי ומברונזרים לגוון שזוף' },
     icon: 'sun',
     googleCategory: '469',

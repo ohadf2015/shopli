@@ -42,7 +42,7 @@ export const blogPosts: BlogPost[] = [
       it: 'Non serve un abbonamento in palestra per diventare forti. Con 500$ e le scelte giuste, puoi costruire una palestra completa in casa.',
     },
     sections: [
-      { heading: { en: 'Priority 1: Adjustable Dumbbells', he: 'עדיפות 1: משקולות מתכווננות' }, body: { en: 'The single most versatile piece. One pair replaces 15+ sets of fixed dumbbells. Look for 5-50lb range with quick selector.', he: 'הכלי הכי ורסטילי. זוג אחד מחליף 15+ סטים של משקולות קבועות. חפשו טווח 2-22 ק"ג עם בורר מהיר.' } },
+      { heading: { en: 'Priority 1: Adjustable Dumbbells', he: 'עדיפות 1: משקולות מתכווננות' }, body: { en: 'The single most versatile piece. One pair replaces 15+ sets of fixed dumbbells. Look for 5-50lb range with quick selector.', he: 'הכלי הכי גמיש. זוג אחד מחליף 15+ סטים של משקולות קבועות. חפשו טווח 2-22 ק"ג עם בורר מהיר.' } },
       { heading: { en: 'Priority 2: Resistance Bands Set', he: 'עדיפות 2: סט רצועות התנגדות' }, body: { en: 'Adds variable resistance, warm-ups, mobility work, and travel capability for ~$20. Get a set with 5 bands (10-150lb).', he: 'מוסיף התנגדות משתנה, חימום, עבודת ניידות ויכולת נסיעה ב-~$20. קחו סט עם 5 רצועות (5-70 ק"ג).' } },
       { heading: { en: 'Priority 3: Adjustable Bench', he: 'עדיפות 3: ספסל מתכוונן' }, body: { en: 'Enables incline/decline press, rows, split squats. Flat-only benches limit you. Get one with 6+ angles and 600lb capacity.', he: 'מאפשר לחיצה בשיפוע/ירידה, חתירות, סקוואט מפוצל. ספסל שטוח בלבד מגביל אתכם.' } },
       { heading: { en: 'Priority 4: Pull-Up Bar / Power Tower', he: 'עדיפות 4: מתח / מגדל כוח' }, body: { en: 'Vertical pulling is non-negotiable for back development. Doorframe bar ($15) works; power tower ($80) adds dips, leg raises.', he: 'משיכה אנכית חיונית לפיתוח גב. מתח לדלת ($15) עובד; מגדל כוח ($80) מוסיף מקבילים, הרמות רגליים.' } },
@@ -89,7 +89,7 @@ export const blogPosts: BlogPost[] = [
       it: 'Il buon caffè a casa non richiede una macchina espresso da 500$. I maggiori guadagni di sapore vengono da chicchi freschi, macinatura corretta e rapporto costante.',
     },
     sections: [
-      { heading: { en: '1. Burr Grinder (Non-Negotiable)', he: '1. מטחנת בור (חובה)' }, body: { en: 'Blade grinders chop unevenly = bitter + sour in same cup. Entry hand grinder ($25) beats electric blade. Electric burr starts at $80.', he: 'מטחנות להב קוצצות לא אחיד = מר + חמוץ באותה כוס. מטחנת יד בסיסית ($25) מנצחת חשמלית להב. מטחנת בור חשמלית מ-$80.' } },
+      { heading: { en: '1. Burr Grinder (Non-Negotiable)', he: '1. מטחנת קפה איכותית (חובה)' }, body: { en: 'Blade grinders chop unevenly = bitter + sour in same cup. Entry hand grinder ($25) beats electric blade. Electric burr starts at $80.', he: 'מטחנות להב קוצצות לא אחיד = מר + חמוץ באותה כוס. מטחנת יד בסיסית ($25) מנצחת חשמלית להב. מטחנה חשמלית איכותית מ-$80.' } },
       { heading: { en: '2. French Press or AeroPress', he: '2. פרנץ׳ פרס או אירופרס' }, body: { en: 'Both under $30. French press = richer, more body. AeroPress = cleaner, faster, travel-friendly. Pick one.', he: 'שניהם מתחת ל-$30. פרנץ׳ פרס = עשיר יותר, יותר גוף. אירופרס = נקי יותר, מהיר, ידידותי לנסיעות. בחרו אחד.' } },
       { heading: { en: '3. Digital Scale (0.1g)', he: '3. משקל דיגיטלי (0.1ג)' }, body: { en: 'Eyeballing ratios = inconsistent coffee. $15 scale gives repeatable 1:16 ratio every time. Essential.', he: 'ניחוש יחסים = קפה לא עקבי. משקל $15 נותן יחס 1:16 חוזר בכל פעם. חובה.' } },
       { heading: { en: '4. Gooseneck Kettle', he: '4. קומקום צוואר אווז' }, body: { en: 'Controls pour rate for even extraction. Stovetop ($20) or electric with temp control ($60). Variable temp matters for light roasts.', he: 'שולט בקצב מזיגה למיצוי אחיד. כיריים ($20) או חשמלי עם בקרת טמפרטורה ($60). טמפרטורה משתנה חשובה לקלייה קלה.' } },
@@ -310,7 +310,7 @@ export const blogPosts: BlogPost[] = [
     },
     sections: [
       {
-        heading: { en: 'Feeding & Hydration', he: 'האכלה והידרציה' },
+        heading: { en: 'Feeding & Hydration', he: 'האכלה ושתייה' },
         body: { en: 'A slow feeder bowl prevents bloat and makes mealtime last longer — especially important for dogs that inhale food. A pet water fountain with a carbon filter encourages cats to drink more (prevents kidney issues). Look for stainless steel or ceramic bowls — they\'re hygienic and don\'t harbor bacteria like plastic. An automatic feeder with a timer is a game-changer for busy pet parents: it dispenses measured portions at set times.', he: 'קערת האכלה איטית מונעת נפיחות ומאריכה את זמן הארוחה — חשוב במיוחד לכלבים שבולעים אוכל. מזרקת מים עם פילטר פחם מעודדת חתולים לשתות יותר (מונעת בעיות כליות).' },
       },
       {
