@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
   reactStrictMode: true,
+  experimental: {
+    // Constrained CI runner (shared pid/thread cgroup cap): keep workers low.
+    cpus: 2,
+  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'ae01.alicdn.com' },
