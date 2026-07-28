@@ -140,7 +140,6 @@ export function organizationJsonLd() {
     logo: `${SITE_URL}/logo.svg`,
     sameAs: [
       'https://t.me/shoppingisraelnew',
-      'https://t.me/shopli_eu',
     ],
   };
 }
