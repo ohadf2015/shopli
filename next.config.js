@@ -14,6 +14,8 @@ const migratedSlugs = csvText
 
 module.exports = {
   reactStrictMode: true,
+  // Constrain worker threads: shared runner hits the 1000-pid cgroup cap otherwise.
+  experimental: { cpus: 2 },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'ae01.alicdn.com' },
