@@ -2,11 +2,12 @@ import { GetServerSideProps } from 'next';
 import Header from '../../../components/Header';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, RegionCode } from '../../../lib/regions';
+import { getCategoryNavItems } from '../../../lib/categories';
 import { blogPosts } from '../../../lib/blog';
 import Link from 'next/link';
 import { breadcrumbJsonLd, SITE_URL } from '../../../lib/seo';
 
-export default function BlogIndexPage({ region, config, posts, rtl }: any) {
+export default function BlogIndexPage({ region, config, posts, rtl, categoryNavItems }: any) {
   const lang = config?.lang || 'en';
 
   const title = rtl ? 'בלוג שופלי — מדריכי קנייה והשוואות' : 'Shopli Blog — Buying Guides & Comparisons';
@@ -30,7 +31,7 @@ export default function BlogIndexPage({ region, config, posts, rtl }: any) {
         ogType="website"
         jsonLd={structuredData}
       />
-      <Header currentRegion={region} dir={config?.direction} />
+      <Header currentRegion={region} dir={config?.direction} categoryNavItems={categoryNavItems} />
       <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         <div className="mb-12">
           <h1 className="text-3xl md:text-5xl font-extrabold mb-4" style={{ color: 'var(--shopli-navy)' }}>
@@ -102,6 +103,6 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     .sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
 
   return {
-    props: { region, config, posts, rtl },
+    props: { region, config, posts, rtl, categoryNavItems: getCategoryNavItems(config.lang || 'en') },
   };
 };

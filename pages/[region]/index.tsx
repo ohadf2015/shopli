@@ -6,6 +6,7 @@ import WhatsAppShare from '../../components/WhatsAppShare';
 import SeoHead from '../../components/SeoHead';
 import { getRegion, RegionCode } from '../../lib/regions';
 import { getAllCollections } from '../../lib/collections';
+import { getCategoryNavItems } from '../../lib/categories';
 import { breadcrumbJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
 import type { RegionConfig } from '../../lib/regions';
 import type { Product } from '../../lib/types';
@@ -25,6 +26,7 @@ interface HomePageProps {
   config: RegionConfig;
   groups: CollectionGroup[];
   rtl: boolean;
+  categoryNavItems: Array<{ slug: string; name: string }>;
 }
 
 async function fetchCollectionProducts(region: string, keywords: string[], limit = 4): Promise<FlatProduct[]> {
@@ -34,7 +36,7 @@ async function fetchCollectionProducts(region: string, keywords: string[], limit
   } catch { return []; }
 }
 
-export default function HomePage({ region, config, groups, rtl }: HomePageProps) {
+export default function HomePage({ region, config, groups, rtl, categoryNavItems }: HomePageProps) {
   const t = (text?: Record<string, string> | null) => text?.[config.lang] || text?.en || '';
 
   const heroTitle = rtl ? 'מצאו את הדילים הכי שווים מאליאקספרס' : 'The Best AliExpress Deals, Curated for You';
@@ -57,7 +59,7 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
         description={config.meta.description}
         jsonLd={structuredData}
       />
-      <Header currentRegion={region} dir={config.direction} />
+      <Header currentRegion={region} dir={config.direction} categoryNavItems={categoryNavItems} />
 
       <main style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}>
 
@@ -333,10 +335,12 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
             shopli
           </div>
           <div>&copy; {new Date().getFullYear()} Shopli. {rtl ? 'כל הזכויות שמורות' : 'All rights reserved.'}</div>
-          <div className="flex gap-4">
-            <a href={`/${region}/collection/home-gym`} className="hover:underline">{rtl ? 'אימונים' : 'Workout'}</a>
-            <a href={`/${region}/collection/coffee-ritual`} className="hover:underline">{rtl ? 'קפה' : 'Coffee'}</a>
-            <a href={`/${region}/mood/jack-sparrow`} className="hover:underline">{rtl ? 'תחפושות' : 'Costumes'}</a>
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-1">
+            <a href={`/${region}/category/skincare-routine`} className="hover:underline">{rtl ? 'טיפוח' : 'Skincare'}</a>
+            <a href={`/${region}/category/makeup-essentials`} className="hover:underline">{rtl ? 'איפור' : 'Makeup'}</a>
+            <a href={`/${region}/category/hair-styling`} className="hover:underline">{rtl ? 'שיער' : 'Hair'}</a>
+            <a href={`/${region}/category/nail-care`} className="hover:underline">{rtl ? 'ציפורניים' : 'Nails'}</a>
+            <a href={`/${region}/category/mens-grooming`} className="hover:underline">{rtl ? 'גברים' : 'Men'}</a>
           </div>
         </div>
       </footer>
@@ -373,6 +377,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
       config,
       groups: groups || [],
       rtl,
+      categoryNavItems: getCategoryNavItems(config.lang || 'en'),
     },
   };
 };

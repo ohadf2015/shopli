@@ -6,6 +6,7 @@ import Icon from '../../components/icons';
 import ProductCard from '../../components/ProductCard';
 import SeoHead from '../../components/SeoHead';
 import { getRegion, RegionCode, RegionConfig } from '../../lib/regions';
+import { getCategoryNavItems } from '../../lib/categories';
 import { breadcrumbJsonLd, itemListJsonLd, productJsonLd, SITE_URL } from '../../lib/seo';
 import type { SearchProduct } from '../../lib/aliexpress';
 
@@ -16,6 +17,7 @@ interface SearchPageProps {
   products: SearchProduct[];
   rtl: boolean;
   error: string | null;
+  categoryNavItems: Array<{ slug: string; name: string }>;
 }
 
 export default function SearchPage({
@@ -25,6 +27,7 @@ export default function SearchPage({
   products,
   rtl,
   error,
+  categoryNavItems,
 }: SearchPageProps) {
   const router = useRouter();
   const [q, setQ] = useState(initialQuery);
@@ -106,7 +109,7 @@ export default function SearchPage({
         noindex={!initialQuery}
         jsonLd={structuredData}
       />
-      <Header currentRegion={region} dir={config.direction} />
+      <Header currentRegion={region} dir={config.direction} categoryNavItems={categoryNavItems} />
 
       <main
         className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-16"
@@ -236,6 +239,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
       products: JSON.parse(JSON.stringify(products)),
       rtl,
       error,
+      categoryNavItems: getCategoryNavItems(config.lang || 'en'),
     },
   };
 };

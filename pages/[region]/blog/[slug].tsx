@@ -3,10 +3,11 @@ import Link from 'next/link';
 import Header from '../../../components/Header';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, RegionCode } from '../../../lib/regions';
+import { getCategoryNavItems } from '../../../lib/categories';
 import { getBlogPost } from '../../../lib/blog';
 import { blogPostingJsonLd, breadcrumbJsonLd, SITE_URL } from '../../../lib/seo';
 
-export default function BlogPostPage({ region, config, post, rtl, error }: any) {
+export default function BlogPostPage({ region, config, post, rtl, error, categoryNavItems }: any) {
   if (error) {
     return <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>Error: {error}</div>;
   }
@@ -48,7 +49,7 @@ export default function BlogPostPage({ region, config, post, rtl, error }: any) 
         articleModifiedTime={p.publishDate}
         jsonLd={structuredData}
       />
-      <Header currentRegion={region} dir={config?.direction} />
+      <Header currentRegion={region} dir={config?.direction} categoryNavItems={categoryNavItems} />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         <Link href={`/${region}/blog`} className="text-orange-600 hover:underline text-sm mb-6 inline-block">
           &larr; {rtl ? 'כל הכתבות' : 'All Articles'}
@@ -144,6 +145,6 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   if (!post) return { notFound: true };
 
   return {
-    props: { region, config, post, rtl },
+    props: { region, config, post, rtl, categoryNavItems: getCategoryNavItems(config.lang || 'en') },
   };
 };

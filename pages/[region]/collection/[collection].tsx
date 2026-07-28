@@ -6,6 +6,7 @@ import WhatsAppShare from '../../../components/WhatsAppShare';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, RegionCode } from '../../../lib/regions';
 import { getCollection } from '../../../lib/collections';
+import { getCategory, getCategoryNavItems } from '../../../lib/categories';
 import { COLLECTION_CONTENT } from '../../../lib/collection-content';
 import {
   articleJsonLd,
@@ -16,7 +17,7 @@ import {
   SITE_URL,
 } from '../../../lib/seo';
 
-export default function CollectionPage({ region, config, collection, content, sections, rtl, error }: any) {
+export default function CollectionPage({ region, config, collection, content, sections, rtl, error, categoryHub, categoryNavItems }: any) {
   if (error) {
     return (
       <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>
@@ -46,17 +47,23 @@ export default function CollectionPage({ region, config, collection, content, se
   const allProducts = (sections || []).flatMap((s: any) => s.products || []);
   const structuredData: Record<string, unknown>[] = [];
 
-  // BreadcrumbList: Home > Categories > Collection (Hebrew when rtl)
-  structuredData.push(
-    breadcrumbJsonLd([
-      { name: rtl ? 'דף הבית' : 'Home', url: `${SITE_URL}/${region}` },
-      {
-        name: rtl ? 'קטגוריות' : 'Categories',
-        url: `${SITE_URL}/${region}#categories`,
-      },
-      { name: collection.name, url: pageUrl },
-    ])
-  );
+  // BreadcrumbList: Home > [Category hub] > Collection (Hebrew when rtl)
+  const breadcrumbItems: Array<{ name: string; url: string }> = [
+    { name: rtl ? 'דף הבית' : 'Home', url: `${SITE_URL}/${region}` },
+  ];
+  if (categoryHub) {
+    breadcrumbItems.push({
+      name: categoryHub.name,
+      url: `${SITE_URL}/${region}/category/${categoryHub.slug}`,
+    });
+  } else {
+    breadcrumbItems.push({
+      name: rtl ? 'קטגוריות' : 'Categories',
+      url: `${SITE_URL}/${region}#categories`,
+    });
+  }
+  breadcrumbItems.push({ name: collection.name, url: pageUrl });
+  structuredData.push(breadcrumbJsonLd(breadcrumbItems));
 
   if (content) {
     structuredData.push(
@@ -116,7 +123,7 @@ export default function CollectionPage({ region, config, collection, content, se
         ogType="product"
         jsonLd={structuredData}
       />
-      <Header currentRegion={region} dir={config?.direction} />
+      <Header currentRegion={region} dir={config?.direction} categoryNavItems={categoryNavItems} />
       <main
         className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-16"
         style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}
@@ -130,10 +137,21 @@ export default function CollectionPage({ region, config, collection, content, se
             {rtl ? 'דף הבית' : 'Home'}
           </a>
           <span>/</span>
-          <a href={`/${region}#categories`} className="hover:underline">
-            {rtl ? 'קטגוריות' : 'Categories'}
-          </a>
-          <span>/</span>
+          {categoryHub ? (
+            <>
+              <a href={`/${region}/category/${categoryHub.slug}`} className="hover:underline">
+                {categoryHub.name}
+              </a>
+              <span>/</span>
+            </>
+          ) : (
+            <>
+              <a href={`/${region}#categories`} className="hover:underline">
+                {rtl ? 'קטגוריות' : 'Categories'}
+              </a>
+              <span>/</span>
+            </>
+          )}
           <span style={{ color: 'var(--shopli-navy)' }}>{collection.name}</span>
         </nav>
 
@@ -265,6 +283,19 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
       metaTitle: coll.metaTitle || null,
       metaDesc: coll.metaDesc || null,
     };
+
+    // Link collection up to its category hub when the slug exists in the CSV.
+    const matchedCategory = getCategory(coll.slug);
+    const categoryHub = matchedCategory
+      ? {
+          slug: matchedCategory.slug,
+          name:
+            matchedCategory.name[lang] ||
+            matchedCategory.name.en ||
+            matchedCategory.slug,
+        }
+      : null;
+
     const sections: any[] = [];
 
     if (content) {
@@ -298,6 +329,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
         content: content ? JSON.parse(JSON.stringify(content)) : null,
         sections: JSON.parse(JSON.stringify(sections)),
         rtl: config?.direction === 'rtl',
+        categoryHub,
+        categoryNavItems: getCategoryNavItems(config?.lang || 'en'),
         error: null,
       },
     };
@@ -310,6 +343,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
         content: null,
         sections: [],
         rtl: false,
+        categoryHub: null,
+        categoryNavItems: getCategoryNavItems('en'),
         error: e?.message || String(e),
       },
     };
