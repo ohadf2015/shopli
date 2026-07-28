@@ -3,6 +3,7 @@ import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, RegionCode } from '../../../lib/regions';
+import { getCategoryNavItems } from '../../../lib/categories';
 import { getMoodBoard, getMoodBoardsByTag } from '../../../lib/moodboards';
 import { articleJsonLd, breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
 
@@ -14,7 +15,7 @@ function Stars({ rating, size = 10 }: { rating: number; size?: number }) {
   return <span style={{ color: 'oklch(70% 0.15 70)' }}>{'★'.repeat(Math.max(0, full))}{'☆'.repeat(Math.max(0, 5 - full))}</span>;
 }
 
-export default function MoodPage({ region, config, board, itemGroups, related, rtl, error }: any) {
+export default function MoodPage({ region, config, board, itemGroups, related, rtl, error, categoryNavItems }: any) {
   if (error) return <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>Error: {error}</div>;
   const lang = config?.lang || 'en';
   const get = (o: any) => o?.[lang] || o?.en || '';
@@ -65,7 +66,7 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
         ogType="article"
         jsonLd={structuredData}
       />
-      <Header currentRegion={region} dir={config?.direction} />
+      <Header currentRegion={region} dir={config?.direction} categoryNavItems={categoryNavItems} />
 
       <main className="pb-16" style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}>
         {/* HERO */}
@@ -240,10 +241,12 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
         region, config,
         board: JSON.parse(JSON.stringify(board)),
         itemGroups, related: JSON.parse(JSON.stringify(relatedBoards)),
-        rtl, error: null,
+        rtl,
+        categoryNavItems: getCategoryNavItems(config?.lang || 'en'),
+        error: null,
       },
     };
   } catch (e: any) {
-    return { props: { error: e?.message || String(e), region: 'eu', config: null, board: { slug: 'error', h1: { en: 'Error' }, metaTitle: { en: 'Error' }, metaDesc: { en: '' }, intro: { en: '' }, items: [], tags: [] }, itemGroups: [], related: [], rtl: false } };
+    return { props: { error: e?.message || String(e), region: 'eu', config: null, board: { slug: 'error', h1: { en: 'Error' }, metaTitle: { en: 'Error' }, metaDesc: { en: '' }, intro: { en: '' }, items: [], tags: [] }, itemGroups: [], related: [], rtl: false, categoryNavItems: getCategoryNavItems('en') } };
   }
 };

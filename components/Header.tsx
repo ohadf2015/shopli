@@ -5,7 +5,15 @@ import Icon from './icons';
 import { ALL_REGIONS, getRegion, RegionCode } from '../lib/regions';
 import { getCollectionNavItems } from '../lib/collections';
 
-export default function Header({ currentRegion, dir }: { currentRegion: RegionCode; dir?: string }) {
+export default function Header({
+  currentRegion,
+  dir,
+  categoryNavItems = [],
+}: {
+  currentRegion: RegionCode;
+  dir?: string;
+  categoryNavItems?: Array<{ slug: string; name: string }>;
+}) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [regionOpen, setRegionOpen] = useState(false);
@@ -20,6 +28,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
   const lang = region.lang || 'en';
 
   const collections = getCollectionNavItems(lang).slice(0, 14);
+  const categories = categoryNavItems.slice(0, 12);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -124,7 +133,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
               <Icon name="chevron-down" size={14} />
             </button>
             {catOpen && (
-              <div className="absolute top-full mt-1 start-0 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden min-w-[220px] max-h-[70vh] overflow-y-auto z-50">
+              <div className="absolute top-full mt-1 start-0 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden min-w-[240px] max-h-[70vh] overflow-y-auto z-50">
                 <a
                   href={`/${currentRegion}#categories`}
                   onClick={() => setCatOpen(false)}
@@ -133,17 +142,38 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
                 >
                   {rtl ? 'כל הקטגוריות' : 'All categories'}
                 </a>
-                {collections.map((c) => (
+
+                <div className="px-4 py-1.5 text-[0.65rem] font-bold uppercase tracking-wider" style={{ color: 'var(--shopli-warm-gray)' }}>
+                  {rtl ? 'קטגוריות ביוטי' : 'Beauty categories'}
+                </div>
+                {categories.map((c) => (
                   <Link
-                    key={c.slug}
-                    href={`/${currentRegion}/collection/${c.slug}`}
+                    key={`cat-${c.slug}`}
+                    href={`/${currentRegion}/category/${c.slug}`}
                     onClick={() => setCatOpen(false)}
-                    className="block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+                    className="block px-4 py-2 text-sm hover:bg-orange-50/40 transition-colors"
                     style={{ color: 'var(--shopli-navy)' }}
                   >
                     {c.name}
                   </Link>
                 ))}
+
+                <div className="border-t border-gray-50 mt-1 pt-1">
+                  <div className="px-4 py-1.5 text-[0.65rem] font-bold uppercase tracking-wider" style={{ color: 'var(--shopli-warm-gray)' }}>
+                    {rtl ? 'אוספים' : 'Collections'}
+                  </div>
+                  {collections.map((c) => (
+                    <Link
+                      key={`coll-${c.slug}`}
+                      href={`/${currentRegion}/collection/${c.slug}`}
+                      onClick={() => setCatOpen(false)}
+                      className="block px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                      style={{ color: 'var(--shopli-navy)' }}
+                    >
+                      {c.name}
+                    </Link>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -293,32 +323,53 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             {rtl ? 'טלגרם' : 'Telegram'}
           </a>
 
-          <div className="pt-2 mt-1 border-t border-gray-100">
-            <p
-              className="px-3 py-2 text-xs font-semibold uppercase tracking-wider"
-              style={{ color: 'var(--shopli-warm-gray)' }}
-            >
-              {rtl ? 'קטגוריות' : 'Categories'}
-            </p>
-            {collections.map((c) => (
-              <Link
-                key={c.slug}
-                href={`/${currentRegion}/collection/${c.slug}`}
-                className="block px-3 py-2.5 rounded-lg text-sm hover:bg-gray-50 min-h-[44px]"
-                style={{ color: 'var(--shopli-navy)' }}
-                onClick={() => setMenuOpen(false)}
-              >
-                {c.name}
-              </Link>
-            ))}
+          <div className="pt-2 mt-1 border-t border-gray-100 space-y-0.5">
             <a
               href={`/${currentRegion}#categories`}
               className="block px-3 py-2.5 rounded-lg text-sm font-semibold"
               style={{ color: 'var(--shopli-orange)' }}
               onClick={() => setMenuOpen(false)}
             >
-              {rtl ? 'הצג הכל ←' : 'View all →'}
+              {rtl ? 'כל הקטגוריות והאוספים' : 'All categories & collections'}
             </a>
+
+            <p
+              className="px-3 py-2 text-xs font-semibold uppercase tracking-wider"
+              style={{ color: 'var(--shopli-warm-gray)' }}
+            >
+              {rtl ? 'קטגוריות ביוטי' : 'Beauty categories'}
+            </p>
+            {categories.map((c) => (
+              <Link
+                key={`mob-cat-${c.slug}`}
+                href={`/${currentRegion}/category/${c.slug}`}
+                className="block px-3 py-2.5 rounded-lg text-sm hover:bg-orange-50/40 min-h-[44px]"
+                style={{ color: 'var(--shopli-navy)' }}
+                onClick={() => setMenuOpen(false)}
+              >
+                {c.name}
+              </Link>
+            ))}
+
+            <div className="border-t border-gray-50 pt-1">
+              <p
+                className="px-3 py-2 text-xs font-semibold uppercase tracking-wider"
+                style={{ color: 'var(--shopli-warm-gray)' }}
+              >
+                {rtl ? 'אוספים' : 'Collections'}
+              </p>
+              {collections.map((c) => (
+                <Link
+                  key={`mob-coll-${c.slug}`}
+                  href={`/${currentRegion}/collection/${c.slug}`}
+                  className="block px-3 py-2.5 rounded-lg text-sm hover:bg-gray-50 min-h-[44px]"
+                  style={{ color: 'var(--shopli-navy)' }}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {c.name}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       )}

@@ -3,9 +3,10 @@ import Header from '../../components/Header';
 import SeoHead from '../../components/SeoHead';
 import { getRegion, RegionCode } from '../../lib/regions';
 import type { RegionConfig } from '../../lib/regions';
+import { getCategoryNavItems } from '../../lib/categories';
 import { SITE_URL } from '../../lib/seo';
 
-export default function GoogleShoppingFeedPage({ region, config, rtl }: { region: string; config: RegionConfig; rtl: boolean }) {
+export default function GoogleShoppingFeedPage({ region, config, rtl, categoryNavItems }: { region: string; config: RegionConfig; rtl: boolean; categoryNavItems: Array<{ slug: string; name: string }> }) {
   const feedUrl = `${SITE_URL}/products-feed.xml`;
 
   return (
@@ -17,7 +18,7 @@ export default function GoogleShoppingFeedPage({ region, config, rtl }: { region
         description="Shopli Google Shopping product feed — submit to Google Merchant Center for free product listing ads."
         noindex
       />
-      <Header currentRegion={region} dir={config?.direction} />
+      <Header currentRegion={region} dir={config?.direction} categoryNavItems={categoryNavItems} />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         <div className="flex items-center gap-2 text-xs mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
           <a href={`/${region}`}>Home</a> <span>/</span> <span style={{ color: 'var(--shopli-navy)' }}>Google Shopping Feed</span>
@@ -129,6 +130,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
       region,
       config,
       rtl: config?.direction === 'rtl',
+      categoryNavItems: getCategoryNavItems(config?.lang || 'en'),
     },
   };
 };

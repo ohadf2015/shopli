@@ -3,10 +3,11 @@ import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, RegionCode } from '../../../lib/regions';
+import { getCategoryNavItems } from '../../../lib/categories';
 import { getComparison } from '../../../lib/comparisons';
 import { articleJsonLd, breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
 
-export default function ComparisonPage({ region, config, comparison, prod1Items, prod2Items, rtl, error }: any) {
+export default function ComparisonPage({ region, config, comparison, prod1Items, prod2Items, rtl, error, categoryNavItems }: any) {
   if (error) {
     return <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>Error: {error}</div>;
   }
@@ -65,7 +66,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
         ogType="article"
         jsonLd={structuredData}
       />
-      <Header currentRegion={region} dir={config?.direction} />
+      <Header currentRegion={region} dir={config?.direction} categoryNavItems={categoryNavItems} />
       <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         <div className="flex items-center gap-2 text-xs mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
           <a href={`/${region}`}>{rtl ? 'דף הבית' : 'Home'}</a> <span>/</span>
@@ -199,6 +200,6 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   } catch {}
 
   return {
-    props: { region, config, comparison, prod1Items, prod2Items, rtl },
+    props: { region, config, comparison, prod1Items, prod2Items, rtl, categoryNavItems: getCategoryNavItems(config.lang || 'en') },
   };
 };

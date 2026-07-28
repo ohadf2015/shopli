@@ -6,6 +6,7 @@ import Icon from '../../../components/icons';
 import WhatsAppShare from '../../../components/WhatsAppShare';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, RegionCode, RegionConfig } from '../../../lib/regions';
+import { getCategoryNavItems } from '../../../lib/categories';
 import type { SearchProduct } from '../../../lib/aliexpress';
 import {
   buildCompareRows,
@@ -33,6 +34,7 @@ interface ComparePageProps {
   shareUrl: string;
   rtl: boolean;
   error: string | null;
+  categoryNavItems: Array<{ slug: string; name: string }>;
 }
 
 function tLabel(
@@ -51,6 +53,7 @@ export default function ProductComparePage({
   shareUrl: initialShareUrl,
   rtl,
   error,
+  categoryNavItems,
 }: ComparePageProps) {
   const router = useRouter();
   const lang = config.lang || 'en';
@@ -175,7 +178,7 @@ export default function ProductComparePage({
         noindex={emptyState}
         jsonLd={structuredData}
       />
-      <Header currentRegion={region} dir={config.direction} />
+      <Header currentRegion={region} dir={config.direction} categoryNavItems={categoryNavItems} />
 
       <main
         className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16"
@@ -688,6 +691,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
       shareUrl,
       rtl,
       error,
+      categoryNavItems: getCategoryNavItems(config.lang || 'en'),
     },
   };
 };

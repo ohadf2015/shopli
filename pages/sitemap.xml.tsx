@@ -49,6 +49,9 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   const { getAllBlogSlugs } = await import('../lib/blog').catch(() => ({
     getAllBlogSlugs: () => [] as string[],
   }));
+  const { getAllCategories } = await import('../lib/categories').catch(() => ({
+    getAllCategories: () => [] as Array<{ slug: string; name: Record<string, string> }>,
+  }));
 
   // Fresh lastmod on every generation (hourly revalidation via Cache-Control)
   const now = new Date();
@@ -56,6 +59,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   const regionCodes = Object.keys(REGIONS);
 
   const collections = getAllCollections();
+  const categories = getAllCategories();
   const moodSlugs = getAllMoodboardSlugs();
   const compareSlugs = getAllComparisonSlugs();
   const blogSlugs = getAllBlogSlugs();
@@ -116,6 +120,22 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
         priority: 0.8,
         lastmod: today,
         images: [og, staticImg].filter(Boolean) as string[],
+      });
+    }
+  }
+
+  // Category hub pages (from CSV beauty-niche.csv)
+  for (const region of regionCodes) {
+    const lang = REGIONS[region]?.lang || 'en';
+    for (const cat of categories) {
+      const name = cat.name?.[lang] || cat.name?.en || cat.slug;
+      const og = getCollectionOgImage(cat.slug, name, lang);
+      urls.push({
+        loc: `${SITE_URL}/${region}/category/${cat.slug}`,
+        changefreq: 'daily',
+        priority: 0.8,
+        lastmod: today,
+        images: [og].filter(Boolean) as string[],
       });
     }
   }
