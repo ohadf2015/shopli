@@ -1,6 +1,6 @@
 import { REGIONS, RegionCode } from './regions';
 
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://shopli-neon.vercel.app';
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.tryshopli.com';
 export const SITE_NAME = 'Shopli';
 export const SITE_TAGLINE = 'AI-curated AliExpress deals';
 export const OG_IMAGE_URL = process.env.NEXT_PUBLIC_OG_IMAGE_URL || 'https://placehold.co/1200x630/F97316/FFFFFF/png?text=Shopli+-+AI+AliExpress+Deals';

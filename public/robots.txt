@@ -3,4 +3,4 @@ Allow: /
 Disallow: /api/
 Disallow: /*/google-shopping-feed
 
-Sitemap: https://shopli-neon.vercel.app/sitemap.xml
+Sitemap: https://www.tryshopli.com/sitemap.xml
