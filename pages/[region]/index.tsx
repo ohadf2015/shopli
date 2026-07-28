@@ -5,7 +5,7 @@ import ProductCard from '../../components/ProductCard';
 import WhatsAppShare from '../../components/WhatsAppShare';
 import SeoHead from '../../components/SeoHead';
 import { getRegion, RegionCode } from '../../lib/regions';
-import { getAllCollections } from '../../lib/collections';
+import { getAllCollections, getFeaturedCollections } from '../../lib/collections';
 import { breadcrumbJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
 import type { RegionConfig } from '../../lib/regions';
 import type { Product } from '../../lib/types';
@@ -25,6 +25,7 @@ interface HomePageProps {
   config: RegionConfig;
   groups: CollectionGroup[];
   rtl: boolean;
+  orderedSlugs: string[];
 }
 
 async function fetchCollectionProducts(region: string, keywords: string[], limit = 4): Promise<FlatProduct[]> {
@@ -34,7 +35,7 @@ async function fetchCollectionProducts(region: string, keywords: string[], limit
   } catch { return []; }
 }
 
-export default function HomePage({ region, config, groups, rtl }: HomePageProps) {
+export default function HomePage({ region, config, groups, rtl, orderedSlugs }: HomePageProps) {
   const t = (text?: Record<string, string> | null) => text?.[config.lang] || text?.en || '';
 
   const heroTitle = rtl ? 'מצאו את הדילים הכי שווים מאליאקספרס' : 'The Best AliExpress Deals, Curated for You';
@@ -74,7 +75,7 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
               {heroDesc}
             </p>
             <div className="flex flex-wrap gap-3">
-              <a href={`/${region}/collection/home-gym`} className="btn-primary">
+              <a href={`/${region}/collection/${groups[0]?.slug || orderedSlugs[0] || 'home-gym'}`} className="btn-primary">
                 <Icon name="tag" size={16} />
                 {rtl ? 'כל המבצעים' : 'Browse All Deals'}
               </a>
@@ -143,7 +144,14 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
               {rtl ? 'מוצרים מקובצים לפי נושא — בחרו מה שמעניין אתכם' : 'Products grouped by theme — pick what interests you'}
             </p>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              {getAllCollections().filter(coll => coll.name).map(coll => {
+              {getAllCollections()
+                .filter(coll => coll.name)
+                .sort((a, b) => {
+                  const ia = orderedSlugs.indexOf(a.slug);
+                  const ib = orderedSlugs.indexOf(b.slug);
+                  return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+                })
+                .map(coll => {
                 const name = t(coll.name);
                 const desc = t(coll.desc);
                 return (
@@ -351,7 +359,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
 
   const t = (text: Record<string, string>) => text[config.lang] || text.en || '';
 
-  const collections = getAllCollections().slice(0, 6);
+  const collections = getFeaturedCollections(region, 6);
+  const orderedSlugs = getFeaturedCollections(region, 100).map((c) => c.slug);
   const groups: CollectionGroup[] = [];
 
   for (const coll of collections) {
@@ -373,6 +382,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
       config,
       groups: groups || [],
       rtl,
+      orderedSlugs,
     },
   };
 };
