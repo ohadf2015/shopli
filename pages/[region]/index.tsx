@@ -6,7 +6,7 @@ import WhatsAppShare from '../../components/WhatsAppShare';
 import SeoHead from '../../components/SeoHead';
 import { getRegion, RegionCode } from '../../lib/regions';
 import { getAllCollections } from '../../lib/collections';
-import { getCategoryNavItems } from '../../lib/categories';
+import { getAllCategories, getCategoryNavItems } from '../../lib/categories';
 import { breadcrumbJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
 import type { RegionConfig } from '../../lib/regions';
 import type { Product } from '../../lib/types';
@@ -27,6 +27,7 @@ interface HomePageProps {
   groups: CollectionGroup[];
   rtl: boolean;
   categoryNavItems: Array<{ slug: string; name: string }>;
+  categories: Array<{ slug: string; name: string; desc: string; icon: string }>;
 }
 
 async function fetchCollectionProducts(region: string, keywords: string[], limit = 4): Promise<FlatProduct[]> {
@@ -36,7 +37,7 @@ async function fetchCollectionProducts(region: string, keywords: string[], limit
   } catch { return []; }
 }
 
-export default function HomePage({ region, config, groups, rtl, categoryNavItems }: HomePageProps) {
+export default function HomePage({ region, config, groups, rtl, categoryNavItems, categories }: HomePageProps) {
   const t = (text?: Record<string, string> | null) => text?.[config.lang] || text?.en || '';
 
   const heroTitle = rtl ? 'מצאו את הדילים הכי שווים מאליאקספרס' : 'The Best AliExpress Deals, Curated for You';
@@ -135,15 +136,35 @@ export default function HomePage({ region, config, groups, rtl, categoryNavItems
           </section>
         ))}
 
-        {/* FULL COLLECTIONS LIST */}
+        {/* FULL CATEGORIES & COLLECTIONS LIST */}
         <section id="categories" className="py-14 bg-white scroll-mt-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <h2 className="text-xl md:text-2xl font-bold mb-2" style={{ color: 'var(--shopli-navy)' }}>
-              {rtl ? 'כל הקטגוריות' : 'All Collections'}
+              {rtl ? 'כל הקטגוריות והקולקציות' : 'All Categories & Collections'}
             </h2>
             <p className="text-sm mb-8" style={{ color: 'var(--shopli-warm-gray)' }}>
               {rtl ? 'מוצרים מקובצים לפי נושא — בחרו מה שמעניין אתכם' : 'Products grouped by theme — pick what interests you'}
             </p>
+
+            <h3 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--shopli-orange)' }}>
+              {rtl ? 'קטגוריות' : 'Categories'}
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
+              {categories.map((cat) => (
+                <a key={cat.slug} href={`/${region}/category/${cat.slug}`}
+                  className="p-4 rounded-xl border border-gray-100 hover:border-orange-200 hover:bg-orange-50/30 transition-all">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style={{ background: 'oklch(90% 0.06 45)', color: 'var(--shopli-orange)' }}>
+                    <Icon name={cat.icon as any} size={16} />
+                  </div>
+                  <h3 className="font-bold text-sm mb-1" style={{ color: 'var(--shopli-navy)' }}>{cat.name}</h3>
+                  <p className="text-xs leading-snug" style={{ color: 'var(--shopli-warm-gray)' }}>{cat.desc}</p>
+                </a>
+              ))}
+            </div>
+
+            <h3 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--shopli-orange)' }}>
+              {rtl ? 'קולקציות' : 'Collections'}
+            </h3>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
               {getAllCollections().filter(coll => coll.name).map(coll => {
                 const name = t(coll.name);
@@ -356,6 +377,12 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
   const t = (text: Record<string, string>) => text[config.lang] || text.en || '';
 
   const collections = getAllCollections().slice(0, 6);
+  const categories = getAllCategories().map((cat) => ({
+    slug: cat.slug,
+    name: t(cat.name),
+    desc: t(cat.desc),
+    icon: cat.icon,
+  }));
   const groups: CollectionGroup[] = [];
 
   for (const coll of collections) {
@@ -378,6 +405,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
       groups: groups || [],
       rtl,
       categoryNavItems: getCategoryNavItems(config.lang || 'en'),
+      categories,
     },
   };
 };

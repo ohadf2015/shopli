@@ -70,7 +70,9 @@ function loadCategories(): Category[] {
     const csvPath = path.join(process.cwd(), 'data', 'beauty-niche.csv');
     const text = fs.readFileSync(csvPath, 'utf-8');
     const table = parseCSV(text);
-    if (table.length < 2) return [];
+    if (table.length < 2) {
+      throw new Error('data/beauty-niche.csv has header but no category rows');
+    }
 
     const header = table[0].map((h: string) => h.trim().toLowerCase());
     const idx = (name: string) => header.indexOf(name);
@@ -107,8 +109,10 @@ function loadCategories(): Category[] {
 
     cachedCategories = categories;
     return categories;
-  } catch {
-    return [];
+  } catch (e: any) {
+    throw new Error(
+      `Failed to load categories from data/beauty-niche.csv: ${e?.message || String(e)}`
+    );
   }
 }
 

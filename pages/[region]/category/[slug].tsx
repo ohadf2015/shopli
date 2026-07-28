@@ -20,7 +20,6 @@ interface CategoryPageProps {
   products: any[];
   rtl: boolean;
   categoryNavItems: Array<{ slug: string; name: string }>;
-  error?: string;
 }
 
 export default function CategoryPage({
@@ -30,16 +29,7 @@ export default function CategoryPage({
   products,
   rtl,
   categoryNavItems,
-  error,
 }: CategoryPageProps) {
-  if (error) {
-    return (
-      <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>
-        Error: {error}
-      </div>
-    );
-  }
-
   const lang = config?.lang || 'en';
   const pageUrl = `${SITE_URL}/${region}/category/${category.slug}`;
   const categoryName = category.name[lang] || category.name.en || category.slug;
@@ -85,7 +75,7 @@ export default function CategoryPage({
         title={title}
         description={categoryDesc}
         image={ogImage}
-        ogType="product"
+        noindex={products.length === 0}
         jsonLd={structuredData}
       />
       <Header currentRegion={region} dir={config?.direction} categoryNavItems={categoryNavItems} />
@@ -231,18 +221,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         rtl,
         categoryNavItems: getCategoryNavItems(config?.lang || 'en'),
       },
+      revalidate: 3600,
     };
   } catch (e: any) {
-    return {
-      props: {
-        region: 'eu',
-        config: getRegion('eu'),
-        category: null,
-        products: [],
-        rtl: false,
-        categoryNavItems: getCategoryNavItems(getRegion('eu').lang || 'en'),
-        error: e?.message || String(e),
-      },
-    };
+    return { notFound: true };
   }
 };
