@@ -6,6 +6,7 @@ import WhatsAppShare from '../../../components/WhatsAppShare';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getCollection } from '../../../lib/collections';
+import { listingAggregateFields } from '../../../lib/pdp';
 import { COLLECTION_CONTENT } from '../../../lib/collection-content';
 import {
   articleJsonLd,
@@ -76,7 +77,8 @@ export default function CollectionPage({ region, config, collection, content, se
         pageUrl,
         allProducts.slice(0, 16).map((p: any, i: number) => ({
           name: p.title,
-          url: p.affiliateLink || pageUrl,
+          // Rich-result URLs must be on-site: link the PDP when we have an id
+          url: p.id ? `${SITE_URL}/${region}/product/${encodeURIComponent(p.id)}` : pageUrl,
           image: p.imageUrl,
           position: i + 1,
         }))
@@ -92,12 +94,15 @@ export default function CollectionPage({ region, config, collection, content, se
           title: p.title,
           description: p.title,
           image: p.imageUrl,
-          url: p.affiliateLink || pageUrl,
+          url: p.id ? `${SITE_URL}/${region}/product/${encodeURIComponent(p.id)}` : pageUrl,
           brand: p.shopName,
           price: p.price,
           currency: config?.currency,
-          ratingValue: p.rating > 0 ? p.rating / 20 : undefined,
-          reviewCount: p.reviewCount || undefined,
+          // v1: no AggregateRating on on-site PDP URLs (docs/PDP-V1-SPEC.md)
+          ...listingAggregateFields(p, {
+            ratingValue: p.rating > 0 ? p.rating / 20 : undefined,
+            reviewCount: p.reviewCount || undefined,
+          }),
           sku: p.id,
           region,
         })

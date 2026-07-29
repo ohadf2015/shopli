@@ -1,5 +1,6 @@
 import { GetServerSideProps } from 'next';
 import { REGIONS } from '../lib/regions';
+import { DEMO_PRODUCT_IDS } from '../lib/demo-products';
 import { SITE_URL, getCollectionOgImage } from '../lib/seo';
 
 function xmlEncode(s: string): string {
@@ -147,6 +148,19 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
         loc: `${SITE_URL}/${region}/compare/${slug}`,
         changefreq: 'weekly',
         priority: 0.6,
+        lastmod: today,
+      });
+    }
+  }
+
+  // Product detail pages — exactly the static demo catalog (single source of
+  // truth: lib/demo-products.ts). Dynamic search PDPs are discovered via links.
+  for (const region of regionCodes) {
+    for (const pid of DEMO_PRODUCT_IDS) {
+      urls.push({
+        loc: `${SITE_URL}/${region}/product/${pid}`,
+        changefreq: 'weekly',
+        priority: 0.7,
         lastmod: today,
       });
     }

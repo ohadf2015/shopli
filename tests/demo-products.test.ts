@@ -1,0 +1,36 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  DEMO_PRODUCT_IDS,
+  getDemoProducts,
+  getDemoProductById,
+} from '../lib/demo-products';
+
+test('demo catalog exposes exactly the known static ids', () => {
+  assert.deepEqual([...DEMO_PRODUCT_IDS].sort(), [
+    '1005007001',
+    '1005007002',
+    '1005007003',
+    '1005007005',
+  ]);
+});
+
+test('getDemoProducts localizes titles and prices per region', () => {
+  const il = getDemoProducts('il', 'ILS');
+  const eu = getDemoProducts('eu', 'EUR');
+  assert.equal(il.length, DEMO_PRODUCT_IDS.length);
+  assert.equal(eu.length, DEMO_PRODUCT_IDS.length);
+  assert.notEqual(il[0].title, eu[0].title);
+  assert.ok(il[0].price > eu[0].price, 'ILS price should be higher nominal than EUR');
+  for (const p of eu) {
+    assert.ok(p.affiliateLink.includes(p.id), 'affiliate link contains product id');
+    assert.equal(p.currency, 'EUR');
+  }
+});
+
+test('getDemoProductById round-trips every catalog id and rejects unknown ids', () => {
+  for (const id of DEMO_PRODUCT_IDS) {
+    assert.ok(getDemoProductById(id, 'eu', 'EUR'), `missing demo product ${id}`);
+  }
+  assert.equal(getDemoProductById('nope', 'eu', 'EUR'), null);
+});
