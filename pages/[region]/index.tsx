@@ -126,6 +126,7 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
                     locale={config.lang}
                     region={region}
                     showCompareLink
+                    category={group.name}
                   />
                 ))}
               </div>

@@ -27,6 +27,8 @@ interface ProductCardProps {
   showShare?: boolean;
   showCompareLink?: boolean;
   region?: string;
+  /** Category/collection name — attached to affiliate_click analytics events */
+  category?: string;
   className?: string;
 }
 
@@ -57,6 +59,7 @@ export default function ProductCard({
   showShare = false,
   showCompareLink = false,
   region,
+  category,
   className = '',
 }: ProductCardProps) {
   const href = product.affiliateLink || fallbackUrl || '#';
@@ -71,6 +74,11 @@ export default function ProductCard({
   return (
     <article
       className={`product-card group bg-white rounded-xl border border-gray-100 overflow-hidden flex flex-col h-full ${className}`}
+      data-product-id={product.id}
+      data-product-title={product.title}
+      data-price={price.toFixed(2)}
+      data-currency={currencySymbol}
+      data-category={category}
     >
       <a
         href={href}

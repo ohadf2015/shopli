@@ -191,6 +191,7 @@ export default function CollectionPage({ region, config, collection, content, se
                       locale={lang}
                       fallbackUrl={pageUrl}
                       region={region}
+                      category={section.heading}
                       showShare
                       showCompareLink
                       compact

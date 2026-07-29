@@ -181,6 +181,7 @@ export default function SearchPage({
                 rtl={rtl}
                 locale={lang}
                 region={region}
+                category={initialQuery ? `search: ${initialQuery}` : 'search'}
                 showCompareLink
               />
             ))}
