@@ -4,7 +4,7 @@ import Icon from '../../../components/icons';
 import ProductCard from '../../../components/ProductCard';
 import WhatsAppShare from '../../../components/WhatsAppShare';
 import SeoHead from '../../../components/SeoHead';
-import { getRegion, RegionCode } from '../../../lib/regions';
+import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getCollection } from '../../../lib/collections';
 import { COLLECTION_CONTENT } from '../../../lib/collection-content';
 import {
@@ -249,6 +249,7 @@ export default function CollectionPage({ region, config, collection, content, se
 export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
   try {
     const region = (query?.region as string) || (params?.region as string) || 'eu';
+    if (!isValidRegion(region)) return { notFound: true };
     const slug = params?.collection as string;
     const config = getRegion(region);
     const lang = config?.lang || 'en';

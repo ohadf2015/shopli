@@ -4,7 +4,7 @@ import Icon from '../../components/icons';
 import ProductCard from '../../components/ProductCard';
 import WhatsAppShare from '../../components/WhatsAppShare';
 import SeoHead from '../../components/SeoHead';
-import { getRegion, RegionCode } from '../../lib/regions';
+import { getRegion, isValidRegion, RegionCode } from '../../lib/regions';
 import { getAllCollections } from '../../lib/collections';
 import { breadcrumbJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
 import type { RegionConfig } from '../../lib/regions';
@@ -347,6 +347,8 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
 
 export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
   const region = (query?.region as string) || (params?.region as string) || 'eu';
+  // Unknown region slugs (e.g. /deals before it existed) must 404, not silently render the EU homepage as a self-canonical duplicate.
+  if (!isValidRegion(region)) return { notFound: true };
   const config = getRegion(region);
   const rtl = config.direction === 'rtl';
 

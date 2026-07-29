@@ -56,6 +56,8 @@ interface SeoProps {
   noindex?: boolean;
   articlePublishedTime?: string;
   articleModifiedTime?: string;
+  /** Set false for non-regional pages (e.g. /deals) that must not emit hreflang alternates */
+  hreflang?: boolean;
 }
 
 export function getSeoHead(props: SeoProps) {
@@ -70,6 +72,7 @@ export function getSeoHead(props: SeoProps) {
     noindex = false,
     articlePublishedTime,
     articleModifiedTime,
+    hreflang = true,
   } = props;
 
   const config = REGIONS[region];
@@ -113,7 +116,11 @@ export function getSeoHead(props: SeoProps) {
   }
 
   // hreflang + canonical (prefer explicit canonical when provided, e.g. share URLs with query params)
-  for (const t of getHreflangTags(region, path)) {
+  // Non-regional pages (e.g. /deals) pass hreflang: false — canonical only, no alternates.
+  if (!hreflang) {
+    meta.push({ tag: 'link', rel: 'canonical', href: url });
+  }
+  for (const t of hreflang ? getHreflangTags(region, path) : []) {
     if (t.rel === 'canonical') {
       meta.push({ tag: 'link', rel: 'canonical', href: canonical || t.href });
     } else {

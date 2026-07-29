@@ -163,6 +163,10 @@ export function getRegion(code: string): RegionConfig {
   return REGIONS[code as RegionCode] || REGIONS.eu;
 }
 
+export function isValidRegion(code: string): code is RegionCode {
+  return Object.prototype.hasOwnProperty.call(REGIONS, code);
+}
+
 export const LOCALE_LABELS: Record<string, string> = {
   'he': 'עברית',
   'en': 'English',

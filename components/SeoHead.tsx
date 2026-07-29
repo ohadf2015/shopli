@@ -13,6 +13,8 @@ interface SeoHeadProps {
   noindex?: boolean;
   articlePublishedTime?: string;
   articleModifiedTime?: string;
+  /** Set false for non-regional pages (e.g. /deals) that must not emit hreflang alternates */
+  hreflang?: boolean;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   children?: React.ReactNode;
 }
@@ -28,6 +30,7 @@ export default function SeoHead({
   noindex,
   articlePublishedTime,
   articleModifiedTime,
+  hreflang,
   jsonLd,
   children,
 }: SeoHeadProps) {
@@ -42,6 +45,7 @@ export default function SeoHead({
     noindex,
     articlePublishedTime,
     articleModifiedTime,
+    hreflang,
   });
 
   const jsonLdScripts = jsonLd
