@@ -2,7 +2,7 @@ import { GetServerSideProps } from 'next';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
 import SeoHead from '../../../components/SeoHead';
-import { getRegion, RegionCode } from '../../../lib/regions';
+import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getMoodBoard, getMoodBoardsByTag } from '../../../lib/moodboards';
 import { articleJsonLd, breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
 
@@ -209,6 +209,7 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
 export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
   try {
     const region = (query?.region as string) || (params?.region as string) || 'eu';
+    if (!isValidRegion(region)) return { notFound: true };
     const slug = params?.mood as string;
     const config = getRegion(region);
     const rtl = config?.direction === 'rtl';

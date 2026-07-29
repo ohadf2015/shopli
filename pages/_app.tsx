@@ -4,10 +4,15 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import '../styles/globals.css';
 import { organizationJsonLd, websiteJsonLd } from '../lib/seo';
+import { installClickTracking } from '../lib/analytics';
 
 export default function ShopliApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const config = (pageProps as any)?.regionConfig;
+
+  // Revenue analytics: one delegated listener fires affiliate_click for every
+  // AliExpress CTA (and outbound_click for Telegram/WhatsApp) on every page.
+  useEffect(() => installClickTracking(), []);
 
   // Keep the html lang/dir in sync on client-side navigations.
   useEffect(() => {

@@ -1,15 +1,17 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
     "noEmit": false,
     "outDir": ".test-build",
     "rootDir": ".",
-    "module": "commonjs",
-    "moduleResolution": "node",
     "target": "ES2019",
     "incremental": false,
+    "sourceMap": false,
+    "declaration": false,
     "types": ["node"]
   },
-  "include": ["tests/**/*.ts"],
+  "include": ["tests/**/*.ts", "lib/regions.ts", "lib/deals.ts"],
   "exclude": ["node_modules", ".test-build"]
 }

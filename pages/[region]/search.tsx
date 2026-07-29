@@ -5,7 +5,7 @@ import Header from '../../components/Header';
 import Icon from '../../components/icons';
 import ProductCard from '../../components/ProductCard';
 import SeoHead from '../../components/SeoHead';
-import { getRegion, RegionCode, RegionConfig } from '../../lib/regions';
+import { getRegion, isValidRegion, RegionCode, RegionConfig } from '../../lib/regions';
 import { breadcrumbJsonLd, itemListJsonLd, productJsonLd, SITE_URL } from '../../lib/seo';
 import type { SearchProduct } from '../../lib/aliexpress';
 
@@ -181,6 +181,7 @@ export default function SearchPage({
                 rtl={rtl}
                 locale={lang}
                 region={region}
+                category={initialQuery ? `search: ${initialQuery}` : 'search'}
                 showCompareLink
               />
             ))}
@@ -210,6 +211,7 @@ export default function SearchPage({
 
 export const getServerSideProps: GetServerSideProps = async ({ params, query, res }) => {
   const region = ((params?.region as string) || 'eu') as RegionCode;
+  if (!isValidRegion(region)) return { notFound: true };
   const config = getRegion(region);
   const rtl = config.direction === 'rtl';
   const q = typeof query?.q === 'string' ? query.q.trim() : '';

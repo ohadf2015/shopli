@@ -63,6 +63,14 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
 
   const urls: SitemapUrl[] = [];
 
+  // Top-level aggregated deals page (absorbs legacy smart-shopping-il equity via registrar 301s)
+  urls.push({
+    loc: `${SITE_URL}/deals`,
+    changefreq: 'daily',
+    priority: 0.9,
+    lastmod: today,
+  });
+
   // Regional homepages
   for (const region of regionCodes) {
     urls.push({

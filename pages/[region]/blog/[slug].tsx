@@ -2,7 +2,7 @@ import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import Header from '../../../components/Header';
 import SeoHead from '../../../components/SeoHead';
-import { getRegion, RegionCode } from '../../../lib/regions';
+import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getBlogPost } from '../../../lib/blog';
 import { blogPostingJsonLd, breadcrumbJsonLd, SITE_URL } from '../../../lib/seo';
 
@@ -137,6 +137,7 @@ export default function BlogPostPage({ region, config, post, rtl, error }: any) 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const slug = params?.slug as string;
   const region = (params?.region as string) || 'eu';
+  if (!isValidRegion(region)) return { notFound: true };
   const config = getRegion(region);
   const rtl = config.direction === 'rtl';
 

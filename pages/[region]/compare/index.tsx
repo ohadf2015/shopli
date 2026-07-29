@@ -5,7 +5,7 @@ import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
 import WhatsAppShare from '../../../components/WhatsAppShare';
 import SeoHead from '../../../components/SeoHead';
-import { getRegion, RegionCode, RegionConfig } from '../../../lib/regions';
+import { getRegion, isValidRegion, RegionCode, RegionConfig } from '../../../lib/regions';
 import type { SearchProduct } from '../../../lib/aliexpress';
 import { getDemoProducts } from '../../../lib/demo-products';
 import { listingAggregateFields } from '../../../lib/pdp';
@@ -634,6 +634,7 @@ export default function ProductComparePage({
 
 export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
   const region = ((params?.region as string) || 'eu') as RegionCode;
+  if (!isValidRegion(region)) return { notFound: true };
   const config = getRegion(region);
   const rtl = config.direction === 'rtl';
   const productIds = parseCompareIds(query.ids as string | undefined);
