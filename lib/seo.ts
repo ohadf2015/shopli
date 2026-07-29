@@ -3,7 +3,7 @@ import { REGIONS, RegionCode } from './regions';
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.tryshopli.com';
 export const SITE_NAME = 'Shopli';
 export const SITE_TAGLINE = 'AI-curated AliExpress deals';
-export const OG_IMAGE_URL = process.env.NEXT_PUBLIC_OG_IMAGE_URL || 'https://placehold.co/1200x630/F97316/FFFFFF/png?text=Shopli+-+AI+AliExpress+Deals';
+export const OG_IMAGE_URL = process.env.NEXT_PUBLIC_OG_IMAGE_URL || `${SITE_URL}/og-default.png`;
 
 export function getPageUrl(region: RegionCode, path = '') {
   return `${SITE_URL}/${region}${path}`;
@@ -183,6 +183,35 @@ export function getCollectionOgImage(
   if (lang) params.set('lang', lang);
   const qs = params.toString();
   return `${SITE_URL}/api/og/${encodeURIComponent(slug)}${qs ? `?${qs}` : ''}`;
+}
+
+/** Absolute OG image URL for a product PDP (dynamic 1200×630). */
+export function getProductOgImage({
+  title,
+  price,
+  currencySymbol,
+  originalPrice,
+  discount,
+  image,
+  lang,
+}: {
+  title: string;
+  price?: number;
+  currencySymbol?: string;
+  originalPrice?: number;
+  discount?: string;
+  image?: string;
+  lang?: string;
+}): string {
+  const params = new URLSearchParams();
+  params.set('title', title);
+  if (price != null) params.set('price', String(price));
+  if (currencySymbol) params.set('currencySymbol', currencySymbol);
+  if (originalPrice != null) params.set('originalPrice', String(originalPrice));
+  if (discount) params.set('discount', discount);
+  if (image) params.set('image', image);
+  if (lang) params.set('lang', lang);
+  return `${SITE_URL}/api/og/product?${params.toString()}`;
 }
 
 /** ItemList schema for product grids (collection / home sections). */

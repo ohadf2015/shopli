@@ -15,7 +15,7 @@ import {
   SpecRow,
   FaqItem,
 } from '../../../lib/pdp';
-import { breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
+import { breadcrumbJsonLd, productJsonLd, getProductOgImage, SITE_URL } from '../../../lib/seo';
 import type { CollectionDef } from '../../../lib/collections';
 
 interface ProductPageProps {
@@ -91,6 +91,20 @@ export default function ProductPage({
   }
 
   const title = `${product.title} | Shopli`;
+  // og:image: branded card with product image + title + price.
+  // Always uses the dynamic card for consistent branding on shares.
+  const ogImage = getProductOgImage({
+    title: product.title,
+    price: product.price,
+    currencySymbol: config.currencySymbol,
+    originalPrice:
+      product.originalPrice != null && product.originalPrice > product.price
+        ? product.originalPrice
+        : undefined,
+    discount: product.discount,
+    image: product.imageUrl || undefined,
+    lang,
+  });
   const stars = ratingStars(product.rating);
   const originalPrice = product.originalPrice != null && product.originalPrice > product.price ? product.originalPrice : null;
 
@@ -121,7 +135,7 @@ export default function ProductPage({
         path={`/product/${productId}`}
         title={title}
         description={description}
-        image={product.imageUrl}
+        image={ogImage}
         ogType="product"
         canonical={pageUrl}
         jsonLd={structuredData}
