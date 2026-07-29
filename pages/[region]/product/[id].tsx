@@ -12,6 +12,8 @@ import {
   buildPdpProsCons,
   buildPdpFaq,
   relatedCollections,
+  resolvePdpProduct,
+  pdpGsspWhenMissing,
   SpecRow,
   FaqItem,
 } from '../../../lib/pdp';
@@ -387,27 +389,21 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
     return { notFound: true };
   }
 
-  let product: SearchProduct | null = null;
-
-  try {
-    const products = await getProductsByIds([productId], region);
-    product = products[0] || null;
-  } catch {
-    product = null;
-  }
-
+  // Dual-source: AliExpress → demo catalog. Both miss → hard 404 (not soft-404 props).
+  const product = await resolvePdpProduct(productId, region, config.currency, {
+    getProductsByIds,
+    getDemoProductById,
+  });
   if (!product) {
-    product = getDemoProductById(productId, region, config.currency);
+    return pdpGsspWhenMissing();
   }
 
   const lang = config.lang || 'en';
   const collName = (c: CollectionDef) =>
     c.name?.[lang] || c.name?.en || c.tag?.[lang] || c.tag?.en || c.slug;
 
-  const description = product ? buildPdpDescription(product, rtl) : '';
-  const { pros, cons } = product
-    ? buildPdpProsCons(product, rtl)
-    : { pros: [] as string[], cons: [] as string[] };
+  const description = buildPdpDescription(product, rtl);
+  const { pros, cons } = buildPdpProsCons(product, rtl);
 
   return {
     props: {
@@ -417,13 +413,11 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
       productId,
       rtl,
       description,
-      specs: product ? buildPdpSpecs(product, rtl) : [],
+      specs: buildPdpSpecs(product, rtl),
       pros,
       cons,
-      faq: product ? buildPdpFaq(product, rtl) : [],
-      related: product
-        ? relatedCollections(product).map((c) => ({ slug: c.slug, name: collName(c) }))
-        : [],
+      faq: buildPdpFaq(product, rtl),
+      related: relatedCollections(product).map((c) => ({ slug: c.slug, name: collName(c) })),
     },
   };
 };
