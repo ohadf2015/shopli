@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Icon from './icons';
-import { ALL_REGIONS, getRegion, RegionCode } from '../lib/regions';
+import { ALL_REGIONS, getRegion, getTelegramChannelUrl, RegionCode } from '../lib/regions';
 import { getCollectionNavItems } from '../lib/collections';
 
 export default function Header({
@@ -26,6 +26,7 @@ export default function Header({
   const region = getRegion(currentRegion);
   const rtl = region.direction === 'rtl';
   const lang = region.lang || 'en';
+  const telegramUrl = getTelegramChannelUrl(region);
 
   const collections = getCollectionNavItems(lang).slice(0, 14);
   const categories = categoryNavItems.slice(0, 12);
@@ -185,16 +186,18 @@ export default function Header({
           >
             {rtl ? 'השוואה' : 'Compare'}
           </Link>
-          <a
-            href={`https://t.me/${region.tgChannel || 'shoppingisraelnew'}`}
-            target="_blank"
-            rel="noopener"
-            className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-1.5"
-            style={{ color: 'var(--shopli-navy)' }}
-          >
-            <Icon name="telegram" size={14} />
-            {rtl ? 'טלגרם' : 'Telegram'}
-          </a>
+          {telegramUrl && (
+            <a
+              href={telegramUrl}
+              target="_blank"
+              rel="noopener"
+              className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-1.5"
+              style={{ color: 'var(--shopli-navy)' }}
+            >
+              <Icon name="telegram" size={14} />
+              {rtl ? 'טלגרם' : 'Telegram'}
+            </a>
+          )}
         </nav>
 
         {/* Right side — search (mobile) + region + menu */}
@@ -312,16 +315,18 @@ export default function Header({
           >
             {rtl ? 'השוואה' : 'Compare'}
           </Link>
-          <a
-            href={`https://t.me/${region.tgChannel || 'shoppingisraelnew'}`}
-            target="_blank"
-            rel="noopener"
-            className="flex items-center gap-2 px-3 py-3 rounded-lg font-medium text-sm hover:bg-gray-100 min-h-[44px]"
-            onClick={() => setMenuOpen(false)}
-          >
-            <Icon name="telegram" size={16} />
-            {rtl ? 'טלגרם' : 'Telegram'}
-          </a>
+          {telegramUrl && (
+            <a
+              href={telegramUrl}
+              target="_blank"
+              rel="noopener"
+              className="flex items-center gap-2 px-3 py-3 rounded-lg font-medium text-sm hover:bg-gray-100 min-h-[44px]"
+              onClick={() => setMenuOpen(false)}
+            >
+              <Icon name="telegram" size={16} />
+              {rtl ? 'טלגרם' : 'Telegram'}
+            </a>
+          )}
 
           <div className="pt-2 mt-1 border-t border-gray-100 space-y-0.5">
             <a

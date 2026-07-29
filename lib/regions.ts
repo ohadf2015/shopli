@@ -46,7 +46,6 @@ export const REGIONS: Record<string, RegionConfig> = {
       title: 'Shopli — Best AliExpress Deals Picked by AI',
       description: 'AI-powered product recommendations from AliExpress. Curated deals, free shipping, quality guaranteed.',
     },
-    tgChannel: 'shopli_eu',
   },
   us: {
     code: 'us',
@@ -62,7 +61,6 @@ export const REGIONS: Record<string, RegionConfig> = {
       title: 'Shopli — Best AliExpress Deals Picked by AI',
       description: 'AI-powered product recommendations from AliExpress. Curated deals, free shipping, quality guaranteed.',
     },
-    tgChannel: 'shopli_us',
   },
   uk: {
     code: 'uk',
@@ -161,6 +159,10 @@ export type RegionCode = keyof typeof REGIONS;
 
 export function getRegion(code: string): RegionConfig {
   return REGIONS[code as RegionCode] || REGIONS.eu;
+}
+
+export function getTelegramChannelUrl(config: RegionConfig): string | undefined {
+  return config.tgChannel ? `https://t.me/${config.tgChannel}` : undefined;
 }
 
 export const LOCALE_LABELS: Record<string, string> = {

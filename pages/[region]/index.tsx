@@ -4,7 +4,7 @@ import Icon from '../../components/icons';
 import ProductCard from '../../components/ProductCard';
 import WhatsAppShare from '../../components/WhatsAppShare';
 import SeoHead from '../../components/SeoHead';
-import { getRegion, RegionCode } from '../../lib/regions';
+import { getRegion, getTelegramChannelUrl, RegionCode } from '../../lib/regions';
 import { getAllCollections } from '../../lib/collections';
 import { getAllCategories, getCategoryNavItems } from '../../lib/categories';
 import { breadcrumbJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
@@ -39,6 +39,7 @@ async function fetchCollectionProducts(region: string, keywords: string[], limit
 
 export default function HomePage({ region, config, groups, rtl, categoryNavItems, categories }: HomePageProps) {
   const t = (text?: Record<string, string> | null) => text?.[config.lang] || text?.en || '';
+  const telegramUrl = getTelegramChannelUrl(config);
 
   const heroTitle = rtl ? 'מצאו את הדילים הכי שווים מאליאקספרס' : 'The Best AliExpress Deals, Curated for You';
   const heroDesc = rtl
@@ -81,8 +82,8 @@ export default function HomePage({ region, config, groups, rtl, categoryNavItems
                 <Icon name="tag" size={16} />
                 {rtl ? 'כל המבצעים' : 'Browse All Deals'}
               </a>
-              {config.tgChannel && (
-                <a href={`https://t.me/${config.tgChannel}`} target="_blank" rel="noopener" className="btn-secondary">
+              {telegramUrl && (
+                <a href={telegramUrl} target="_blank" rel="noopener" className="btn-secondary">
                   <Icon name="telegram" size={16} />
                   {rtl ? 'ערוץ טלגרם' : 'Telegram Channel'}
                 </a>
@@ -337,8 +338,8 @@ export default function HomePage({ region, config, groups, rtl, categoryNavItems
               {rtl ? 'או' : 'or'}
             </div>
 
-            {config.tgChannel && (
-              <a href={`https://t.me/${config.tgChannel}`} target="_blank" rel="noopener"
+            {telegramUrl && (
+              <a href={telegramUrl} target="_blank" rel="noopener"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm mt-4"
                 style={{ background: 'var(--shopli-orange)', color: 'white' }}>
                 <Icon name="telegram" size={18} />

@@ -132,16 +132,21 @@ export function getSeoHead(props: SeoProps) {
 // ------------------------------------------------------------------
 
 export function organizationJsonLd() {
+  const telegramUrls = [
+    ...new Set(
+      Object.values(REGIONS)
+        .map((r) => (r.tgChannel ? `https://t.me/${r.tgChannel}` : null))
+        .filter((url): url is string => url !== null)
+    ),
+  ];
+
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: SITE_NAME,
     url: SITE_URL,
     logo: `${SITE_URL}/logo.svg`,
-    sameAs: [
-      'https://t.me/shoppingisraelnew',
-      'https://t.me/shopli_eu',
-    ],
+    sameAs: telegramUrls,
   };
 }
 
