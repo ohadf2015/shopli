@@ -39,7 +39,7 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
 
   const heroTitle = rtl ? 'מצאו את הדילים הכי שווים מאליאקספרס' : 'The Best AliExpress Deals, Curated for You';
   const heroDesc = rtl
-    ? 'אנחנו בוחרים מוצרים לפי טרנדים, עונה ואיכות. אתם קונים במחירים הכי נמוכים עם קישור partnerפים ישיר.'
+    ? 'אנחנו בוחרים מוצרים לפי טרנדים, עונה ואיכות. אתם קונים במחירים הכי נמוכים דרך קישורי שותפים ישירים.'
     : 'We pick products by trends, season & quality. You buy at the lowest price with direct affiliate links.';
 
   const pageUrl = `${SITE_URL}/${region}`;
@@ -74,7 +74,7 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
               {heroDesc}
             </p>
             <div className="flex flex-wrap gap-3">
-              <a href={`/${region}/collection/home-gym`} className="btn-primary">
+              <a href="#categories" className="btn-primary">
                 <Icon name="tag" size={16} />
                 {rtl ? 'כל המבצעים' : 'Browse All Deals'}
               </a>
@@ -166,10 +166,10 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
         <section className="py-10 bg-orange-50/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <h2 className="text-xl md:text-2xl font-bold mb-2" style={{ color: 'var(--shopli-navy)' }}>
-              {rtl ? 'ערכות שלמות — מראה, חדר, ערכת' : 'Complete Looks, Rooms & Kits'}
+              {rtl ? 'לוקים שלמים, חדרים וערכות' : 'Complete Looks, Rooms & Kits'}
             </h2>
             <p className="text-sm mb-6" style={{ color: 'var(--shopli-warm-gray)' }}>
-              {rtl ? 'כל ערכה מחברת מספר פריטים ליצירת מראה שלם, עיצוב חדר או ערכת שלמה' : 'Each board combines multiple products into a complete look, room design, or kit.'}
+              {rtl ? 'כל ערכה משלבת כמה פריטים למראה שלם, חדר מעוצב או קיט מלא' : 'Each board combines multiple products into a complete look, room design, or kit.'}
             </p>
 
             <h3 className="text-xs font-semibold uppercase tracking-widest mb-3 mt-4" style={{ color: 'var(--shopli-orange)' }}>{rtl ? 'תחפושות לפורים / הלווין' : 'PURIM & HALLOWEEN COSTUMES'}</h3>
@@ -179,8 +179,8 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
                 { link: 'queen-esther', titleEn: 'Queen Esther', titleHe: 'אסתר המלכה', descEn: 'Royal costume €25', descHe: 'תחפושת מלכותית ₪100' },
                 { link: 'pikachu', titleEn: 'Pikachu Cosplay', titleHe: 'פיקאצ׳ו', descEn: 'Cute Pokemon cosplay €20', descHe: 'קוספליי פוקימון ₪80' },
                 { link: 'spiderman', titleEn: 'Spider-Man', titleHe: 'ספיידרמן', descEn: 'Superhero costume €25', descHe: 'תחפושת גיבור על ₪100' },
-                { link: 'wonder-woman', titleEn: 'Wonder Woman', titleHe: 'ונדר וומן', descEn: 'Amazon warrior €30', descHe: 'לוחמת אמזונות ₪120' },
-                { link: 'ninja-turtle', titleEn: 'Ninja Turtle', titleHe: 'צב נינג׳ה', descEn: 'Hero in a half shell €20', descHe: 'גיבור חצי קליפה ₪80' },
+                { link: 'wonder-woman', titleEn: 'Wonder Woman', titleHe: 'ונדר וומן', descEn: 'Amazon warrior €30', descHe: 'תחפושת לוחמת ₪120' },
+                { link: 'ninja-turtle', titleEn: 'Ninja Turtle', titleHe: 'צב נינג׳ה', descEn: 'Hero in a half shell €20', descHe: 'תחפושת צב נינג׳ה ₪80' },
                 { link: 'superman', titleEn: 'Superman', titleHe: 'סופרמן', descEn: 'Man of Steel €25', descHe: 'איש הפלדה ₪100' },
               ].map(b => (                <a key={b.link} href={`/${region}/mood/${b.link}`}
                   className="p-3 rounded-xl border border-orange-200 bg-white hover:shadow-md transition-all">
@@ -193,10 +193,10 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
             <h3 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--shopli-orange)' }}>{rtl ? 'עיצובי חדרים' : 'ROOM DESIGN'}</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
               {[
-                { link: 'japandi-office', titleEn: 'Japandi Office', titleHe: 'משרד יפנדי', descEn: 'Minimalist serene workspace €80', descHe: 'מרחב עבודה שלו ₪320' },
-                { link: 'gamer-den', titleEn: 'RGB Gamer Den', titleHe: 'פינת גיימרינג', descEn: 'Ultimate gaming setup €120', descHe: 'עמדת משחק אולטימטיבית ₪480' },
+                { link: 'japandi-office', titleEn: 'Japandi Office', titleHe: 'משרד ג׳פנדי', descEn: 'Minimalist serene workspace €80', descHe: 'מרחב עבודה שלו ומינימליסטי ₪320' },
+                { link: 'gamer-den', titleEn: 'RGB Gamer Den', titleHe: 'פינת גיימינג', descEn: 'Ultimate gaming setup €120', descHe: 'עמדת משחק אולטימטיבית ₪480' },
                 { link: 'boho-bedroom', titleEn: 'Boho Bedroom', titleHe: 'חדר בוהו', descEn: 'Cozy aesthetic bedroom €50', descHe: 'חדר נעים בסגנון בוהמי ₪200' },
-                { link: 'scandinavian-reading-nook', titleEn: 'Reading Nook', titleHe: 'פינת קריאה', descEn: 'Hygge cozy corner €60', descHe: 'פינה הייג׳ית נעימה ₪240' },
+                { link: 'scandinavian-reading-nook', titleEn: 'Reading Nook', titleHe: 'פינת קריאה', descEn: 'Hygge cozy corner €60', descHe: 'פינת קריאה נעימה בסגנון סקנדינבי ₪240' },
                 { link: 'indoor-jungle', titleEn: 'Indoor Jungle', titleHe: 'ג׳ונגל ביתי', descEn: 'Plant corner €40', descHe: 'פינת צמחים שופעת ₪160' },
               ].map(b => (                <a key={b.link} href={`/${region}/mood/${b.link}`}
                   className="p-3 rounded-xl border border-orange-200 bg-white hover:shadow-md transition-all">
@@ -206,7 +206,7 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
               ))}
             </div>
 
-            <h3 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--shopli-orange)' }}>{rtl ? 'ערכות מתוייבות' : 'CURATED KITS'}</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--shopli-orange)' }}>{rtl ? 'ערכות נבחרות' : 'CURATED KITS'}</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {[
                 { link: 'sushi-night', titleEn: 'Sushi Night', titleHe: 'ערב סושי', descEn: 'Kitchen kit under €25', descHe: 'ערכת סושי ₪100' },
@@ -223,7 +223,7 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
                 { link: 'beach-day', titleEn: 'Beach Day', titleHe: 'יום חוף', descEn: 'Stress-free kit under €30', descHe: 'ערכת חוף ₪120' },
                 { link: 'wireless-audio', titleEn: 'Wireless Audio', titleHe: 'אודיו אלחוטי', descEn: 'Earbuds, headphones & speaker €60', descHe: 'אוזניות ורמקולים ₪240' },
                 { link: 'phone-accessories', titleEn: 'Phone Kit', titleHe: 'אביזרים לטלפון', descEn: 'Protect, charge & mount €25', descHe: 'הגנה וטעינה ₪100' },
-                { link: 'summer-essentials', titleEn: 'Summer Survival', titleHe: 'קיץ הכרחי', descEn: 'Beat the heat kit under €25', descHe: 'ערכת הישרדות ₪100' },
+                { link: 'summer-essentials', titleEn: 'Summer Survival', titleHe: 'ערכת קיץ', descEn: 'Beat the heat kit under €25', descHe: 'ערכת קיץ מושלמת ₪100' },
               ].map(b => (                <a key={b.link} href={`/${region}/mood/${b.link}`}
                   className="p-3 rounded-xl border border-orange-200 bg-white hover:shadow-md transition-all">
                   <div className="font-semibold text-sm mb-0.5" style={{ color: 'var(--shopli-navy)' }}>{rtl ? b.titleHe : b.titleEn}</div>

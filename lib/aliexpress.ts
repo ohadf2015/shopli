@@ -118,11 +118,24 @@ export async function searchCollection(region: string, keywords: string[], limit
   return all.slice(0, limit);
 }
 
+/**
+ * Clean up common machine-translation artifacts in Hebrew product titles
+ * returned by the AliExpress API (broken geresh spacing like "גאדג 'טים",
+ * doubled spaces). Applied only when the request language is HE.
+ */
+function sanitizeHebrewTitle(title: string): string {
+  return title
+    .replace(/([א-ת])\s*['`]\s*([א-ת])/g, '$1׳$2')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
 function mapRawProduct(p: any, cfg: { language: string; currency: string; shipToCountry: string }): SearchProduct {
+  const rawTitle: string = p.product_title || 'Product';
   return {
     id: String(p.product_id),
     sku: p.sku_id || '',
-    title: p.product_title || 'Product',
+    title: cfg.language === 'HE' ? sanitizeHebrewTitle(rawTitle) : rawTitle,
     price: parseFloat(p.target_sale_price || p.sale_price || '0'),
     originalPrice: (p.target_original_price || p.original_price)
       ? parseFloat(p.target_original_price || p.original_price)
