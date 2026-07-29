@@ -146,8 +146,8 @@ export function organizationJsonLd() {
     url: SITE_URL,
     logo: `${SITE_URL}/logo.svg`,
     sameAs: [
+      // Only channels verified to exist (t.me/s/<name> -> HTTP 200).
       'https://t.me/shoppingisraelnew',
-      'https://t.me/shopli_eu',
     ],
   };
 }

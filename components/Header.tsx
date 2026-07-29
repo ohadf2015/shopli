@@ -155,16 +155,18 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
           >
             {rtl ? 'השוואה' : 'Compare'}
           </Link>
-          <a
-            href={`https://t.me/${region.tgChannel || 'shoppingisraelnew'}`}
-            target="_blank"
-            rel="noopener"
-            className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-1.5"
-            style={{ color: 'var(--shopli-navy)' }}
-          >
-            <Icon name="telegram" size={14} />
-            {rtl ? 'טלגרם' : 'Telegram'}
-          </a>
+          {region.tgChannel && (
+            <a
+              href={`https://t.me/${region.tgChannel}`}
+              target="_blank"
+              rel="noopener"
+              className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-1.5"
+              style={{ color: 'var(--shopli-navy)' }}
+            >
+              <Icon name="telegram" size={14} />
+              {rtl ? 'טלגרם' : 'Telegram'}
+            </a>
+          )}
         </nav>
 
         {/* Right side — search (mobile) + region + menu */}
@@ -282,16 +284,18 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
           >
             {rtl ? 'השוואה' : 'Compare'}
           </Link>
-          <a
-            href={`https://t.me/${region.tgChannel || 'shoppingisraelnew'}`}
-            target="_blank"
-            rel="noopener"
-            className="flex items-center gap-2 px-3 py-3 rounded-lg font-medium text-sm hover:bg-gray-100 min-h-[44px]"
-            onClick={() => setMenuOpen(false)}
-          >
-            <Icon name="telegram" size={16} />
-            {rtl ? 'טלגרם' : 'Telegram'}
-          </a>
+          {region.tgChannel && (
+            <a
+              href={`https://t.me/${region.tgChannel}`}
+              target="_blank"
+              rel="noopener"
+              className="flex items-center gap-2 px-3 py-3 rounded-lg font-medium text-sm hover:bg-gray-100 min-h-[44px]"
+              onClick={() => setMenuOpen(false)}
+            >
+              <Icon name="telegram" size={16} />
+              {rtl ? 'טלגרם' : 'Telegram'}
+            </a>
+          )}
 
           <div className="pt-2 mt-1 border-t border-gray-100">
             <p

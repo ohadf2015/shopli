@@ -46,7 +46,6 @@ export const REGIONS: Record<string, RegionConfig> = {
       title: 'Shopli — Best AliExpress Deals Picked by AI',
       description: 'AI-powered product recommendations from AliExpress. Curated deals, free shipping, quality guaranteed.',
     },
-    tgChannel: 'shopli_eu',
   },
   us: {
     code: 'us',
@@ -62,7 +61,6 @@ export const REGIONS: Record<string, RegionConfig> = {
       title: 'Shopli — Best AliExpress Deals Picked by AI',
       description: 'AI-powered product recommendations from AliExpress. Curated deals, free shipping, quality guaranteed.',
     },
-    tgChannel: 'shopli_us',
   },
   uk: {
     code: 'uk',
