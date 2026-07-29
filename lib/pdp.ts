@@ -176,3 +176,13 @@ export function listingAggregateFields(
   if (p.id) return { ratingValue: undefined, reviewCount: undefined };
   return whenNotPdp;
 }
+
+/**
+ * PDP v1.1 (spec finding #2): SearchProduct.reviewCount is mapped from
+ * AliExpress last_5_days_trade_count — recent trade volume, NOT reviews.
+ * Never label it "reviews"; describe recent sales honestly.
+ */
+export function recentTradesLabel(count: number, rtl: boolean): string {
+  const n = count.toLocaleString('en-US');
+  return rtl ? `(${n} נמכרו לאחרונה)` : `(${n} sold recently)`;
+}

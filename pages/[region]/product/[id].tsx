@@ -12,6 +12,7 @@ import {
   buildPdpProsCons,
   buildPdpFaq,
   relatedCollections,
+  recentTradesLabel,
   SpecRow,
   FaqItem,
 } from '../../../lib/pdp';
@@ -21,7 +22,7 @@ import type { CollectionDef } from '../../../lib/collections';
 interface ProductPageProps {
   region: RegionCode;
   config: RegionConfig;
-  product: SearchProduct | null;
+  product: SearchProduct;
   productId: string;
   rtl: boolean;
   description: string;
@@ -57,38 +58,6 @@ export default function ProductPage({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const lang = config.lang || 'en';
   const pageUrl = `${SITE_URL}/${region}/product/${productId}`;
-
-  if (!product) {
-    return (
-      <>
-        <SeoHead
-          region={region}
-          path={`/product/${productId}`}
-          title={rtl ? 'מוצר לא נמצא | Shopli' : 'Product not found | Shopli'}
-          description={rtl ? 'לא הצלחנו למצוא את המוצר המבוקש.' : 'We could not find the requested product.'}
-          noindex
-        />
-        <Header currentRegion={region} dir={config.direction} />
-        <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16 text-center">
-          <div
-            className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
-            style={{ background: 'oklch(90% 0.06 45)', color: 'var(--shopli-orange)' }}
-          >
-            <Icon name="package" size={32} />
-          </div>
-          <h1 className="text-xl font-bold mb-2" style={{ color: 'var(--shopli-navy)' }}>
-            {rtl ? 'מוצר לא נמצא' : 'Product not found'}
-          </h1>
-          <p className="text-sm mb-6" style={{ color: 'var(--shopli-warm-gray)' }}>
-            {rtl ? 'המוצר שחיפשת אינו קיים או שאינו זמין כרגע.' : 'The product you are looking for does not exist or is currently unavailable.'}
-          </p>
-          <a href={`/${region}`} className="btn-primary text-sm">
-            {rtl ? 'חזרה לדף הבית' : 'Back to home'}
-          </a>
-        </main>
-      </>
-    );
-  }
 
   const title = `${product.title} | Shopli`;
   const stars = ratingStars(product.rating);
@@ -195,7 +164,7 @@ export default function ProductPage({
               )}
               {(product.reviewCount || 0) > 0 && (
                 <span className="text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
-                  ({product.reviewCount?.toLocaleString()} AliExpress {rtl ? 'ביקורות' : 'reviews'})
+                  {recentTradesLabel(product.reviewCount, rtl)}
                 </span>
               )}
               {product.shopName && (
@@ -400,14 +369,19 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
     product = getDemoProductById(productId, region, config.currency);
   }
 
+  // PDP v1.1 (spec finding #1): no soft-404 — when both the AliExpress fetch
+  // and the demo fallback miss, return a real 404 so crawlers drop the URL
+  // instead of indexing an HTTP 200 "not found" page at crawl scale.
+  if (!product) {
+    return { notFound: true };
+  }
+
   const lang = config.lang || 'en';
   const collName = (c: CollectionDef) =>
     c.name?.[lang] || c.name?.en || c.tag?.[lang] || c.tag?.en || c.slug;
 
-  const description = product ? buildPdpDescription(product, rtl) : '';
-  const { pros, cons } = product
-    ? buildPdpProsCons(product, rtl)
-    : { pros: [] as string[], cons: [] as string[] };
+  const description = buildPdpDescription(product, rtl);
+  const { pros, cons } = buildPdpProsCons(product, rtl);
 
   return {
     props: {
@@ -417,13 +391,11 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
       productId,
       rtl,
       description,
-      specs: product ? buildPdpSpecs(product, rtl) : [],
+      specs: buildPdpSpecs(product, rtl),
       pros,
       cons,
-      faq: product ? buildPdpFaq(product, rtl) : [],
-      related: product
-        ? relatedCollections(product).map((c) => ({ slug: c.slug, name: collName(c) }))
-        : [],
+      faq: buildPdpFaq(product, rtl),
+      related: relatedCollections(product).map((c) => ({ slug: c.slug, name: collName(c) })),
     },
   };
 };

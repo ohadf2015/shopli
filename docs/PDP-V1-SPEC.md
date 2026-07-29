@@ -54,3 +54,38 @@ smallest sane scope and simultaneously resolves findings #1 (fake seeds),
 - PDP meta description != product.title; PDP body contains specs/pros-cons/FAQ sections.
 - Sitemap PDP locs = `{SITE_URL}/{region}/product/{demoId}` for all regions, www host.
 - No POST handler / review form on PDP.
+
+---
+
+# PDP v1.1 spec (2026-07-29, grok council second-pass findings)
+
+## Goal
+1. Kill soft-404: when both the AliExpress fetch and the demo fallback miss, the PDP
+   GSSP must return `notFound: true` (real HTTP 404) instead of HTTP 200 + in-page
+   "not found" + noindex. Crawl-scale risk: every ProductCard deep-links a PDP id.
+2. Honest social proof: `SearchProduct.reviewCount` is mapped from AliExpress
+   `last_5_days_trade_count` (recent trade volume, not reviews — lib/aliexpress.ts).
+   The PDP must not label it "reviews". Relabel to recent-sales wording, matching the
+   compare table which already says "Recent trades".
+
+## Approach
+- `pages/[region]/product/[id].tsx`: return `{ notFound: true }` when product is null
+  after both lookups; drop the now-dead in-page not-found branch and make the
+  `product` prop non-nullable. Render the trade-count via a new
+  `recentTradesLabel(count, rtl)` helper ("1,234 sold recently" / Hebrew) instead of
+  "AliExpress reviews".
+- `lib/pdp.ts`: add `recentTradesLabel` (pure, unit-testable).
+- Field rename in lib/aliexpress.ts is OUT OF SCOPE (touches every listing surface;
+  compare table already labels it honestly).
+
+## Files
+- MOD `pages/[region]/product/[id].tsx`
+- MOD `lib/pdp.ts`
+- MOD `docs/PDP-V1-SPEC.md` (this note)
+- NEW `tests/pdp-notfound.test.ts`
+
+## Acceptance criteria
+- GSSP returns `{ notFound: true }` for an unknown id with AliExpress unreachable
+  (fetch mocked) → local `next start` serves HTTP 404 for a bogus PDP url (curl-verified).
+- No PDP UI string claims "reviews"/"ביקורות" for trade-count data.
+- `npx tsc --noEmit` clean; full `npm test` suite green (196 prior tests + new).
