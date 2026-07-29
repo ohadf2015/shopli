@@ -19,7 +19,7 @@ export function getHreflangTags(region: RegionCode, path: string) {
   for (const [code, config] of Object.entries(REGIONS)) {
     tags.push({
       rel: 'alternate',
-      hrefLang: config.locale,
+      hrefLang: config.hreflang,
       href: `${SITE_URL}/${code}${path}`,
     });
   }
