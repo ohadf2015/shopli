@@ -268,6 +268,11 @@ export default function ProductPage({
                 target="_blank"
                 rel="nofollow sponsored noopener noreferrer"
                 className="btn-primary text-center text-base"
+                data-product-id={product.id}
+                data-product-title={product.title}
+                data-price={product.price.toFixed(2)}
+                data-currency={config.currencySymbol}
+                data-category={product.category || ''}
               >
                 <Icon name="external" size={16} />
                 {rtl ? 'קנו עכשיו באליאקספרס' : 'Buy now on AliExpress'}
