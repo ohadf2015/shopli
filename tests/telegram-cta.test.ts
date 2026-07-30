@@ -13,8 +13,8 @@ import { join } from 'node:path';
 import { REGIONS } from '../lib/regions';
 import { organizationJsonLd } from '../lib/seo';
 
-// Channels verified live (t.me/s/<name> -> HTTP 200) as of 2026-07-29.
-const VERIFIED_CHANNELS = new Set(['shoppingisraelnew']);
+// Channels verified live (t.me/s/<name> -> HTTP 200) as of 2026-07-30.
+const VERIFIED_CHANNELS = new Set(['shoppingisraelnew', 'shopli_us', 'shopli_eu']);
 
 test('every tgChannel in REGIONS is a verified-existing channel', () => {
   for (const [code, config] of Object.entries(REGIONS)) {
@@ -27,9 +27,9 @@ test('every tgChannel in REGIONS is a verified-existing channel', () => {
   }
 });
 
-test('us and eu locales expose no Telegram CTA (no real channel exists)', () => {
-  assert.equal(REGIONS.us.tgChannel, undefined);
-  assert.equal(REGIONS.eu.tgChannel, undefined);
+test('us and eu locales expose Telegram CTAs to @shopli_us and @shopli_eu', () => {
+  assert.equal(REGIONS.us.tgChannel, 'shopli_us');
+  assert.equal(REGIONS.eu.tgChannel, 'shopli_eu');
 });
 
 test('il and ru keep the real shoppingisraelnew channel', () => {

@@ -148,6 +148,8 @@ export function organizationJsonLd() {
     sameAs: [
       // Only channels verified to exist (t.me/s/<name> -> HTTP 200).
       'https://t.me/shoppingisraelnew',
+      'https://t.me/shopli_us',
+      'https://t.me/shopli_eu',
     ],
   };
 }
