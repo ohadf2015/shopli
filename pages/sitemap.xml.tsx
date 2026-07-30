@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import { REGIONS } from '../lib/regions';
 import { DEMO_PRODUCT_IDS } from '../lib/demo-products';
 import { SITE_URL, getCollectionOgImage } from '../lib/seo';
+import { searchCollection } from '../lib/aliexpress';
 
 function xmlEncode(s: string): string {
   return s
@@ -60,6 +61,23 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   const moodSlugs = getAllMoodboardSlugs();
   const compareSlugs = getAllComparisonSlugs();
   const blogSlugs = getAllBlogSlugs();
+
+  // Collect dynamic product IDs from all collections (AliExpress API)
+  // so PDP pages for live deal products appear in the sitemap.
+  const dynamicProductIds = new Set<string>();
+  const collectionDefs = getAllCollections().filter(
+    (c: any) => c.keywords && c.keywords.length > 0
+  );
+  await Promise.allSettled(
+    collectionDefs.map(async (coll: any) => {
+      const products = await searchCollection('il', [coll.keywords![0]], 4);
+      for (const p of products) {
+        if (p.id) dynamicProductIds.add(p.id);
+      }
+    })
+  );
+  // Merge dynamic IDs with static demo IDs, preserving the 4 hardcoded ones
+  const allProductIds = [...new Set([...DEMO_PRODUCT_IDS, ...dynamicProductIds])];
 
   const urls: SitemapUrl[] = [];
 
@@ -153,10 +171,11 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     }
   }
 
-  // Product detail pages — exactly the static demo catalog (single source of
-  // truth: lib/demo-products.ts). Dynamic search PDPs are discovered via links.
+  // Product detail pages — static demo catalog + dynamic AliExpress deals.
+  // Dynamic product IDs are collected at generation time from all collection
+  // keyword searches (see above). 9 locale alternates per product.
   for (const region of regionCodes) {
-    for (const pid of DEMO_PRODUCT_IDS) {
+    for (const pid of allProductIds) {
       urls.push({
         loc: `${SITE_URL}/${region}/product/${pid}`,
         changefreq: 'weekly',
