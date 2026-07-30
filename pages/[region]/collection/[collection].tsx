@@ -17,7 +17,7 @@ import {
   SITE_URL,
 } from '../../../lib/seo';
 
-export default function CollectionPage({ region, config, collection, content, sections, rtl, error }: any) {
+export default function CollectionPage({ region, config, collection, content, sections, rtl, noindex, error }: any) {
   if (error) {
     return (
       <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>
@@ -119,6 +119,7 @@ export default function CollectionPage({ region, config, collection, content, se
         description={description}
         image={ogImage}
         ogType="product"
+        noindex={noindex}
         jsonLd={structuredData}
       />
       <Header currentRegion={region} dir={config?.direction} />
@@ -297,6 +298,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
       }
     }
 
+    // noindex keyword-only collections that returned zero products (soft-404 prevention)
+    const noindex = !content && sections.length === 0;
+
     return {
       props: {
         region,
@@ -305,6 +309,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
         content: content ? JSON.parse(JSON.stringify(content)) : null,
         sections: JSON.parse(JSON.stringify(sections)),
         rtl: config?.direction === 'rtl',
+        noindex,
         error: null,
       },
     };

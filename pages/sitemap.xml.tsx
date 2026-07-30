@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import { REGIONS } from '../lib/regions';
 import { DEMO_PRODUCT_IDS } from '../lib/demo-products';
 import { SITE_URL, getCollectionOgImage } from '../lib/seo';
+import { COLLECTION_CONTENT } from '../lib/collection-content';
 import { searchCollection } from '../lib/aliexpress';
 
 function xmlEncode(s: string): string {
@@ -9,7 +10,7 @@ function xmlEncode(s: string): string {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+    .replace(/\"/g, '&quot;')
     .replace(/'/g, '&apos;');
 }
 
@@ -64,7 +65,10 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
 
   // Collect dynamic product IDs from all collections (AliExpress API)
   // so PDP pages for live deal products appear in the sitemap.
+  // Also track which collections returned ≥1 product to filter the sitemap.
   const dynamicProductIds = new Set<string>();
+  const collectionsWithProducts = new Set<string>();
+  const collectionsWithContent = new Set(Object.keys(COLLECTION_CONTENT));
   const collectionDefs = getAllCollections().filter(
     (c: any) => c.keywords && c.keywords.length > 0
   );
@@ -72,7 +76,10 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     collectionDefs.map(async (coll: any) => {
       const products = await searchCollection('il', [coll.keywords![0]], 4);
       for (const p of products) {
-        if (p.id) dynamicProductIds.add(p.id);
+        if (p.id) {
+          dynamicProductIds.add(p.id);
+          collectionsWithProducts.add(coll.slug);
+        }
       }
     })
   );
@@ -122,10 +129,15 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     });
   }
 
-  // Collection pages — include per-category OG image
+  // Collection pages — only include slugs that have either editorial content
+  // (always valuable regardless of product availability) or returned ≥1 product
+  // from the AliExpress API scan. This prevents soft-404 crawl waste.
   for (const region of regionCodes) {
     const lang = REGIONS[region]?.lang || 'en';
     for (const coll of collections) {
+      if (!collectionsWithContent.has(coll.slug) && !collectionsWithProducts.has(coll.slug)) {
+        continue;
+      }
       const name =
         coll.name?.[lang] ||
         coll.name?.en ||
