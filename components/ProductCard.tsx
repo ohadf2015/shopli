@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import Icon from './icons';
 import WhatsAppShare from './WhatsAppShare';
+import { isInWishlist, syncAdd, syncRemove } from '../lib/useWishlist';
 
 export interface ProductCardProduct {
   id: string;
@@ -62,6 +64,11 @@ export default function ProductCard({
   category,
   className = '',
 }: ProductCardProps) {
+  const [saved, setSaved] = useState(false);
+  useEffect(() => {
+    setSaved(isInWishlist(product.id));
+  }, [product.id]);
+
   const stars = ratingStars(product.rating || 0);
   const sold = formatSold(product.volume || 0, rtl);
   const price = Number(product.price) || 0;
@@ -76,6 +83,31 @@ export default function ProductCard({
   const externalHref = product.affiliateLink || fallbackUrl || '#';
   const isExternal = !productPageUrl;
   const cardHref = productPageUrl || externalHref;
+
+  const toggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isInWishlist(product.id)) {
+      syncRemove(product.id);
+      setSaved(false);
+    } else {
+      syncAdd({
+        id: product.id,
+        title: product.title,
+        price,
+        originalPrice: product.originalPrice,
+        imageUrl: product.imageUrl,
+        affiliateLink: product.affiliateLink,
+        rating: product.rating,
+        reviewCount: product.reviewCount,
+        volume: product.volume,
+        discount: product.discount,
+        freeShipping: product.freeShipping,
+        shopName: product.shopName,
+      });
+      setSaved(true);
+    }
+  };
 
   return (
     <article
@@ -131,6 +163,28 @@ export default function ProductCard({
             {rtl ? 'משלוח חינם' : 'Free ship'}
           </span>
         )}
+
+        {/* Wishlist heart toggle */}
+        <button
+          type="button"
+          onClick={toggleWishlist}
+          className={`absolute top-2 start-2 w-8 h-8 rounded-full flex items-center justify-center z-10 transition-all duration-200 ${
+            saved
+              ? 'bg-white shadow-md scale-110'
+              : 'bg-white/80 hover:bg-white hover:shadow-sm'
+          }`}
+          aria-label={saved ? (rtl ? 'הסר מהמועדפים' : 'Remove from wishlist') : (rtl ? 'הוסף למועדפים' : 'Add to wishlist')}
+        >
+          {saved ? (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--shopli-orange)" stroke="var(--shopli-orange)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+            </svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--shopli-warm-gray)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+            </svg>
+          )}
+        </button>
       </div>
 
       <div className={`flex flex-col flex-1 ${compact ? 'p-2' : 'p-3'}`}>

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import Icon from './icons';
 import { ALL_REGIONS, getRegion, RegionCode } from '../lib/regions';
 import { getCollectionNavItems } from '../lib/collections';
+import { getWishlistSnapshot } from '../lib/useWishlist';
 
 export default function Header({ currentRegion, dir }: { currentRegion: RegionCode; dir?: string }) {
   const router = useRouter();
@@ -12,6 +13,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
   const [catOpen, setCatOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [wishlistCount, setWishlistCount] = useState(0);
   const regionRef = useRef<HTMLDivElement>(null);
   const catRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -20,6 +22,18 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
   const lang = region.lang || 'en';
 
   const collections = getCollectionNavItems(lang).slice(0, 14);
+
+  useEffect(() => {
+    // Read initial + listen for changes
+    const update = () => setWishlistCount(getWishlistSnapshot().length);
+    update();
+    window.addEventListener('shopli-wishlist-changed', update);
+    window.addEventListener('storage', update);
+    return () => {
+      window.removeEventListener('shopli-wishlist-changed', update);
+      window.removeEventListener('storage', update);
+    };
+  }, []);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -155,6 +169,23 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
           >
             {rtl ? 'השוואה' : 'Compare'}
           </Link>
+          <Link
+            href={`/${currentRegion}/wishlist`}
+            className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors inline-flex items-center gap-1.5 relative"
+            style={{ color: 'var(--shopli-navy)' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+            </svg>
+            {rtl ? 'מועדפים' : 'Wishlist'}
+            {wishlistCount > 0 && (
+              <span className="absolute -top-0.5 -end-0.5 min-w-[18px] h-[18px] rounded-full text-[10px] font-bold flex items-center justify-center px-1"
+                style={{ background: 'var(--shopli-orange)', color: 'white' }}
+              >
+                {wishlistCount > 99 ? '99+' : wishlistCount}
+              </span>
+            )}
+          </Link>
           {region.tgChannel && (
             <a
               href={`https://t.me/${region.tgChannel}`}
@@ -283,6 +314,24 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             onClick={() => setMenuOpen(false)}
           >
             {rtl ? 'השוואה' : 'Compare'}
+          </Link>
+          <Link
+            href={`/${currentRegion}/wishlist`}
+            className="flex items-center gap-2 px-3 py-3 rounded-lg font-medium text-sm hover:bg-gray-100 min-h-[44px]"
+            style={{ color: 'var(--shopli-navy)' }}
+            onClick={() => setMenuOpen(false)}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+            </svg>
+            {rtl ? 'מועדפים' : 'Wishlist'}
+            {wishlistCount > 0 && (
+              <span className="text-[10px] font-bold ml-auto rounded-full px-1.5 py-0.5"
+                style={{ background: 'var(--shopli-orange)', color: 'white' }}
+              >
+                {wishlistCount > 99 ? '99+' : wishlistCount}
+              </span>
+            )}
           </Link>
           {region.tgChannel && (
             <a
