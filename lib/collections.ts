@@ -21,6 +21,103 @@ export const COLLECTIONS: CollectionDef[] = [
     desc: { en: 'Complete your look — costume, wig, makeup & accessories', he: 'תחפושת שלמה עם פאה, איפור ואביזרים', fr: 'Look Halloween complet — costume, perruque, maquillage', de: 'Kompletter Look — Kostüm, Perücke, Make-up', es: 'Look completo — disfraz, peluca, maquillaje', it: 'Look completo — costume, parrucca, trucco' },
     icon: 'mask',
   },
+  // ════════════════════════════════════════════════════
+  // [P1 TEMU MOAT] Maker Lab — DIY electronics
+  // Temu has limited hobby electronics selection. AliExpress is THE global
+  // source for Arduino, sensors, soldering kits, and maker components.
+  // ════════════════════════════════════════════════════
+  {
+    slug: 'maker-lab',
+    keywords: ['Arduino kit', 'soldering practice kit', 'Raspberry Pi accessories', 'electronics DIY project kit', 'breadboard jumper wire'],
+    name: { en: 'Maker Lab', he: 'מעבדת יוצר', fr: 'Atelier Maker', de: 'Maker Labor', es: 'Laboratorio Maker', it: 'Laboratorio Maker' },
+    desc: { en: 'Arduino, sensors, soldering kits & everything for your DIY electronics projects', he: 'ארדואינו, סנסורים, ערכות הלחמה וכל מה שצריך לפרויקטי אלקטרוניקה', fr: 'Arduino, capteurs, kits de soudure pour vos projets électroniques', de: 'Arduino, Sensoren, Lötkits für deine Elektronik-Projekte', es: 'Arduino, sensores, kits de soldadura para proyectos electrónicos', it: 'Arduino, sensori, kit di saldatura per progetti elettronici' },
+    icon: 'bulb',
+  },
+  // ════════════════════════════════════════════════════
+  // [P1 TEMU MOAT] Home Bar — cocktail starters & barware
+  // Temu carries some bar tools but doesn't curate into complete kits.
+  // AliExpress has huge selection for home mixology.
+  // ════════════════════════════════════════════════════
+  {
+    slug: 'home-bar',
+    keywords: ['cocktail shaker set', 'jigger measure', 'muddler bar spoon', 'ice cube mold silicone', 'bar pour spout'],
+    name: { en: 'Home Bar', he: 'בר ביתי', fr: 'Bar à Domicile', de: 'Hausbar', es: 'Bar en Casa', it: 'Bar in Casa' },
+    desc: { en: 'Shakers, jiggers & tools to mix craft cocktails at home under €30', he: 'שייקרים, ג\'יגרים וכלים לקוקטיילים ביתיים בפחות מ-₪120', fr: 'Shakers, doseurs et outils pour cocktails maison à moins de 30€', de: 'Shaker, Jigger & Werkzeuge für Craft-Cocktails unter 30€', es: 'Cocteleras, dosificadores para cocktails caseros', it: 'Shaker, misurini e strumenti per cocktail fatti in casa' },
+    icon: 'chef',
+  },
+  // ════════════════════════════════════════════════════
+  // [P1 TEMU MOAT] Zero Waste — plastic-free essentials
+  // Temu avoids regulated/safety categories; eco-friendly consumer goods
+  // (bamboo, silicone, stainless) are harder to curate on Temu's platform.
+  // Strong appeal in EU/IL eco-conscious markets.
+  // ════════════════════════════════════════════════════
+  {
+    slug: 'zero-waste',
+    keywords: ['bamboo toothbrush', 'reusable produce bags', 'beeswax food wrap', 'stainless steel straw set', 'reusable makeup pads'],
+    name: { en: 'Zero Waste', he: 'אפס פסולת', fr: 'Zéro Déchet', de: 'Zero Waste', es: 'Cero Residuos', it: 'Zero Sprechi' },
+    desc: { en: 'Reusable, plastic-free essentials for a greener everyday routine', he: 'מוצרים רב-פעמיים נטולי פלסטיק לשגרה ירוקה יותר', fr: 'Essentiels réutilisables sans plastique pour un quotidien plus vert', de: 'Wiederverwendbare, plastikfreie Essentials für den Alltag', es: 'Esenciales reutilizables sin plástico para una rutina más verde', it: 'Essenziali riutilizzabili senza plastica per una routine più verde' },
+    icon: 'sun',
+  },
+  // ════════════════════════════════════════════════════
+  // [P1 TEMU MOAT] Dorm Room — college essentials
+  // Seasonal Back-to-School niche targeting dorm & student housing.
+  // AliExpress has space-saving organizers not well-curated on Temu.
+  // ════════════════════════════════════════════════════
+  {
+    slug: 'dorm-room',
+    keywords: ['bed riser', 'dorm room organizer', 'shower caddy', 'under bed storage', 'closet organizer small space'],
+    name: { en: 'Dorm Room', he: 'חדר מעונות', fr: 'Chambre Étudiant', de: 'Studenten-WG', es: 'Habitación Residencia', it: 'Camera Studenti' },
+    desc: { en: 'Space-saving essentials for dorm rooms & small apartments', he: 'מוצרים חוסכי מקום לחדרי מעונות ודירות קטנות', fr: 'Essentiels gain de place pour chambres étudiantes', de: 'Platzsparende Essentials für WG-Zimmer', es: 'Esenciales que ahorran espacio para habitaciones pequeñas', it: 'Essenziali salvaspazio per camere studenti' },
+    icon: 'backpack',
+  },
+  // ════════════════════════════════════════════════════
+  // [P1 TEMU MOAT] Tea Ceremony — matcha & loose-leaf kits
+  // Cultural curation Temu's algorithm can't replicate. AliExpress has
+  // authentic Japanese & Chinese tea ware that Temu doesn't curate.
+  // ════════════════════════════════════════════════════
+  {
+    slug: 'tea-ceremony',
+    keywords: ['matcha whisk bamboo', 'Japanese tea set', 'ceramic teapot', 'tea scoop', 'matcha bowl'],
+    name: { en: 'Tea Ceremony', he: 'טקס תה', fr: 'Cérémonie du Thé', de: 'Tea Zeremonie', es: 'Ceremonia del Té', it: 'Cerimonia del Tè' },
+    desc: { en: 'Authentic matcha sets, teapots & accessories for the perfect brew', he: 'ערכות מאצ\'ה אותנטיות, קומקומים ואביזרים לחליטה מושלמת', fr: 'Sets matcha authentiques, théières pour une infusion parfaite', de: 'Authentische Matcha-Sets, Teekannen für den perfekten Aufguss', es: 'Sets de matcha auténticos, teteras para una infusión perfecta', it: 'Set matcha autentici, teiere per un infuso perfetto' },
+    icon: 'lamp',
+  },
+  // ════════════════════════════════════════════════════
+  // [P1 TEMU MOAT] Desk Wellness — ergonomic home office health
+  // Health/ergonomic accessories Temu doesn't target well.
+  // AliExpress has a vast selection of posture & ergonomic tools.
+  // ════════════════════════════════════════════════════
+  {
+    slug: 'desk-wellness',
+    keywords: ['posture corrector', 'lumbar support cushion', 'ergonomic wrist rest', 'standing desk mat anti fatigue', 'neck stretcher'],
+    name: { en: 'Desk Wellness', he: 'בריאות במשרד', fr: 'Bien-être Bureau', de: 'Büro-Wellness', es: 'Bienestar en la Oficina', it: 'Benessere in Ufficio' },
+    desc: { en: 'Ergonomic cushions, posture aids & desk health essentials under €25', he: 'כריות ארגונומיות, מתקני יציבה וציוד בריאותי לשולחן בפחות מ-₪100', fr: 'Coussins ergonomiques, aides posturales pour le bureau à moins de 25€', de: 'Ergonomische Kissen, Haltungshilfen für den Schreibtisch unter 25€', es: 'Cojines ergonómicos, ayudas posturales para la oficina', it: 'Cuscini ergonomici, ausili posturali per la scrivania' },
+    icon: 'monitor',
+  },
+  // ════════════════════════════════════════════════════
+  // [P1 TEMU MOAT] Jewelry Making — DIY craft supplies
+  // Massive AliExpress category. Temu carries some findings but doesn't
+  // curate for jewelry makers. Strong repeat-purchase potential.
+  // ════════════════════════════════════════════════════
+  {
+    slug: 'jewelry-making',
+    keywords: ['beading kit', 'jewelry pliers set', 'crimp beads', 'wire wrapping kit', 'resin mold jewelry'],
+    name: { en: 'Jewelry Making', he: 'תכשיטנות', fr: 'Fabrication Bijoux', de: 'Schmuckherstellung', es: 'Fabricación de Joyas', it: 'Creazione Gioielli' },
+    desc: { en: 'Beads, wires, pliers & resin molds for DIY jewelry crafting', he: 'חרוזים, חוטים, צבתות ותבניות שרף ליצירת תכשיטים', fr: 'Perles, fils, pinces et moules résine pour créer vos bijoux', de: 'Perlen, Drähte, Zangen & Harzformen für DIY-Schmuck', es: 'Abalorios, alambres, alicates y moldes de resina', it: 'Perline, fili, pinze e stampi in resina per creare gioielli' },
+    icon: 'run',
+  },
+  // ════════════════════════════════════════════════════
+  // [P1 TEMU MOAT] Microgreens & Sprouting — home growing
+  // Temu doesn't carry gardening supplies well. AliExpress has vast
+  // seed, tray & growing medium selection.
+  // ════════════════════════════════════════════════════
+  {
+    slug: 'microgreens',
+    keywords: ['sprouting jar', 'microgreen growing tray', 'seed starter kit', 'growing medium', 'organic seeds mix'],
+    name: { en: 'Microgreens', he: 'מיקרוגרין', fr: 'Micro-pousses', de: 'Microgreens', es: 'Microvegetales', it: 'Microgreens' },
+    desc: { en: 'Grow nutrient-packed microgreens at home — trays, seeds & jars', he: 'לגדל מיקרוגרין עשיר ברכיבים תזונתיים בבית', fr: 'Cultivez des micro-pousses à la maison — plateaux, graines', de: 'Nährstoffreiche Microgreens zu Hause anbauen', es: 'Cultiva microvegetales ricos en nutrientes en casa', it: 'Coltiva microgreens ricchi di nutrienti a casa' },
+    icon: 'sun',
+  },
   {
     slug: 'home-gym',
     keywords: ['fitness resistance bands', 'yoga mat', 'home gym equipment', 'jump rope'],
