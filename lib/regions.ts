@@ -64,7 +64,7 @@ export const REGIONS: Record<string, RegionConfig> = {
     direction: 'ltr',
     meta: {
       title: 'Shopli — Best AliExpress Deals Picked by AI',
-      description: 'AI-powered product recommendations from AliExpress. Curated deals, free shipping, quality guaranteed.',
+      description: 'AI-curated AliExpress deals picked just for you. Unbeatable prices, free shipping to the US, quality guaranteed.',
     },
   },
   uk: {
@@ -80,7 +80,7 @@ export const REGIONS: Record<string, RegionConfig> = {
     direction: 'ltr',
     meta: {
       title: 'Shopli — Best AliExpress Deals Picked by AI',
-      description: 'AI-powered product recommendations from AliExpress. Curated deals, free shipping, quality guaranteed.',
+      description: 'AI-curated AliExpress deals picked just for you. Unbeatable prices, free delivery to the UK, quality guaranteed.',
     },
   },
   fr: {
