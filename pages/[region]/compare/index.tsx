@@ -650,6 +650,9 @@ export default function ProductComparePage({
   );
 }
 
+// Last-resort IDs for the sample comparison, verified live 2026-08-02.
+const SAMPLE_FALLBACK_IDS = ['1005010287294727', '1005007171202355', '1005007244759019'];
+
 export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
   const region = ((params?.region as string) || 'eu') as RegionCode;
   if (!isValidRegion(region)) return { notFound: true };
@@ -661,17 +664,23 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
   if (rawIds === 'sample') {
     // "Load sample comparison": resolve to 3 real, currently-live products so
     // the sample never shows fabricated data or dead affiliate links.
-    // AliExpress search is occasionally flaky/rate-limited, so retry.
+    // AliExpress search is flaky/rate-limited from serverless egress IPs (returns
+    // empty without throwing), so retry with a pause; if search stays empty, fall
+    // back to curated IDs verified live — productdetail calls are reliable.
     const { searchAliExpress } = await import('../../../lib/aliexpress');
     let found: SearchProduct[] = [];
     for (let attempt = 0; attempt < 3 && found.length < MIN_COMPARE_PRODUCTS; attempt++) {
+      if (attempt > 0) await new Promise((r) => setTimeout(r, 800));
       try {
         found = await searchAliExpress('wireless charger', region, 6);
       } catch {
         // retry
       }
     }
-    productIds = found.slice(0, 3).map((p) => p.id);
+    productIds =
+      found.length >= MIN_COMPARE_PRODUCTS
+        ? found.slice(0, 3).map((p) => p.id)
+        : [...SAMPLE_FALLBACK_IDS];
   } else {
     productIds = parseCompareIds(rawIds);
   }
