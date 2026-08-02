@@ -661,13 +661,17 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
   if (rawIds === 'sample') {
     // "Load sample comparison": resolve to 3 real, currently-live products so
     // the sample never shows fabricated data or dead affiliate links.
-    try {
-      const { searchAliExpress } = await import('../../../lib/aliexpress');
-      const found = await searchAliExpress('wireless charger', region, 6);
-      productIds = found.slice(0, 3).map((p) => p.id);
-    } catch {
-      productIds = [];
+    // AliExpress search is occasionally flaky/rate-limited, so retry.
+    const { searchAliExpress } = await import('../../../lib/aliexpress');
+    let found: SearchProduct[] = [];
+    for (let attempt = 0; attempt < 3 && found.length < MIN_COMPARE_PRODUCTS; attempt++) {
+      try {
+        found = await searchAliExpress('wireless charger', region, 6);
+      } catch {
+        // retry
+      }
     }
+    productIds = found.slice(0, 3).map((p) => p.id);
   } else {
     productIds = parseCompareIds(rawIds);
   }
