@@ -682,12 +682,16 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
 
       // Never fabricate fallback products: an empty/failed API response must
       // surface as an error, not as fake items with dead affiliate links.
-      if (products.length < MIN_COMPARE_PRODUCTS) {
+      if (products.length === 0) {
         error =
           config.lang === 'he'
             ? 'לא הצלחנו לטעון את המוצרים כרגע. בדקו את המזהים או נסו שוב בעוד רגע.'
             : "We couldn't load those products right now. Check the IDs or try again in a moment.";
-        products = [];
+      } else if (products.length < MIN_COMPARE_PRODUCTS) {
+        error =
+          config.lang === 'he'
+            ? 'נטען מוצר אחד בלבד — הוסיפו עוד מזהה כדי להשוות.'
+            : 'Only one product loaded — add another ID to compare.';
       }
     } catch (e: any) {
       error =
