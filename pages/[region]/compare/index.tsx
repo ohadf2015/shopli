@@ -7,7 +7,6 @@ import WhatsAppShare from '../../../components/WhatsAppShare';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, isValidRegion, RegionCode, RegionConfig } from '../../../lib/regions';
 import type { SearchProduct } from '../../../lib/aliexpress';
-import { getDemoProducts } from '../../../lib/demo-products';
 import { listingAggregateFields } from '../../../lib/pdp';
 import {
   buildCompareRows,
@@ -56,13 +55,26 @@ export default function ProductComparePage({
 }: ComparePageProps) {
   const router = useRouter();
   const lang = config.lang || 'en';
-  const [products] = useState(initialProducts);
-  const [rows] = useState(initialRows);
+  // Products/rows come straight from props: on client-side navigation to this
+  // same page, Next.js re-renders with fresh getServerSideProps props but does
+  // NOT remount the component — useState(initial*) would keep stale data and
+  // the page would look like the fetch never happened.
+  const products = initialProducts;
+  const rows = initialRows;
   const [productIds, setProductIds] = useState(initialIds);
   const [shareUrl, setShareUrl] = useState(initialShareUrl);
   const [copied, setCopied] = useState(false);
   const [idInput, setIdInput] = useState(initialIds.join(', '));
   const [removing, setRemoving] = useState<string | null>(null);
+
+  const initialIdsKey = initialIds.join(',');
+  useEffect(() => {
+    setProductIds(initialIds);
+    setIdInput(initialIds.join(', '));
+    setShareUrl(initialShareUrl);
+    setRemoving(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialIdsKey, initialShareUrl]);
 
   useEffect(() => {
     setShareUrl(buildCompareShareUrl(SITE_URL, region, productIds));
@@ -312,7 +324,13 @@ export default function ProductComparePage({
               className="text-lg font-bold mb-2"
               style={{ color: 'var(--shopli-navy)' }}
             >
-              {rtl ? 'אין מוצרים להשוואה עדיין' : 'No products to compare yet'}
+              {error
+                ? rtl
+                  ? 'הטעינה נכשלה'
+                  : 'Could not load the comparison'
+                : rtl
+                  ? 'אין מוצרים להשוואה עדיין'
+                  : 'No products to compare yet'}
             </h2>
             <p
               className="text-sm max-w-md mx-auto mb-6"
@@ -323,7 +341,7 @@ export default function ProductComparePage({
                 : `Enter at least ${MIN_COMPARE_PRODUCTS} product IDs above, or try a sample:`}
             </p>
             <a
-              href={`/${region}/compare?ids=1005007001,1005007002,1005007005`}
+              href={`/${region}/compare?ids=sample`}
               className="btn-secondary text-sm"
             >
               {rtl ? 'השוואת דוגמה' : 'Load sample comparison'}
@@ -637,7 +655,22 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
   if (!isValidRegion(region)) return { notFound: true };
   const config = getRegion(region);
   const rtl = config.direction === 'rtl';
-  const productIds = parseCompareIds(query.ids as string | undefined);
+  const rawIds = query.ids as string | undefined;
+  let productIds: string[];
+
+  if (rawIds === 'sample') {
+    // "Load sample comparison": resolve to 3 real, currently-live products so
+    // the sample never shows fabricated data or dead affiliate links.
+    try {
+      const { searchAliExpress } = await import('../../../lib/aliexpress');
+      const found = await searchAliExpress('wireless charger', region, 6);
+      productIds = found.slice(0, 3).map((p) => p.id);
+    } catch {
+      productIds = [];
+    }
+  } else {
+    productIds = parseCompareIds(rawIds);
+  }
 
   let products: SearchProduct[] = [];
   let error: string | null = null;
@@ -647,40 +680,27 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
       const { getProductsByIds } = await import('../../../lib/aliexpress');
       products = await getProductsByIds(productIds, region);
 
-      // Demo/fallback when API has no keys or returns empty
-      if (products.length === 0) {
-        const samples = getDemoProducts(region, config.currency);
-        products = productIds
-          .map((id) => samples.find((p) => p.id === id))
-          .filter(Boolean) as SearchProduct[];
-
-        if (products.length === 0 && samples.length >= 2) {
-          // Map requested IDs onto demo catalog by order for sample links
-          products = productIds
-            .map((id, i) => {
-              const base = samples[i % samples.length];
-              return base ? { ...base, id } : null;
-            })
-            .filter(Boolean) as SearchProduct[];
-        }
-      }
-
-      if (products.length < MIN_COMPARE_PRODUCTS && productIds.length >= MIN_COMPARE_PRODUCTS) {
+      // Never fabricate fallback products: an empty/failed API response must
+      // surface as an error, not as fake items with dead affiliate links.
+      if (products.length < MIN_COMPARE_PRODUCTS) {
         error =
           config.lang === 'he'
-            ? 'לא נמצאו מספיק מוצרים. בדקו את מזהי המוצר ונסו שוב.'
-            : 'Could not load enough products. Check the IDs and try again.';
+            ? 'לא הצלחנו לטעון את המוצרים כרגע. בדקו את המזהים או נסו שוב בעוד רגע.'
+            : "We couldn't load those products right now. Check the IDs or try again in a moment.";
+        products = [];
       }
     } catch (e: any) {
-      error = e?.message || 'Failed to load products';
-      const samples = getDemoProducts(region, config.currency);
-      products = productIds
-        .map((id, i) => {
-          const base = samples[i % samples.length];
-          return base ? { ...base, id } : null;
-        })
-        .filter(Boolean) as SearchProduct[];
+      error =
+        config.lang === 'he'
+          ? 'שגיאה בטעינת המוצרים. נסו שוב בעוד רגע.'
+          : 'Failed to load products. Please try again in a moment.';
+      products = [];
     }
+  } else if (rawIds && rawIds !== 'sample') {
+    error =
+      config.lang === 'he'
+        ? 'מזהי המוצר לא תקינים. הזינו 2–4 מזהים מספריים מופרדים בפסיק.'
+        : 'Those product IDs look invalid. Enter 2–4 numeric IDs separated by commas.';
   }
 
   const rows = buildCompareRows(products, config.currencySymbol);
