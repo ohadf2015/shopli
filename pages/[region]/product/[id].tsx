@@ -3,6 +3,8 @@ import Header from '../../../components/Header';
 import SeoHead from '../../../components/SeoHead';
 import Icon from '../../../components/icons';
 import WhatsAppShare from '../../../components/WhatsAppShare';
+import FindSimilar from '../../../components/FindSimilar';
+import { trendingEnabled } from '../../../lib/flags';
 import { getRegion, RegionCode, RegionConfig } from '../../../lib/regions';
 import { getProductsByIds, SearchProduct } from '../../../lib/aliexpress';
 import { getDemoProductById } from '../../../lib/demo-products';
@@ -30,6 +32,7 @@ interface ProductPageProps {
   cons: string[];
   faq: FaqItem[];
   related: Array<{ slug: string; name: string }>;
+  similarEnabled: boolean;
 }
 
 function ratingStars(rating: number): number {
@@ -54,6 +57,7 @@ export default function ProductPage({
   cons,
   faq,
   related,
+  similarEnabled,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const lang = config.lang || 'en';
   const pageUrl = `${SITE_URL}/${region}/product/${productId}`;
@@ -284,6 +288,23 @@ export default function ProductPage({
                 size="md"
               />
             </div>
+
+            {similarEnabled && (
+              <div className="mt-3">
+                <FindSimilar
+                  region={region}
+                  rtl={rtl}
+                  currencySymbol={config.currencySymbol}
+                  source={{
+                    id: product.id,
+                    title: product.title,
+                    price: product.price,
+                    currency: product.currency,
+                    category: product.category || 'general',
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -443,6 +464,7 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
       related: product
         ? relatedCollections(product).map((c) => ({ slug: c.slug, name: collName(c) }))
         : [],
+      similarEnabled: trendingEnabled(),
     },
   };
 };

@@ -4,9 +4,12 @@ import Icon from '../../components/icons';
 import ProductCard from '../../components/ProductCard';
 import WhatsAppShare from '../../components/WhatsAppShare';
 import SeoHead from '../../components/SeoHead';
+import TrendingRail, { TrendingItem } from '../../components/TrendingRail';
 import { getRegion, isValidRegion, RegionCode } from '../../lib/regions';
 import { getAllCollections } from '../../lib/collections';
 import { breadcrumbJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
+import { buildTrending } from '../../lib/trending';
+import { trendingEnabled } from '../../lib/flags';
 import type { RegionConfig } from '../../lib/regions';
 import type { Product } from '../../lib/types';
 
@@ -25,6 +28,7 @@ interface HomePageProps {
   config: RegionConfig;
   groups: CollectionGroup[];
   rtl: boolean;
+  trending: TrendingItem[];
 }
 
 async function fetchCollectionProducts(region: string, keywords: string[], limit = 4): Promise<FlatProduct[]> {
@@ -34,7 +38,7 @@ async function fetchCollectionProducts(region: string, keywords: string[], limit
   } catch { return []; }
 }
 
-export default function HomePage({ region, config, groups, rtl }: HomePageProps) {
+export default function HomePage({ region, config, groups, rtl, trending }: HomePageProps) {
   const t = (text?: Record<string, string> | null) => text?.[config.lang] || text?.en || '';
 
   const heroTitle = rtl ? 'מצאו את הדילים הכי שווים מאליאקספרס' : 'The Best AliExpress Deals, Curated for You';
@@ -95,6 +99,17 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
             </div>
           </div>
         </section>
+
+        {/* TRENDING RAIL — directly below hero */}
+        {trending.length > 0 && (
+          <TrendingRail
+            items={trending}
+            region={region}
+            locale={config.lang}
+            currencySymbol={config.currencySymbol}
+            rtl={rtl}
+          />
+        )}
 
         {/* COLLECTIONS GRID */}
         {groups.filter(g => g.products.length > 0).slice(0, 6).map((group, gi) => (
@@ -374,12 +389,19 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
   // so it's safe to cache at the CDN. Revalidate every 5 min, serve stale up to a day.
   res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
 
+  // Trending rail reuses the already-fetched collection pool — zero extra
+  // AliExpress calls, no render-blocking work for the hero.
+  const trending = trendingEnabled()
+    ? buildTrending(groups.flatMap((g) => g.products), 8)
+    : [];
+
   return {
     props: {
       region,
       config,
       groups: groups || [],
       rtl,
+      trending,
     },
   };
 };

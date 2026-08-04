@@ -28,6 +28,92 @@ function capture(event: string, properties: Record<string, unknown>) {
   }
 }
 
+// ------------------------------------------------------------------
+// Discovery surfaces (trending rail/page, PDP find-similar) — spec: t_a5202144
+// Never send PII, affiliate tokens, or full outbound URLs.
+// ------------------------------------------------------------------
+
+export type TrendingSurface = 'home_rail' | 'trending_page';
+
+/** Fire once per surface per session when the rail/page is ≥50% visible. */
+export function trackTrendingView(props: {
+  region: string;
+  locale: string;
+  surface: TrendingSurface;
+  product_ids: string[];
+  result_count: number;
+  score_version: string;
+}) {
+  const key = `trending_view:${props.surface}:${props.region}`;
+  try {
+    if (typeof window !== 'undefined' && window.sessionStorage?.getItem(key)) return;
+    window.sessionStorage?.setItem(key, '1');
+  } catch {
+    /* storage blocked — still fire once per page load */
+  }
+  capture('trending_view', { ...props, experiment: 'trending_launch_v1', variant: 'rail' });
+}
+
+export function trackTrendingClick(props: {
+  region: string;
+  surface: TrendingSurface;
+  product_id: string;
+  rank: number;
+  trend_score: number;
+  trend_reason: string;
+  click_target: 'pdp' | 'outbound' | 'compare' | 'share';
+  price: number;
+  currency: string;
+  discount_pct: number;
+  score_version: string;
+}) {
+  capture('trending_click', props);
+}
+
+export function trackFindSimilarClick(props: {
+  region: string;
+  surface: 'pdp';
+  source_product_id: string;
+  source_category: string;
+  source_price: number;
+  currency: string;
+  result_count: number;
+  algorithm_version: string;
+}) {
+  capture('find_similar_click', props);
+}
+
+export function trackFindSimilarView(props: {
+  region: string;
+  surface: 'pdp';
+  source_product_id: string;
+  product_ids: string[];
+  result_count: number;
+  algorithm_version: string;
+}) {
+  capture('find_similar_view', props);
+}
+
+export function trackSimilarProductClick(props: {
+  region: string;
+  surface: 'pdp';
+  source_product_id: string;
+  product_id: string;
+  rank: number;
+  similarity_score: number;
+  algorithm_version: string;
+}) {
+  capture('similar_product_click', props);
+}
+
+export function trackFindSimilarError(props: {
+  region: string;
+  source_product_id: string;
+  error: string;
+}) {
+  capture('find_similar_error', props);
+}
+
 const AFFILIATE_HOST_RE = /(^|\.)aliexpress\.com$|(^|\.)s\.click\.aliexpress\.com$/;
 
 function isAffiliateUrl(url: URL): boolean {
