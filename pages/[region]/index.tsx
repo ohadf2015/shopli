@@ -345,7 +345,7 @@ export default function HomePage({ region, config, groups, rtl }: HomePageProps)
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, query, res }) => {
   const region = (query?.region as string) || (params?.region as string) || 'eu';
   // Unknown region slugs (e.g. /deals before it existed) must 404, not silently render the EU homepage as a self-canonical duplicate.
   if (!isValidRegion(region)) return { notFound: true };
@@ -369,6 +369,10 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
       });
     }
   }
+
+  // Homepage content is fully keyed by region (in the URL) — no cookies/auth —
+  // so it's safe to cache at the CDN. Revalidate every 5 min, serve stale up to a day.
+  res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
 
   return {
     props: {
