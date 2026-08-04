@@ -8,7 +8,7 @@ import TrendingRail, { TrendingItem } from '../../components/TrendingRail';
 import { getRegion, isValidRegion, RegionCode } from '../../lib/regions';
 import { getAllCollections } from '../../lib/collections';
 import { breadcrumbJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
-import { buildTrending } from '../../lib/trending';
+import { buildTrending, dedupeAcrossSections } from '../../lib/trending';
 import { trendingEnabled } from '../../lib/flags';
 import type { RegionConfig } from '../../lib/regions';
 import type { Product } from '../../lib/types';
@@ -373,7 +373,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
   const groups: CollectionGroup[] = [];
 
   for (const coll of collections) {
-    const products = await fetchCollectionProducts(region, [coll.keywords[0]], 4);
+    // Fetch double the display count: title-dedupe against the rail and
+    // earlier sections can drop relistings, and sections should still fill.
+    const products = await fetchCollectionProducts(region, [coll.keywords[0]], 8);
     if (products.length > 0) {
       groups.push({
         slug: coll.slug,
@@ -395,11 +397,24 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
     ? buildTrending(groups.flatMap((g) => g.products), 8)
     : [];
 
+  // Same supplier item is often relisted under new IDs, so ID-dedupe alone
+  // lets one title appear in the rail AND a section (or twice across
+  // sections). Rail wins the title; sections are filtered against the rail
+  // plus every earlier section, then trimmed back to 4 cards.
+  const dedupedSections = dedupeAcrossSections<any>(
+    trending.map((entry) => entry.product),
+    groups.map((g) => g.products),
+    (p) => p.title || ''
+  );
+  const finalGroups = groups
+    .map((g, i) => ({ ...g, products: dedupedSections[i].slice(0, 4) as FlatProduct[] }))
+    .filter((g) => g.products.length > 0);
+
   return {
     props: {
       region,
       config,
-      groups: groups || [],
+      groups: finalGroups,
       rtl,
       trending,
     },

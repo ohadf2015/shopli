@@ -238,6 +238,29 @@ export function dedupeByTitle<T>(items: T[], getTitle: (item: T) => string): T[]
   return result;
 }
 
+/**
+ * Dedupe products across page sections so a normalized title appears at
+ * most once on the whole page. `rail` items always win (they are the
+ * highest-scored representative of their title), then each section in
+ * order is filtered against the rail plus every earlier section. The rail
+ * is assumed already title-deduped (rankTrending does this).
+ */
+export function dedupeAcrossSections<T>(
+  rail: T[],
+  sections: T[][],
+  getTitle: (item: T) => string
+): T[][] {
+  const kept: T[] = [...rail];
+  return sections.map((products) => {
+    // Prepending `kept` means any section product that dup-matches a rail
+    // or earlier-section item loses to the first occurrence and is dropped.
+    const combined = dedupeByTitle([...kept, ...products], getTitle);
+    const fresh = combined.slice(kept.length);
+    kept.push(...fresh);
+    return fresh;
+  });
+}
+
 export function rankTrending(
   pool: TrendCandidate[],
   opts: { limit: number; velocity?: VelocityMap }

@@ -6,6 +6,7 @@ import {
   computeTrendScore,
   rankTrending,
   normalizeTitleKey,
+  dedupeAcrossSections,
   trendReasonLabel,
   type TrendCandidate,
 } from '../lib/trending';
@@ -171,4 +172,35 @@ test('scores are deterministic for the same input', () => {
   const first = rankTrending(pool, { limit: 2 }).map((r) => r.score);
   const second = rankTrending(pool, { limit: 2 }).map((r) => r.score);
   assert.deepEqual(first, second);
+});
+
+test('dedupeAcrossSections drops rail titles from sections and dupes across sections', () => {
+  const rail = [cand({ id: 'r1', title: 'Soowee 80cm Long Synthetic Hair White Purple Cosplay Wigs' })];
+  const sectionA = [
+    cand({ id: 'a1', title: 'Soowee 80 CM Long Synthetic Hair White Purple Cosplay Wigs' }), // rail dupe
+    cand({ id: 'a2', title: '10pcs Double Ultra Soft Bamboo Charcoal Nano Toothbrushes' }),
+    cand({ id: 'a3', title: '10pcs Double Ultra Soft Bamboo Charcoal Nano Toothbrushes Set' }), // in-section near-dup (tacked-on suffix)
+    cand({ id: 'a4', title: '5pcs Matcha Whisk Set Bamboo Scoop' }),
+  ];
+  const sectionB = [
+    cand({ id: 'b1', title: '10pcs Double Ultra Soft Bamboo Charcoal Nano Toothbrushes' }), // cross-section dupe
+    cand({ id: 'b2', title: 'Multi-Purpose Round Furniture Risers' }),
+  ];
+  const [outA, outB] = dedupeAcrossSections(rail, [sectionA, sectionB], (p) => p.title);
+  assert.deepEqual(outA.map((p) => p.id), ['a2', 'a4']);
+  assert.deepEqual(outB.map((p) => p.id), ['b2']);
+  // no normalized-title appears twice across rail + all sections
+  const all = [...rail, ...outA, ...outB].map((p) => normalizeTitleKey(p.title));
+  assert.equal(new Set(all).size, all.length);
+});
+
+test('dedupeAcrossSections keeps genuinely distinct titles and handles empty input', () => {
+  const rail = [cand({ id: 'r1', title: 'Wireless Bluetooth Earbuds Pro' })];
+  const sections = [
+    [cand({ id: 's1', title: 'Wireless Bluetooth Speaker Pro' })],
+    [],
+  ];
+  const [outA, outB] = dedupeAcrossSections(rail, sections, (p) => p.title);
+  assert.deepEqual(outA.map((p) => p.id), ['s1']);
+  assert.deepEqual(outB, []);
 });
