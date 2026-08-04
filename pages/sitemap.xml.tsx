@@ -104,6 +104,14 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       priority: 1.0,
       lastmod: today,
     });
+    // Trending hub — updated daily, high-intent discovery page
+    urls.push({
+      loc: `${SITE_URL}/${region}/trending`,
+      changefreq: 'daily',
+      priority: 0.9,
+      lastmod: today,
+      images: [getCollectionOgImage('trending', 'Trending Products 2026', 'en')],
+    });
     // Search landing (noindex when empty; still useful for discovery of path)
     urls.push({
       loc: `${SITE_URL}/${region}/search`,

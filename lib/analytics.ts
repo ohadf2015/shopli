@@ -61,7 +61,7 @@ export function installClickTracking(): () => void {
       const card = anchor.closest('[data-product-id], .product-card') as HTMLElement | null;
       const attr = (el: HTMLElement | null, name: string) =>
         el?.getAttribute(name) || anchor.getAttribute(name) || undefined;
-      capture('affiliate_click', {
+      const baseProps = {
         product: attr(card, 'data-product-title'),
         product_id: attr(card, 'data-product-id'),
         category: attr(card, 'data-category'),
@@ -69,7 +69,11 @@ export function installClickTracking(): () => void {
         currency: attr(card, 'data-currency'),
         page,
         url: anchor.href,
-      });
+      };
+      capture('affiliate_click', baseProps);
+      if (card?.getAttribute('data-trending-hub') === 'true') {
+        capture('trending_hub_click', baseProps);
+      }
       return;
     }
 

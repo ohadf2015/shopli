@@ -32,6 +32,8 @@ interface ProductCardProps {
   /** Category/collection name — attached to affiliate_click analytics events */
   category?: string;
   className?: string;
+  /** Marks this card as part of the trending hub for analytics */
+  trendingHub?: boolean;
 }
 
 function formatSold(n: number, rtl: boolean): string {
@@ -63,6 +65,7 @@ export default function ProductCard({
   region,
   category,
   className = '',
+  trendingHub = false,
 }: ProductCardProps) {
   const [saved, setSaved] = useState(false);
   useEffect(() => {
@@ -117,6 +120,7 @@ export default function ProductCard({
       data-price={price.toFixed(2)}
       data-currency={currencySymbol}
       data-category={category}
+      data-trending-hub={trendingHub || undefined}
     >
       {/* Main link covering the entire card */}
       <a

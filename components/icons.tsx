@@ -4,7 +4,7 @@ type IconName = 'search' | 'cart' | 'star' | 'truck' | 'shield' | 'globe' | 'che
   | 'close' | 'menu' | 'arrow-right' | 'arrow-left' | 'telegram' | 'mail' | 'fire' | 'check' | 'tag' | 'clock' | 'discount'
   | 'tech' | 'electronics' | 'home' | 'sports' | 'fashion' | 'auto' | 'outdoor' | 'kids'
   | 'il-flag' | 'eu-flag' | 'us-flag' | 'uk-flag' | 'fr-flag' | 'de-flag' | 'es-flag' | 'it-flag' | 'ru-flag' | 'language'
-  | 'mask' | 'run' | 'monitor' | 'bulb' | 'chef' | 'plane' | 'tent' | 'paw' | 'car' | 'lamp' | 'percent' | 'package' | 'heart' | 'thumbs-up' | 'flash' | 'sun' | 'moon' | 'grid' | 'list' | 'share' | 'external' | 'camera' | 'info';
+  | 'mask' | 'run' | 'monitor' | 'bulb' | 'chef' | 'plane' | 'tent' | 'paw' | 'car' | 'lamp' | 'percent' | 'package' | 'heart' | 'thumbs-up' | 'flash' | 'sun' | 'moon' | 'grid' | 'list' | 'share' | 'external' | 'camera' | 'info' | 'trending-up';
 
 const SVG = ({ sz = 20, children, viewBox = "0 0 24 24", ...attrs }: { sz?: number; viewBox?: string; children: React.ReactNode; [key: string]: any }) =>
   <svg width={sz} height={sz} viewBox={viewBox} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...attrs}>{children}</svg>;
@@ -73,6 +73,7 @@ const icons: Record<IconName, (p: { size?: number }) => React.ReactNode> = {
   external: ({ size = 16 }) => <SVG sz={size}><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></SVG>,
   camera: ({ size = 20 }) => <SVG sz={size}><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></SVG>,
   info: ({ size = 20 }) => <SVG sz={size}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></SVG>,
+  'trending-up': ({ size = 20 }) => <SVG sz={size}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></SVG>,
 };
 
 export type { IconName };

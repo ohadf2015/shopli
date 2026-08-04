@@ -124,6 +124,14 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             {rtl ? 'בית' : 'Home'}
           </Link>
 
+          <Link
+            href={`/${currentRegion}/trending`}
+            className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors"
+            style={{ color: 'var(--shopli-navy)' }}
+          >
+            {rtl ? 'טרנדים' : 'Trending'}
+          </Link>
+
           {/* Categories dropdown */}
           <div className="relative" ref={catRef}>
             <button
@@ -307,6 +315,13 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             onClick={() => setMenuOpen(false)}
           >
             {rtl ? 'בית' : 'Home'}
+          </Link>
+          <Link
+            href={`/${currentRegion}/trending`}
+            className="block px-3 py-3 rounded-lg font-medium text-sm hover:bg-gray-100 min-h-[44px]"
+            onClick={() => setMenuOpen(false)}
+          >
+            {rtl ? 'טרנדים' : 'Trending'}
           </Link>
           <Link
             href={`/${currentRegion}/compare`}
