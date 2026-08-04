@@ -5,6 +5,7 @@ import {
   discountPct,
   computeTrendScore,
   rankTrending,
+  normalizeTitleKey,
   trendReasonLabel,
   type TrendCandidate,
 } from '../lib/trending';
@@ -87,10 +88,10 @@ test('velocity data switches to the full weighted formula', () => {
 
 test('rankTrending sorts by score desc, dedupes, assigns rank, caps limit', () => {
   const pool = [
-    cand({ id: 'low', discount: '5%', volume: 10, recentTrades: 0 }),
-    cand({ id: 'high', discount: '80%', volume: 9000, recentTrades: 800 }),
-    cand({ id: 'mid', discount: '40%', volume: 100, recentTrades: 10 }),
-    cand({ id: 'high', discount: '80%', volume: 9000, recentTrades: 800 }), // dupe
+    cand({ id: 'low', title: 'Wireless Earbuds Pro', discount: '5%', volume: 10, recentTrades: 0 }),
+    cand({ id: 'high', title: 'Smart LED Strip Lights', discount: '80%', volume: 9000, recentTrades: 800 }),
+    cand({ id: 'mid', title: 'Magnetic Phone Mount', discount: '40%', volume: 100, recentTrades: 10 }),
+    cand({ id: 'high', title: 'Smart LED Strip Lights', discount: '80%', volume: 9000, recentTrades: 800 }), // dupe
   ];
   const ranked = rankTrending(pool, { limit: 10 });
   assert.equal(ranked.length, 3);
@@ -104,6 +105,55 @@ test('rankTrending sorts by score desc, dedupes, assigns rank, caps limit', () =
 
 test('rankTrending flags products with an empty pool gracefully', () => {
   assert.deepEqual(rankTrending([], { limit: 8 }), []);
+});
+
+test('normalizeTitleKey folds case, punctuation, units, and token order', () => {
+  const a = 'Soowee 80cm Long Synthetic Hair White Purple Cosplay Wigs';
+  const b = 'Soowee 80 CM Long Synthetic Hair, White Purple Cosplay Wigs!';
+  assert.equal(normalizeTitleKey(a), normalizeTitleKey(b));
+  // numbers survive so different models stay distinct
+  assert.notEqual(normalizeTitleKey('iPhone 14 case'), normalizeTitleKey('iPhone 15 case'));
+  assert.equal(normalizeTitleKey('!!!'), '');
+});
+
+test('rankTrending dedupes same-title products with different IDs, keeps best score', () => {
+  const title = 'Earphone Clip Wireless Bluetooth Headphone Bone Conduction';
+  const pool = [
+    cand({ id: '1005006888776365', title, discount: '10%', volume: 35100, recentTrades: 100 }),
+    cand({ id: '1005007345320109', title, discount: '40%', volume: 35100, recentTrades: 100 }),
+    cand({ id: 'other', title: 'Oversized Colorful Sports Sunglasses UV400', discount: '5%' }),
+  ];
+  const ranked = rankTrending(pool, { limit: 10 });
+  assert.equal(ranked.length, 2);
+  // higher-scored duplicate wins
+  assert.equal(ranked[0].product.id, '1005007345320109');
+});
+
+test('rankTrending dedupes near-dup titles (unit/punctuation variants, triple listing)', () => {
+  const pool = [
+    cand({ id: 's1', title: 'Oversized Colorful Sports Sunglasses' }),
+    cand({ id: 's2', title: 'Oversized Colorful Sports Sunglasses UV400' }),
+    cand({ id: 's3', title: 'oversized colorful sports sunglasses!' }),
+    cand({ id: 'w1', title: 'Soowee 80cm Long Synthetic Hair White Purple Cosplay Wigs' }),
+    cand({ id: 'w2', title: 'Soowee 80 CM Long Synthetic Hair White Purple Cosplay Wigs' }),
+  ];
+  const ranked = rankTrending(pool, { limit: 10 });
+  assert.equal(ranked.length, 2, '3 sunglass dupes -> 1, 2 wig dupes -> 1');
+  // equal scores -> id asc, so the first of each dupe cluster wins
+  assert.deepEqual(ranked.map((r) => r.product.id), ['s1', 'w1']);
+  // no two cards share a normalized title
+  const keys = ranked.map((r) => normalizeTitleKey(r.product.title));
+  assert.equal(new Set(keys).size, keys.length);
+});
+
+test('rankTrending keeps distinct products that share generic words', () => {
+  const pool = [
+    cand({ id: 'a', title: 'Wireless Bluetooth Earbuds Pro' }),
+    cand({ id: 'b', title: 'Wireless Bluetooth Speaker Pro' }),
+    cand({ id: 'c', title: 'Wireless Bluetooth Earbuds Max' }),
+  ];
+  const ranked = rankTrending(pool, { limit: 10 });
+  assert.equal(ranked.length, 3);
 });
 
 test('trendReasonLabel returns localized human reasons', () => {

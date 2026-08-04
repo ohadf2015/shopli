@@ -13,6 +13,7 @@ import {
   SITE_URL,
 } from '../../lib/seo';
 import { listingAggregateFields } from '../../lib/pdp';
+import { dedupeByTitle } from '../../lib/trending';
 import type { RegionConfig } from '../../lib/regions';
 
 interface TrendingProduct extends SearchProduct {
@@ -109,8 +110,10 @@ async function fetchTrendingProducts(region: string, limit = 30): Promise<Trendi
     })
   );
 
-  all.sort((a, b) => b.trendScore - a.trendScore);
-  return all.slice(0, limit);
+  // Score desc, id asc for determinism, then drop near-identical titles
+  // (same item relisted under a new supplier ID) keeping the best-scored.
+  all.sort((a, b) => b.trendScore - a.trendScore || (a.id < b.id ? -1 : 1));
+  return dedupeByTitle(all, (p) => p.title || '').slice(0, limit);
 }
 
 export default function TrendingPage({ region, config, products, rtl, generatedAt }: TrendingPageProps) {

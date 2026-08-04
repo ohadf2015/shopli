@@ -180,6 +180,64 @@ export function computeTrendScore(
   return { score: Math.round(score * 10) / 10, reason, components, coldStart };
 }
 
+const TITLE_NOISE = new Set([
+  'cm', 'mm', 'm', 'km', 'kg', 'g', 'mg', 'ml', 'l', 'w', 'kw', 'v', 'a',
+  'mah', 'hz', 'inch', 'in', 'ft', 'pcs', 'pc', 'pack', 'size', 'new',
+]);
+
+/**
+ * Normalize a product title for near-duplicate detection across supplier
+ * relistings of the same item: lowercase, strip punctuation, fold
+ * number+unit tokens ("80cm" -> "80"), drop standalone units, then sort
+ * unique tokens so reordered re-listings collapse to one key. Numbers are
+ * kept so genuinely different models ("iPhone 14 case" vs "iPhone 15
+ * case") stay distinct.
+ */
+export function normalizeTitleKey(title: string): string {
+  const tokens = title
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((t) => t.replace(/^(\d+(?:\.\d+)?)(cm|mm|km|kg|mg|ml|kw|mah|hz|inch|in|ft|pcs|pc|pack|g|m|l|w|v|a)$/, '$1'))
+    .filter((t) => !TITLE_NOISE.has(t));
+  return Array.from(new Set(tokens)).sort().join(' ');
+}
+
+/**
+ * Drop near-duplicate items by normalized title. Two items are dupes when
+ * their title token sets are equal, or when one is a subset of the other
+ * and the smaller set has >= 4 tokens (catches relistings with a tacked-on
+ * "UV400"/"Hot" suffix without collapsing genuinely different short-titled
+ * products). Items are assumed pre-sorted best-first: the first occurrence
+ * wins. Items with an empty normalized title are always kept (can't judge).
+ */
+export function dedupeByTitle<T>(items: T[], getTitle: (item: T) => string): T[] {
+  const keptKeys: Array<Set<string>> = [];
+  const result: T[] = [];
+  for (const item of items) {
+    const key = normalizeTitleKey(getTitle(item));
+    if (!key) {
+      result.push(item);
+      continue;
+    }
+    const tokens = new Set(key.split(' '));
+    const isDup = keptKeys.some((prev) => {
+      const [small, big] = prev.size <= tokens.size ? [prev, tokens] : [tokens, prev];
+      if (small.size < 4 && prev.size !== tokens.size) return false;
+      for (const t of small) {
+        if (!big.has(t)) return false;
+      }
+      return true;
+    });
+    if (!isDup) {
+      keptKeys.push(tokens);
+      result.push(item);
+    }
+  }
+  return result;
+}
+
 export function rankTrending(
   pool: TrendCandidate[],
   opts: { limit: number; velocity?: VelocityMap }
@@ -199,7 +257,11 @@ export function rankTrending(
   // Stable, deterministic ordering: score desc, then id asc.
   scored.sort((a, b) => b.score - a.score || (a.product.id < b.product.id ? -1 : 1));
 
-  return scored.slice(0, Math.max(0, opts.limit)).map((entry, i) => ({
+  // Dedupe near-identical titles (same item relisted under a new ID).
+  // Sorted desc, so the first occurrence kept is the highest-scored dupe.
+  const deduped = dedupeByTitle(scored, (entry) => entry.product.title);
+
+  return deduped.slice(0, Math.max(0, opts.limit)).map((entry, i) => ({
     ...entry,
     rank: i + 1,
   }));
