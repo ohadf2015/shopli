@@ -5,25 +5,30 @@ import { useEffect } from 'react';
 import '../styles/globals.css';
 import { organizationJsonLd, websiteJsonLd } from '../lib/seo';
 import { installClickTracking } from '../lib/analytics';
+import { getRegion } from '../lib/regions';
 
 export default function ShopliApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
-  const config = (pageProps as any)?.regionConfig;
 
   // Revenue analytics: one delegated listener fires affiliate_click for every
   // AliExpress CTA (and outbound_click for Telegram/WhatsApp) on every page.
   useEffect(() => installClickTracking(), []);
 
-  // Keep the html lang/dir in sync on client-side navigations.
+  // Keep the html lang/dir in sync after hydration and on client-side
+  // navigations. Derive the region from the URL (not pageProps) so pages that
+  // don't forward their region config can't silently flip /il back to LTR.
   useEffect(() => {
-    if (config?.direction === 'rtl') {
-      document.documentElement.dir = 'rtl';
-      document.documentElement.lang = 'he';
-    } else {
-      document.documentElement.dir = 'ltr';
-      document.documentElement.lang = config?.lang || 'en';
+    const q = router.query?.region;
+    let code = Array.isArray(q) ? q[0] : q;
+    if (!code) {
+      const m = router.asPath?.match(/^\/([a-z]{2})(?:\/|$)/);
+      code = m?.[1];
     }
-  }, [config]);
+    // getRegion falls back to the EU (en/ltr) config for unknown/absent codes.
+    const config = getRegion(code || 'eu');
+    document.documentElement.dir = config.direction;
+    document.documentElement.lang = config.lang;
+  }, [router.asPath, router.query]);
 
   const orgLd = organizationJsonLd();
   const webLd = websiteJsonLd();
