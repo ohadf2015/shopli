@@ -427,6 +427,10 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
     return { notFound: true };
   }
 
+  // PDPs were served with the GSSP default no-store — cache at the edge (10m, SWR 1h)
+  // so repeat views don't re-hit the AliExpress API. Prices can lag by up to ~10m, acceptable.
+  context.res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=3600');
+
   let product: SearchProduct | null = null;
 
   try {

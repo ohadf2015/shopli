@@ -313,7 +313,7 @@ export default function TrendingPage({ region, config, products, rtl, generatedA
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, query, res }) => {
   const region = (query?.region as string) || (params?.region as string) || 'eu';
   if (!isValidRegion(region)) return { notFound: true };
   const config = getRegion(region);
@@ -321,6 +321,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
 
   const products = await fetchTrendingProducts(region, 30);
   const generatedAt = new Date().toISOString().split('T')[0];
+
+  // SEO landing page updated daily — let the edge cache absorb renders (1h, SWR 24h).
+  res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
 
   return {
     props: {
