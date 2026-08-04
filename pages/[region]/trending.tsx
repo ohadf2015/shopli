@@ -291,6 +291,7 @@ export default function TrendingPage({ region, config, products, rtl, generatedA
                   showShare
                   className="h-full"
                   trendingHub={true}
+                  directAffiliate={true}
                 />
               </div>
             ))}

@@ -34,6 +34,8 @@ interface ProductCardProps {
   className?: string;
   /** Marks this card as part of the trending hub for analytics */
   trendingHub?: boolean;
+  /** When true, link the whole card directly to the affiliate URL (outbound) instead of the on-site PDP */
+  directAffiliate?: boolean;
 }
 
 function formatSold(n: number, rtl: boolean): string {
@@ -66,6 +68,7 @@ export default function ProductCard({
   category,
   className = '',
   trendingHub = false,
+  directAffiliate = false,
 }: ProductCardProps) {
   const [saved, setSaved] = useState(false);
   useEffect(() => {
@@ -80,7 +83,7 @@ export default function ProductCard({
       ? product.originalPrice
       : null;
 
-  const productPageUrl = region && product.id
+  const productPageUrl = region && product.id && !directAffiliate
     ? `/${region}/product/${encodeURIComponent(product.id)}`
     : undefined;
   const externalHref = product.affiliateLink || fallbackUrl || '#';
