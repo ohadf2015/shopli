@@ -215,9 +215,9 @@ ${urls.map(buildUrlEntry).join('\n')}
 </urlset>`;
 
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-  // Fresh sitemap: revalidate hourly, serve stale for a day
+  // Fresh sitemap: revalidate hourly, serve stale for a day.
+  // Do not send X-Robots-Tag here: sitemaps must be trusted by crawlers.
   res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
-  res.setHeader('X-Robots-Tag', 'noindex');
   res.write(xml);
   res.end();
 
