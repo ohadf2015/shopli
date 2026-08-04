@@ -30,6 +30,42 @@ function signParams(params: Record<string, string>, secret: string): string {
   return crypto.createHash('md5').update(secret + keys.map(k => k + params[k]).join('') + secret, 'utf8').digest('hex').toUpperCase();
 }
 
+/**
+ * SPEC — Affiliate tracking on every outbound AliExpress link (revenue bug fix)
+ *
+ * Goal: every outbound AliExpress link served by shopli carries the affiliate
+ * tracking param (aff_fcid). Live PDPs were serving raw item URLs
+ * (https://www.aliexpress.com/item/<id>.html) earning $0 commission.
+ *
+ * Approach: centralize link generation here (lib/aliexpress.ts) — chosen over
+ * lib/api.ts because demo-products.ts and the PDP page already import from
+ * this module, keeping the diff minimal. lib/api.ts drops its private
+ * (and partially dead) generateAffiliateLink and uses this one.
+ *
+ * Files changed:
+ *   - lib/aliexpress.ts            (this spec + the two helpers below)
+ *   - lib/api.ts                   (use generateAffiliateLink, remove dead dup)
+ *   - lib/demo-products.ts         (use generateAffiliateLink instead of raw URL)
+ *   - pages/[region]/product/[id].tsx (main CTA href via ensureTrackedLink)
+ *   - pages/[region]/mood/[mood].tsx  (product card href via ensureTrackedLink)
+ *   - tests/demo-products.test.ts  (aff_fcid coverage + ensureTrackedLink cases)
+ *
+ * Acceptance: every demo-product affiliateLink contains aff_fcid; PDP + mood
+ * outbound hrefs pass through ensureTrackedLink; tsc --noEmit clean; npm test green.
+ */
+const AFF_TRACKING_ID = process.env.NEXT_PUBLIC_ALIEXPRESS_TRACKING_ID || 'shopli';
+
+export function generateAffiliateLink(productId: string): string {
+  return `https://www.aliexpress.com/item/${productId}.html?aff_fcid=${AFF_TRACKING_ID}`;
+}
+
+export function ensureTrackedLink(url: string): string {
+  if (!url || !url.includes('aliexpress.com/item/') || url.includes('aff_fcid=')) {
+    return url;
+  }
+  return `${url}${url.includes('?') ? '&' : '?'}aff_fcid=${AFF_TRACKING_ID}`;
+}
+
 export interface SearchProduct {
   id: string;
   sku: string;

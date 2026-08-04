@@ -1,5 +1,6 @@
 import { Product } from './types';
 import { getRegion, RegionCode } from './regions';
+import { generateAffiliateLink } from './aliexpress';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://shopli-neon.vercel.app';
 
@@ -60,7 +61,7 @@ function mapProducts(products: any[], region: RegionCode): Product[] {
     currencySymbol: regionConfig.currencySymbol,
     originalPrice: p.price?.amount,
     imageUrl: p.imageUrl || '',
-    affiliateLink: p.affiliateLink || generateAffiliateLink(p.productId, region),
+    affiliateLink: p.affiliateLink || generateAffiliateLink(p.productId),
     commissionRate: p.commissionRate || 0,
     rating: p.rating || 0,
     reviewCount: p.reviewCount || 0,
@@ -73,12 +74,6 @@ function mapProducts(products: any[], region: RegionCode): Product[] {
     shopName: p.shopName,
     freeShipping: true,
   }));
-}
-
-function generateAffiliateLink(productId: string, region: RegionCode): string {
-  const trackingId = process.env.NEXT_PUBLIC_ALIEXPRESS_TRACKING_ID || 'shopli';
-  const tid = process.env.NEXT_PUBLIC_ALIEXPRESS_TRACKING_ID || 'shopli';
-  return `https://www.aliexpress.com/item/${productId}.html?aff_fcid=${tid}`;
 }
 
 // Fallback products when API is down — realistic examples

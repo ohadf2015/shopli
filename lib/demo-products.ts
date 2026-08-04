@@ -1,4 +1,5 @@
 import type { SearchProduct } from './aliexpress';
+import { generateAffiliateLink } from './aliexpress';
 
 /**
  * Single source of truth for the static demo catalog.
@@ -107,7 +108,7 @@ function toSearchProduct(def: DemoDef, region: string, currency: string): Search
     currency,
     imageUrl: '',
     images: [],
-    affiliateLink: `https://www.aliexpress.com/item/${def.id}.html`,
+    affiliateLink: generateAffiliateLink(def.id),
     rating: def.rating,
     reviewCount: def.reviewCount,
     volume: def.volume,
