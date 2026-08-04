@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { ensureTrackedLink } from '../lib/api';
 import {
   DEMO_PRODUCT_IDS,
   getDemoProducts,
@@ -33,4 +34,35 @@ test('getDemoProductById round-trips every catalog id and rejects unknown ids', 
     assert.ok(getDemoProductById(id, 'eu', 'EUR'), `missing demo product ${id}`);
   }
   assert.equal(getDemoProductById('nope', 'eu', 'EUR'), null);
+});
+
+test('every demo product affiliateLink contains the affiliate tracking param', () => {
+  for (const region of ['il', 'eu', 'us']) {
+    for (const p of getDemoProducts(region, 'USD')) {
+      assert.ok(
+        p.affiliateLink.includes('aff_fcid='),
+        `affiliateLink for ${p.id} in ${region} is missing aff_fcid: ${p.affiliateLink}`
+      );
+    }
+  }
+});
+
+test('ensureTrackedLink appends aff_fcid only to raw AliExpress item URLs', () => {
+  const raw = 'https://www.aliexpress.com/item/1005007002.html';
+  const tracked = ensureTrackedLink(raw);
+  assert.ok(tracked.includes('aff_fcid='), `expected aff_fcid in ${tracked}`);
+  assert.ok(tracked.startsWith(raw), `expected ${tracked} to start with ${raw}`);
+});
+
+test('ensureTrackedLink leaves already-tracked AliExpress URLs unchanged', () => {
+  const already = 'https://www.aliexpress.com/item/1005007002.html?aff_fcid=shopli';
+  assert.equal(ensureTrackedLink(already), already);
+});
+
+test('ensureTrackedLink leaves non-AliExpress and placeholder URLs unchanged', () => {
+  assert.equal(ensureTrackedLink('#'), '#');
+  assert.equal(
+    ensureTrackedLink('https://example.com/product/123'),
+    'https://example.com/product/123'
+  );
 });

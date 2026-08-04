@@ -8,6 +8,7 @@ import { trendingEnabled } from '../../../lib/flags';
 import { getRegion, RegionCode, RegionConfig } from '../../../lib/regions';
 import { getProductsByIds, SearchProduct } from '../../../lib/aliexpress';
 import { getDemoProductById } from '../../../lib/demo-products';
+import { ensureTrackedLink } from '../../../lib/api';
 import {
   buildPdpDescription,
   buildPdpSpecs,
@@ -268,7 +269,7 @@ export default function ProductPage({
 
             <div className="mt-auto flex flex-col sm:flex-row gap-3">
               <a
-                href={product.affiliateLink}
+                href={ensureTrackedLink(product.affiliateLink)}
                 target="_blank"
                 rel="nofollow sponsored noopener noreferrer"
                 className="btn-primary text-center text-base"

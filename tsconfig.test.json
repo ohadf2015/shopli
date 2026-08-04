@@ -10,8 +10,8 @@
     "incremental": false,
     "sourceMap": false,
     "declaration": false,
-    "types": ["node"]
+    "types": ["node", "next"]
   },
-  "include": ["tests/**/*.ts", "lib/regions.ts", "lib/deals.ts", "lib/seo.ts", "lib/trending.ts", "lib/similar.ts"],
+  "include": ["tests/**/*.ts", "lib/regions.ts", "lib/types.ts", "lib/deals.ts", "lib/seo.ts", "lib/trending.ts", "lib/similar.ts", "lib/api.ts", "lib/aliexpress.ts", "lib/demo-products.ts"],
   "exclude": ["node_modules", ".test-build"]
 }

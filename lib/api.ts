@@ -1,3 +1,31 @@
+/**
+ * SPEC: Affiliate link tracking fix
+ * Goal: Ensure every outbound AliExpress product link carries our affiliate
+ *   tracking parameter (aff_fcid) so clicks are attributed and earn commission.
+ * Approach:
+ *   - Export a single generateAffiliateLink(productId) helper that builds
+ *     https://www.aliexpress.com/item/{productId}.html?aff_fcid={...}.
+ *   - Export ensureTrackedLink(url) that idempotently appends the same param
+ *     only to raw aliexpress.com/item URLs that are missing it; all other URLs
+ *     ('#', non-AliExpress, already-tracked) are returned unchanged.
+ *   - Use the helper in lib/demo-products.ts for the static demo catalog.
+ *   - Apply ensureTrackedLink at the two outbound render boundaries:
+ *     pages/[region]/product/[id].tsx (main CTA) and pages/[region]/mood/[mood].tsx
+ *     (product card href).
+ * Files to change:
+ *   - lib/api.ts (spec, helper, remove duplicated dead variable)
+ *   - lib/demo-products.ts (use helper)
+ *   - pages/[region]/product/[id].tsx (ensureTrackedLink on CTA)
+ *   - pages/[region]/mood/[mood].tsx (ensureTrackedLink on card href)
+ *   - tests/demo-products.test.ts (new assertions + ensureTrackedLink tests)
+ *   - tsconfig.test.json (include helper modules so tests compile)
+ * Acceptance criteria:
+ *   - Every demo product affiliateLink contains 'aff_fcid='.
+ *   - ensureTrackedLink(raw AE item URL) appends aff_fcid.
+ *   - ensureTrackedLink('#', non-AE URL, already-tracked URL) returns unchanged.
+ *   - npx tsc --noEmit and npm test both pass.
+ */
+
 import { Product } from './types';
 import { getRegion, RegionCode } from './regions';
 
@@ -60,7 +88,7 @@ function mapProducts(products: any[], region: RegionCode): Product[] {
     currencySymbol: regionConfig.currencySymbol,
     originalPrice: p.price?.amount,
     imageUrl: p.imageUrl || '',
-    affiliateLink: p.affiliateLink || generateAffiliateLink(p.productId, region),
+    affiliateLink: p.affiliateLink || generateAffiliateLink(p.productId),
     commissionRate: p.commissionRate || 0,
     rating: p.rating || 0,
     reviewCount: p.reviewCount || 0,
@@ -75,10 +103,19 @@ function mapProducts(products: any[], region: RegionCode): Product[] {
   }));
 }
 
-function generateAffiliateLink(productId: string, region: RegionCode): string {
+export function generateAffiliateLink(productId: string): string {
   const trackingId = process.env.NEXT_PUBLIC_ALIEXPRESS_TRACKING_ID || 'shopli';
-  const tid = process.env.NEXT_PUBLIC_ALIEXPRESS_TRACKING_ID || 'shopli';
-  return `https://www.aliexpress.com/item/${productId}.html?aff_fcid=${tid}`;
+  return `https://www.aliexpress.com/item/${productId}.html?aff_fcid=${trackingId}`;
+}
+
+const AE_ITEM_URL_RE = /^https?:\/\/(?:www\.)?aliexpress\.com\/item\//i;
+
+export function ensureTrackedLink(url: string): string {
+  if (!url || url === '#' || !AE_ITEM_URL_RE.test(url)) return url;
+  if (url.includes('aff_fcid=')) return url;
+  const trackingId = process.env.NEXT_PUBLIC_ALIEXPRESS_TRACKING_ID || 'shopli';
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}aff_fcid=${trackingId}`;
 }
 
 // Fallback products when API is down — realistic examples
