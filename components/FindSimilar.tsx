@@ -46,7 +46,7 @@ export default function FindSimilar({ region, rtl, currencySymbol, source }: Fin
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<SimilarEntry[] | null>(null);
-  const [hidden, setHidden] = useState(false); // hide button permanently on error
+  const [error, setError] = useState(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const closeRef = useRef<HTMLButtonElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -58,10 +58,14 @@ export default function FindSimilar({ region, rtl, currencySymbol, source }: Fin
 
   const openDrawer = async () => {
     setLoading(true);
+    setError(false);
     try {
       const res = await fetch(
         `/api/products/similar?region=${encodeURIComponent(region)}&id=${encodeURIComponent(source.id)}`
       );
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
       const data = await res.json();
       if (!data.success || !Array.isArray(data.results)) {
         throw new Error(data.error || 'bad response');
@@ -79,9 +83,8 @@ export default function FindSimilar({ region, rtl, currencySymbol, source }: Fin
         algorithm_version: data.algorithmVersion || SIMILAR_ALGO_VERSION,
       });
     } catch (err: any) {
-      // Spec: on error, hide the button silently.
       trackFindSimilarError({ region, source_product_id: source.id, error: String(err?.message || err) });
-      setHidden(true);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -137,33 +140,56 @@ export default function FindSimilar({ region, rtl, currencySymbol, source }: Fin
     };
   }, [open, close]);
 
-  if (hidden) return null;
-
   return (
     <>
-      <button
-        ref={triggerRef}
-        type="button"
-        onClick={openDrawer}
-        disabled={loading}
-        className="inline-flex items-center justify-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl border transition-colors"
-        style={{
-          borderColor: 'var(--shopli-teal)',
-          color: 'var(--shopli-teal)',
-          background: 'rgba(20,184,166,0.06)',
-          opacity: loading ? 0.6 : 1,
-        }}
-        aria-haspopup="dialog"
-      >
-        <Icon name="search" size={15} />
-        {loading
-          ? rtl
-            ? 'מחפש...'
-            : 'Searching...'
-          : rtl
-            ? 'מצאו מוצרים דומים'
-            : 'Find similar picks'}
-      </button>
+      <div className="flex flex-col items-start gap-2">
+        <button
+          ref={triggerRef}
+          type="button"
+          onClick={openDrawer}
+          disabled={loading}
+          className="inline-flex items-center justify-center gap-2 text-sm font-bold px-4 py-2.5 rounded-xl border transition-colors"
+          style={{
+            borderColor: 'var(--shopli-teal)',
+            color: 'var(--shopli-teal)',
+            background: 'rgba(20,184,166,0.06)',
+            opacity: loading ? 0.6 : 1,
+          }}
+          aria-haspopup="dialog"
+        >
+          <Icon name="search" size={15} />
+          {loading
+            ? rtl
+              ? 'מחפש...'
+              : 'Searching...'
+            : rtl
+              ? 'מצאו מוצרים דומים'
+              : 'Find similar picks'}
+        </button>
+
+        {error && (
+          <div
+            role="alert"
+            className="flex items-center gap-2 text-xs rounded-lg border px-3 py-2"
+            style={{
+              borderColor: 'rgba(248,113,113,0.4)',
+              color: '#fca5a5',
+              background: 'rgba(248,113,113,0.08)',
+            }}
+          >
+            <span>{rtl ? 'לא הצלחנו לטעון מוצרים דומים' : "Couldn't load similar picks"}</span>
+            <button
+              type="button"
+              onClick={openDrawer}
+              disabled={loading}
+              className="font-bold underline underline-offset-2"
+              style={{ color: '#fca5a5' }}
+            >
+              {rtl ? 'נסו שוב' : 'Retry'}
+            </button>
+          </div>
+        )}
+      </div>
 
       {open && (
         <>
