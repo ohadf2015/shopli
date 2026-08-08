@@ -68,7 +68,7 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
       />
       <Header currentRegion={region} dir={config?.direction} />
 
-      <main className="pb-16" style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}>
+      <main className="pb-16" style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}>
         {/* HERO */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-8 md:pt-32">
           <div className="flex items-center gap-2 text-xs mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
@@ -239,7 +239,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
 
     // Mood boards are curated + slow to build (several AliExpress searches each).
     // Without this every crawl and every visitor pays a 5-8s uncached SSR.
-    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=3600');
 
     return {
       props: {

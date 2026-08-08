@@ -199,7 +199,7 @@ export default function ProductComparePage({
 
       <main
         className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16"
-        style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}
+        style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}
       >
         {/* Breadcrumb */}
         <nav

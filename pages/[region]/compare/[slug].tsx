@@ -202,7 +202,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
     prod2Items = p2 || [];
   } catch {}
 
-  res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+  res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=3600');
 
   return {
     props: { region, config, comparison, prod1Items, prod2Items, rtl },

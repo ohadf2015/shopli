@@ -125,7 +125,7 @@ export default function CollectionPage({ region, config, collection, content, se
       <Header currentRegion={region} dir={config?.direction} />
       <main
         className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-16"
-        style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}
+        style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}
       >
         <nav
           className="flex items-center gap-2 text-xs mb-4 flex-wrap"
@@ -302,7 +302,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
     const noindex = !content && sections.length === 0;
 
     // Each section is a live AliExpress search; uncached this is a 5s+ SSR per hit.
-    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=3600');
 
     return {
       props: {
