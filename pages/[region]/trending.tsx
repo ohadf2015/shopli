@@ -13,6 +13,8 @@ import {
   SITE_URL,
 } from '../../lib/seo';
 import { listingAggregateFields } from '../../lib/pdp';
+import { getTrendCategories } from '../../lib/trend-calendar';
+import { computeVolumeVelocity, getVolumeBaselines, recordVolumes } from '../../lib/trend-velocity';
 import { dedupeByTitle } from '../../lib/trending';
 import type { RegionConfig } from '../../lib/regions';
 
@@ -20,6 +22,8 @@ interface TrendingProduct extends SearchProduct {
   trendReason: string;
   trendScore: number;
   categoryLabel: string;
+  /** Measured units/day, when we have two snapshots to compare. */
+  soldPerDay?: number;
 }
 
 interface TrendingPageProps {
@@ -30,18 +34,9 @@ interface TrendingPageProps {
   generatedAt: string;
 }
 
-const TRENDING_CATEGORIES = [
-  { key: 'halloween', keywords: ['halloween costume', 'cosplay wig', 'halloween accessories'], label: { en: 'Halloween', he: 'ליל כל הקדושים', fr: 'Halloween', de: 'Halloween', es: 'Halloween', it: 'Halloween' } },
-  { key: 'home-gym', keywords: ['fitness resistance bands', 'home gym equipment', 'jump rope'], label: { en: 'Home Gym', he: 'חדר כושר', fr: 'Sport maison', de: 'Heim-Fitness', es: 'Gimnasio', it: 'Palestra' } },
-  { key: 'smart-home', keywords: ['Tuya smart plug', 'smart LED strip', 'wireless doorbell'], label: { en: 'Smart Home', he: 'בית חכם', fr: 'Maison connectée', de: 'Smart Home', es: 'Hogar inteligente', it: 'Casa smart' } },
-  { key: 'kitchen', keywords: ['kitchen gadgets', 'garlic press', 'fruit peeler'], label: { en: 'Kitchen', he: 'מטבח', fr: 'Cuisine', de: 'Küche', es: 'Cocina', it: 'Cucina' } },
-  { key: 'travel', keywords: ['travel adapter universal', 'packing cubes', 'power bank'], label: { en: 'Travel', he: 'טיולים', fr: 'Voyage', de: 'Reise', es: 'Viaje', it: 'Viaggio' } },
-  { key: 'wireless-audio', keywords: ['wireless earbuds', 'bluetooth headphones', 'TWS earbuds'], label: { en: 'Audio', he: 'אודיו', fr: 'Audio', de: 'Audio', es: 'Audio', it: 'Audio' } },
-  { key: 'phone', keywords: ['phone case', 'screen protector', 'USB C cable', 'power bank'], label: { en: 'Phone Gear', he: 'אביזרי טלפון', fr: 'Téléphone', de: 'Handy', es: 'Teléfono', it: 'Telefono' } },
-  { key: 'desk', keywords: ['desk lamp LED', 'cable management desk', 'monitor stand'], label: { en: 'Desk Setup', he: 'עמדת עבודה', fr: 'Bureau', de: 'Schreibtisch', es: 'Escritorio', it: 'Scrivania' } },
-  { key: 'summer', keywords: ['portable fan', 'sunglasses', 'water bottle', 'beach towel'], label: { en: 'Summer', he: 'קיץ', fr: 'Été', de: 'Sommer', es: 'Verano', it: 'Estate' } },
-  { key: 'pet', keywords: ['cat toy interactive', 'dog leash strong', 'pet grooming brush'], label: { en: 'Pet', he: 'חיות מחמד', fr: 'Animaux', de: 'Haustier', es: 'Mascota', it: 'Animali' } },
-];
+// Categories come from lib/trend-calendar.ts, derived from today's date and
+// the region — this used to be a frozen array, which is how an Israeli page
+// ended up leading with Halloween in August.
 
 function getTrendReason(p: SearchProduct, lang: string): string {
   const volume = p.volume || 0;
@@ -73,13 +68,33 @@ function getTrendReason(p: SearchProduct, lang: string): string {
   return `Trending now`;
 }
 
-function scoreTrending(p: SearchProduct): number {
+/**
+ * Reason text for an item we have actually measured selling. Distinct from
+ * getTrendReason, which infers from lifetime figures — this one is a claim we
+ * can stand behind because we counted it.
+ */
+function risingReason(perDay: number, lang: string): string {
+  const n = perDay >= 10 ? Math.round(perDay) : Math.round(perDay * 10) / 10;
+  if (lang === 'he') return `נמכרות ~${n} יחידות ביום כרגע`;
+  if (lang === 'ru') return `~${n} шт. в день сейчас`;
+  if (lang === 'fr') return `~${n} vendus par jour en ce moment`;
+  if (lang === 'de') return `~${n} Verkäufe pro Tag`;
+  if (lang === 'es') return `~${n} vendidos al día ahora`;
+  if (lang === 'it') return `~${n} venduti al giorno ora`;
+  return `Selling ~${n}/day right now`;
+}
+
+function scoreTrending(p: SearchProduct, soldPerDay?: number): number {
   const volume = p.volume || 0;
   const recent = p.reviewCount || 0;
   const rating = p.rating || 0;
   const discount = p.discount ? parseInt(p.discount.replace(/[^0-9]/g, ''), 10) || 0 : 0;
   const commission = p.commissionRate || 0;
-  return volume * 15 + recent * 25 + rating * 5 + discount * 50 + commission * 2;
+  const base = volume * 15 + recent * 25 + rating * 5 + discount * 50 + commission * 2;
+  // Measured momentum, where we have it. Lifetime volume tells you what sold
+  // well once; units-sold-per-day tells you what is selling now, which is the
+  // question this page asks — so it dominates when a reading exists.
+  return base + (soldPerDay ?? 0) * 5000;
 }
 
 async function fetchTrendingProducts(region: string, limit = 30): Promise<TrendingProduct[]> {
@@ -88,10 +103,11 @@ async function fetchTrendingProducts(region: string, limit = 30): Promise<Trendi
   const cfg = getRegion(region);
   const lang = cfg.lang || 'en';
 
-  const perCategory = Math.ceil((limit * 2) / TRENDING_CATEGORIES.length);
+  const categories = getTrendCategories(region);
+  const perCategory = Math.ceil((limit * 2) / categories.length);
 
   await Promise.allSettled(
-    TRENDING_CATEGORIES.map(async (cat) => {
+    categories.map(async (cat) => {
       try {
         const products = await searchCollection(region, cat.keywords, perCategory);
         for (const p of products) {
@@ -100,8 +116,8 @@ async function fetchTrendingProducts(region: string, limit = 30): Promise<Trendi
           all.push({
             ...p,
             trendReason: getTrendReason(p, lang),
-            trendScore: scoreTrending(p),
-            categoryLabel: cat.label[lang as keyof typeof cat.label] || cat.label.en,
+            trendScore: 0, // set below, once measured velocity is available
+            categoryLabel: cat.label[lang] || cat.label.en,
           });
         }
       } catch {
@@ -109,6 +125,22 @@ async function fetchTrendingProducts(region: string, limit = 30): Promise<Trendi
       }
     })
   );
+
+  // Real momentum: how many units each item has sold since we first saw it.
+  // Fails open to an empty map with no DB, in which case scoring is unchanged.
+  const baselines = await getVolumeBaselines(region, all.map((p) => p.id!).filter(Boolean));
+  const velocity = computeVolumeVelocity(baselines, all);
+
+  for (const p of all) {
+    const perDay = p.id ? velocity[p.id]?.perDay : undefined;
+    p.trendScore = scoreTrending(p, perDay);
+    p.soldPerDay = perDay;
+    if (perDay && perDay >= 1) p.trendReason = risingReason(perDay, lang);
+  }
+
+  // Record today's counts so tomorrow has a baseline. Not awaited on the render
+  // path — a slow write must not hold up the page.
+  void recordVolumes(region, all);
 
   // Score desc, id asc for determinism, then drop near-identical titles
   // (same item relisted under a new supplier ID) keeping the best-scored.
