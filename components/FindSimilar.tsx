@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Icon from './icons';
+import { productImage } from '../lib/img';
 import { SIMILAR_ALGO_VERSION, SIMILAR_CHIP_LABELS, SimilarChip } from '../lib/similar';
 import {
   trackFindSimilarClick,
@@ -258,11 +259,9 @@ export default function FindSimilar({ region, rtl, currencySymbol, source }: Fin
                     >
                       {p.imageUrl && (
                         <img
-                          src={p.imageUrl}
+                          {...productImage(p.imageUrl, 120)}
                           alt=""
                           className="w-full h-full object-cover"
-                          loading="lazy"
-                          decoding="async"
                           onError={(e) => {
                             (e.target as HTMLImageElement).style.display = 'none';
                           }}

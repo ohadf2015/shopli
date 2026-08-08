@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import Icon from './icons';
+import { productImage } from '../lib/img';
 import {
   trackTrendingView,
   trackTrendingClick,
@@ -117,12 +118,11 @@ export function TrendCard({
         <div className="relative aspect-square overflow-hidden" style={{ background: '#0b1222' }}>
           {p.imageUrl ? (
             <img
-              src={p.imageUrl}
+              {...productImage(p.imageUrl, 400, '(max-width: 640px) 60vw, 400px')}
               alt={p.title}
               className="w-full h-full object-cover"
               loading={eagerImage ? 'eager' : 'lazy'}
               fetchPriority={eagerImage ? 'high' : 'auto'}
-              decoding="async"
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
               }}

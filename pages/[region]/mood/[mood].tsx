@@ -4,6 +4,7 @@ import Icon from '../../../components/icons';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getMoodBoard, getMoodBoardsByTag } from '../../../lib/moodboards';
+import { productImage } from '../../../lib/img';
 import { articleJsonLd, breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
 
 interface Product { id: string; title: string; price: number; originalPrice: number | null; currency: string; imageUrl: string; affiliateLink: string; rating: number; reviewCount: number; volume: number; shopName: string; discount: string; }
@@ -67,7 +68,7 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
       />
       <Header currentRegion={region} dir={config?.direction} />
 
-      <main className="pb-16" style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}>
+      <main className="pb-16" style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}>
         {/* HERO */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-8 md:pt-32">
           <div className="flex items-center gap-2 text-xs mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
@@ -127,7 +128,7 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
                     className="bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">
                     <div className="aspect-square bg-gray-100 overflow-hidden relative">
                       {p.imageUrl ? (
-                        <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover hover:scale-105 transition-transform" loading="lazy" decoding="async" />
+                        <img {...productImage(p.imageUrl, 400, '(max-width: 640px) 50vw, 400px')} alt={p.title} className="w-full h-full object-cover hover:scale-105 transition-transform" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center" style={{ color: 'var(--shopli-warm-gray)' }}>
                           <Icon name="package" size={24} />
@@ -206,7 +207,7 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, query, res }) => {
   try {
     const region = (query?.region as string) || (params?.region as string) || 'eu';
     if (!isValidRegion(region)) return { notFound: true };
@@ -235,6 +236,10 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
 
     const tag = board.tags[0];
     const relatedBoards = tag ? getMoodBoardsByTag(tag) : [];
+
+    // Mood boards are curated + slow to build (several AliExpress searches each).
+    // Without this every crawl and every visitor pays a 5-8s uncached SSR.
+    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=3600');
 
     return {
       props: {

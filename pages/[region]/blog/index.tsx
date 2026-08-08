@@ -2,7 +2,7 @@ import { GetServerSideProps } from 'next';
 import Header from '../../../components/Header';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
-import { blogPosts } from '../../../lib/blog';
+import { getBlogPostsForRegion } from '../../../lib/blog';
 import Link from 'next/link';
 import { breadcrumbJsonLd, SITE_URL } from '../../../lib/seo';
 
@@ -82,25 +82,20 @@ export default function BlogIndexPage({ region, config, posts, rtl }: any) {
         )}
       </main>
 
-      <footer className="border-t border-gray-100 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-3 text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
-          <div className="font-semibold" style={{ color: 'var(--shopli-navy)' }}>shopli</div>
-          <div>&copy; {new Date().getFullYear()} {rtl ? 'כל הזכויות שמורות' : 'All rights reserved.'}</div>
-        </div>
-      </footer>
     </>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, res }) => {
   const region = (params?.region as string) || 'eu';
   if (!isValidRegion(region)) return { notFound: true };
   const config = getRegion(region);
   const rtl = config.direction === 'rtl';
 
-  const posts = blogPosts
-    .filter(p => p.category !== 'draft' as any)
-    .sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
+  const posts = getBlogPostsForRegion(region);
+
+  // Editorial content only — it changes when we deploy, not per request.
+  res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
 
   return {
     props: { region, config, posts, rtl },

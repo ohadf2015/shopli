@@ -63,7 +63,7 @@ export default function HomePage({ region, config, groups, rtl, trending }: Home
       />
       <Header currentRegion={region} dir={config.direction} />
 
-      <main style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}>
+      <main style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}>
 
         {/* HERO */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-12 md:pt-32 md:pb-16">
@@ -342,20 +342,6 @@ export default function HomePage({ region, config, groups, rtl, trending }: Home
         </section>
       </main>
 
-      <footer className="border-t border-gray-100 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-3 text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
-          <div className="flex items-center gap-2 font-semibold" style={{ color: 'var(--shopli-navy)' }}>
-            <svg width="18" height="18" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="var(--shopli-orange)"/><path d="M9 12h14l-2 12H11L9 12z" fill="white" opacity="0.9"/></svg>
-            shopli
-          </div>
-          <div>&copy; {new Date().getFullYear()} Shopli. {rtl ? 'כל הזכויות שמורות' : 'All rights reserved.'}</div>
-          <div className="flex gap-4">
-            <a href={`/${region}/collection/home-gym`} className="hover:underline">{rtl ? 'אימונים' : 'Workout'}</a>
-            <a href={`/${region}/collection/coffee-ritual`} className="hover:underline">{rtl ? 'קפה' : 'Coffee'}</a>
-            <a href={`/${region}/mood/jack-sparrow`} className="hover:underline">{rtl ? 'תחפושות' : 'Costumes'}</a>
-          </div>
-        </div>
-      </footer>
     </>
   );
 }

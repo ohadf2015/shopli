@@ -24,7 +24,8 @@ body {
 
 @layer base {
   .font-hebrew {
-    font-family: 'Assistant', system-ui, sans-serif;
+    /* --font-assistant is set by next/font in _app.tsx. */
+    font-family: var(--font-assistant), system-ui, sans-serif;
   }
 }
 

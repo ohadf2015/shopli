@@ -5,6 +5,7 @@ import Icon from '../../../components/icons';
 import WhatsAppShare from '../../../components/WhatsAppShare';
 import FindSimilar from '../../../components/FindSimilar';
 import { trendingEnabled } from '../../../lib/flags';
+import { productImage } from '../../../lib/img';
 import { getRegion, RegionCode, RegionConfig } from '../../../lib/regions';
 import { getProductsByIds, SearchProduct } from '../../../lib/aliexpress';
 import { getDemoProductById } from '../../../lib/demo-products';
@@ -148,7 +149,7 @@ export default function ProductPage({
 
       <main
         className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16"
-        style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}
+        style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}
       >
         {/* Breadcrumb */}
         <nav
@@ -171,11 +172,11 @@ export default function ProductPage({
             <div className="aspect-square bg-gray-50 flex items-center justify-center relative">
               {product.imageUrl ? (
                 <img
-                  src={product.imageUrl}
+                  {...productImage(product.imageUrl, 800, '(max-width: 768px) 100vw, 640px')}
                   alt={product.title}
                   className="w-full h-full object-contain p-4 sm:p-8"
                   loading="eager"
-                  decoding="async"
+                  fetchPriority="high"
                 />
               ) : (
                 <div style={{ color: 'var(--shopli-warm-gray)' }}>
@@ -399,20 +400,6 @@ export default function ProductPage({
         )}
       </main>
 
-      <footer className="border-t border-gray-100 py-6">
-        <div
-          className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-3 text-xs"
-          style={{ color: 'var(--shopli-warm-gray)' }}
-        >
-          <div className="font-semibold" style={{ color: 'var(--shopli-navy)' }}>
-            shopli
-          </div>
-          <div>
-            &copy; {new Date().getFullYear()}{' '}
-            {rtl ? 'כל הזכויות שמורות' : 'All rights reserved.'}
-          </div>
-        </div>
-      </footer>
     </>
   );
 }

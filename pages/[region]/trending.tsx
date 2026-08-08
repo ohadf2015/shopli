@@ -228,7 +228,7 @@ export default function TrendingPage({ region, config, products, rtl, generatedA
       <Header currentRegion={region} dir={config.direction} />
       <main
         className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-16"
-        style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}
+        style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}
       >
         <nav
           className="flex items-center gap-2 text-xs mb-4 flex-wrap"

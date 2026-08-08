@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Icon from './icons';
 import WhatsAppShare from './WhatsAppShare';
 import { isInWishlist, syncAdd, syncRemove } from '../lib/useWishlist';
+import { productImage } from '../lib/img';
 
 export interface ProductCardProduct {
   id: string;
@@ -137,11 +138,9 @@ export default function ProductCard({
       <div className={`aspect-square bg-gray-50 overflow-hidden relative ${compact ? '' : ''}`}>
         {product.imageUrl ? (
           <img
-            src={product.imageUrl}
+            {...productImage(product.imageUrl, compact ? 200 : 400, '(max-width: 640px) 50vw, 400px')}
             alt={product.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-            decoding="async"
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = 'none';
             }}
