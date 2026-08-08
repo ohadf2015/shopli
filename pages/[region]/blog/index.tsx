@@ -92,7 +92,7 @@ export default function BlogIndexPage({ region, config, posts, rtl }: any) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, res }) => {
   const region = (params?.region as string) || 'eu';
   if (!isValidRegion(region)) return { notFound: true };
   const config = getRegion(region);
@@ -101,6 +101,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const posts = blogPosts
     .filter(p => p.category !== 'draft' as any)
     .sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
+
+  // Editorial content only — it changes when we deploy, not per request.
+  res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
 
   return {
     props: { region, config, posts, rtl },

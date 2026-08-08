@@ -6,6 +6,7 @@ import Icon from '../../components/icons';
 import SeoHead from '../../components/SeoHead';
 import { getRegion, RegionCode } from '../../lib/regions';
 import { useWishlist, WishlistItem } from '../../lib/useWishlist';
+import { productImage } from '../../lib/img';
 import type { ProductCardProduct } from '../../components/ProductCard';
 
 /** Minimal product card rendering inside the wishlist page — avoids importing the full ProductCard component tree just for the wishlist page. */
@@ -40,11 +41,9 @@ function WishlistItemCard({
       <div className="aspect-square bg-gray-50 overflow-hidden relative">
         {item.imageUrl ? (
           <img
-            src={item.imageUrl}
+            {...productImage(item.imageUrl, 400, '(max-width: 640px) 50vw, 400px')}
             alt={item.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-            decoding="async"
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = 'none';
             }}

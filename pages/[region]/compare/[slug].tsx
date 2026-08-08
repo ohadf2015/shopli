@@ -4,6 +4,7 @@ import Icon from '../../../components/icons';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getComparison } from '../../../lib/comparisons';
+import { productImage } from '../../../lib/img';
 import { listingAggregateFields } from '../../../lib/pdp';
 import { articleJsonLd, breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
 
@@ -124,11 +125,9 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
                         <a key={i} href={item.affiliateLink} target="_blank" rel="nofollow sponsored noopener noreferrer"
                           className="block bg-gray-50 rounded-lg p-2 hover:shadow transition">
                           <img
-                            src={item.imageUrl || item.image}
+                            {...productImage(item.imageUrl || item.image, 200)}
                             alt={item.title}
                             className="w-full h-20 object-contain mb-1"
-                            loading="lazy"
-                            decoding="async"
                           />
                           <p className="text-xs text-gray-700 line-clamp-2">{item.title}</p>
                           <p className="text-xs font-bold mt-1 tabular-nums" style={{ color: 'var(--shopli-orange)' }} dir="ltr">
@@ -181,7 +180,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, res }) => {
   const slug = params?.slug as string;
   const region = (params?.region as string) || 'eu';
   if (!isValidRegion(region)) return { notFound: true };
@@ -202,6 +201,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     prod1Items = p1 || [];
     prod2Items = p2 || [];
   } catch {}
+
+  res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
 
   return {
     props: { region, config, comparison, prod1Items, prod2Items, rtl },

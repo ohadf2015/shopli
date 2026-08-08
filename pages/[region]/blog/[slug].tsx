@@ -4,7 +4,7 @@ import Header from '../../../components/Header';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getBlogPost } from '../../../lib/blog';
-import { blogPostingJsonLd, breadcrumbJsonLd, SITE_URL } from '../../../lib/seo';
+import { blogPostingJsonLd, breadcrumbJsonLd, faqJsonLd, SITE_URL } from '../../../lib/seo';
 
 export default function BlogPostPage({ region, config, post, rtl, error }: any) {
   if (error) {
@@ -34,7 +34,10 @@ export default function BlogPostPage({ region, config, post, rtl, error }: any) 
       datePublished: p.publishDate,
       dateModified: p.publishDate,
     }),
-  ];
+    // The guide already renders this Q&A; marking it up is what makes it
+    // quotable by AI Overviews and assistants.
+    faqJsonLd((p.faq || []).map((f: any) => ({ question: t(f.q), answer: t(f.a) }))),
+  ].filter(Boolean);
 
   return (
     <>
@@ -134,7 +137,7 @@ export default function BlogPostPage({ region, config, post, rtl, error }: any) 
 }
 
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, res }) => {
   const slug = params?.slug as string;
   const region = (params?.region as string) || 'eu';
   if (!isValidRegion(region)) return { notFound: true };
@@ -143,6 +146,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
   const post = getBlogPost(slug);
   if (!post) return { notFound: true };
+
+  // Editorial content only — it changes when we deploy, not per request.
+  res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
 
   return {
     props: { region, config, post, rtl },

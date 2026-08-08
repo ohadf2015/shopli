@@ -5,6 +5,7 @@ import Icon from '../../../components/icons';
 import WhatsAppShare from '../../../components/WhatsAppShare';
 import FindSimilar from '../../../components/FindSimilar';
 import { trendingEnabled } from '../../../lib/flags';
+import { productImage } from '../../../lib/img';
 import { getRegion, RegionCode, RegionConfig } from '../../../lib/regions';
 import { getProductsByIds, SearchProduct } from '../../../lib/aliexpress';
 import { getDemoProductById } from '../../../lib/demo-products';
@@ -171,11 +172,11 @@ export default function ProductPage({
             <div className="aspect-square bg-gray-50 flex items-center justify-center relative">
               {product.imageUrl ? (
                 <img
-                  src={product.imageUrl}
+                  {...productImage(product.imageUrl, 800, '(max-width: 768px) 100vw, 640px')}
                   alt={product.title}
                   className="w-full h-full object-contain p-4 sm:p-8"
                   loading="eager"
-                  decoding="async"
+                  fetchPriority="high"
                 />
               ) : (
                 <div style={{ color: 'var(--shopli-warm-gray)' }}>

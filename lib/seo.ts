@@ -315,6 +315,28 @@ export function blogPostingJsonLd({
   };
 }
 
+/**
+ * FAQPage for the Q&A already written into each buying guide. Answering
+ * questions in structured form is what gets a page quoted in AI Overviews and
+ * assistant answers, which is the traffic this site is chasing.
+ *
+ * Returns null for an empty list — an FAQPage with no mainEntity is invalid
+ * structured data, so callers should drop it rather than emit an empty shell.
+ */
+export function faqJsonLd(faqs: Array<{ question: string; answer: string }>) {
+  const entries = faqs.filter((f) => f.question?.trim() && f.answer?.trim());
+  if (entries.length === 0) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: entries.map((f) => ({
+      '@type': 'Question',
+      name: f.question,
+      acceptedAnswer: { '@type': 'Answer', text: f.answer },
+    })),
+  };
+}
+
 export function productJsonLd({
   title,
   description,

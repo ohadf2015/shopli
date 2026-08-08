@@ -7,6 +7,7 @@ import WhatsAppShare from '../../../components/WhatsAppShare';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, isValidRegion, RegionCode, RegionConfig } from '../../../lib/regions';
 import type { SearchProduct } from '../../../lib/aliexpress';
+import { productImage } from '../../../lib/img';
 import { listingAggregateFields } from '../../../lib/pdp';
 import {
   buildCompareRows,
@@ -364,11 +365,9 @@ export default function ProductComparePage({
                     <div className="aspect-square bg-gray-50 relative">
                       {p.imageUrl ? (
                         <img
-                          src={p.imageUrl}
+                          {...productImage(p.imageUrl, 400, '(max-width: 640px) 70vw, 220px')}
                           alt={p.title}
                           className="w-full h-full object-contain p-2"
-                          loading="lazy"
-                          decoding="async"
                         />
                       ) : (
                         <div
@@ -561,10 +560,9 @@ export default function ProductComparePage({
                 >
                   {p.imageUrl && (
                     <img
-                      src={p.imageUrl}
+                      {...productImage(p.imageUrl, 120)}
                       alt=""
                       className="w-12 h-12 object-contain rounded-lg bg-gray-50 shrink-0"
-                      loading="lazy"
                     />
                   )}
                   <div className="min-w-0 flex-1">
@@ -653,7 +651,7 @@ export default function ProductComparePage({
 // Last-resort IDs for the sample comparison, verified live 2026-08-02.
 const SAMPLE_FALLBACK_IDS = ['1005010287294727', '1005007171202355', '1005007244759019'];
 
-export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, query, res }) => {
   const region = ((params?.region as string) || 'eu') as RegionCode;
   if (!isValidRegion(region)) return { notFound: true };
   const config = getRegion(region);
@@ -722,6 +720,10 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
 
   const rows = buildCompareRows(products, config.currencySymbol);
   const shareUrl = buildCompareShareUrl(SITE_URL, region, products.map((p) => p.id));
+
+  // Keyed on ?ids= by the CDN, so a shared comparison link is cheap on repeat hits.
+  // Short TTL: prices here are the thing being compared.
+  if (!error) res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=3600');
 
   return {
     props: {

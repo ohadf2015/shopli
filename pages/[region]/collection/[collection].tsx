@@ -252,7 +252,7 @@ export default function CollectionPage({ region, config, collection, content, se
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, query, res }) => {
   try {
     const region = (query?.region as string) || (params?.region as string) || 'eu';
     if (!isValidRegion(region)) return { notFound: true };
@@ -300,6 +300,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
 
     // noindex keyword-only collections that returned zero products (soft-404 prevention)
     const noindex = !content && sections.length === 0;
+
+    // Each section is a live AliExpress search; uncached this is a 5s+ SSR per hit.
+    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
 
     return {
       props: {
