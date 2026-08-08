@@ -6,6 +6,49 @@ import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getBlogPost, isBlogPostInRegion } from '../../../lib/blog';
 import { blogPostingJsonLd, breadcrumbJsonLd, faqJsonLd, SITE_URL } from '../../../lib/seo';
 
+/**
+ * The one route from a guide to something buyable.
+ *
+ * This used to link `/compare/<slugified keyword>`, but /compare/[slug] only
+ * resolves the 15 curated comparison slugs — "adjustable dumbbells set" is a
+ * search phrase, not one of them, so every link in every post 404'd. Search
+ * takes the keyword directly and returns live listings with affiliate links.
+ */
+function ShopThePicks({
+  region,
+  rtl,
+  items,
+}: {
+  region: string;
+  rtl: boolean;
+  items?: Array<{ name: string; keyword: string }>;
+}) {
+  if (!items?.length) return null;
+  return (
+    <div className="mt-6 p-4 sm:p-5 rounded-xl border border-orange-100 bg-orange-50/50">
+      <h3 className="text-sm font-semibold mb-1" style={{ color: 'var(--shopli-navy)' }}>
+        {rtl ? 'לראות את הפריטים מהמדריך' : 'See the picks from this guide'}
+      </h3>
+      <p className="text-xs mb-3" style={{ color: 'var(--shopli-warm-gray)' }}>
+        {rtl ? 'מחירים חיים מאליאקספרס — נפתח בחיפוש באתר.' : 'Live AliExpress prices — opens a search on Shopli.'}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {items.map((rp) => (
+          <a
+            key={rp.keyword}
+            href={`/${region}/search?q=${encodeURIComponent(rp.keyword)}`}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-white border border-orange-200 hover:border-orange-400 hover:shadow-sm transition-all"
+            style={{ color: 'var(--shopli-orange)' }}
+          >
+            {rp.name}
+            <span aria-hidden="true">{rtl ? '←' : '→'}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function BlogPostPage({ region, config, post, rtl, regionOnly, error }: any) {
   if (error) {
     return <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>Error: {error}</div>;
@@ -85,22 +128,7 @@ export default function BlogPostPage({ region, config, post, rtl, regionOnly, er
                     {t(section.body)}
                   </p>
 
-                  {/* Related products inline */}
-                  {p.relatedProducts && i === 0 && (
-                    <div className="mt-6 p-4 bg-orange-50/50 rounded-xl">
-                      <h3 className="text-sm font-semibold mb-3" style={{ color: 'var(--shopli-navy)' }}>
-                        {rtl ? 'מוצרים קשורים' : 'Related Products'}
-                      </h3>
-                      <div className="grid grid-cols-2 gap-3">
-                        {p.relatedProducts.slice(0, 4).map((rp: any, ri: number) => (
-                          <a key={ri} href={`/${region}/compare/${rp.keyword.replace(/\s+/g, '-').toLowerCase()}`} 
-                            className="text-xs font-medium text-orange-600 hover:underline">
-                            {rp.name}
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  {i === 0 && <ShopThePicks region={region} rtl={rtl} items={p.relatedProducts} />}
                 </div>
               </section>
             ))}
@@ -123,16 +151,16 @@ export default function BlogPostPage({ region, config, post, rtl, regionOnly, er
                 </div>
               </section>
             )}
+
+            {/* Readers who reach the end of a buying guide are the ones ready
+                to buy, so repeat the route out rather than ending on the FAQ. */}
+            <section className="pt-4">
+              <ShopThePicks region={region} rtl={rtl} items={p.relatedProducts} />
+            </section>
           </div>
         </article>
       </main>
 
-      <footer className="border-t border-gray-100 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-3 text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
-          <div className="font-semibold" style={{ color: 'var(--shopli-navy)' }}>shopli</div>
-          <div>&copy; {new Date().getFullYear()} {rtl ? 'כל הזכויות שמורות' : 'All rights reserved.'}</div>
-        </div>
-      </footer>
     </>
   );
 }

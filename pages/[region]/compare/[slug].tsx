@@ -170,12 +170,6 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
         )}
       </main>
 
-      <footer className="border-t border-gray-100 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-3 text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
-          <div className="font-semibold" style={{ color: 'var(--shopli-navy)' }}>shopli</div>
-          <div>&copy; {new Date().getFullYear()} {rtl ? 'כל הזכויות שמורות' : 'All rights reserved.'}</div>
-        </div>
-      </footer>
     </>
   );
 }

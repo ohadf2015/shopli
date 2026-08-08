@@ -172,16 +172,6 @@ export default function DealsPage({ region, config, lang, groups, updatedIso, up
 
       </main>
 
-      <footer className="border-t border-gray-100 py-8 mt-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm" style={{ color: 'var(--shopli-warm-gray)' }}>
-          <div>&copy; {new Date().getFullYear()} Shopli. {rtl ? 'כל הזכויות שמורות' : 'All rights reserved.'}</div>
-          <div className="flex gap-4">
-            <a href={`/${region}`} className="hover:underline">{rtl ? 'דף הבית' : 'Home'}</a>
-            <a href={`/${region}/blog`} className="hover:underline">{rtl ? 'בלוג' : 'Blog'}</a>
-            <a href={`/${region}/compare`} className="hover:underline">{rtl ? 'השוואות' : 'Compare'}</a>
-          </div>
-        </div>
-      </footer>
     </>
   );
 }
