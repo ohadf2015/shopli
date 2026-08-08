@@ -2,7 +2,7 @@ import { GetServerSideProps } from 'next';
 import Header from '../../../components/Header';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
-import { blogPosts } from '../../../lib/blog';
+import { getBlogPostsForRegion } from '../../../lib/blog';
 import Link from 'next/link';
 import { breadcrumbJsonLd, SITE_URL } from '../../../lib/seo';
 
@@ -98,9 +98,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
   const config = getRegion(region);
   const rtl = config.direction === 'rtl';
 
-  const posts = blogPosts
-    .filter(p => p.category !== 'draft' as any)
-    .sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
+  const posts = getBlogPostsForRegion(region);
 
   // Editorial content only — it changes when we deploy, not per request.
   res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');

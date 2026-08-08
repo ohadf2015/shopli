@@ -12,6 +12,27 @@ export interface BlogPost {
   relatedProducts: { name: string; keyword: string }[];
   publishDate: string; // ISO
   category: 'buying-guide' | 'comparison' | 'seasonal' | 'tips';
+  /**
+   * Restrict a post to specific regions. Omit for posts that apply everywhere.
+   * Country-specific pieces (import tax rules, say) are wrong — not merely
+   * untranslated — in the other eight locales, and publishing them there would
+   * be eight thin pages per post.
+   */
+  regions?: string[];
+}
+
+/** Posts publishable in `region`, newest first. */
+export function getBlogPostsForRegion(region: string): BlogPost[] {
+  return blogPosts
+    .filter((p) => (p.category as string) !== 'draft')
+    .filter((p) => !p.regions || p.regions.includes(region))
+    .sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime());
+}
+
+/** True when `slug` exists and is publishable in `region`. */
+export function isBlogPostInRegion(slug: string, region: string): boolean {
+  const post = getBlogPost(slug);
+  return !!post && (!post.regions || post.regions.includes(region));
 }
 
 export const blogPosts: BlogPost[] = [
@@ -180,9 +201,9 @@ export const blogPosts: BlogPost[] = [
       it: 'Gli auricolari wireless sono diventati sorprendentemente buoni a prezzi economici.',
     },
     sections: [
-      { heading: { en: 'What to Look for in Budget TWS Earbuds' }, body: { en: 'Bluetooth 5.3+ ensures stable connection and lower power consumption. ANC (Active Noise Cancellation) is now common under $30 — it attenuates 25-30dB of ambient noise. IPX5+ water resistance handles sweat and rain. Battery life should be 6-8 hours per charge; the case adds 3-4 full charges. USB-C charging is standard; wireless charging is a bonus.', he: 'Bluetooth 5.3+ מבטיח חיבור יציב וצריכת חשמל נמוכה יותר. ANC נפוץ מתחת ל-30$. IPX5+ עמיד בפני זיעה וגשם.' } },
-      { heading: { en: 'Pick Your Priority: ANC, Sound, or Battery' }, body: { en: 'For commuting and noisy environments, prioritize ANC earbuds with transparency mode. For music lovers, look for 13mm+ dynamic drivers and AAC codec support. For all-day wear, prioritize battery (8h+ per charge) and comfort — slim stem designs with ear tips that match your ear canal size.', he: 'לנסיעה ברכבת ובסביבות רועשות, תעדיפו ANC עם מצב שקיפות. לאוהבי מוזיקה, חפשו דרייברים 13mm+ ותמיכה ב-AAC.' } },
-      { heading: { en: 'Top Budget Picks Under $30' }, body: { en: 'The best value tier: earbuds with ANC, Bluetooth 5.3, 30h+ total battery, IPX5, USB-C charging, and touch controls — all for $15-30 on AliExpress. Brands like Baseus, SoundPEATS, QCY, and Moondrop offer exceptional value. Look for 4.3+ star ratings and 1000+ reviews.', he: 'השכבה התקציבית הטובה ביותר עם ANC, Bluetooth 5.3, 30h+ סוללה, IPX5, טעינת USB-C ובקרת מגע — הכל ב-$15-30.' } },
+      { heading: { en: 'What to Look for in Budget TWS Earbuds', he: 'מה לבדוק באוזניות TWS תקציביות' }, body: { en: 'Bluetooth 5.3+ ensures stable connection and lower power consumption. ANC (Active Noise Cancellation) is now common under $30 — it attenuates 25-30dB of ambient noise. IPX5+ water resistance handles sweat and rain. Battery life should be 6-8 hours per charge; the case adds 3-4 full charges. USB-C charging is standard; wireless charging is a bonus.', he: 'Bluetooth 5.3 ומעלה נותן חיבור יציב וצריכת חשמל נמוכה יותר. ANC — ביטול רעשים אקטיבי — כבר נפוץ מתחת ל-30$ ומנחית 25-30 דציבל מרעש הרקע. עמידות IPX5 ומעלה מספיקה לזיעה ולגשם. סוללה סבירה היא 6-8 שעות לטעינה, והנרתיק מוסיף עוד 3-4 טעינות מלאות. טעינת USB-C היא סטנדרט; טעינה אלחוטית זה בונוס, לא שיקול.' } },
+      { heading: { en: 'Pick Your Priority: ANC, Sound, or Battery', he: 'תחליטו מה חשוב: ביטול רעשים, צליל או סוללה' }, body: { en: 'For commuting and noisy environments, prioritize ANC earbuds with transparency mode. For music lovers, look for 13mm+ dynamic drivers and AAC codec support. For all-day wear, prioritize battery (8h+ per charge) and comfort — slim stem designs with ear tips that match your ear canal size.', he: 'אי אפשר לקבל את שלושתם במחיר הזה, אז כדאי להחליט מראש. לנסיעות ולסביבות רועשות — ANC עם מצב שקיפות, שמאפשר לשמוע הכרזות בלי להוציא את האוזנייה. לאוהבי מוזיקה — דרייבר דינמי 13 מ"מ ומעלה ותמיכה בקודק AAC. לשימוש לאורך כל היום — סוללה של 8 שעות ומעלה ונוחות: מבנה גזע דק וטיפים בגודל שמתאים לתעלת האוזן שלכם. טיפ שלא עולה כלום: החליפו טיפים עד שיש אטימה מלאה — אטימה גרועה מורידה גם בס וגם ANC יותר מכל הבדל בין דגמים.' } },
+      { heading: { en: 'Top Budget Picks Under $30', he: 'מה מקבלים מתחת ל-30$' }, body: { en: 'The best value tier: earbuds with ANC, Bluetooth 5.3, 30h+ total battery, IPX5, USB-C charging, and touch controls — all for $15-30 on AliExpress. Brands like Baseus, SoundPEATS, QCY, and Moondrop offer exceptional value. Look for 4.3+ star ratings and 1000+ reviews.', he: 'בטווח 15-30$ כבר מקבלים ANC, ‏Bluetooth 5.3, סוללה מצטברת של 30 שעות ומעלה, IPX5, טעינת USB-C ובקרת מגע. Baseus, ‏SoundPEATS, ‏QCY ו-Moondrop הם השמות שחוזרים בטווח הזה. סינון מהיר שעובד: דירוג 4.3 ומעלה עם יותר מ-1000 ביקורות — מתחת לזה אין מספיק דגימות כדי לדעת אם הדגם אמין.' } },
     ],
     faq: [
       { q: { en: 'Are $20 ANC earbuds actually good?', he: 'האם אוזניות ANC ב-20$ באמת טובות?' }, a: { en: 'The ANC won\'t match $300 Sony earbuds — expect ~20-25dB reduction vs 35-40dB. But they\'re effective enough for commuting, office, and gym. Sound quality has improved dramatically. For the price, they\'re excellent value.', he: 'ה-ANC לא יתאים לאוזניות סוני ב-300$ — תצפו להפחתה של ~20-25dB לעומת 35-40dB. אבל הן מספיק יעילות לנסיעה, משרד וחדר כושר.' } },
@@ -223,9 +244,9 @@ export const blogPosts: BlogPost[] = [
       it: 'Le ondate di calore peggiorano, ma non serve sparare l\'aria condizionata.',
     },
     sections: [
-      { heading: { en: 'Neck Fans & Portable Coolers' }, body: { en: 'Wearable neck fans are the #1 summer gadget in 2026. They blow cool air directly on your face and neck — the most heat-sensitive areas. Look for 4000mAh+ battery, 3+ speed settings, and quiet operation. For desk use, a mini USB fan with 360° rotation cools your workspace without hogging space. Both cost €7-20 on AliExpress.', he: 'מאווררי צוואר לבישים הם גאדג\'ט הקיץ מספר 1 ב-2026. הם נושפים אוויר קריר ישירות על הפנים והצוואר.' } },
-      { heading: { en: 'Hydration That Actually Stays Cold' }, body: { en: 'A vacuum-insulated stainless steel bottle keeps ice water cold for 24+ hours — even in direct sun. Look for 1L+ capacity, wide mouth for ice cubes, and a carry loop. Pair with electrolyte powder packets for faster hydration. For hands-free hydration, a hydration backpack holds 2L and has a drinking tube — perfect for outdoor work or long walks.', he: 'בקבוק נירוסטה מבודד ואקום שומר מים קרים 24+ שעות — אפילו בשמש ישירה. חפשו קיבולת 1L+, פה רחב לקוביות קרח ולולאת נשיאה.' } },
-      { heading: { en: 'Sun & Heat Protection' }, body: { en: 'A UV umbrella with silver coating reflects sunlight and lowers perceived temperature by 5-10°C. Cooling towels activated by water (wet, wring, snap) drop 15-20°C below ambient and stay cool for 1-3 hours. UV400 polarized sunglasses protect your eyes and reduce glare. A wide-brim UV hat adds full face and neck protection.', he: 'מטריית UV עם ציפוי כסף מחזירה אור שמש ומורידה טמפרטורה מורגשת ב-5-10°C.' } },
+      { heading: { en: 'Neck Fans & Portable Coolers', he: 'מאווררי צוואר וקירור נייד' }, body: { en: 'Wearable neck fans are the #1 summer gadget in 2026. They blow cool air directly on your face and neck — the most heat-sensitive areas. Look for 4000mAh+ battery, 3+ speed settings, and quiet operation. For desk use, a mini USB fan with 360° rotation cools your workspace without hogging space. Both cost €7-20 on AliExpress.', he: 'מאוורר צוואר לביש מכוון אוויר ישירות לפנים ולצוואר — האזורים שהכי רגישים לחום, ולכן ההרגשה משתנה מהר יותר מאשר עם מאוורר חדר. מה לבדוק: סוללה 4000mAh ומעלה (מספיקה ליום עבודה), לפחות שלוש מהירויות, ורעש נמוך — דגמים זולים משמיעים שריקה שמעצבנת אחרי חצי שעה. לשולחן, מאוורר USB קטן עם סיבוב 360° מקרר את העמדה בלי לתפוס מקום. שניהם בטווח 25-70 ש"ח.' } },
+      { heading: { en: 'Hydration That Actually Stays Cold', he: 'שתייה שנשארת קרה באמת' }, body: { en: 'A vacuum-insulated stainless steel bottle keeps ice water cold for 24+ hours — even in direct sun. Look for 1L+ capacity, wide mouth for ice cubes, and a carry loop. Pair with electrolyte powder packets for faster hydration. For hands-free hydration, a hydration backpack holds 2L and has a drinking tube — perfect for outdoor work or long walks.', he: 'בקבוק נירוסטה עם בידוד ואקום שומר על מים עם קרח קרים יותר מ-24 שעות, גם בשמש ישירה — זה הפריט היחיד ברשימה שמשנה את היום בישראל. מה לבדוק: קיבולת ליטר ומעלה, פה רחב שקוביות קרח נכנסות דרכו (פה צר הופך אותו לבקבוק רגיל), ולולאת נשיאה. אבקת אלקטרוליטים עוזרת כשמזיעים הרבה — מים לבד לא מחזירים מלחים. לפעילות ממושכת, תיק שתייה של 2 ליטר עם צינורית משחרר את הידיים.' } },
+      { heading: { en: 'Sun & Heat Protection', he: 'הגנה מהשמש ומהחום' }, body: { en: 'A UV umbrella with silver coating reflects sunlight and lowers perceived temperature by 5-10°C. Cooling towels activated by water (wet, wring, snap) drop 15-20°C below ambient and stay cool for 1-3 hours. UV400 polarized sunglasses protect your eyes and reduce glare. A wide-brim UV hat adds full face and neck protection.', he: 'מטריית UV עם ציפוי כסף מחזירה קרינה ומורידה את הטמפרטורה המורגשת ב-5-10 מעלות — הבדל מורגש בהמתנה לאוטובוס. מגבת קירור עובדת במחזור של הרטבה, סחיטה ונפנוף, ונשארת קרירה שעה עד שלוש. משקפי שמש UV400 מקוטבים מגנים על העיניים ומורידים סנוור מאספלט ומים. כובע רחב שוליים עם דירוג UV מכסה גם את הפנים וגם את העורף, שזה האזור שנשרף הכי הרבה.' } },
     ],
     faq: [
       { q: { en: 'Do neck fans actually cool you down?', he: 'האם מאווררי צוואר באמת מקררים?' }, a: { en: 'Yes — by blowing air directly over your face and neck, they accelerate evaporative cooling from sweat and moisture. Users report feeling 5-8°C cooler. They work best in dry heat. For humid climates, cooling towels are more effective.', he: 'כן — על ידי ניפוח אוויר ישירות על הפנים והצוואר, הם מאיצים קירור באידוי מזיעה ולחות.' } },
@@ -507,6 +528,464 @@ export const blogPosts: BlogPost[] = [
       { name: 'Pet Life Jacket', keyword: 'dog life jacket buoyancy' },
     ],
     publishDate: '2026-07-17',
+    category: 'buying-guide',
+  },
+  {
+    slug: 'aliexpress-israel-customs-vat',
+    regions: ['il'],
+    title: {
+      he: 'מכס ומע"מ על אליאקספרס: כמה באמת תשלמו (עדכון אוגוסט 2026)',
+      en: 'AliExpress Import Tax in Israel: What You Actually Pay (August 2026)',
+    },
+    metaDesc: {
+      he: 'הפטור חזר ל-75$ ב-2 ביוני 2026. מה פטור, מתי נכנס מע"מ 18%, ולמה החישוב של רשות המסים שונה מזה שבעגלה. כולל דוגמאות מספריות.',
+      en: 'Israel restored the $75 exemption on 2 June 2026. What is exempt, when 18% VAT applies, and why the tax authority does the sum differently than your cart does.',
+    },
+    intro: {
+      he: 'רוב האנשים שמוותרים על הזמנה מאליאקספרס עושים את זה כי הם לא בטוחים כמה יעלה המכס. התשובה הקצרה: מתחת ל-75 דולר שווי סחורה — לא תשלמו כלום. מעל זה — 18% מע"מ, ולא מכס. הבעיה היא שהסכום שממנו סופרים את ה-75$ והסכום שעליו גובים את המע"מ הם שני סכומים שונים, וזה בדיוק המקום שבו אנשים מופתעים.',
+      en: 'Most people who abandon an AliExpress cart do it because they cannot tell what the tax will be. Short answer: under $75 of goods, nothing. Above it, 18% VAT and no customs duty. The catch is that the figure used to test the $75 threshold and the figure the VAT is charged on are two different numbers — which is exactly where the surprises come from.',
+    },
+    sections: [
+      {
+        heading: { he: 'המצב נכון לאוגוסט 2026', en: 'Where the rules stand in August 2026' },
+        body: {
+          he: 'הסף עלה ל-150$ בתחילת 2026 ואז הוחזר ל-75$ ב-2 ביוני 2026. כלומר: חבילות בשווי 75$–130$ שהיו פטורות לגמרי בחודשים שלפני כן חייבות היום ב-18% מע"מ. אם ראיתם מדריך שמדבר על 150$ — הוא לא מעודכן. הסף השתנה פעמיים בשנה אחת, אז לפני הזמנה גדולה שווה לוודא באתר רשות המסים.',
+          en: 'The threshold rose to $150 in early 2026 and was put back to $75 on 2 June 2026. Parcels worth $75–$130, fully exempt for the months in between, now carry 18% VAT. Any guide still quoting $150 is out of date — the figure moved twice in one year, so check the Tax Authority site before a large order.',
+        },
+      },
+      {
+        heading: { he: 'שלוש המדרגות', en: 'The three brackets' },
+        body: {
+          he: 'עד 75$ שווי סחורה: פטור מלא — בלי מע"מ, בלי מכס, בלי מס קנייה. מ-75$ עד 500$: מכס לא נגבה, אבל מע"מ 18% כן, ובתוספת מס קנייה אם המוצר חייב בו. מעל 500$: נכנסים גם מכס וגם מס קנייה לפי סיווג המוצר, וזה כבר תלוי מאוד במה קניתם. רוב הזמנות אליאקספרס נופלות במדרגה הראשונה או השנייה.',
+          en: 'Up to $75 of goods: fully exempt — no VAT, no duty, no purchase tax. From $75 to $500: no customs duty, but 18% VAT applies, plus purchase tax on the categories that carry it. Above $500: customs duty and purchase tax both enter, at rates that depend on how the item is classified. Most AliExpress orders sit in the first two brackets.',
+        },
+      },
+      {
+        heading: { he: 'הפרט שמפתיע: שני סכומים שונים', en: 'The detail that catches people out' },
+        body: {
+          he: 'כדי לבדוק אם עברתם את ה-75$ סופרים רק את שווי הסחורה — בלי משלוח ובלי ביטוח. אבל ברגע שעברתם, המע"מ מחושב על ה-CIF: סחורה + משלוח + ביטוח. הזמנה של 72$ עם משלוח 10$ נשארת פטורה. הזמנה של 78$ עם אותו משלוח חייבת ב-18% על 88$, כלומר בערך 15.8$ — קפיצה של כמעט 16 דולר על הפרש של 6 דולר במחיר המוצר. אם אתם קרובים לסף, לפצל להזמנות נפרדות זה לרוב זול יותר.',
+          en: 'The $75 test looks only at the goods — shipping and insurance are excluded. Once you cross it, VAT is charged on the CIF value: goods plus shipping plus insurance. A $72 order with $10 shipping stays exempt. A $78 order with the same shipping is taxed 18% on $88, about $15.80 — nearly sixteen dollars triggered by a six-dollar difference in item price. Near the line, splitting into separate orders is usually cheaper.',
+        },
+      },
+      {
+        heading: { he: 'איך זה נגבה בפועל', en: 'How it actually gets collected' },
+        body: {
+          he: 'על חבילות קטנות אליאקספרס בדרך כלל גובה את המע"מ בקופה ומעביר אותו — במקרה כזה החבילה מגיעה בלי דרישת תשלום נוספת. אם המע"מ לא נגבה מראש, חברת השילוח או דואר ישראל יגבו אותו לפני המסירה, בתוספת דמי טיפול. שווה להסתכל בעמוד התשלום: אם כתוב שם "VAT" או "מע"מ" בשורה נפרדת, כבר שילמתם ולא אמורה להגיע דרישה שנייה.',
+          en: 'On small parcels AliExpress usually collects the VAT at checkout and remits it, so the package arrives with nothing further to pay. Where it is not collected upfront, the courier or Israel Post collects it before delivery and adds a handling fee. Check the payment page: if VAT appears as its own line, you have already paid it and no second demand should follow.',
+        },
+      },
+      {
+        heading: { he: 'טעויות שעולות כסף', en: 'Mistakes that cost money' },
+        body: {
+          he: 'לבקש מהמוכר להצהיר על ערך נמוך יותר זה הצהרה כוזבת — החבילה עלולה להיתפס, והביטוח לא יכסה אובדן מעבר לערך שהוצהר. לצרף כמה פריטים למשלוח אחד עלול לדחוף אתכם מעל הסף בלי שהתכוונתם. ומוצרים מסוימים חייבים באישור רגולטורי בלי קשר למחיר — מכשירי חשמל עם תקע, ציוד סלולרי ומוצרי תינוקות הם הקטגוריות שנתקעות הכי הרבה.',
+          en: 'Asking a seller to under-declare is a false declaration: the parcel can be seized, and insurance will not cover a loss beyond the declared value. Consolidating items into one shipment can push you over the threshold unintentionally. And some goods need regulatory approval regardless of price — mains-powered electronics, cellular equipment and baby products are the categories that get held most often.',
+        },
+      },
+    ],
+    faq: [
+      {
+        q: { he: 'האם המשלוח נספר לתוך ה-75 דולר?', en: 'Does shipping count toward the $75?' },
+        a: {
+          he: 'לא לצורך הפטור — הסף נבדק על שווי הסחורה בלבד. אבל אם עברתם את הסף, המע"מ כן מחושב על הסחורה יחד עם המשלוח והביטוח.',
+          en: 'Not for the exemption — the threshold is tested on the goods alone. But once you are over it, the VAT is calculated on the goods together with shipping and insurance.',
+        },
+      },
+      {
+        q: { he: 'שתי הזמנות נפרדות באותו יום — זה נחשב לאחת?', en: 'Do two separate orders on the same day count as one?' },
+        a: {
+          he: 'כל משלוח נבדק בנפרד. אבל אם שתי הזמנות מגיעות מאותו מוכר באותה חבילה פיזית, הן משלוח אחד לכל דבר. אם אתם מפצלים בכוונה, ודאו שהמוכר לא מאחד אותן.',
+          en: 'Each shipment is assessed on its own. But if two orders arrive from the same seller in one physical parcel, that is a single shipment. If you are splitting deliberately, make sure the seller does not consolidate them.',
+        },
+      },
+      {
+        q: { he: 'מה קורה אם החבילה מגיעה פגומה אחרי ששילמתי מע"מ?', en: 'What if the parcel arrives damaged after I have paid VAT?' },
+        a: {
+          he: 'החזר מהמוכר דרך אליאקספרס והחזר מס הם שני מסלולים נפרדים. את המע"מ מבקשים חזרה מרשות המסים עם אסמכתאות, וזה תהליך שלוקח זמן — סיבה טובה להישאר מתחת לסף כשאפשר.',
+          en: 'A seller refund through AliExpress and a tax refund are two separate processes. VAT is reclaimed from the Tax Authority with documentation, and it takes time — a good reason to stay under the threshold where you can.',
+        },
+      },
+      {
+        q: { he: 'הפטור עוד ישתנה?', en: 'Will the threshold change again?' },
+        a: {
+          he: 'ייתכן. הוא עלה ל-150$ ואז ירד חזרה ל-75$ בתוך חצי שנה, בלחץ של קמעונאים מקומיים. המספרים כאן נכונים לאוגוסט 2026 — לפני הזמנה גדולה בדקו באתר רשות המסים.',
+          en: 'Possibly. It went to $150 and back to $75 inside six months under pressure from local retailers. The figures here are current as of August 2026 — check the Tax Authority site before a large order.',
+        },
+      },
+    ],
+    keywords: ['מכס אליאקספרס', 'מע"מ אליאקספרס', 'יבוא אישי פטור 75 דולר', 'כמה מכס משלמים על חבילה', 'aliexpress israel customs', 'israel import vat threshold'],
+    relatedProducts: [
+      { name: 'Under $75 Picks', keyword: 'best value gadgets under 20' },
+      { name: 'Phone Accessories', keyword: 'phone accessories bundle' },
+      { name: 'Home Gadgets', keyword: 'home gadgets useful' },
+    ],
+    publishDate: '2026-08-08',
+    category: 'tips',
+  },
+  {
+    slug: 'desk-wellness-setup-guide',
+    title: {
+      he: 'שדרוג עמדת העבודה: מה באמת משנה תחושה אחרי 8 שעות',
+      en: 'Desk Wellness: What Actually Changes How You Feel After Eight Hours',
+      fr: 'Bien-être au Bureau : Ce Qui Change Vraiment Après Huit Heures',
+      de: 'Schreibtisch-Ergonomie: Was nach acht Stunden wirklich zählt',
+      es: 'Bienestar en el Escritorio: Lo Que de Verdad Cambia Tras Ocho Horas',
+      it: 'Benessere alla Scrivania: Cosa Cambia Davvero Dopo Otto Ore',
+    },
+    metaDesc: {
+      he: 'לא צריך כיסא ב-3000 ש"ח. סדר העדיפויות האמיתי לעמדת עבודה — גובה מסך, תמיכה למרפקים, ותאורה — ומה עולה כמה.',
+      en: 'You do not need a $900 chair. The real priority order for a desk setup — screen height, forearm support, lighting — and what each part costs.',
+      fr: 'Pas besoin d\'un fauteuil à 900€. Le vrai ordre de priorité pour un poste de travail et ce que coûte chaque élément.',
+      de: 'Sie brauchen keinen 900-Euro-Stuhl. Die echte Prioritätenfolge für den Arbeitsplatz — und was jedes Teil kostet.',
+      es: 'No necesitas una silla de 900€. El orden de prioridad real para tu puesto de trabajo y cuánto cuesta cada pieza.',
+      it: 'Non serve una sedia da 900€. Il vero ordine di priorità per la postazione e quanto costa ogni pezzo.',
+    },
+    intro: {
+      he: 'הכאב בסוף יום עבודה כמעט תמיד מגיע משלושה דברים: מסך נמוך מדי, מרפקים בלי תמיכה, ומסך בהיר בחדר חשוך. כיסא יקר לא מתקן אף אחד מהם. הנה סדר העדיפויות לפי כמה שקל שהשקעתם באמת משנה תחושה.',
+      en: 'End-of-day aches almost always trace to three things: a screen that sits too low, forearms with nothing under them, and a bright display in a dark room. An expensive chair fixes none of them. Here is the priority order, ranked by how much each dollar actually changes how you feel.',
+      fr: 'Les douleurs de fin de journée viennent presque toujours de trois choses : un écran trop bas, des avant-bras sans appui et un écran lumineux dans une pièce sombre.',
+      de: 'Beschwerden am Abend haben fast immer drei Ursachen: ein zu tiefer Bildschirm, Unterarme ohne Auflage und ein heller Monitor im dunklen Raum.',
+      es: 'Los dolores al final del día casi siempre vienen de tres cosas: una pantalla demasiado baja, antebrazos sin apoyo y un monitor brillante en una habitación oscura.',
+      it: 'I dolori di fine giornata derivano quasi sempre da tre cose: schermo troppo basso, avambracci senza appoggio e monitor luminoso in una stanza buia.',
+    },
+    sections: [
+      {
+        heading: { he: '1. גובה המסך — התיקון הזול ביותר', en: '1. Screen height — the cheapest fix there is' },
+        body: {
+          he: 'השורה העליונה של המסך צריכה להיות בגובה העיניים או מעט מתחת. אם אתם מסתכלים למטה, הצוואר נושא את משקל הראש בזווית כל היום. זרוע מסך עם מלחציים ($12-25) פותרת את זה ומשחררת את השולחן; מעמד פשוט ($6-12) עושה את אותה עבודה בגובה קבוע. על לפטופ זה קריטי במיוחד — מעמד לפטופ ($8-15) בתוספת מקלדת ועכבר חיצוניים הוא ההבדל בין עמדה זמנית לעמדה שאפשר לעבוד בה.',
+          en: 'The top line of the screen should sit at eye level or just below. Looking down means your neck holds the weight of your head at an angle all day. A clamp monitor arm ($12-25) fixes it and frees the desk; a fixed riser ($6-12) does the same job without the adjustability. On a laptop it matters most — a stand ($8-15) plus an external keyboard and mouse is the difference between a temporary perch and a workstation.',
+        },
+      },
+      {
+        heading: { he: '2. תמיכה למרפקים ולפרקי כף היד', en: '2. Support for forearms and wrists' },
+        body: {
+          he: 'כשהמרפקים תלויים באוויר, הכתפיים עובדות כל היום. תמיכת מרפק שמתחברת לקצה השולחן ($10-20) מעבירה את העומס מהכתף לשולחן. משענת ג\'ל למקלדת ($4-8) עוזרת רק אם היא בגובה של המקשים — משענת גבוהה מדי מכופפת את פרק כף היד למעלה ומחמירה את המצב. אם אתם מקלידים הרבה, מקלדת נמוכה עדיפה על משענת עבה.',
+          en: 'Forearms hanging in the air mean the shoulders carry them all day. A clamp-on forearm support ($10-20) moves that load from your shoulder to the desk. A gel wrist rest ($4-8) helps only if it sits level with the key tops — one that is too tall bends the wrist upward and makes things worse. If you type a lot, a low-profile keyboard beats a thick rest.',
+        },
+      },
+      {
+        heading: { he: '3. תאורה — מה שרוב האנשים מדלגים עליו', en: '3. Lighting — the part most people skip' },
+        body: {
+          he: 'מסך בהיר בחדר חשוך מכריח את האישונים להתאים את עצמם בכל פעם שאתם מסיטים מבט. מנורת בר מעל המסך ($15-30) מאירה את השולחן בלי להחזיר בוהק, וזה ההבדל היחיד שרוב האנשים מרגישים באותו ערב. תאורת הטיה מאחורי המסך ($8-15) מקטינה את הניגודיות בין המסך לקיר. אור לבן-ניטרלי (4000K בערך) נוח יותר לעבודה מאור צהוב חם.',
+          en: 'A bright display in a dark room forces your pupils to readjust every time you glance away. A monitor light bar ($15-30) lights the desk without throwing glare back, and it is the one change most people notice the same evening. Bias lighting behind the screen ($8-15) cuts the contrast between display and wall. Neutral white, around 4000K, is easier to work under than warm yellow.',
+        },
+      },
+      {
+        heading: { he: '4. הרגליים והישיבה', en: '4. Feet and seating' },
+        body: {
+          he: 'אם הרגליים לא מגיעות לרצפה בנוחות, הלחץ עובר לירכיים. הדום רגליים ($10-20) עולה הרבה פחות מכיסא חדש ופותר את זה. כרית ישיבה מקצף זיכרון ($12-25) משפרת כיסא בינוני יותר משדרוג לכיסא בינוני אחר. תמיכה מותנית ($8-18) עובדת רק אם היא בגובה הנכון — מתחת לצלעות, לא באמצע הגב.',
+          en: 'If your feet do not reach the floor comfortably, the pressure moves to your thighs. A footrest ($10-20) costs far less than a new chair and solves it. A memory-foam seat cushion ($12-25) improves a mediocre chair more than swapping it for another mediocre chair. A lumbar support ($8-18) only works at the right height — under the ribs, not mid-back.',
+        },
+      },
+      {
+        heading: { he: 'מה לא לקנות קודם', en: 'What not to buy first' },
+        body: {
+          he: 'שולחן עמידה חשמלי הוא לרוב הפריט הראשון שאנשים קונים והאחרון שהיה צריך. אם המסך בגובה לא נכון, הוא יישאר בגובה לא נכון גם בעמידה. אותו דבר לגבי כיסא גיימינג — הגב הגבוה נראה תומך אבל רוב הדגמים הזולים עם ריפוד קשה. תקנו קודם את הגובה, התמיכה והאור, ואז תחליטו אם עוד חסר משהו.',
+          en: 'A powered standing desk is usually the first thing people buy and the last thing they needed. If the screen is at the wrong height, it stays at the wrong height standing up. Same for a gaming chair — the tall back looks supportive, but the cheap models are firm foam in a racing shape. Fix height, support and light first, then decide whether anything is still missing.',
+        },
+      },
+    ],
+    faq: [
+      {
+        q: { he: 'האם מקלדת ארגונומית מפוצלת שווה את זה?', en: 'Is a split ergonomic keyboard worth it?' },
+        a: {
+          he: 'אם יש כאב בפרק כף היד — כן, היא משנה את זווית האמה. אם אין כאב, ההסתגלות לוקחת שבוע-שבועיים של הקלדה איטית ולא בטוח שתרוויחו. תתחילו ממקלדת נמוכה ומעמד למסך.',
+          en: 'If you have wrist pain, yes — it changes the forearm angle. Without pain, expect a week or two of slower typing while you adapt, for a benefit you may not notice. Start with a low-profile keyboard and a screen riser.',
+        },
+      },
+      {
+        q: { he: 'זרוע מסך תחזיק מסך 27 אינץ\'?', en: 'Will a monitor arm hold a 27-inch display?' },
+        a: {
+          he: 'רוב הזרועות הזולות מדורגות ל-8 ק"ג ומחזיקות 27 אינץ\' בלי בעיה. שני דברים לבדוק: עובי משטח השולחן (המלחציים לרוב עד 8 ס"מ) ותקן VESA — 100x100 הוא הנפוץ, אבל חלק מהמסכים דורשים מתאם.',
+          en: 'Most budget arms are rated to 8 kg and hold a 27-inch fine. Two things to check: your desktop thickness (clamps usually top out around 8 cm) and the VESA pattern — 100x100 is common, but some monitors need an adapter plate.',
+        },
+      },
+      {
+        q: { he: 'כמה זה עולה בסך הכל?', en: 'What does the whole thing cost?' },
+        a: {
+          he: 'מעמד או זרוע למסך, תמיכת מרפק, מנורת בר והדום רגליים יוצאים בערך 50-80$ ביחד. זה פחות מכיסא משרדי בינוני, ומטפל בסיבות עצמן ולא בתסמינים.',
+          en: 'A riser or arm, a forearm support, a light bar and a footrest come to roughly $50-80 together. That is less than one mid-range office chair, and it addresses the causes rather than the symptoms.',
+        },
+      },
+    ],
+    keywords: ['desk setup ergonomic budget', 'monitor light bar worth it', 'monitor arm cheap', 'forearm support desk', 'עמדת עבודה ארגונומית', 'מנורת מסך'],
+    relatedProducts: [
+      { name: 'Monitor Arm', keyword: 'monitor arm desk mount gas spring' },
+      { name: 'Monitor Light Bar', keyword: 'monitor light bar screen lamp' },
+      { name: 'Forearm Support', keyword: 'forearm support desk clamp' },
+      { name: 'Footrest', keyword: 'under desk footrest ergonomic' },
+      { name: 'Laptop Stand', keyword: 'laptop stand aluminum adjustable' },
+    ],
+    publishDate: '2026-08-08',
+    category: 'buying-guide',
+  },
+  {
+    slug: 'home-bar-starter-kit',
+    title: {
+      he: 'בר ביתי מאפס: מה קונים קודם ומה אפשר לדלג עליו',
+      en: 'Building a Home Bar From Scratch: What to Buy First, What to Skip',
+      fr: 'Créer un Bar à la Maison : Quoi Acheter en Premier',
+      de: 'Hausbar von Grund auf: Was zuerst kaufen, was weglassen',
+      es: 'Montar un Bar en Casa: Qué Comprar Primero y Qué Saltarte',
+      it: 'Bar di Casa da Zero: Cosa Comprare Prima e Cosa Saltare',
+    },
+    metaDesc: {
+      he: 'ארבעה כלים מכסים כמעט כל קוקטייל קלאסי. מה באמת צריך, למה שייקר בוסטון עדיף על קוברלר, ואיזה גאדג\'טים רק תופסים מקום.',
+      en: 'Four tools cover nearly every classic cocktail. What you actually need, why a Boston shaker beats a cobbler, and which gadgets just take up space.',
+      fr: 'Quatre outils couvrent presque tous les classiques. Ce qu\'il faut vraiment et ce qui prend juste de la place.',
+      de: 'Vier Werkzeuge decken fast jeden Klassiker ab. Was Sie wirklich brauchen und was nur Platz wegnimmt.',
+      es: 'Cuatro herramientas cubren casi todos los clásicos. Lo que de verdad necesitas y lo que solo ocupa sitio.',
+      it: 'Quattro strumenti coprono quasi tutti i classici. Cosa serve davvero e cosa occupa solo spazio.',
+    },
+    intro: {
+      he: 'סטים של בר ב-24 חלקים נראים מרשימים ורובם נשארים בקופסה. כמעט כל קוקטייל קלאסי דורש ארבעה כלים: משהו לנער בו, משהו למדוד בו, משהו לסנן דרכו וכף ערבוב. הנה מה שכדאי לקנות, ולמה.',
+      en: 'Twenty-four-piece bar sets look impressive and mostly stay in the box. Nearly every classic cocktail needs four tools: something to shake in, something to measure with, something to strain through, and a bar spoon. Here is what to buy, and why.',
+      fr: 'Les coffrets de 24 pièces impressionnent et restent dans leur boîte. Presque tous les classiques demandent quatre outils.',
+      de: '24-teilige Barsets sehen beeindruckend aus und bleiben meist in der Schachtel. Fast jeder Klassiker braucht vier Werkzeuge.',
+      es: 'Los sets de 24 piezas impresionan y se quedan en la caja. Casi todos los clásicos necesitan cuatro herramientas.',
+      it: 'I set da 24 pezzi fanno scena e restano nella scatola. Quasi tutti i classici richiedono quattro strumenti.',
+    },
+    sections: [
+      {
+        heading: { he: 'שייקר: בוסטון, לא קוברלר', en: 'The shaker: Boston, not cobbler' },
+        body: {
+          he: 'שייקר קוברלר (שלושה חלקים עם מסננת מובנית) הוא מה שרוב הסטים כוללים, והמכסה שלו נתקע כשהמתכת מתקררת. שייקר בוסטון — כוס מתכת 800 מ"ל וכוס קטנה 500 מ"ל — נאטם בדפיקה ונפתח בדפיקה, וזה מה שמשתמשים בו בברים. עולה 8-18$. אם אתם קונים דבר אחד מהרשימה, זה הדבר.',
+          en: 'A cobbler shaker — three parts with a built-in strainer — is what most sets include, and its cap seizes as the metal chills. A Boston shaker, an 800 ml tin and a 500 ml tin, seals with a tap and opens with a tap, and it is what bars actually use. $8-18. If you buy one thing off this list, buy this.',
+        },
+      },
+      {
+        heading: { he: 'ג\'יגר: המדידה היא כל ההבדל', en: 'The jigger: measuring is the whole difference' },
+        body: {
+          he: 'קוקטייל הוא יחס. מזיגה בעין משנה את היחס בכל פעם, וזו הסיבה שאותו מתכון יוצא שונה בכל ערב. ג\'יגר יפני עם סימוני מדידה פנימיים ($4-9) נותן 15, 20, 30 ו-45 מ"ל באותו כלי. הימנעו מג\'יגר חלק בלי סימונים — הוא רק שני נפחים.',
+          en: 'A cocktail is a ratio. Free-pouring changes the ratio every time, which is why the same recipe tastes different each evening. A Japanese jigger with internal graduations ($4-9) gives you 15, 20, 30 and 45 ml in one tool. Skip the smooth unmarked kind — it is only two volumes.',
+        },
+      },
+      {
+        heading: { he: 'מסננות: הוֹתוֹרן ומסננת דקה', en: 'Strainers: a Hawthorne and a fine mesh' },
+        body: {
+          he: 'מסננת הוֹתוֹרן ($3-7) — זו עם הקפיץ — יושבת על כוס השייקר ועוצרת קרח ופירות. למשקאות שמנוערים עם מיץ הדרים, סינון כפול דרך מסננת תה דקה ($2-5) מוציא רסיסי קרח ועסיס ונותן מרקם חלק. שתיהן ביחד עולות פחות מעשרה דולר ומשנות את התוצאה יותר מכל גאדג\'ט אחר.',
+          en: 'A Hawthorne strainer ($3-7) — the one with the spring — sits on the shaking tin and holds back ice and fruit. For anything shaken with citrus, double-straining through a fine tea strainer ($2-5) removes ice shards and pulp and gives a clean texture. Both together cost under ten dollars and change the result more than any gadget.',
+        },
+      },
+      {
+        heading: { he: 'קרח: החלק שהכי מזלזלים בו', en: 'Ice: the most underrated part' },
+        body: {
+          he: 'קרח קטן נמס מהר ומדלל את המשקה תוך דקות. תבנית סיליקון לקוביות 5 ס"מ ($5-12) נותנת קובייה אחת גדולה לכוס אולד פאשנד, שמצננת באותה מידה ומדללת הרבה פחות. לקוקטיילים ארוכים, תבנית לקוביות מוארכות מתאימה לכוס גבוהה. זו ההשקעה הכי זולה שמשנה את הטעם.',
+          en: 'Small ice melts fast and waters the drink down within minutes. A silicone mould for 5 cm cubes ($5-12) gives one large cube for an Old Fashioned glass — same chill, far less dilution. For long drinks, a collins-spear mould fits a highball. It is the cheapest change that alters how the drink tastes.',
+        },
+      },
+      {
+        heading: { he: 'מה אפשר לדלג עליו', en: 'What you can skip' },
+        body: {
+          he: 'מוֹדְלֶר מעץ מיותר — גב של כף ערבוב מועך נענע ולימון בדיוק אותו דבר, ועץ לא שרוד במדיח. סחטן הדרים חשמלי מיותר לשניים-שלושה משקאות. וסט של 24 חלקים כמעט תמיד מרכיב את החלקים החלשים: קוברלר, ג\'יגר בלי סימונים ומסננת רופפת. עדיף לקנות ארבעה פריטים טובים בנפרד.',
+          en: 'A wooden muddler is unnecessary — the back of a bar spoon presses mint and citrus just as well, and wood does not survive a dishwasher. An electric citrus juicer is overkill for two or three drinks. And a 24-piece set almost always bundles the weak versions: a cobbler, an unmarked jigger, a loose strainer. Four good pieces bought separately beat it.',
+        },
+      },
+    ],
+    faq: [
+      {
+        q: { he: 'נערים או מערבבים?', en: 'Shake or stir?' },
+        a: {
+          he: 'הכלל הישן עובד: משקה שכולו אלכוהול (נגרוני, מנהטן, מרטיני) מערבבים; כל דבר עם מיץ, ביצה או שמנת מנערים. ניעור מכניס אוויר ומעכיר — נהדר למרגריטה, הרסני למרטיני.',
+          en: 'The old rule holds: all-spirit drinks (Negroni, Manhattan, Martini) are stirred; anything with juice, egg or cream is shaken. Shaking aerates and clouds the drink — right for a Margarita, wrong for a Martini.',
+        },
+      },
+      {
+        q: { he: 'כמה עולה להתחיל?', en: 'What does it cost to start?' },
+        a: {
+          he: 'שייקר בוסטון, ג\'יגר מסומן, שתי מסננות, כף ערבוב ותבנית קרח יוצאים 25-45$ ביחד — פחות משני קוקטיילים בבר. הכוסות והאלכוהול הם ההוצאה האמיתית.',
+          en: 'A Boston shaker, a graduated jigger, two strainers, a bar spoon and an ice mould come to $25-45 together — less than two cocktails out. The glassware and the spirits are the real expense.',
+        },
+      },
+    ],
+    keywords: ['home bar starter kit', 'boston shaker vs cobbler', 'japanese jigger', 'cocktail tools beginner', 'בר ביתי', 'ערכת קוקטיילים'],
+    relatedProducts: [
+      { name: 'Boston Shaker', keyword: 'boston shaker tin set stainless' },
+      { name: 'Japanese Jigger', keyword: 'japanese jigger graduated 30ml' },
+      { name: 'Hawthorne Strainer', keyword: 'hawthorne cocktail strainer' },
+      { name: 'Ice Cube Mould', keyword: 'silicone ice cube mold large square' },
+      { name: 'Bar Spoon', keyword: 'twisted bar spoon long stainless' },
+    ],
+    publishDate: '2026-08-08',
+    category: 'buying-guide',
+  },
+  {
+    slug: 'zero-waste-kitchen-swaps',
+    title: {
+      he: 'מטבח בלי חד-פעמי: ההחלפות שבאמת מחזיקות',
+      en: 'Zero-Waste Kitchen: The Swaps That Actually Last',
+      fr: 'Cuisine Zéro Déchet : Les Alternatives Qui Durent Vraiment',
+      de: 'Zero-Waste-Küche: Die Alternativen, die wirklich halten',
+      es: 'Cocina Sin Residuos: Los Cambios Que de Verdad Duran',
+      it: 'Cucina Zero Rifiuti: I Cambi Che Durano Davvero',
+    },
+    metaDesc: {
+      he: 'לא כל החלפה "ידידותית לסביבה" מחזיקה מעמד. מה שורד שימוש יומיומי, מה מתפרק אחרי חודש, ותוך כמה זמן זה מחזיר את עצמו.',
+      en: 'Not every eco swap survives daily use. What holds up, what falls apart within a month, and how long each takes to pay for itself.',
+      fr: 'Toutes les alternatives écologiques ne résistent pas. Ce qui tient, ce qui casse et en combien de temps c\'est rentabilisé.',
+      de: 'Nicht jede Öko-Alternative übersteht den Alltag. Was hält, was nach einem Monat kaputtgeht und wann es sich rechnet.',
+      es: 'No todo cambio ecológico aguanta el uso diario. Qué dura, qué se rompe en un mes y cuándo se amortiza.',
+      it: 'Non ogni alternativa ecologica regge l\'uso quotidiano. Cosa dura, cosa si rompe e quando si ripaga.',
+    },
+    intro: {
+      he: 'החלפה שנשברת אחרי חודש היא לא חיסכון ולא ידידותית לסביבה — היא סתם קנייה נוספת. המדריך הזה מפריד בין ההחלפות ששורדות שימוש יומיומי לבין אלה שנראות טוב בתמונה ומתפרקות במדיח.',
+      en: 'A swap that breaks in a month is neither cheaper nor greener — it is just another purchase. This guide separates the swaps that survive daily use from the ones that photograph well and disintegrate in the dishwasher.',
+      fr: 'Une alternative qui casse en un mois n\'est ni plus économique ni plus écologique. Voici celles qui tiennent vraiment.',
+      de: 'Eine Alternative, die nach einem Monat kaputtgeht, ist weder günstiger noch grüner. Hier steht, was wirklich hält.',
+      es: 'Un cambio que se rompe en un mes no es ni más barato ni más ecológico. Aquí están los que de verdad aguantan.',
+      it: 'Un cambio che si rompe in un mese non è né più economico né più ecologico. Ecco quelli che reggono davvero.',
+    },
+    sections: [
+      {
+        heading: { he: 'מה שורד: סיליקון, נירוסטה, כותנה', en: 'What survives: silicone, stainless, cotton' },
+        body: {
+          he: 'שקיות סיליקון לשימוש חוזר ($3-8 ליחידה) נכנסות למקפיא, למדיח ולמיקרוגל ומחזיקות שנים — הן מחליפות שקיות ziplock בערך פי מאה. מכסי סיליקון נמתחים ($5-10 לסט) מכסים קערות בלי ניילון נצמד. מסננת תה מנירוסטה ($2-5) מחליפה שקיות תה לנצח. שקיות כותנה לירקות ($5-10 לסט) נכנסות לכביסה. כל אלה מחזירים את עצמם תוך חודשיים-שלושה של שימוש יומיומי.',
+          en: 'Reusable silicone bags ($3-8 each) go in the freezer, the dishwasher and the microwave and last years — they replace roughly a hundred ziplock bags apiece. Stretch silicone lids ($5-10 a set) cover bowls without cling film. A stainless tea infuser ($2-5) replaces tea bags permanently. Cotton produce bags ($5-10 a set) go through the wash. All of these pay for themselves within two or three months of daily use.',
+        },
+      },
+      {
+        heading: { he: 'מה מתפרק: שעווה, במבוק בלח, ספוגים דקים', en: 'What falls apart: wax wraps, wet bamboo, thin sponges' },
+        body: {
+          he: 'מטליות שעוות דבורים מאבדות את ההידבקות אחרי כ-20 שטיפות, ולא נוגעים איתן בבשר נא. כלי במבוק שנשארים רטובים מפתחים כתמים שחורים תוך שבועות — במבוק דורש ייבוש בין שימושים, וזה לא מסתדר עם מדיח. ספוגי לוּפָה זולים מתפוררים אחרי כמה שבועות. אם קונים במבוק, קונים למה שנשאר יבש: כלי הגשה, לא כפות שיושבות בסיר.',
+          en: 'Beeswax wraps lose their cling after about twenty washes, and you cannot use them on raw meat. Bamboo utensils left wet develop black staining within weeks — bamboo needs drying between uses, which does not fit a dishwasher routine. Cheap loofah sponges shed and crumble after a few weeks. If you buy bamboo, buy it for things that stay dry: serving pieces, not the spoon that sits in the pot.',
+        },
+      },
+      {
+        heading: { he: 'המקרר: איפה הפחת האמיתי', en: 'The fridge: where the real waste is' },
+        body: {
+          he: 'רוב הפחת במטבח הוא אוכל שנזרק, לא אריזות. מיכלי אחסון עם שסתום ואקום ($8-20 לסט) מאריכים חיי ירקות משמעותית. סופגי אתילן למגירת הפירות ($5-10) מאטים הבשלה. מיכלים שקופים עם תאריך פשוט עובדים כי רואים מה יש. שדרוג האחסון חוסך יותר כסף מכל החלפה של חד-פעמי.',
+          en: 'Most kitchen waste is food thrown out, not packaging. Vacuum-valve storage containers ($8-20 a set) extend vegetable life noticeably. Ethylene absorbers in the crisper drawer ($5-10) slow ripening. Clear containers with a date on them work simply because you can see what is in there. Improving storage saves more money than any single-use swap.',
+        },
+      },
+      {
+        heading: { he: 'קפה ותה', en: 'Coffee and tea' },
+        body: {
+          he: 'קפסולה נטענת מנירוסטה ($6-15) מחליפה קפסולות אלומיניום, אבל דורשת טחינה נכונה ודפיקה — אם אתם לא מוכנים לכוונן, פילטר מתכת לפור-אובר ($5-12) פשוט יותר ומבטל נייר לגמרי. פילטר מתכת מעביר יותר שמנים, כלומר כוס עם יותר גוף ופחות נקייה מנייר. זה עניין של טעם, לא של איכות.',
+          en: 'A refillable stainless capsule ($6-15) replaces aluminium pods, but needs the right grind and a proper tamp — if you are not up for dialling it in, a metal pour-over filter ($5-12) is simpler and eliminates paper entirely. A metal filter passes more oils, so the cup has more body and less of the clarity paper gives. That is a preference, not a quality difference.',
+        },
+      },
+    ],
+    faq: [
+      {
+        q: { he: 'שקיות סיליקון באמת בטוחות למקפיא ולמיקרוגל?', en: 'Are silicone bags really freezer and microwave safe?' },
+        a: {
+          he: 'סיליקון בדרגת מזון כן, בטווח של בערך -40°C עד 220°C. הנקודה לבדוק היא הסוגר: דגמים זולים עם סוגר פלסטיק נסדק בהקפאה. חפשו סוגר סיליקון או נירוסטה.',
+          en: 'Food-grade silicone is, across roughly -40°C to 220°C. The part to check is the closure: cheap models with a plastic slider crack when frozen. Look for a silicone or stainless closure.',
+        },
+      },
+      {
+        q: { he: 'תוך כמה זמן זה מחזיר את עצמו?', en: 'How long until this pays for itself?' },
+        a: {
+          he: 'סט התחלתי — ארבע שקיות סיליקון, מכסים נמתחים, שקיות ירקות ומסננת תה — יוצא בערך 25-40$. מול שקיות חד-פעמיות, ניילון נצמד ושקיות תה, זה מתאזן תוך שלושה-ארבעה חודשים.',
+          en: 'A starter set — four silicone bags, stretch lids, produce bags and a tea infuser — runs about $25-40. Against disposable bags, cling film and tea bags, it breaks even in three to four months.',
+        },
+      },
+      {
+        q: { he: 'איך מנקים שקית סיליקון שהריחה מהאוכל?', en: 'How do you clean a silicone bag that has taken on a smell?' },
+        a: {
+          he: 'סיליקון סופג ריחות של שום, קארי ובצל. משרים בסודה לשתייה וחומץ חצי שעה, ואז מייבשים בשמש — אור UV מפרק את מה שנשאר. מדיח לבד לרוב לא מספיק.',
+          en: 'Silicone picks up garlic, curry and onion. Soak in baking soda and vinegar for half an hour, then dry in sunlight — UV breaks down what is left. A dishwasher cycle alone usually will not do it.',
+        },
+      },
+    ],
+    keywords: ['zero waste kitchen swaps', 'reusable silicone bags review', 'do beeswax wraps work', 'plastic free kitchen', 'מטבח ללא פלסטיק', 'שקיות סיליקון'],
+    relatedProducts: [
+      { name: 'Silicone Food Bags', keyword: 'reusable silicone food storage bags' },
+      { name: 'Stretch Lids', keyword: 'silicone stretch lids set' },
+      { name: 'Produce Bags', keyword: 'cotton mesh produce bags reusable' },
+      { name: 'Vacuum Containers', keyword: 'vacuum seal food storage container set' },
+      { name: 'Pour-Over Filter', keyword: 'stainless steel pour over coffee filter' },
+    ],
+    publishDate: '2026-08-08',
+    category: 'buying-guide',
+  },
+  {
+    slug: 'arduino-starter-kit-guide',
+    title: {
+      he: 'ערכת אלקטרוניקה ראשונה: מה שווה לקנות ומה סתם ממלא את הקופסה',
+      en: 'Your First Electronics Kit: What Is Worth Buying, What Just Fills the Box',
+      fr: 'Premier Kit Électronique : Ce Qui Vaut le Coup et Ce Qui Remplit la Boîte',
+      de: 'Das erste Elektronik-Set: Was sich lohnt und was nur die Schachtel füllt',
+      es: 'Tu Primer Kit de Electrónica: Qué Vale la Pena y Qué Solo Rellena la Caja',
+      it: 'Il Primo Kit di Elettronica: Cosa Vale e Cosa Riempie Solo la Scatola',
+    },
+    metaDesc: {
+      he: 'ESP32 או Uno? כמה חיישנים באמת צריך? מה מבדיל ערכה ב-15$ מערכה ב-50$, ואיזה חלקים תשתמשו בהם בפועל.',
+      en: 'ESP32 or Uno? How many sensors do you actually need? What separates a $15 kit from a $50 one, and which parts you will genuinely use.',
+      fr: 'ESP32 ou Uno ? Combien de capteurs faut-il vraiment ? Ce qui distingue un kit à 15$ d\'un kit à 50$.',
+      de: 'ESP32 oder Uno? Wie viele Sensoren braucht man wirklich? Was ein 15-Dollar-Set von einem 50-Dollar-Set unterscheidet.',
+      es: '¿ESP32 o Uno? ¿Cuántos sensores necesitas de verdad? Qué diferencia un kit de 15$ de uno de 50$.',
+      it: 'ESP32 o Uno? Quanti sensori servono davvero? Cosa distingue un kit da 15$ da uno da 50$.',
+    },
+    intro: {
+      he: 'ערכות "37 חיישנים" נראות כמו מציאה, ובפועל משתמשים בערך בשישה מהם. מה שקובע אם תסיימו פרויקט ראשון זה לא מספר החלקים אלא הלוח שבחרתם, איכות חוטי הגישור, ואם יש לכם ספק כוח יציב. הנה איך לבחור.',
+      en: 'A "37 sensors" kit looks like a bargain, and in practice you use about six of them. What decides whether you finish a first project is not the part count — it is which board you picked, the quality of the jumper wires, and whether you have a stable power supply. Here is how to choose.',
+      fr: 'Les kits « 37 capteurs » semblent avantageux ; en pratique on en utilise six. Ce qui compte, c\'est la carte, les fils et l\'alimentation.',
+      de: '„37 Sensoren"-Sets wirken günstig; genutzt werden etwa sechs. Entscheidend sind Board, Jumper-Kabel und Stromversorgung.',
+      es: 'Los kits de «37 sensores» parecen una ganga; en la práctica usas seis. Lo decisivo es la placa, los cables y la alimentación.',
+      it: 'I kit «37 sensori» sembrano un affare; in pratica ne usi sei. Ciò che conta è la scheda, i cavi e l\'alimentazione.',
+    },
+    sections: [
+      {
+        heading: { he: 'הלוח: ESP32 כמעט תמיד', en: 'The board: ESP32, nearly always' },
+        body: {
+          he: 'Arduino Uno תואם ($4-8) הוא הקלאסיקה ויש לו הכי הרבה מדריכים. אבל ESP32 ($4-9) עולה אותו דבר ומגיע עם Wi-Fi ו-Bluetooth מובנים, יותר זיכרון ומעבד דו-ליבתי — כלומר הפרויקט השני שלכם יכול להיות מחובר לרשת בלי לקנות שום דבר נוסף. הוא עובד באותה סביבת Arduino IDE. הסיבה היחידה להתחיל ב-Uno היא אם אתם עוקבים אחרי קורס ספציפי שדורש אותו.',
+          en: 'A compatible Arduino Uno ($4-8) is the classic and has the most tutorials. But an ESP32 ($4-9) costs the same and arrives with Wi-Fi and Bluetooth built in, more memory and a dual-core processor — meaning your second project can be networked without buying anything else. It runs in the same Arduino IDE. The one reason to start on a Uno is if you are following a course that requires it.',
+        },
+      },
+      {
+        heading: { he: 'החיישנים שבאמת בשימוש', en: 'The sensors people actually use' },
+        body: {
+          he: 'מתוך ערכת 37 החלקים, אלה שחוזרים בפרויקטים אמיתיים: DHT22 לטמפרטורה ולחות (מדויק יותר מ-DHT11 שנמצא בערכות הזולות), HC-SR04 למרחק אולטרסוני, PIR לגילוי תנועה, LDR לעוצמת אור, ומודול ממסר להפעלת מכשירי 220V. השאר — חיישן להבה, חיישן דופק, מקלדת ממברנה — כמעט אף פעם לא מגיעים לפרויקט שני.',
+          en: 'Out of a 37-piece kit, these are the ones that recur in real projects: a DHT22 for temperature and humidity (more accurate than the DHT11 that ships in cheap kits), an HC-SR04 for ultrasonic distance, a PIR for motion, an LDR for light level, and a relay module for switching mains devices. The rest — flame sensor, pulse sensor, membrane keypad — rarely make it into a second project.',
+        },
+      },
+      {
+        heading: { he: 'איפה ערכות זולות חוסכות', en: 'Where cheap kits cut corners' },
+        body: {
+          he: 'חוטי גישור זולים הם הבעיה הכי נפוצה — הליבה נשברת בתוך הבידוד ומקבלים תקלה שנראית כמו באג בקוד. חוטים איכותיים ($3-6 ל-120 יחידות) חוסכים שעות. בעיה שנייה: לוח מטריצה עם קפיצים חלשים שלא מחזיקים רגלי רכיבים. שלישית: ספק כוח. הזנת מנועים או רצועת LED מיציאת ה-5V של הלוח מפילה אותו — ספק חיצוני ($3-8) פותר את זה.',
+          en: 'Cheap jumper wires are the most common problem — the core snaps inside the insulation and you get a fault that looks exactly like a bug in your code. Decent wires ($3-6 for 120) save hours. Second: a breadboard with weak springs that will not grip component legs. Third: power. Driving motors or an LED strip from the board\'s 5V pin browns it out — an external supply ($3-8) fixes it.',
+        },
+      },
+      {
+        heading: { he: 'מה להוסיף אחרי הפרויקט הראשון', en: 'What to add after the first project' },
+        body: {
+          he: 'מולטימטר ($8-15) הוא הכלי שהופך ניחושים לבדיקה — בלעדיו מנפים תקלות בעיניים. מלחם עם בקרת טמפרטורה ($15-30) נדרש ברגע שרוצים משהו קבוע ולא על לוח מטריצה. וצג OLED קטן ב-I2C ($2-5) הופך כל פרויקט למשהו שאפשר להראות, כי רואים את הפלט בלי מחשב מחובר.',
+          en: 'A multimeter ($8-15) is the tool that turns guessing into measuring — without one you debug by eye. A temperature-controlled soldering iron ($15-30) becomes necessary the moment you want something permanent rather than on a breadboard. And a small I2C OLED display ($2-5) makes any project demonstrable, because the output is visible with no computer attached.',
+        },
+      },
+    ],
+    faq: [
+      {
+        q: { he: 'ESP32 או Raspberry Pi?', en: 'ESP32 or Raspberry Pi?' },
+        a: {
+          he: 'הם לא מתחרים. ESP32 הוא מיקרו-בקר: מתעורר מיד, אוכל מעט חשמל, מריץ לולאה אחת אמינה — מושלם לחיישנים ולאוטומציה. Raspberry Pi הוא מחשב עם לינוקס — צריך אותו למצלמה, לשרת או לעיבוד וידאו. לפרויקט חיישנים ראשון, ESP32, ובעשירית המחיר.',
+          en: 'They are not competitors. An ESP32 is a microcontroller: instant boot, tiny power draw, one reliable loop — ideal for sensors and automation. A Raspberry Pi is a Linux computer, which you need for a camera, a server or video processing. For a first sensor project, the ESP32, at a tenth of the price.',
+        },
+      },
+      {
+        q: { he: 'למה הלוח לא מזוהה במחשב?', en: 'Why is my board not detected?' },
+        a: {
+          he: 'כמעט תמיד אחת משתיים: כבל USB לטעינה בלבד בלי חוטי נתונים (תחליפו כבל), או שחסר דרייבר ל-CH340/CP2102 — השבב שלוחות תואמים משתמשים בו במקום ה-FTDI המקורי. את הדרייבר מתקינים ידנית והלוח מופיע מיד.',
+          en: 'Almost always one of two things: a charge-only USB cable with no data lines (swap the cable), or a missing CH340/CP2102 driver — the chip compatible boards use instead of the original FTDI. Install the driver manually and the port appears immediately.',
+        },
+      },
+      {
+        q: { he: 'האם כדאי לקנות ערכה או חלקים בנפרד?', en: 'Kit or individual parts?' },
+        a: {
+          he: 'ערכה משתלמת בפעם הראשונה כי היא כוללת לוח מטריצה, נגדים, LEDים וחוטים במחיר שקשה להרכיב לבד. מהפרויקט השני והלאה עדיף לקנות ספציפית — תשלמו פחות ותקבלו רכיבים טובים יותר.',
+          en: 'A kit is worth it the first time, because it bundles a breadboard, resistors, LEDs and wires for less than assembling them separately. From the second project on, buy specifically — you pay less and get better parts.',
+        },
+      },
+    ],
+    keywords: ['arduino starter kit beginner', 'esp32 vs arduino uno', 'best sensors arduino kit', 'electronics kit worth buying', 'ערכת ארדואינו', 'ESP32 למתחילים'],
+    relatedProducts: [
+      { name: 'ESP32 Board', keyword: 'esp32 development board wifi bluetooth' },
+      { name: 'Sensor Kit', keyword: 'arduino sensor kit dht22 ultrasonic' },
+      { name: 'Jumper Wires', keyword: 'dupont jumper wires 120pcs' },
+      { name: 'Breadboard', keyword: 'solderless breadboard 830 tie points' },
+      { name: 'OLED Display', keyword: 'oled display i2c 0.96 inch' },
+    ],
+    publishDate: '2026-08-08',
     category: 'buying-guide',
   },
 ];

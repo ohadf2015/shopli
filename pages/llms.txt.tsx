@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next';
 import { SITE_URL, SITE_NAME, SITE_TAGLINE } from '../lib/seo';
 import { getAllCollections } from '../lib/collections';
-import { blogPosts } from '../lib/blog';
+import { blogPosts, type BlogPost } from '../lib/blog';
 import { comparisons } from '../lib/comparisons';
 import { ALL_REGIONS, getRegion } from '../lib/regions';
 
@@ -16,6 +16,8 @@ function buildLlmsTxt(): string {
   const en = (obj: any) => obj?.en || Object.values(obj || {})[0] || '';
   const collections = getAllCollections();
   const guides = blogPosts.filter((p) => (p.category as string) !== 'draft');
+  // A region-restricted post 404s under /eu, so link it where it actually lives.
+  const guideUrl = (p: BlogPost) => `${SITE_URL}/${p.regions?.[0] || 'eu'}/blog/${p.slug}`;
   const regionList = ALL_REGIONS.map((r) => {
     const cfg = getRegion(r.code);
     return `${r.code} (${r.label}, ${cfg.currency})`;
@@ -43,7 +45,7 @@ function buildLlmsTxt(): string {
     '',
     '## Buying guides',
     '',
-    ...guides.map((p) => `- [${en(p.title)}](${SITE_URL}/eu/blog/${p.slug}): ${en(p.metaDesc)}`),
+    ...guides.map((p) => `- [${en(p.title)}](${guideUrl(p)}): ${en(p.metaDesc)}`),
     '',
     '## Comparisons',
     '',

@@ -3,10 +3,10 @@ import Link from 'next/link';
 import Header from '../../../components/Header';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
-import { getBlogPost } from '../../../lib/blog';
+import { getBlogPost, isBlogPostInRegion } from '../../../lib/blog';
 import { blogPostingJsonLd, breadcrumbJsonLd, faqJsonLd, SITE_URL } from '../../../lib/seo';
 
-export default function BlogPostPage({ region, config, post, rtl, error }: any) {
+export default function BlogPostPage({ region, config, post, rtl, regionOnly, error }: any) {
   if (error) {
     return <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>Error: {error}</div>;
   }
@@ -49,6 +49,7 @@ export default function BlogPostPage({ region, config, post, rtl, error }: any) 
         ogType="article"
         articlePublishedTime={p.publishDate}
         articleModifiedTime={p.publishDate}
+        hreflang={!regionOnly}
         jsonLd={structuredData}
       />
       <Header currentRegion={region} dir={config?.direction} />
@@ -144,6 +145,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
   const config = getRegion(region);
   const rtl = config.direction === 'rtl';
 
+  // 404 rather than render: a country-specific post (import tax rules, say) is
+  // wrong in the other locales, not merely untranslated.
+  if (!isBlogPostInRegion(slug, region)) return { notFound: true };
   const post = getBlogPost(slug);
   if (!post) return { notFound: true };
 
@@ -151,6 +155,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
   res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
 
   return {
-    props: { region, config, post, rtl },
+    // regionOnly suppresses hreflang: the alternates would point at the eight
+    // locales where this post 404s.
+    props: { region, config, post, rtl, regionOnly: !!post.regions },
   };
 };

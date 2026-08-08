@@ -49,8 +49,8 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   const { getAllComparisonSlugs } = await import('../lib/comparisons').catch(() => ({
     getAllComparisonSlugs: () => [] as string[],
   }));
-  const { getAllBlogSlugs } = await import('../lib/blog').catch(() => ({
-    getAllBlogSlugs: () => [] as string[],
+  const { getBlogPostsForRegion } = await import('../lib/blog').catch(() => ({
+    getBlogPostsForRegion: (_r: string) => [] as Array<{ slug: string }>,
   }));
 
   // Fresh lastmod on every generation (hourly revalidation via Cache-Control)
@@ -61,7 +61,6 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   const collections = getAllCollections();
   const moodSlugs = getAllMoodboardSlugs();
   const compareSlugs = getAllComparisonSlugs();
-  const blogSlugs = getAllBlogSlugs();
 
   // Collect dynamic product IDs from all collections (AliExpress API)
   // so PDP pages for live deal products appear in the sitemap.
@@ -205,9 +204,10 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     }
   }
 
-  // Blog posts
+  // Blog posts — per region, since a region-restricted post 404s elsewhere and
+  // listing it for all nine would put eight dead URLs in the sitemap.
   for (const region of regionCodes) {
-    for (const slug of blogSlugs) {
+    for (const { slug } of getBlogPostsForRegion(region)) {
       urls.push({
         loc: `${SITE_URL}/${region}/blog/${slug}`,
         changefreq: 'monthly',
