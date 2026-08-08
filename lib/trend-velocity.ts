@@ -78,14 +78,18 @@ export async function recordVolumes(
   const rows = products.filter((p) => p.id && typeof p.volume === 'number' && p.volume > 0);
   if (!rows.length) return 0;
 
+  // One multi-row statement, not one round trip per product: a full sweep is
+  // ~1,700 products across the regions, and sequential inserts took the cron
+  // past Vercel's function limit.
   try {
-    for (const p of rows) {
-      await sql`
-        INSERT INTO product_volume_snapshots (product_id, region, volume)
-        VALUES (${p.id}, ${region}, ${p.volume})
-        ON CONFLICT (product_id, region, seen_on)
-        DO UPDATE SET volume = EXCLUDED.volume`;
-    }
+    const ids = rows.map((p) => p.id as string);
+    const volumes = rows.map((p) => String(p.volume));
+    await sql`
+      INSERT INTO product_volume_snapshots (product_id, region, volume)
+      SELECT id, ${region}, vol
+      FROM UNNEST(${ids}::text[], ${volumes}::bigint[]) AS t(id, vol)
+      ON CONFLICT (product_id, region, seen_on)
+      DO UPDATE SET volume = EXCLUDED.volume`;
     return rows.length;
   } catch {
     return 0;

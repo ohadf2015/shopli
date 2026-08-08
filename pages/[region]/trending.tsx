@@ -14,7 +14,7 @@ import {
 } from '../../lib/seo';
 import { listingAggregateFields } from '../../lib/pdp';
 import { getTrendCategories } from '../../lib/trend-calendar';
-import { computeVolumeVelocity, getVolumeBaselines, recordVolumes } from '../../lib/trend-velocity';
+import { computeVolumeVelocity, getVolumeBaselines } from '../../lib/trend-velocity';
 import { dedupeByTitle } from '../../lib/trending';
 import type { RegionConfig } from '../../lib/regions';
 
@@ -128,7 +128,12 @@ async function fetchTrendingProducts(region: string, limit = 30): Promise<Trendi
 
   // Real momentum: how many units each item has sold since we first saw it.
   // Fails open to an empty map with no DB, in which case scoring is unchanged.
-  const baselines = await getVolumeBaselines(region, all.map((p) => p.id!).filter(Boolean));
+  // Time-boxed because Neon compute auto-suspends and a cold wake would land
+  // on the TTFB of the page this whole change set exists to make fast.
+  const baselines = await Promise.race([
+    getVolumeBaselines(region, all.map((p) => p.id!).filter(Boolean)),
+    new Promise<{}>((resolve) => setTimeout(() => resolve({}), 2000)),
+  ]);
   const velocity = computeVolumeVelocity(baselines, all);
 
   for (const p of all) {
@@ -138,9 +143,9 @@ async function fetchTrendingProducts(region: string, limit = 30): Promise<Trendi
     if (perDay && perDay >= 1) p.trendReason = risingReason(perDay, lang);
   }
 
-  // Record today's counts so tomorrow has a baseline. Not awaited on the render
-  // path — a slow write must not hold up the page.
-  void recordVolumes(region, all);
+  // No write here. A fire-and-forget promise in a serverless function is not
+  // guaranteed to run — the instance can freeze once the response is sent — so
+  // it would be a write that works sometimes. The daily cron is the writer.
 
   // Score desc, id asc for determinism, then drop near-identical titles
   // (same item relisted under a new supplier ID) keeping the best-scored.
@@ -358,7 +363,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
   const generatedAt = new Date().toISOString().split('T')[0];
 
   // SEO landing page updated daily — let the edge cache absorb renders (1h, SWR 24h).
-  res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+  // Short SWR: this page emits Product offers.price, and a long stale window
+  // would serve stale prices in structured data.
+  res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=3600');
 
   return {
     props: {

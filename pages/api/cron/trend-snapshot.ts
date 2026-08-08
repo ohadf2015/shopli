@@ -21,20 +21,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: 'unauthorized' });
   }
 
+  // Categories run concurrently: sequentially this was ~90 AliExpress searches
+  // back to back and the whole sweep measured 343s, past the function limit.
   const results: Record<string, number> = {};
-  for (const { code } of ALL_REGIONS) {
-    const seen = new Map<string, { id: string; volume?: number }>();
-    for (const cat of getTrendCategories(code)) {
-      try {
-        for (const p of await searchCollection(code, cat.keywords, 20)) {
+  await Promise.all(
+    ALL_REGIONS.map(async ({ code }) => {
+      const seen = new Map<string, { id: string; volume?: number }>();
+      const batches = await Promise.all(
+        getTrendCategories(code).map((cat) =>
+          // One dead category must not lose the whole region's snapshot.
+          searchCollection(code, cat.keywords, 20).catch(() => [])
+        )
+      );
+      for (const products of batches) {
+        for (const p of products) {
           if (p.id && !seen.has(p.id)) seen.set(p.id, { id: p.id, volume: p.volume });
         }
-      } catch {
-        /* one dead category must not lose the whole region's snapshot */
       }
-    }
-    results[code] = await recordVolumes(code, Array.from(seen.values()));
-  }
+      results[code] = await recordVolumes(code, Array.from(seen.values()));
+    })
+  );
 
   res.setHeader('Cache-Control', 'no-store');
   return res.status(200).json({ ok: true, recorded: results });
