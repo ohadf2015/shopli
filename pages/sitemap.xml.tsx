@@ -124,6 +124,31 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       priority: 0.5,
       lastmod: today,
     });
+    // Legal pages
+    urls.push({
+      loc: `${SITE_URL}/${region}/about`,
+      changefreq: 'monthly',
+      priority: 0.5,
+      lastmod: today,
+    });
+    urls.push({
+      loc: `${SITE_URL}/${region}/privacy`,
+      changefreq: 'monthly',
+      priority: 0.5,
+      lastmod: today,
+    });
+    urls.push({
+      loc: `${SITE_URL}/${region}/terms`,
+      changefreq: 'monthly',
+      priority: 0.5,
+      lastmod: today,
+    });
+    urls.push({
+      loc: `${SITE_URL}/${region}/contact`,
+      changefreq: 'monthly',
+      priority: 0.5,
+      lastmod: today,
+    });
   }
 
   // Blog index pages
