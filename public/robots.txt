@@ -2,5 +2,10 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /*/google-shopping-feed
+Disallow: /admin
+Disallow: /test
+Disallow: /*/wishlist
+Disallow: /*/compare?
+Disallow: /*/search?
 
 Sitemap: https://www.tryshopli.com/sitemap.xml

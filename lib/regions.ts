@@ -2,6 +2,8 @@ export interface RegionConfig {
   code: string;
   label: string;
   locale: string;
+  /** ISO 639-1 (+ optional ISO 3166-1 alpha-2) code used in hreflang annotations. */
+  hreflang: string;
   currency: string;
   currencySymbol: string;
   flag: string;
@@ -20,6 +22,7 @@ export const REGIONS: Record<string, RegionConfig> = {
     code: 'il',
     label: 'ישראל',
     locale: 'he-IL',
+    hreflang: 'he',
     currency: 'ILS',
     currencySymbol: '₪',
     flag: 'il-flag',
@@ -36,6 +39,7 @@ export const REGIONS: Record<string, RegionConfig> = {
     code: 'eu',
     label: 'Europe',
     locale: 'en-EU',
+    hreflang: 'en',
     currency: 'EUR',
     currencySymbol: '€',
     flag: 'eu-flag',
@@ -46,12 +50,12 @@ export const REGIONS: Record<string, RegionConfig> = {
       title: 'Shopli — Best AliExpress Deals Picked by AI',
       description: 'AI-powered product recommendations from AliExpress. Curated deals, free shipping, quality guaranteed.',
     },
-    tgChannel: 'shopli_eu',
   },
   us: {
     code: 'us',
     label: 'USA',
     locale: 'en-US',
+    hreflang: 'en-US',
     currency: 'USD',
     currencySymbol: '$',
     flag: 'us-flag',
@@ -60,14 +64,14 @@ export const REGIONS: Record<string, RegionConfig> = {
     direction: 'ltr',
     meta: {
       title: 'Shopli — Best AliExpress Deals Picked by AI',
-      description: 'AI-powered product recommendations from AliExpress. Curated deals, free shipping, quality guaranteed.',
+      description: 'AI-curated AliExpress deals picked just for you. Unbeatable prices, free shipping to the US, quality guaranteed.',
     },
-    tgChannel: 'shopli_us',
   },
   uk: {
     code: 'uk',
     label: 'UK',
     locale: 'en-GB',
+    hreflang: 'en-GB',
     currency: 'GBP',
     currencySymbol: '£',
     flag: 'uk-flag',
@@ -76,13 +80,14 @@ export const REGIONS: Record<string, RegionConfig> = {
     direction: 'ltr',
     meta: {
       title: 'Shopli — Best AliExpress Deals Picked by AI',
-      description: 'AI-powered product recommendations from AliExpress. Curated deals, free shipping, quality guaranteed.',
+      description: 'AI-curated AliExpress deals picked just for you. Unbeatable prices, free delivery to the UK, quality guaranteed.',
     },
   },
   fr: {
     code: 'fr',
     label: 'France',
     locale: 'fr-FR',
+    hreflang: 'fr',
     currency: 'EUR',
     currencySymbol: '€',
     flag: 'fr-flag',
@@ -98,6 +103,7 @@ export const REGIONS: Record<string, RegionConfig> = {
     code: 'de',
     label: 'Deutschland',
     locale: 'de-DE',
+    hreflang: 'de',
     currency: 'EUR',
     currencySymbol: '€',
     flag: 'de-flag',
@@ -113,6 +119,7 @@ export const REGIONS: Record<string, RegionConfig> = {
     code: 'it',
     label: 'Italia',
     locale: 'it-IT',
+    hreflang: 'it',
     currency: 'EUR',
     currencySymbol: '€',
     flag: 'it-flag',
@@ -128,6 +135,7 @@ export const REGIONS: Record<string, RegionConfig> = {
     code: 'es',
     label: 'España',
     locale: 'es-ES',
+    hreflang: 'es',
     currency: 'EUR',
     currencySymbol: '€',
     flag: 'es-flag',
@@ -143,6 +151,7 @@ export const REGIONS: Record<string, RegionConfig> = {
     code: 'ru',
     label: 'Русский (Israel)',
     locale: 'ru-IL',
+    hreflang: 'ru',
     currency: 'ILS',
     currencySymbol: '₪',
     flag: 'ru-flag',
@@ -161,6 +170,10 @@ export type RegionCode = keyof typeof REGIONS;
 
 export function getRegion(code: string): RegionConfig {
   return REGIONS[code as RegionCode] || REGIONS.eu;
+}
+
+export function isValidRegion(code: string): code is RegionCode {
+  return Object.prototype.hasOwnProperty.call(REGIONS, code);
 }
 
 export const LOCALE_LABELS: Record<string, string> = {

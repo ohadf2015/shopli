@@ -1,14 +1,18 @@
 import { GetServerSideProps } from 'next';
 import Header from '../../components/Header';
 import Icon from '../../components/icons';
-import ProductCard from '../../components/ProductCard';
+import ProductCard, { ProductCardProduct } from '../../components/ProductCard';
 import WhatsAppShare from '../../components/WhatsAppShare';
 import SeoHead from '../../components/SeoHead';
-import { getRegion, RegionCode } from '../../lib/regions';
+import TrendingRail, { TrendingItem } from '../../components/TrendingRail';
+import { getRegion, isValidRegion, RegionCode } from '../../lib/regions';
 import { getAllCollections, getFeaturedCollections } from '../../lib/collections';
 import { breadcrumbJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
+import { buildTrending, dedupeAcrossSections } from '../../lib/trending';
+import { trendingEnabled } from '../../lib/flags';
 import type { RegionConfig } from '../../lib/regions';
 import type { Product } from '../../lib/types';
+import { cacheIfNotEmpty } from '../../lib/cache';
 
 interface FlatProduct extends Product { collectionSlug?: string; collectionName?: string; }
 
@@ -20,12 +24,38 @@ interface CollectionGroup {
   products: FlatProduct[];
 }
 
+interface CardGroup extends Omit<CollectionGroup, 'products'> { products: ProductCardProduct[]; }
+
 interface HomePageProps {
   region: RegionCode;
   config: RegionConfig;
-  groups: CollectionGroup[];
+  groups: CardGroup[];
   rtl: boolean;
   orderedSlugs: string[];
+  trending: TrendingItem[];
+}
+
+/**
+ * Keep only what ProductCard renders. The raw AliExpress record carries an
+ * images array, sku, shopId, categoryPath and commission rate that no card
+ * reads, and Next serialises every prop into __NEXT_DATA__ — so shipping the
+ * raw record duplicated ~50KB of dead JSON into every homepage response.
+ */
+function toCardProduct(p: any): ProductCardProduct {
+  return {
+    id: p.id,
+    title: p.title,
+    price: p.price,
+    originalPrice: p.originalPrice ?? null,
+    imageUrl: p.imageUrl || '',
+    affiliateLink: p.affiliateLink || '',
+    rating: p.rating,
+    reviewCount: p.reviewCount,
+    volume: p.volume,
+    discount: p.discount,
+    freeShipping: p.freeShipping,
+    shopName: p.shopName,
+  };
 }
 
 async function fetchCollectionProducts(region: string, keywords: string[], limit = 4): Promise<FlatProduct[]> {
@@ -35,12 +65,12 @@ async function fetchCollectionProducts(region: string, keywords: string[], limit
   } catch { return []; }
 }
 
-export default function HomePage({ region, config, groups, rtl, orderedSlugs }: HomePageProps) {
+export default function HomePage({ region, config, groups, rtl, orderedSlugs, trending }: HomePageProps) {
   const t = (text?: Record<string, string> | null) => text?.[config.lang] || text?.en || '';
 
   const heroTitle = rtl ? 'מצאו את הדילים הכי שווים מאליאקספרס' : 'The Best AliExpress Deals, Curated for You';
   const heroDesc = rtl
-    ? 'אנחנו בוחרים מוצרים לפי טרנדים, עונה ואיכות. אתם קונים במחירים הכי נמוכים עם קישור partnerפים ישיר.'
+    ? 'אנחנו בוחרים מוצרים לפי טרנדים, עונה ואיכות. אתם קונים במחירים הכי נמוכים דרך קישורי שותפים ישירים.'
     : 'We pick products by trends, season & quality. You buy at the lowest price with direct affiliate links.';
 
   const pageUrl = `${SITE_URL}/${region}`;
@@ -60,7 +90,7 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs }: 
       />
       <Header currentRegion={region} dir={config.direction} />
 
-      <main style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}>
+      <main style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}>
 
         {/* HERO */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-12 md:pt-32 md:pb-16">
@@ -97,6 +127,17 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs }: 
           </div>
         </section>
 
+        {/* TRENDING RAIL — directly below hero */}
+        {trending.length > 0 && (
+          <TrendingRail
+            items={trending}
+            region={region}
+            locale={config.lang}
+            currencySymbol={config.currencySymbol}
+            rtl={rtl}
+          />
+        )}
+
         {/* COLLECTIONS GRID */}
         {groups.filter(g => g.products.length > 0).slice(0, 6).map((group, gi) => (
           <section key={group.slug} className={`py-10 md:py-14 ${gi % 2 === 1 ? 'bg-white' : 'bg-gray-50/50'}`}>
@@ -127,6 +168,7 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs }: 
                     locale={config.lang}
                     region={region}
                     showCompareLink
+                    category={group.name}
                   />
                 ))}
               </div>
@@ -173,10 +215,10 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs }: 
         <section className="py-10 bg-orange-50/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <h2 className="text-xl md:text-2xl font-bold mb-2" style={{ color: 'var(--shopli-navy)' }}>
-              {rtl ? 'ערכות שלמות — מראה, חדר, ערכת' : 'Complete Looks, Rooms & Kits'}
+              {rtl ? 'לוקים שלמים, חדרים וערכות' : 'Complete Looks, Rooms & Kits'}
             </h2>
             <p className="text-sm mb-6" style={{ color: 'var(--shopli-warm-gray)' }}>
-              {rtl ? 'כל ערכה מחברת מספר פריטים ליצירת מראה שלם, עיצוב חדר או ערכת שלמה' : 'Each board combines multiple products into a complete look, room design, or kit.'}
+              {rtl ? 'כל ערכה משלבת כמה פריטים למראה שלם, חדר מעוצב או קיט מלא' : 'Each board combines multiple products into a complete look, room design, or kit.'}
             </p>
 
             <h3 className="text-xs font-semibold uppercase tracking-widest mb-3 mt-4" style={{ color: 'var(--shopli-orange)' }}>{rtl ? 'תחפושות לפורים / הלווין' : 'PURIM & HALLOWEEN COSTUMES'}</h3>
@@ -186,8 +228,8 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs }: 
                 { link: 'queen-esther', titleEn: 'Queen Esther', titleHe: 'אסתר המלכה', descEn: 'Royal costume €25', descHe: 'תחפושת מלכותית ₪100' },
                 { link: 'pikachu', titleEn: 'Pikachu Cosplay', titleHe: 'פיקאצ׳ו', descEn: 'Cute Pokemon cosplay €20', descHe: 'קוספליי פוקימון ₪80' },
                 { link: 'spiderman', titleEn: 'Spider-Man', titleHe: 'ספיידרמן', descEn: 'Superhero costume €25', descHe: 'תחפושת גיבור על ₪100' },
-                { link: 'wonder-woman', titleEn: 'Wonder Woman', titleHe: 'ונדר וומן', descEn: 'Amazon warrior €30', descHe: 'לוחמת אמזונות ₪120' },
-                { link: 'ninja-turtle', titleEn: 'Ninja Turtle', titleHe: 'צב נינג׳ה', descEn: 'Hero in a half shell €20', descHe: 'גיבור חצי קליפה ₪80' },
+                { link: 'wonder-woman', titleEn: 'Wonder Woman', titleHe: 'ונדר וומן', descEn: 'Amazon warrior €30', descHe: 'תחפושת לוחמת ₪120' },
+                { link: 'ninja-turtle', titleEn: 'Ninja Turtle', titleHe: 'צב נינג׳ה', descEn: 'Hero in a half shell €20', descHe: 'תחפושת צב נינג׳ה ₪80' },
                 { link: 'superman', titleEn: 'Superman', titleHe: 'סופרמן', descEn: 'Man of Steel €25', descHe: 'איש הפלדה ₪100' },
               ].map(b => (                <a key={b.link} href={`/${region}/mood/${b.link}`}
                   className="p-3 rounded-xl border border-orange-200 bg-white hover:shadow-md transition-all">
@@ -200,10 +242,10 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs }: 
             <h3 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--shopli-orange)' }}>{rtl ? 'עיצובי חדרים' : 'ROOM DESIGN'}</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
               {[
-                { link: 'japandi-office', titleEn: 'Japandi Office', titleHe: 'משרד יפנדי', descEn: 'Minimalist serene workspace €80', descHe: 'מרחב עבודה שלו ₪320' },
-                { link: 'gamer-den', titleEn: 'RGB Gamer Den', titleHe: 'פינת גיימרינג', descEn: 'Ultimate gaming setup €120', descHe: 'עמדת משחק אולטימטיבית ₪480' },
+                { link: 'japandi-office', titleEn: 'Japandi Office', titleHe: 'משרד ג׳פנדי', descEn: 'Minimalist serene workspace €80', descHe: 'מרחב עבודה שלו ומינימליסטי ₪320' },
+                { link: 'gamer-den', titleEn: 'RGB Gamer Den', titleHe: 'פינת גיימינג', descEn: 'Ultimate gaming setup €120', descHe: 'עמדת משחק אולטימטיבית ₪480' },
                 { link: 'boho-bedroom', titleEn: 'Boho Bedroom', titleHe: 'חדר בוהו', descEn: 'Cozy aesthetic bedroom €50', descHe: 'חדר נעים בסגנון בוהמי ₪200' },
-                { link: 'scandinavian-reading-nook', titleEn: 'Reading Nook', titleHe: 'פינת קריאה', descEn: 'Hygge cozy corner €60', descHe: 'פינה הייג׳ית נעימה ₪240' },
+                { link: 'scandinavian-reading-nook', titleEn: 'Reading Nook', titleHe: 'פינת קריאה', descEn: 'Hygge cozy corner €60', descHe: 'פינת קריאה נעימה בסגנון סקנדינבי ₪240' },
                 { link: 'indoor-jungle', titleEn: 'Indoor Jungle', titleHe: 'ג׳ונגל ביתי', descEn: 'Plant corner €40', descHe: 'פינת צמחים שופעת ₪160' },
               ].map(b => (                <a key={b.link} href={`/${region}/mood/${b.link}`}
                   className="p-3 rounded-xl border border-orange-200 bg-white hover:shadow-md transition-all">
@@ -213,7 +255,7 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs }: 
               ))}
             </div>
 
-            <h3 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--shopli-orange)' }}>{rtl ? 'ערכות מתוייבות' : 'CURATED KITS'}</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--shopli-orange)' }}>{rtl ? 'ערכות נבחרות' : 'CURATED KITS'}</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {[
                 { link: 'sushi-night', titleEn: 'Sushi Night', titleHe: 'ערב סושי', descEn: 'Kitchen kit under €25', descHe: 'ערכת סושי ₪100' },
@@ -230,7 +272,7 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs }: 
                 { link: 'beach-day', titleEn: 'Beach Day', titleHe: 'יום חוף', descEn: 'Stress-free kit under €30', descHe: 'ערכת חוף ₪120' },
                 { link: 'wireless-audio', titleEn: 'Wireless Audio', titleHe: 'אודיו אלחוטי', descEn: 'Earbuds, headphones & speaker €60', descHe: 'אוזניות ורמקולים ₪240' },
                 { link: 'phone-accessories', titleEn: 'Phone Kit', titleHe: 'אביזרים לטלפון', descEn: 'Protect, charge & mount €25', descHe: 'הגנה וטעינה ₪100' },
-                { link: 'summer-essentials', titleEn: 'Summer Survival', titleHe: 'קיץ הכרחי', descEn: 'Beat the heat kit under €25', descHe: 'ערכת הישרדות ₪100' },
+                { link: 'summer-essentials', titleEn: 'Summer Survival', titleHe: 'ערכת קיץ', descEn: 'Beat the heat kit under €25', descHe: 'ערכת קיץ מושלמת ₪100' },
               ].map(b => (                <a key={b.link} href={`/${region}/mood/${b.link}`}
                   className="p-3 rounded-xl border border-orange-200 bg-white hover:shadow-md transition-all">
                   <div className="font-semibold text-sm mb-0.5" style={{ color: 'var(--shopli-navy)' }}>{rtl ? b.titleHe : b.titleEn}</div>
@@ -334,26 +376,14 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs }: 
         </section>
       </main>
 
-      <footer className="border-t border-gray-100 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-3 text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
-          <div className="flex items-center gap-2 font-semibold" style={{ color: 'var(--shopli-navy)' }}>
-            <svg width="18" height="18" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="var(--shopli-orange)"/><path d="M9 12h14l-2 12H11L9 12z" fill="white" opacity="0.9"/></svg>
-            shopli
-          </div>
-          <div>&copy; {new Date().getFullYear()} Shopli. {rtl ? 'כל הזכויות שמורות' : 'All rights reserved.'}</div>
-          <div className="flex gap-4">
-            <a href={`/${region}/collection/home-gym`} className="hover:underline">{rtl ? 'אימונים' : 'Workout'}</a>
-            <a href={`/${region}/collection/coffee-ritual`} className="hover:underline">{rtl ? 'קפה' : 'Coffee'}</a>
-            <a href={`/${region}/mood/jack-sparrow`} className="hover:underline">{rtl ? 'תחפושות' : 'Costumes'}</a>
-          </div>
-        </div>
-      </footer>
     </>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, query, res }) => {
   const region = (query?.region as string) || (params?.region as string) || 'eu';
+  // Unknown region slugs (e.g. /deals before it existed) must 404, not silently render the EU homepage as a self-canonical duplicate.
+  if (!isValidRegion(region)) return { notFound: true };
   const config = getRegion(region);
   const rtl = config.direction === 'rtl';
 
@@ -363,8 +393,18 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
   const orderedSlugs = getFeaturedCollections(region, 100).map((c) => c.slug);
   const groups: CollectionGroup[] = [];
 
-  for (const coll of collections) {
-    const products = await fetchCollectionProducts(region, [coll.keywords[0]], 4);
+  // Six collections, fetched together rather than one after another: these are
+  // six independent AliExpress searches and awaiting them in sequence made the
+  // homepage's TTFB their sum. lib/aliexpress caps real concurrency, so this
+  // cannot stampede the rate limiter.
+  // Fetch double the display count: title-dedupe against the rail and
+  // earlier sections can drop relistings, and sections should still fill.
+  const fetched = await Promise.all(
+    collections.map((coll) => fetchCollectionProducts(region, [coll.keywords[0]], 8))
+  );
+
+  collections.forEach((coll, i) => {
+    const products = fetched[i];
     if (products.length > 0) {
       groups.push({
         slug: coll.slug,
@@ -374,15 +414,39 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
         products,
       });
     }
-  }
+  });
+
+  // Homepage content is fully keyed by region (in the URL) — no cookies/auth —
+  // so it's safe to cache at the CDN. Revalidate every 5 min, serve stale up to a day.
+  cacheIfNotEmpty(res, groups.length > 0, 'public, s-maxage=300, stale-while-revalidate=86400');
+
+  // Trending rail reuses the already-fetched collection pool — zero extra
+  // AliExpress calls, no render-blocking work for the hero.
+  const trending = trendingEnabled()
+    ? buildTrending(groups.flatMap((g) => g.products), 8)
+    : [];
+
+  // Same supplier item is often relisted under new IDs, so ID-dedupe alone
+  // lets one title appear in the rail AND a section (or twice across
+  // sections). Rail wins the title; sections are filtered against the rail
+  // plus every earlier section, then trimmed back to 4 cards.
+  const dedupedSections = dedupeAcrossSections<any>(
+    trending.map((entry) => entry.product),
+    groups.map((g) => g.products),
+    (p) => p.title || ''
+  );
+  const finalGroups = groups
+    .map((g, i) => ({ ...g, products: dedupedSections[i].slice(0, 4).map(toCardProduct) }))
+    .filter((g) => g.products.length > 0);
 
   return {
     props: {
       region,
       config,
-      groups: groups || [],
+      groups: finalGroups,
       rtl,
       orderedSlugs,
+      trending,
     },
   };
 };

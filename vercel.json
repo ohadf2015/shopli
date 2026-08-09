@@ -3,5 +3,11 @@
   "framework": "nextjs",
   "buildCommand": "npx next build",
   "installCommand": "npm install",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "crons": [
+    { "path": "/api/cron/trend-snapshot", "schedule": "0 3 * * *" }
+  ],
+  "functions": {
+    "pages/api/cron/trend-snapshot.ts": { "maxDuration": 300 }
+  }
 }

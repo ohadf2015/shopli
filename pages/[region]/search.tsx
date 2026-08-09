@@ -5,9 +5,10 @@ import Header from '../../components/Header';
 import Icon from '../../components/icons';
 import ProductCard from '../../components/ProductCard';
 import SeoHead from '../../components/SeoHead';
-import { getRegion, RegionCode, RegionConfig } from '../../lib/regions';
+import { getRegion, isValidRegion, RegionCode, RegionConfig } from '../../lib/regions';
 import { breadcrumbJsonLd, itemListJsonLd, productJsonLd, SITE_URL } from '../../lib/seo';
 import type { SearchProduct } from '../../lib/aliexpress';
+import { cacheIfNotEmpty } from '../../lib/cache';
 
 interface SearchPageProps {
   region: RegionCode;
@@ -110,7 +111,7 @@ export default function SearchPage({
 
       <main
         className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-16"
-        style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}
+        style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}
       >
         <nav
           className="flex items-center gap-2 text-xs mb-4 flex-wrap"
@@ -181,6 +182,7 @@ export default function SearchPage({
                 rtl={rtl}
                 locale={lang}
                 region={region}
+                category={initialQuery ? `search: ${initialQuery}` : 'search'}
                 showCompareLink
               />
             ))}
@@ -210,6 +212,7 @@ export default function SearchPage({
 
 export const getServerSideProps: GetServerSideProps = async ({ params, query, res }) => {
   const region = ((params?.region as string) || 'eu') as RegionCode;
+  if (!isValidRegion(region)) return { notFound: true };
   const config = getRegion(region);
   const rtl = config.direction === 'rtl';
   const q = typeof query?.q === 'string' ? query.q.trim() : '';
@@ -226,7 +229,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
     }
   }
 
-  res.setHeader('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=600');
+  cacheIfNotEmpty(res, products.length > 0, 'public, s-maxage=120, stale-while-revalidate=600');
 
   return {
     props: {

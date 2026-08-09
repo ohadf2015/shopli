@@ -17,7 +17,7 @@ module.exports = {
         },
       },
       fontFamily: {
-        hebrew: ['Assistant', 'system-ui', 'sans-serif'],
+        hebrew: ['var(--font-assistant)', 'system-ui', 'sans-serif'],
       },
     },
   },

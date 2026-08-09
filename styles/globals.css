@@ -24,7 +24,8 @@ body {
 
 @layer base {
   .font-hebrew {
-    font-family: 'Assistant', system-ui, sans-serif;
+    /* --font-assistant is set by next/font in _app.tsx. */
+    font-family: var(--font-assistant), system-ui, sans-serif;
   }
 }
 
@@ -102,5 +103,339 @@ body {
     font-weight: 600;
     padding: 0.2rem 0.55rem;
     border-radius: 999px;
+  }
+}
+/* ------------------------------------------------------------------
+ * Animations & review UI helpers
+ * ------------------------------------------------------------------ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.35s ease-out both;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* ------------------------------------------------------------------
+ * Discovery surfaces: trending rail/page + find-similar drawer.
+ * Dark theme per design mock (t_a5202144), CSS keyframes only,
+ * logical properties for RTL, prefers-reduced-motion respected.
+ * ------------------------------------------------------------------ */
+.trend-surface {
+  --t-bg: #070b16;
+  --t-panel: #0f172a;
+  --t-panel-soft: rgba(15, 23, 42, 0.72);
+  --t-text: #fff7ed;
+  --t-muted: #b7aa9d;
+  --t-teal: #5eead4;
+  --t-orange: #f97316;
+  --t-border: rgba(148, 163, 184, 0.18);
+  color: var(--t-text);
+}
+
+@keyframes trend-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes trend-live-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(20, 184, 166, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(20, 184, 166, 0);
+  }
+}
+
+@keyframes trend-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.trend-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #14b8a6;
+  animation: trend-live-pulse 1.8s ease-out infinite;
+}
+
+.trend-badge-shimmer {
+  background: linear-gradient(110deg, #f97316 35%, #fdba74 50%, #f97316 65%);
+  background-size: 200% 100%;
+  animation: trend-shimmer 2.6s linear infinite;
+  color: #1a1005;
+}
+
+.trend-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--t-border);
+  border-radius: 20px;
+  background: linear-gradient(180deg, var(--t-panel), var(--t-panel-soft));
+  animation: trend-card-in 0.6s ease both;
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.trend-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(249, 115, 22, 0.55);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+}
+
+.trend-rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(240px, 78%);
+  gap: 12px;
+  overflow-x: auto;
+  padding-block-end: 14px;
+  scroll-snap-type: inline mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.trend-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.trend-rail .trend-card {
+  scroll-snap-align: start;
+}
+
+/* Desktop: 4-column grid instead of horizontal rail */
+@media (min-width: 768px) {
+  .trend-rail {
+    grid-auto-flow: row;
+    grid-auto-columns: unset;
+    grid-template-columns: repeat(4, 1fr);
+    overflow-x: visible;
+    gap: 16px;
+  }
+}
+
+.trend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border: 1px solid var(--t-border);
+  color: var(--t-muted);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Find-similar drawer: bottom sheet on mobile, side panel on desktop */
+.fs-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(4, 7, 14, 0.66);
+  backdrop-filter: blur(3px);
+  animation: fadeIn 0.2s ease-out both;
+}
+
+.fs-panel {
+  position: fixed;
+  z-index: 61;
+  inset-inline: 0;
+  inset-block-end: 0;
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--t-bg, #070b16);
+  border: 1px solid var(--t-border, rgba(148, 163, 184, 0.18));
+  border-block-end: 0;
+  border-start-start-radius: 22px;
+  border-start-end-radius: 22px;
+  animation: fs-sheet-up 0.28s ease-out both;
+}
+
+@keyframes fs-sheet-up {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (min-width: 768px) {
+  .fs-panel {
+    inset-inline-start: auto;
+    inset-block-start: 0;
+    inset-block-end: 0;
+    width: min(430px, 92vw);
+    max-height: none;
+    border-block-end: 1px solid var(--t-border, rgba(148, 163, 184, 0.18));
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+    animation-name: fs-panel-in;
+  }
+
+  @keyframes fs-panel-in {
+    from {
+      transform: translateX(40px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  [dir='rtl'] .fs-panel {
+    animation-name: fs-panel-in-rtl;
+  }
+
+  @keyframes fs-panel-in-rtl {
+    from {
+      transform: translateX(-40px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trend-card,
+  .fs-overlay,
+  .fs-panel,
+  .trend-live-dot,
+  .trend-badge-shimmer {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Find-similar drawer (bottom sheet on mobile, side panel on desktop)
+   ------------------------------------------------------------------ */
+.fs-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 80;
+  animation: fsFadeIn 0.2s ease-out both;
+}
+
+.fs-panel {
+  position: fixed;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  background: var(--t-bg, #070b16);
+  border: 1px solid var(--t-border, rgba(148, 163, 184, 0.18));
+  /* Mobile: bottom sheet */
+  inset-inline: 0;
+  bottom: 0;
+  max-height: 82vh;
+  border-radius: 20px 20px 0 0;
+  animation: fsSlideUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Desktop: side panel anchored to the inline end (mirrors in RTL) */
+@media (min-width: 768px) {
+  .fs-panel {
+    inset-inline-end: 0;
+    inset-inline-start: auto;
+    top: 0;
+    bottom: 0;
+    width: min(420px, 92vw);
+    max-height: none;
+    border-radius: 0;
+    border-top: none;
+    border-bottom: none;
+    border-inline-end: none;
+    animation: fsSlideIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@keyframes fsFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fsSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes fsSlideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+/* In RTL the panel is on the left — slide in from the left */
+[dir='rtl'] .fs-panel {
+  animation-name: fsSlideUp;
+}
+@media (min-width: 768px) {
+  [dir='rtl'] .fs-panel {
+    animation-name: fsSlideInRtl;
+  }
+}
+@keyframes fsSlideInRtl {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fs-overlay,
+  .fs-panel,
+  [dir='rtl'] .fs-panel {
+    animation: none !important;
   }
 }

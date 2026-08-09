@@ -2,9 +2,12 @@ import { GetServerSideProps } from 'next';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
 import SeoHead from '../../../components/SeoHead';
-import { getRegion, RegionCode } from '../../../lib/regions';
+import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getComparison } from '../../../lib/comparisons';
+import { productImage } from '../../../lib/img';
+import { listingAggregateFields } from '../../../lib/pdp';
 import { articleJsonLd, breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
+import { cacheIfNotEmpty } from '../../../lib/cache';
 
 export default function ComparisonPage({ region, config, comparison, prod1Items, prod2Items, rtl, error }: any) {
   if (error) {
@@ -42,12 +45,15 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
           title: item.title,
           description: item.title,
           image: item.imageUrl || item.image,
-          url: item.affiliateLink || pageUrl,
+          url: item.id ? `${SITE_URL}/${region}/product/${encodeURIComponent(item.id)}` : pageUrl,
           brand: item.shopName,
           price: typeof item.price === 'number' ? item.price : parseFloat(item.price) || undefined,
           currency: item.currency || config?.currency,
-          ratingValue: item.rating > 0 ? item.rating / 20 : undefined,
-          reviewCount: item.reviewCount || undefined,
+          // v1: no AggregateRating on on-site PDP URLs (docs/PDP-V1-SPEC.md)
+          ...listingAggregateFields(item, {
+            ratingValue: item.rating > 0 ? item.rating / 20 : undefined,
+            reviewCount: item.reviewCount || undefined,
+          }),
           sku: item.id,
           region,
         })
@@ -120,11 +126,9 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
                         <a key={i} href={item.affiliateLink} target="_blank" rel="nofollow sponsored noopener noreferrer"
                           className="block bg-gray-50 rounded-lg p-2 hover:shadow transition">
                           <img
-                            src={item.imageUrl || item.image}
+                            {...productImage(item.imageUrl || item.image, 200)}
                             alt={item.title}
                             className="w-full h-20 object-contain mb-1"
-                            loading="lazy"
-                            decoding="async"
                           />
                           <p className="text-xs text-gray-700 line-clamp-2">{item.title}</p>
                           <p className="text-xs font-bold mt-1 tabular-nums" style={{ color: 'var(--shopli-orange)' }} dir="ltr">
@@ -167,19 +171,14 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
         )}
       </main>
 
-      <footer className="border-t border-gray-100 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-3 text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
-          <div className="font-semibold" style={{ color: 'var(--shopli-navy)' }}>shopli</div>
-          <div>&copy; {new Date().getFullYear()} {rtl ? 'כל הזכויות שמורות' : 'All rights reserved.'}</div>
-        </div>
-      </footer>
     </>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, res }) => {
   const slug = params?.slug as string;
   const region = (params?.region as string) || 'eu';
+  if (!isValidRegion(region)) return { notFound: true };
   const config = getRegion(region);
   const rtl = config.direction === 'rtl';
 
@@ -197,6 +196,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     prod1Items = p1 || [];
     prod2Items = p2 || [];
   } catch {}
+
+  cacheIfNotEmpty(res, prod1Items.length > 0 || prod2Items.length > 0, 'public, s-maxage=3600, stale-while-revalidate=3600');
 
   return {
     props: { region, config, comparison, prod1Items, prod2Items, rtl },

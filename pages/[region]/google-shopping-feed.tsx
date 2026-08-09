@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next';
 import Header from '../../components/Header';
 import SeoHead from '../../components/SeoHead';
-import { getRegion, RegionCode } from '../../lib/regions';
+import { getRegion, isValidRegion, RegionCode } from '../../lib/regions';
 import type { RegionConfig } from '../../lib/regions';
 import { SITE_URL } from '../../lib/seo';
 
@@ -123,6 +123,7 @@ export default function GoogleShoppingFeedPage({ region, config, rtl }: { region
 
 export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
   const region = (query?.region as string) || (params?.region as string) || 'eu';
+  if (!isValidRegion(region)) return { notFound: true };
   const config = getRegion(region);
   return {
     props: {

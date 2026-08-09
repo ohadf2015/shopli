@@ -4,9 +4,11 @@ import Icon from '../../../components/icons';
 import ProductCard from '../../../components/ProductCard';
 import WhatsAppShare from '../../../components/WhatsAppShare';
 import SeoHead from '../../../components/SeoHead';
-import { getRegion, RegionCode } from '../../../lib/regions';
+import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getCollection } from '../../../lib/collections';
+import { listingAggregateFields } from '../../../lib/pdp';
 import { COLLECTION_CONTENT } from '../../../lib/collection-content';
+import { cacheIfNotEmpty } from '../../../lib/cache';
 import {
   articleJsonLd,
   breadcrumbJsonLd,
@@ -16,7 +18,7 @@ import {
   SITE_URL,
 } from '../../../lib/seo';
 
-export default function CollectionPage({ region, config, collection, content, sections, rtl, error }: any) {
+export default function CollectionPage({ region, config, collection, content, sections, rtl, noindex, error }: any) {
   if (error) {
     return (
       <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>
@@ -76,7 +78,8 @@ export default function CollectionPage({ region, config, collection, content, se
         pageUrl,
         allProducts.slice(0, 16).map((p: any, i: number) => ({
           name: p.title,
-          url: p.affiliateLink || pageUrl,
+          // Rich-result URLs must be on-site: link the PDP when we have an id
+          url: p.id ? `${SITE_URL}/${region}/product/${encodeURIComponent(p.id)}` : pageUrl,
           image: p.imageUrl,
           position: i + 1,
         }))
@@ -92,12 +95,15 @@ export default function CollectionPage({ region, config, collection, content, se
           title: p.title,
           description: p.title,
           image: p.imageUrl,
-          url: p.affiliateLink || pageUrl,
+          url: p.id ? `${SITE_URL}/${region}/product/${encodeURIComponent(p.id)}` : pageUrl,
           brand: p.shopName,
           price: p.price,
           currency: config?.currency,
-          ratingValue: p.rating > 0 ? p.rating / 20 : undefined,
-          reviewCount: p.reviewCount || undefined,
+          // v1: no AggregateRating on on-site PDP URLs (docs/PDP-V1-SPEC.md)
+          ...listingAggregateFields(p, {
+            ratingValue: p.rating > 0 ? p.rating / 20 : undefined,
+            reviewCount: p.reviewCount || undefined,
+          }),
           sku: p.id,
           region,
         })
@@ -114,12 +120,13 @@ export default function CollectionPage({ region, config, collection, content, se
         description={description}
         image={ogImage}
         ogType="product"
+        noindex={noindex}
         jsonLd={structuredData}
       />
       <Header currentRegion={region} dir={config?.direction} />
       <main
         className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-16"
-        style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}
+        style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}
       >
         <nav
           className="flex items-center gap-2 text-xs mb-4 flex-wrap"
@@ -191,6 +198,7 @@ export default function CollectionPage({ region, config, collection, content, se
                       locale={lang}
                       fallbackUrl={pageUrl}
                       region={region}
+                      category={section.heading}
                       showShare
                       showCompareLink
                       compact
@@ -245,9 +253,10 @@ export default function CollectionPage({ region, config, collection, content, se
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, query, res }) => {
   try {
     const region = (query?.region as string) || (params?.region as string) || 'eu';
+    if (!isValidRegion(region)) return { notFound: true };
     const slug = params?.collection as string;
     const config = getRegion(region);
     const lang = config?.lang || 'en';
@@ -290,6 +299,12 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
       }
     }
 
+    // noindex keyword-only collections that returned zero products (soft-404 prevention)
+    const noindex = !content && sections.length === 0;
+
+    // Each section is a live AliExpress search; uncached this is a 5s+ SSR per hit.
+    cacheIfNotEmpty(res, sections.length > 0, 'public, s-maxage=3600, stale-while-revalidate=3600');
+
     return {
       props: {
         region,
@@ -298,6 +313,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
         content: content ? JSON.parse(JSON.stringify(content)) : null,
         sections: JSON.parse(JSON.stringify(sections)),
         rtl: config?.direction === 'rtl',
+        noindex,
         error: null,
       },
     };

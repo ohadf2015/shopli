@@ -3,7 +3,7 @@ import { REGIONS, RegionCode } from './regions';
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.tryshopli.com';
 export const SITE_NAME = 'Shopli';
 export const SITE_TAGLINE = 'AI-curated AliExpress deals';
-export const OG_IMAGE_URL = process.env.NEXT_PUBLIC_OG_IMAGE_URL || 'https://placehold.co/1200x630/F97316/FFFFFF/png?text=Shopli+-+AI+AliExpress+Deals';
+export const OG_IMAGE_URL = process.env.NEXT_PUBLIC_OG_IMAGE_URL || `${SITE_URL}/og-default.png`;
 
 export function getPageUrl(region: RegionCode, path = '') {
   return `${SITE_URL}/${region}${path}`;
@@ -19,7 +19,7 @@ export function getHreflangTags(region: RegionCode, path: string) {
   for (const [code, config] of Object.entries(REGIONS)) {
     tags.push({
       rel: 'alternate',
-      hrefLang: config.locale,
+      hrefLang: config.hreflang,
       href: `${SITE_URL}/${code}${path}`,
     });
   }
@@ -56,6 +56,8 @@ interface SeoProps {
   noindex?: boolean;
   articlePublishedTime?: string;
   articleModifiedTime?: string;
+  /** Set false for non-regional pages (e.g. /deals) that must not emit hreflang alternates */
+  hreflang?: boolean;
 }
 
 export function getSeoHead(props: SeoProps) {
@@ -70,6 +72,7 @@ export function getSeoHead(props: SeoProps) {
     noindex = false,
     articlePublishedTime,
     articleModifiedTime,
+    hreflang = true,
   } = props;
 
   const config = REGIONS[region];
@@ -113,7 +116,11 @@ export function getSeoHead(props: SeoProps) {
   }
 
   // hreflang + canonical (prefer explicit canonical when provided, e.g. share URLs with query params)
-  for (const t of getHreflangTags(region, path)) {
+  // Non-regional pages (e.g. /deals) pass hreflang: false — canonical only, no alternates.
+  if (!hreflang) {
+    meta.push({ tag: 'link', rel: 'canonical', href: url });
+  }
+  for (const t of hreflang ? getHreflangTags(region, path) : []) {
     if (t.rel === 'canonical') {
       meta.push({ tag: 'link', rel: 'canonical', href: canonical || t.href });
     } else {
@@ -139,8 +146,8 @@ export function organizationJsonLd() {
     url: SITE_URL,
     logo: `${SITE_URL}/logo.svg`,
     sameAs: [
+      // Only channels verified to exist (t.me/s/<name> -> HTTP 200).
       'https://t.me/shoppingisraelnew',
-      'https://t.me/shopli_eu',
     ],
   };
 }
@@ -176,6 +183,35 @@ export function getCollectionOgImage(
   if (lang) params.set('lang', lang);
   const qs = params.toString();
   return `${SITE_URL}/api/og/${encodeURIComponent(slug)}${qs ? `?${qs}` : ''}`;
+}
+
+/** Absolute OG image URL for a product PDP (dynamic 1200×630). */
+export function getProductOgImage({
+  title,
+  price,
+  currencySymbol,
+  originalPrice,
+  discount,
+  image,
+  lang,
+}: {
+  title: string;
+  price?: number;
+  currencySymbol?: string;
+  originalPrice?: number;
+  discount?: string;
+  image?: string;
+  lang?: string;
+}): string {
+  const params = new URLSearchParams();
+  params.set('title', title);
+  if (price != null) params.set('price', String(price));
+  if (currencySymbol) params.set('currencySymbol', currencySymbol);
+  if (originalPrice != null) params.set('originalPrice', String(originalPrice));
+  if (discount) params.set('discount', discount);
+  if (image) params.set('image', image);
+  if (lang) params.set('lang', lang);
+  return `${SITE_URL}/api/og/product?${params.toString()}`;
 }
 
 /** ItemList schema for product grids (collection / home sections). */
@@ -276,6 +312,28 @@ export function blogPostingJsonLd({
       logo: { '@type': 'ImageObject', url: `${SITE_URL}/logo.svg` },
     },
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+  };
+}
+
+/**
+ * FAQPage for the Q&A already written into each buying guide. Answering
+ * questions in structured form is what gets a page quoted in AI Overviews and
+ * assistant answers, which is the traffic this site is chasing.
+ *
+ * Returns null for an empty list — an FAQPage with no mainEntity is invalid
+ * structured data, so callers should drop it rather than emit an empty shell.
+ */
+export function faqJsonLd(faqs: Array<{ question: string; answer: string }>) {
+  const entries = faqs.filter((f) => f.question?.trim() && f.answer?.trim());
+  if (entries.length === 0) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: entries.map((f) => ({
+      '@type': 'Question',
+      name: f.question,
+      acceptedAnswer: { '@type': 'Answer', text: f.answer },
+    })),
   };
 }
 

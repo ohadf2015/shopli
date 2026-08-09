@@ -5,8 +5,10 @@ import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
 import WhatsAppShare from '../../../components/WhatsAppShare';
 import SeoHead from '../../../components/SeoHead';
-import { getRegion, RegionCode, RegionConfig } from '../../../lib/regions';
+import { getRegion, isValidRegion, RegionCode, RegionConfig } from '../../../lib/regions';
 import type { SearchProduct } from '../../../lib/aliexpress';
+import { productImage } from '../../../lib/img';
+import { listingAggregateFields } from '../../../lib/pdp';
 import {
   buildCompareRows,
   buildCompareShareUrl,
@@ -54,13 +56,26 @@ export default function ProductComparePage({
 }: ComparePageProps) {
   const router = useRouter();
   const lang = config.lang || 'en';
-  const [products] = useState(initialProducts);
-  const [rows] = useState(initialRows);
+  // Products/rows come straight from props: on client-side navigation to this
+  // same page, Next.js re-renders with fresh getServerSideProps props but does
+  // NOT remount the component — useState(initial*) would keep stale data and
+  // the page would look like the fetch never happened.
+  const products = initialProducts;
+  const rows = initialRows;
   const [productIds, setProductIds] = useState(initialIds);
   const [shareUrl, setShareUrl] = useState(initialShareUrl);
   const [copied, setCopied] = useState(false);
   const [idInput, setIdInput] = useState(initialIds.join(', '));
   const [removing, setRemoving] = useState<string | null>(null);
+
+  const initialIdsKey = initialIds.join(',');
+  useEffect(() => {
+    setProductIds(initialIds);
+    setIdInput(initialIds.join(', '));
+    setShareUrl(initialShareUrl);
+    setRemoving(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialIdsKey, initialShareUrl]);
 
   useEffect(() => {
     setShareUrl(buildCompareShareUrl(SITE_URL, region, productIds));
@@ -89,13 +104,15 @@ export default function ProductComparePage({
           title: p.title,
           description: p.title,
           image: p.imageUrl,
-          url: p.affiliateLink || shareUrl,
+          url: p.id ? `${SITE_URL}/${region}/product/${encodeURIComponent(p.id)}` : shareUrl,
           brand: p.shopName,
           price: p.price,
           currency: p.currency || config.currency,
-          // evaluate_rate is 0–100; schema expects ~1–5
-          ratingValue: p.rating > 0 ? p.rating / 20 : undefined,
-          reviewCount: p.reviewCount || p.volume || undefined,
+          // v1: no AggregateRating on on-site PDP URLs (docs/PDP-V1-SPEC.md)
+          ...listingAggregateFields(p, {
+            ratingValue: p.rating > 0 ? p.rating / 20 : undefined,
+            reviewCount: p.reviewCount || p.volume || undefined,
+          }),
         })),
       })
     );
@@ -106,12 +123,15 @@ export default function ProductComparePage({
           title: p.title,
           description: p.title,
           image: p.imageUrl,
-          url: p.affiliateLink || shareUrl,
+          url: p.id ? `${SITE_URL}/${region}/product/${encodeURIComponent(p.id)}` : shareUrl,
           brand: p.shopName,
           price: p.price,
           currency: p.currency || config.currency,
-          ratingValue: p.rating > 0 ? p.rating / 20 : undefined,
-          reviewCount: p.reviewCount || undefined,
+          // v1: no AggregateRating on on-site PDP URLs (docs/PDP-V1-SPEC.md)
+          ...listingAggregateFields(p, {
+            ratingValue: p.rating > 0 ? p.rating / 20 : undefined,
+            reviewCount: p.reviewCount || undefined,
+          }),
         })
       );
     }
@@ -179,7 +199,7 @@ export default function ProductComparePage({
 
       <main
         className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16"
-        style={{ fontFamily: rtl ? "'Assistant', system-ui, sans-serif" : undefined }}
+        style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}
       >
         {/* Breadcrumb */}
         <nav
@@ -305,7 +325,13 @@ export default function ProductComparePage({
               className="text-lg font-bold mb-2"
               style={{ color: 'var(--shopli-navy)' }}
             >
-              {rtl ? 'אין מוצרים להשוואה עדיין' : 'No products to compare yet'}
+              {error
+                ? rtl
+                  ? 'הטעינה נכשלה'
+                  : 'Could not load the comparison'
+                : rtl
+                  ? 'אין מוצרים להשוואה עדיין'
+                  : 'No products to compare yet'}
             </h2>
             <p
               className="text-sm max-w-md mx-auto mb-6"
@@ -316,7 +342,7 @@ export default function ProductComparePage({
                 : `Enter at least ${MIN_COMPARE_PRODUCTS} product IDs above, or try a sample:`}
             </p>
             <a
-              href={`/${region}/compare?ids=1005007001,1005007002,1005007005`}
+              href={`/${region}/compare?ids=sample`}
               className="btn-secondary text-sm"
             >
               {rtl ? 'השוואת דוגמה' : 'Load sample comparison'}
@@ -339,11 +365,9 @@ export default function ProductComparePage({
                     <div className="aspect-square bg-gray-50 relative">
                       {p.imageUrl ? (
                         <img
-                          src={p.imageUrl}
+                          {...productImage(p.imageUrl, 400, '(max-width: 640px) 70vw, 220px')}
                           alt={p.title}
                           className="w-full h-full object-contain p-2"
-                          loading="lazy"
-                          decoding="async"
                         />
                       ) : (
                         <div
@@ -536,10 +560,9 @@ export default function ProductComparePage({
                 >
                   {p.imageUrl && (
                     <img
-                      src={p.imageUrl}
+                      {...productImage(p.imageUrl, 120)}
                       alt=""
                       className="w-12 h-12 object-contain rounded-lg bg-gray-50 shrink-0"
-                      loading="lazy"
                     />
                   )}
                   <div className="min-w-0 flex-1">
@@ -607,29 +630,44 @@ export default function ProductComparePage({
         )}
       </main>
 
-      <footer className="border-t border-gray-100 py-6">
-        <div
-          className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-3 text-xs"
-          style={{ color: 'var(--shopli-warm-gray)' }}
-        >
-          <div className="font-semibold" style={{ color: 'var(--shopli-navy)' }}>
-            shopli
-          </div>
-          <div>
-            &copy; {new Date().getFullYear()}{' '}
-            {rtl ? 'כל הזכויות שמורות' : 'All rights reserved.'}
-          </div>
-        </div>
-      </footer>
     </>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
+// Last-resort IDs for the sample comparison, verified live 2026-08-02.
+const SAMPLE_FALLBACK_IDS = ['1005010287294727', '1005007171202355', '1005007244759019'];
+
+export const getServerSideProps: GetServerSideProps = async ({ params, query, res }) => {
   const region = ((params?.region as string) || 'eu') as RegionCode;
+  if (!isValidRegion(region)) return { notFound: true };
   const config = getRegion(region);
   const rtl = config.direction === 'rtl';
-  const productIds = parseCompareIds(query.ids as string | undefined);
+  const rawIds = query.ids as string | undefined;
+  let productIds: string[];
+
+  if (rawIds === 'sample') {
+    // "Load sample comparison": resolve to 3 real, currently-live products so
+    // the sample never shows fabricated data or dead affiliate links.
+    // AliExpress search is flaky/rate-limited from serverless egress IPs (returns
+    // empty without throwing), so retry with a pause; if search stays empty, fall
+    // back to curated IDs verified live — productdetail calls are reliable.
+    const { searchAliExpress } = await import('../../../lib/aliexpress');
+    let found: SearchProduct[] = [];
+    for (let attempt = 0; attempt < 3 && found.length < MIN_COMPARE_PRODUCTS; attempt++) {
+      if (attempt > 0) await new Promise((r) => setTimeout(r, 800));
+      try {
+        found = await searchAliExpress('wireless charger', region, 6);
+      } catch {
+        // retry
+      }
+    }
+    productIds =
+      found.length >= MIN_COMPARE_PRODUCTS
+        ? found.slice(0, 3).map((p) => p.id)
+        : [...SAMPLE_FALLBACK_IDS];
+  } else {
+    productIds = parseCompareIds(rawIds);
+  }
 
   let products: SearchProduct[] = [];
   let error: string | null = null;
@@ -639,44 +677,39 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
       const { getProductsByIds } = await import('../../../lib/aliexpress');
       products = await getProductsByIds(productIds, region);
 
-      // Demo/fallback when API has no keys or returns empty
+      // Never fabricate fallback products: an empty/failed API response must
+      // surface as an error, not as fake items with dead affiliate links.
       if (products.length === 0) {
-        const samples = getDemoProducts(region, config.currency);
-        products = productIds
-          .map((id) => samples.find((p) => p.id === id))
-          .filter(Boolean) as SearchProduct[];
-
-        if (products.length === 0 && samples.length >= 2) {
-          // Map requested IDs onto demo catalog by order for sample links
-          products = productIds
-            .map((id, i) => {
-              const base = samples[i % samples.length];
-              return base ? { ...base, id } : null;
-            })
-            .filter(Boolean) as SearchProduct[];
-        }
-      }
-
-      if (products.length < MIN_COMPARE_PRODUCTS && productIds.length >= MIN_COMPARE_PRODUCTS) {
         error =
           config.lang === 'he'
-            ? 'לא נמצאו מספיק מוצרים. בדקו את מזהי המוצר ונסו שוב.'
-            : 'Could not load enough products. Check the IDs and try again.';
+            ? 'לא הצלחנו לטעון את המוצרים כרגע. בדקו את המזהים או נסו שוב בעוד רגע.'
+            : "We couldn't load those products right now. Check the IDs or try again in a moment.";
+      } else if (products.length < MIN_COMPARE_PRODUCTS) {
+        error =
+          config.lang === 'he'
+            ? 'נטען מוצר אחד בלבד — הוסיפו עוד מזהה כדי להשוות.'
+            : 'Only one product loaded — add another ID to compare.';
       }
     } catch (e: any) {
-      error = e?.message || 'Failed to load products';
-      const samples = getDemoProducts(region, config.currency);
-      products = productIds
-        .map((id, i) => {
-          const base = samples[i % samples.length];
-          return base ? { ...base, id } : null;
-        })
-        .filter(Boolean) as SearchProduct[];
+      error =
+        config.lang === 'he'
+          ? 'שגיאה בטעינת המוצרים. נסו שוב בעוד רגע.'
+          : 'Failed to load products. Please try again in a moment.';
+      products = [];
     }
+  } else if (rawIds && rawIds !== 'sample') {
+    error =
+      config.lang === 'he'
+        ? 'מזהי המוצר לא תקינים. הזינו 2–4 מזהים מספריים מופרדים בפסיק.'
+        : 'Those product IDs look invalid. Enter 2–4 numeric IDs separated by commas.';
   }
 
   const rows = buildCompareRows(products, config.currencySymbol);
   const shareUrl = buildCompareShareUrl(SITE_URL, region, products.map((p) => p.id));
+
+  // Keyed on ?ids= by the CDN, so a shared comparison link is cheap on repeat hits.
+  // Short TTL: prices here are the thing being compared.
+  if (!error) res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=3600');
 
   return {
     props: {
@@ -692,93 +725,4 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
   };
 };
 
-/** Offline demo catalog aligned with api.ts fallback product IDs */
-function getDemoProducts(region: string, currency: string): SearchProduct[] {
-  const isHe = region === 'il';
-  return [
-    {
-      id: '1005007001',
-      sku: '',
-      title: isHe ? 'מטען אלחוטי מהיר 15W' : '15W Fast Wireless Charger',
-      price: region === 'il' ? 39.9 : 9.9,
-      originalPrice: region === 'il' ? 59.9 : 14.9,
-      currency,
-      imageUrl: '',
-      images: [],
-      affiliateLink: `https://www.aliexpress.com/item/1005007001.html`,
-      rating: 94,
-      reviewCount: 2341,
-      volume: 15000,
-      category: isHe ? 'גאדג\'טים' : 'Gadgets',
-      categoryPath: isHe ? 'אלקטרוניקה > מטענים' : 'Electronics > Chargers',
-      shopName: 'TechHome Store',
-      shopId: '1',
-      discount: '33%',
-      commissionRate: 8,
-      freeShipping: true,
-    },
-    {
-      id: '1005007002',
-      sku: '',
-      title: isHe ? 'אוזניות BT Sport Pro' : 'Sport Bluetooth Earbuds Pro',
-      price: region === 'il' ? 69.9 : 18.9,
-      originalPrice: region === 'il' ? 99.9 : 29.9,
-      currency,
-      imageUrl: '',
-      images: [],
-      affiliateLink: `https://www.aliexpress.com/item/1005007002.html`,
-      rating: 92,
-      reviewCount: 5872,
-      volume: 34000,
-      category: isHe ? 'אלקטרוניקה' : 'Electronics',
-      categoryPath: isHe ? 'אלקטרוניקה > אודיו' : 'Electronics > Audio',
-      shopName: 'AudioMax',
-      shopId: '2',
-      discount: '30%',
-      commissionRate: 8,
-      freeShipping: true,
-    },
-    {
-      id: '1005007003',
-      sku: '',
-      title: isHe ? 'ערכת מברגים מדויקת 48in1' : 'Precision Screwdriver Set 48in1',
-      price: region === 'il' ? 45 : 11.5,
-      originalPrice: region === 'il' ? 65 : 16.9,
-      currency,
-      imageUrl: '',
-      images: [],
-      affiliateLink: `https://www.aliexpress.com/item/1005007003.html`,
-      rating: 98,
-      reviewCount: 3204,
-      volume: 8900,
-      category: isHe ? 'כלים' : 'Tools',
-      categoryPath: isHe ? 'בית > כלי עבודה' : 'Home > Tools',
-      shopName: 'ProTools',
-      shopId: '3',
-      discount: '31%',
-      commissionRate: 6,
-      freeShipping: false,
-    },
-    {
-      id: '1005007005',
-      sku: '',
-      title: isHe ? 'שעון חכם ספורט IP68' : 'IP68 Smart Sports Watch',
-      price: region === 'il' ? 89.9 : 22.9,
-      originalPrice: region === 'il' ? 149.9 : 39.9,
-      currency,
-      imageUrl: '',
-      images: [],
-      affiliateLink: `https://www.aliexpress.com/item/1005007005.html`,
-      rating: 88,
-      reviewCount: 8901,
-      volume: 42000,
-      category: isHe ? 'ספורט' : 'Sports',
-      categoryPath: isHe ? 'ספורט > לביש' : 'Sports > Wearables',
-      shopName: 'FitGear',
-      shopId: '5',
-      discount: '40%',
-      commissionRate: 10,
-      freeShipping: true,
-    },
-  ];
-}
+

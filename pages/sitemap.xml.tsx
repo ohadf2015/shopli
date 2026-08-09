@@ -1,13 +1,17 @@
 import { GetServerSideProps } from 'next';
 import { REGIONS } from '../lib/regions';
+import { DEMO_PRODUCT_IDS } from '../lib/demo-products';
+import { cacheIfNotEmpty } from '../lib/cache';
 import { SITE_URL, getCollectionOgImage } from '../lib/seo';
+import { COLLECTION_CONTENT } from '../lib/collection-content';
+import { searchCollection } from '../lib/aliexpress';
 
 function xmlEncode(s: string): string {
   return s
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+    .replace(/\"/g, '&quot;')
     .replace(/'/g, '&apos;');
 }
 
@@ -46,8 +50,8 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   const { getAllComparisonSlugs } = await import('../lib/comparisons').catch(() => ({
     getAllComparisonSlugs: () => [] as string[],
   }));
-  const { getAllBlogSlugs } = await import('../lib/blog').catch(() => ({
-    getAllBlogSlugs: () => [] as string[],
+  const { getBlogPostsForRegion } = await import('../lib/blog').catch(() => ({
+    getBlogPostsForRegion: (_r: string) => [] as Array<{ slug: string }>,
   }));
 
   // Fresh lastmod on every generation (hourly revalidation via Cache-Control)
@@ -58,9 +62,39 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   const collections = getAllCollections();
   const moodSlugs = getAllMoodboardSlugs();
   const compareSlugs = getAllComparisonSlugs();
-  const blogSlugs = getAllBlogSlugs();
+
+  // Collect dynamic product IDs from all collections (AliExpress API)
+  // so PDP pages for live deal products appear in the sitemap.
+  // Also track which collections returned ≥1 product to filter the sitemap.
+  const dynamicProductIds = new Set<string>();
+  const collectionsWithProducts = new Set<string>();
+  const collectionsWithContent = new Set(Object.keys(COLLECTION_CONTENT));
+  const collectionDefs = getAllCollections().filter(
+    (c: any) => c.keywords && c.keywords.length > 0
+  );
+  await Promise.allSettled(
+    collectionDefs.map(async (coll: any) => {
+      const products = await searchCollection('il', [coll.keywords![0]], 4);
+      for (const p of products) {
+        if (p.id) {
+          dynamicProductIds.add(p.id);
+          collectionsWithProducts.add(coll.slug);
+        }
+      }
+    })
+  );
+  // Merge dynamic IDs with static demo IDs, preserving the 4 hardcoded ones
+  const allProductIds = [...new Set([...DEMO_PRODUCT_IDS, ...dynamicProductIds])];
 
   const urls: SitemapUrl[] = [];
+
+  // Top-level aggregated deals page (absorbs legacy smart-shopping-il equity via registrar 301s)
+  urls.push({
+    loc: `${SITE_URL}/deals`,
+    changefreq: 'daily',
+    priority: 0.9,
+    lastmod: today,
+  });
 
   // Regional homepages
   for (const region of regionCodes) {
@@ -69,6 +103,14 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       changefreq: 'daily',
       priority: 1.0,
       lastmod: today,
+    });
+    // Trending hub — updated daily, high-intent discovery page
+    urls.push({
+      loc: `${SITE_URL}/${region}/trending`,
+      changefreq: 'daily',
+      priority: 0.9,
+      lastmod: today,
+      images: [getCollectionOgImage('trending', 'Trending Products 2026', 'en')],
     });
     // Search landing (noindex when empty; still useful for discovery of path)
     urls.push({
@@ -80,6 +122,31 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     urls.push({
       loc: `${SITE_URL}/${region}/compare`,
       changefreq: 'weekly',
+      priority: 0.5,
+      lastmod: today,
+    });
+    // Legal pages
+    urls.push({
+      loc: `${SITE_URL}/${region}/about`,
+      changefreq: 'monthly',
+      priority: 0.5,
+      lastmod: today,
+    });
+    urls.push({
+      loc: `${SITE_URL}/${region}/privacy`,
+      changefreq: 'monthly',
+      priority: 0.5,
+      lastmod: today,
+    });
+    urls.push({
+      loc: `${SITE_URL}/${region}/terms`,
+      changefreq: 'monthly',
+      priority: 0.5,
+      lastmod: today,
+    });
+    urls.push({
+      loc: `${SITE_URL}/${region}/contact`,
+      changefreq: 'monthly',
       priority: 0.5,
       lastmod: today,
     });
@@ -95,10 +162,15 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     });
   }
 
-  // Collection pages — include per-category OG image
+  // Collection pages — only include slugs that have either editorial content
+  // (always valuable regardless of product availability) or returned ≥1 product
+  // from the AliExpress API scan. This prevents soft-404 crawl waste.
   for (const region of regionCodes) {
     const lang = REGIONS[region]?.lang || 'en';
     for (const coll of collections) {
+      if (!collectionsWithContent.has(coll.slug) && !collectionsWithProducts.has(coll.slug)) {
+        continue;
+      }
       const name =
         coll.name?.[lang] ||
         coll.name?.en ||
@@ -144,9 +216,24 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     }
   }
 
-  // Blog posts
+  // Product detail pages — static demo catalog + dynamic AliExpress deals.
+  // Dynamic product IDs are collected at generation time from all collection
+  // keyword searches (see above). 9 locale alternates per product.
   for (const region of regionCodes) {
-    for (const slug of blogSlugs) {
+    for (const pid of allProductIds) {
+      urls.push({
+        loc: `${SITE_URL}/${region}/product/${pid}`,
+        changefreq: 'weekly',
+        priority: 0.7,
+        lastmod: today,
+      });
+    }
+  }
+
+  // Blog posts — per region, since a region-restricted post 404s elsewhere and
+  // listing it for all nine would put eight dead URLs in the sitemap.
+  for (const region of regionCodes) {
+    for (const { slug } of getBlogPostsForRegion(region)) {
       urls.push({
         loc: `${SITE_URL}/${region}/blog/${slug}`,
         changefreq: 'monthly',
@@ -162,9 +249,11 @@ ${urls.map(buildUrlEntry).join('\n')}
 </urlset>`;
 
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-  // Fresh sitemap: revalidate hourly, serve stale for a day
-  res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
-  res.setHeader('X-Robots-Tag', 'noindex');
+  // Fresh sitemap: revalidate hourly, serve stale for a day.
+  // Do not send X-Robots-Tag here: sitemaps must be trusted by crawlers.
+  // A rate-limited sweep yields a sitemap missing its product URLs. Never cache
+  // that for an hour — a short sitemap tells Google the pages were removed.
+  cacheIfNotEmpty(res, dynamicProductIds.size > 0, 'public, s-maxage=3600, stale-while-revalidate=86400');
   res.write(xml);
   res.end();
 

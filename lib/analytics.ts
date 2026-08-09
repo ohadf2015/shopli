@@ -1,0 +1,176 @@
+// PostHog analytics — EU project 151059 (shared across products, split by $host).
+// The snippet itself is injected in pages/_document.tsx; this module provides
+// the typed capture helpers + a delegated click tracker for affiliate CTAs.
+//
+// Event schema (matches the old smart-shopping-il instrumentation):
+//   affiliate_click { product, product_id, category, price, currency, page, url, region? }
+//   outbound_click  { target, page, url }   (telegram / whatsapp)
+
+export const POSTHOG_KEY = 'phc_m3X2YeaZ89r7m8yQYXfc6afyrygXmJG7TegJco5H9skD';
+export const POSTHOG_HOST = 'https://eu.i.posthog.com';
+
+declare global {
+  interface Window {
+    posthog?: {
+      capture: (event: string, properties?: Record<string, unknown>) => void;
+      init?: (key: string, opts: Record<string, unknown>) => void;
+    };
+  }
+}
+
+function capture(event: string, properties: Record<string, unknown>) {
+  try {
+    if (typeof window !== 'undefined' && window.posthog?.capture) {
+      window.posthog.capture(event, properties);
+    }
+  } catch {
+    /* analytics must never break the page */
+  }
+}
+
+// ------------------------------------------------------------------
+// Discovery surfaces (trending rail/page, PDP find-similar) — spec: t_a5202144
+// Never send PII, affiliate tokens, or full outbound URLs.
+// ------------------------------------------------------------------
+
+export type TrendingSurface = 'home_rail' | 'trending_page';
+
+/** Fire once per surface per session when the rail/page is ≥50% visible. */
+export function trackTrendingView(props: {
+  region: string;
+  locale: string;
+  surface: TrendingSurface;
+  product_ids: string[];
+  result_count: number;
+  score_version: string;
+}) {
+  const key = `trending_view:${props.surface}:${props.region}`;
+  try {
+    if (typeof window !== 'undefined' && window.sessionStorage?.getItem(key)) return;
+    window.sessionStorage?.setItem(key, '1');
+  } catch {
+    /* storage blocked — still fire once per page load */
+  }
+  capture('trending_view', { ...props, experiment: 'trending_launch_v1', variant: 'rail' });
+}
+
+export function trackTrendingClick(props: {
+  region: string;
+  surface: TrendingSurface;
+  product_id: string;
+  rank: number;
+  trend_score: number;
+  trend_reason: string;
+  click_target: 'pdp' | 'outbound' | 'compare' | 'share';
+  price: number;
+  currency: string;
+  discount_pct: number;
+  score_version: string;
+}) {
+  capture('trending_click', props);
+}
+
+export function trackFindSimilarClick(props: {
+  region: string;
+  surface: 'pdp';
+  source_product_id: string;
+  source_category: string;
+  source_price: number;
+  currency: string;
+  result_count: number;
+  algorithm_version: string;
+}) {
+  capture('find_similar_click', props);
+}
+
+export function trackFindSimilarView(props: {
+  region: string;
+  surface: 'pdp';
+  source_product_id: string;
+  product_ids: string[];
+  result_count: number;
+  algorithm_version: string;
+}) {
+  capture('find_similar_view', props);
+}
+
+export function trackSimilarProductClick(props: {
+  region: string;
+  surface: 'pdp';
+  source_product_id: string;
+  product_id: string;
+  rank: number;
+  similarity_score: number;
+  algorithm_version: string;
+}) {
+  capture('similar_product_click', props);
+}
+
+export function trackFindSimilarError(props: {
+  region: string;
+  source_product_id: string;
+  error: string;
+}) {
+  capture('find_similar_error', props);
+}
+
+const AFFILIATE_HOST_RE = /(^|\.)aliexpress\.com$|(^|\.)s\.click\.aliexpress\.com$/;
+
+function isAffiliateUrl(url: URL): boolean {
+  return AFFILIATE_HOST_RE.test(url.hostname) || url.hostname.endsWith('.aliexpress.com');
+}
+
+/**
+ * Installs ONE delegated click listener on document that fires:
+ *  - affiliate_click for any anchor pointing at AliExpress (incl. s.click short links)
+ *  - outbound_click for Telegram / WhatsApp links
+ * Product metadata is read from data-* attributes on the closest `.product-card`
+ * (rendered by components/ProductCard.tsx) or the anchor itself.
+ * Returns an uninstall function.
+ */
+export function installClickTracking(): () => void {
+  const onClick = (e: MouseEvent) => {
+    const target = e.target as HTMLElement | null;
+    const anchor = target?.closest?.('a[href]') as HTMLAnchorElement | null;
+    if (!anchor) return;
+
+    let url: URL;
+    try {
+      url = new URL(anchor.href, window.location.origin);
+    } catch {
+      return;
+    }
+
+    const page = window.location.pathname;
+
+    if (isAffiliateUrl(url)) {
+      const card = anchor.closest('[data-product-id], .product-card') as HTMLElement | null;
+      const attr = (el: HTMLElement | null, name: string) =>
+        el?.getAttribute(name) || anchor.getAttribute(name) || undefined;
+      const baseProps = {
+        product: attr(card, 'data-product-title'),
+        product_id: attr(card, 'data-product-id'),
+        category: attr(card, 'data-category'),
+        price: attr(card, 'data-price'),
+        currency: attr(card, 'data-currency'),
+        page,
+        url: anchor.href,
+      };
+      capture('affiliate_click', baseProps);
+      if (card?.getAttribute('data-trending-hub') === 'true') {
+        capture('trending_hub_click', baseProps);
+      }
+      return;
+    }
+
+    if (url.hostname === 't.me' || url.hostname === 'telegram.me') {
+      capture('outbound_click', { target: 'telegram', page, url: anchor.href });
+    } else if (url.hostname === 'wa.me' || url.hostname.endsWith('.whatsapp.com')) {
+      capture('outbound_click', { target: 'whatsapp', page, url: anchor.href });
+    }
+  };
+
+  // capture phase so we fire before any navigation/other handlers
+  document.addEventListener('click', onClick, true);
+  return () => document.removeEventListener('click', onClick, true);
+}

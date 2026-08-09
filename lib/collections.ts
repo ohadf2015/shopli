@@ -21,6 +21,103 @@ export const COLLECTIONS: CollectionDef[] = [
     desc: { en: 'Complete your look — costume, wig, makeup & accessories', he: 'תחפושת שלמה עם פאה, איפור ואביזרים', fr: 'Look Halloween complet — costume, perruque, maquillage', de: 'Kompletter Look — Kostüm, Perücke, Make-up', es: 'Look completo — disfraz, peluca, maquillaje', it: 'Look completo — costume, parrucca, trucco' },
     icon: 'mask',
   },
+  // ════════════════════════════════════════════════════
+  // [P1 TEMU MOAT] Maker Lab — DIY electronics
+  // Temu has limited hobby electronics selection. AliExpress is THE global
+  // source for Arduino, sensors, soldering kits, and maker components.
+  // ════════════════════════════════════════════════════
+  {
+    slug: 'maker-lab',
+    keywords: ['Arduino kit', 'soldering practice kit', 'Raspberry Pi accessories', 'electronics DIY project kit', 'breadboard jumper wire'],
+    name: { en: 'Maker Lab', he: 'מעבדת יוצר', fr: 'Atelier Maker', de: 'Maker Labor', es: 'Laboratorio Maker', it: 'Laboratorio Maker' },
+    desc: { en: 'Arduino, sensors, soldering kits & everything for your DIY electronics projects', he: 'ארדואינו, סנסורים, ערכות הלחמה וכל מה שצריך לפרויקטי אלקטרוניקה', fr: 'Arduino, capteurs, kits de soudure pour vos projets électroniques', de: 'Arduino, Sensoren, Lötkits für deine Elektronik-Projekte', es: 'Arduino, sensores, kits de soldadura para proyectos electrónicos', it: 'Arduino, sensori, kit di saldatura per progetti elettronici' },
+    icon: 'bulb',
+  },
+  // ════════════════════════════════════════════════════
+  // [P1 TEMU MOAT] Home Bar — cocktail starters & barware
+  // Temu carries some bar tools but doesn't curate into complete kits.
+  // AliExpress has huge selection for home mixology.
+  // ════════════════════════════════════════════════════
+  {
+    slug: 'home-bar',
+    keywords: ['cocktail shaker set', 'jigger measure', 'muddler bar spoon', 'ice cube mold silicone', 'bar pour spout'],
+    name: { en: 'Home Bar', he: 'בר ביתי', fr: 'Bar à Domicile', de: 'Hausbar', es: 'Bar en Casa', it: 'Bar in Casa' },
+    desc: { en: 'Shakers, jiggers & tools to mix craft cocktails at home under €30', he: 'שייקרים, ג\'יגרים וכלים לקוקטיילים ביתיים בפחות מ-₪120', fr: 'Shakers, doseurs et outils pour cocktails maison à moins de 30€', de: 'Shaker, Jigger & Werkzeuge für Craft-Cocktails unter 30€', es: 'Cocteleras, dosificadores para cocktails caseros', it: 'Shaker, misurini e strumenti per cocktail fatti in casa' },
+    icon: 'chef',
+  },
+  // ════════════════════════════════════════════════════
+  // [P1 TEMU MOAT] Zero Waste — plastic-free essentials
+  // Temu avoids regulated/safety categories; eco-friendly consumer goods
+  // (bamboo, silicone, stainless) are harder to curate on Temu's platform.
+  // Strong appeal in EU/IL eco-conscious markets.
+  // ════════════════════════════════════════════════════
+  {
+    slug: 'zero-waste',
+    keywords: ['bamboo toothbrush', 'reusable produce bags', 'beeswax food wrap', 'stainless steel straw set', 'reusable makeup pads'],
+    name: { en: 'Zero Waste', he: 'אפס פסולת', fr: 'Zéro Déchet', de: 'Zero Waste', es: 'Cero Residuos', it: 'Zero Sprechi' },
+    desc: { en: 'Reusable, plastic-free essentials for a greener everyday routine', he: 'מוצרים רב-פעמיים נטולי פלסטיק לשגרה ירוקה יותר', fr: 'Essentiels réutilisables sans plastique pour un quotidien plus vert', de: 'Wiederverwendbare, plastikfreie Essentials für den Alltag', es: 'Esenciales reutilizables sin plástico para una rutina más verde', it: 'Essenziali riutilizzabili senza plastica per una routine più verde' },
+    icon: 'sun',
+  },
+  // ════════════════════════════════════════════════════
+  // [P1 TEMU MOAT] Dorm Room — college essentials
+  // Seasonal Back-to-School niche targeting dorm & student housing.
+  // AliExpress has space-saving organizers not well-curated on Temu.
+  // ════════════════════════════════════════════════════
+  {
+    slug: 'dorm-room',
+    keywords: ['bed riser', 'dorm room organizer', 'shower caddy', 'under bed storage', 'closet organizer small space'],
+    name: { en: 'Dorm Room', he: 'חדר מעונות', fr: 'Chambre Étudiant', de: 'Studenten-WG', es: 'Habitación Residencia', it: 'Camera Studenti' },
+    desc: { en: 'Space-saving essentials for dorm rooms & small apartments', he: 'מוצרים חוסכי מקום לחדרי מעונות ודירות קטנות', fr: 'Essentiels gain de place pour chambres étudiantes', de: 'Platzsparende Essentials für WG-Zimmer', es: 'Esenciales que ahorran espacio para habitaciones pequeñas', it: 'Essenziali salvaspazio per camere studenti' },
+    icon: 'backpack',
+  },
+  // ════════════════════════════════════════════════════
+  // [P1 TEMU MOAT] Tea Ceremony — matcha & loose-leaf kits
+  // Cultural curation Temu's algorithm can't replicate. AliExpress has
+  // authentic Japanese & Chinese tea ware that Temu doesn't curate.
+  // ════════════════════════════════════════════════════
+  {
+    slug: 'tea-ceremony',
+    keywords: ['matcha whisk bamboo', 'Japanese tea set', 'ceramic teapot', 'tea scoop', 'matcha bowl'],
+    name: { en: 'Tea Ceremony', he: 'טקס תה', fr: 'Cérémonie du Thé', de: 'Tea Zeremonie', es: 'Ceremonia del Té', it: 'Cerimonia del Tè' },
+    desc: { en: 'Authentic matcha sets, teapots & accessories for the perfect brew', he: 'ערכות מאצ\'ה אותנטיות, קומקומים ואביזרים לחליטה מושלמת', fr: 'Sets matcha authentiques, théières pour une infusion parfaite', de: 'Authentische Matcha-Sets, Teekannen für den perfekten Aufguss', es: 'Sets de matcha auténticos, teteras para una infusión perfecta', it: 'Set matcha autentici, teiere per un infuso perfetto' },
+    icon: 'lamp',
+  },
+  // ════════════════════════════════════════════════════
+  // [P1 TEMU MOAT] Desk Wellness — ergonomic home office health
+  // Health/ergonomic accessories Temu doesn't target well.
+  // AliExpress has a vast selection of posture & ergonomic tools.
+  // ════════════════════════════════════════════════════
+  {
+    slug: 'desk-wellness',
+    keywords: ['posture corrector', 'lumbar support cushion', 'ergonomic wrist rest', 'standing desk mat anti fatigue', 'neck stretcher'],
+    name: { en: 'Desk Wellness', he: 'בריאות במשרד', fr: 'Bien-être Bureau', de: 'Büro-Wellness', es: 'Bienestar en la Oficina', it: 'Benessere in Ufficio' },
+    desc: { en: 'Ergonomic cushions, posture aids & desk health essentials under €25', he: 'כריות ארגונומיות, מתקני יציבה וציוד בריאותי לשולחן בפחות מ-₪100', fr: 'Coussins ergonomiques, aides posturales pour le bureau à moins de 25€', de: 'Ergonomische Kissen, Haltungshilfen für den Schreibtisch unter 25€', es: 'Cojines ergonómicos, ayudas posturales para la oficina', it: 'Cuscini ergonomici, ausili posturali per la scrivania' },
+    icon: 'monitor',
+  },
+  // ════════════════════════════════════════════════════
+  // [P1 TEMU MOAT] Jewelry Making — DIY craft supplies
+  // Massive AliExpress category. Temu carries some findings but doesn't
+  // curate for jewelry makers. Strong repeat-purchase potential.
+  // ════════════════════════════════════════════════════
+  {
+    slug: 'jewelry-making',
+    keywords: ['beading kit', 'jewelry pliers set', 'crimp beads', 'wire wrapping kit', 'resin mold jewelry'],
+    name: { en: 'Jewelry Making', he: 'תכשיטנות', fr: 'Fabrication Bijoux', de: 'Schmuckherstellung', es: 'Fabricación de Joyas', it: 'Creazione Gioielli' },
+    desc: { en: 'Beads, wires, pliers & resin molds for DIY jewelry crafting', he: 'חרוזים, חוטים, צבתות ותבניות שרף ליצירת תכשיטים', fr: 'Perles, fils, pinces et moules résine pour créer vos bijoux', de: 'Perlen, Drähte, Zangen & Harzformen für DIY-Schmuck', es: 'Abalorios, alambres, alicates y moldes de resina', it: 'Perline, fili, pinze e stampi in resina per creare gioielli' },
+    icon: 'run',
+  },
+  // ════════════════════════════════════════════════════
+  // [P1 TEMU MOAT] Microgreens & Sprouting — home growing
+  // Temu doesn't carry gardening supplies well. AliExpress has vast
+  // seed, tray & growing medium selection.
+  // ════════════════════════════════════════════════════
+  {
+    slug: 'microgreens',
+    keywords: ['sprouting jar', 'microgreen growing tray', 'seed starter kit', 'growing medium', 'organic seeds mix'],
+    name: { en: 'Microgreens', he: 'מיקרוגרין', fr: 'Micro-pousses', de: 'Microgreens', es: 'Microvegetales', it: 'Microgreens' },
+    desc: { en: 'Grow nutrient-packed microgreens at home — trays, seeds & jars', he: 'לגדל מיקרוגרין עשיר ברכיבים תזונתיים בבית', fr: 'Cultivez des micro-pousses à la maison — plateaux, graines', de: 'Nährstoffreiche Microgreens zu Hause anbauen', es: 'Cultiva microvegetales ricos en nutrientes en casa', it: 'Coltiva microgreens ricchi di nutrienti a casa' },
+    icon: 'sun',
+  },
   {
     slug: 'home-gym',
     keywords: ['fitness resistance bands', 'yoga mat', 'home gym equipment', 'jump rope'],
@@ -31,8 +128,8 @@ export const COLLECTIONS: CollectionDef[] = [
   {
     slug: 'home-office',
     keywords: ['desk lamp LED', 'cable management desk', 'monitor stand', 'desk organizer', 'wireless charging pad'],
-    name: { en: 'Desk Setup', he: 'משימה ביתית', fr: 'Bureau Domicile', de: 'Schreibtisch-Setup', es: 'Setup de Escritorio', it: 'Set up Scrivania' },
-    desc: { en: 'Ergonomic desk gear, cable management & lighting', he: 'ציוד ארגונומי, ניהול כבלים ותאורה', fr: 'Équipement ergonomique, gestion des câbles', de: 'Ergonomisch, Kabelmanagement & Beleuchtung', es: 'Equipo ergonómico, gestión de cables', it: 'Attrezzatura ergonomica, gestione cavi' },
+    name: { en: 'Desk Setup', he: 'עמדת עבודה ביתית', fr: 'Bureau Domicile', de: 'Schreibtisch-Setup', es: 'Setup de Escritorio', it: 'Set up Scrivania' },
+    desc: { en: 'Ergonomic desk gear, cable management & lighting', he: 'ציוד ארגונומי לשולחן, סידור כבלים ותאורה', fr: 'Équipement ergonomique, gestion des câbles', de: 'Ergonomisch, Kabelmanagement & Beleuchtung', es: 'Equipo ergonómico, gestión de cables', it: 'Attrezzatura ergonomica, gestione cavi' },
     icon: 'monitor',
   },
   {
@@ -80,8 +177,8 @@ export const COLLECTIONS: CollectionDef[] = [
   {
     slug: 'summer-essentials',
     keywords: ['portable fan', 'beach towel', 'pool float', 'sunglasses', 'sun hat', 'water bottle'],
-    name: { en: 'Summer Essentials', he: 'קיץ הכרחי', fr: 'Essentiels Ete', de: 'Sommer-Essentials', es: 'Esenciales de Verano', it: 'Essenziali Estivi' },
-    desc: { en: 'Beat the heat — fans, beach gear, hydration & sun protection', he: 'מניפות, ציוד חוף, הידרציה והגנה מהשמש', fr: 'Ventilateurs, plage, hydratation & protection solaire', de: 'Ventilatoren, Strand, Hydration & Sonnenschutz', es: 'Ventiladores, playa, hidratacion', it: 'Ventilatori, spiaggia, idratazione' },
+    name: { en: 'Summer Essentials', he: 'מוצרי חובה לקיץ', fr: 'Essentiels Ete', de: 'Sommer-Essentials', es: 'Esenciales de Verano', it: 'Essenziali Estivi' },
+    desc: { en: 'Beat the heat — fans, beach gear, hydration & sun protection', he: 'מאווררים ניידים, ציוד חוף, שתייה והגנה מהשמש', fr: 'Ventilateurs, plage, hydratation & protection solaire', de: 'Ventilatoren, Strand, Hydration & Sonnenschutz', es: 'Ventiladores, playa, hidratacion', it: 'Ventilatori, spiaggia, idratazione' },
     icon: 'sun',
   },
   {
@@ -115,14 +212,14 @@ export const COLLECTIONS: CollectionDef[] = [
   {
     slug: 'coffee-ritual',
     keywords: ['french press stainless steel', 'burr coffee grinder', 'milk frother handheld', 'reusable coffee cup'],
-    name: { en: 'Coffee Ritual', he: 'פולחן קפה', fr: 'Rituel Café', de: 'Kaffeeritual', es: 'Ritual del Café', it: 'Rituale del Caffè' },
+    name: { en: 'Coffee Ritual', he: 'טקס הקפה', fr: 'Rituel Café', de: 'Kaffeeritual', es: 'Ritual del Café', it: 'Rituale del Caffè' },
     desc: { en: 'Brew barista-quality coffee at home under €60', he: 'קפה באיכות בריסטה בבית בפחות מ-₪250', fr: 'Café de barista à domicile à moins de 60€', de: 'Barista-Qualität zu Hause unter 60€', es: 'Café de barista en casa por menos de 60€', it: 'Caffè da bar a casa sotto i 60€' },
     icon: 'chef',
   },
   {
     slug: 'content-creator',
     keywords: ['wireless lavalier microphone', 'ring light with tripod', 'phone gimbal stabilizer', 'LED ring light 10'],
-    name: { en: 'Content Creator Kit', he: 'ערכת קריאייטיב', fr: 'Kit Créateur', de: 'Creator-Set', es: 'Kit Creador', it: 'Kit Creator' },
+    name: { en: 'Content Creator Kit', he: 'ערכת יוצרי תוכן', fr: 'Kit Créateur', de: 'Creator-Set', es: 'Kit Creador', it: 'Kit Creator' },
     desc: { en: 'Start recording like a pro with mic, light & gimbal under €80', he: 'להקליט כמו מקצוען עם מיקרופון, תאורה וגימבל בפחות מ-₪350', fr: 'Enregistrez comme un pro avec micro, lumière et gimbal à moins de 80€', de: 'Professionell aufnehmen mit Mikro, Licht & Gimbal unter 80€', es: 'Graba como un pro con mic, luz y gimbal por menos de 80€', it: 'Registra come un pro con microfono, luce e gimbal sotto 80€' },
     icon: 'camera',
   },
@@ -158,7 +255,7 @@ export const COLLECTIONS: CollectionDef[] = [
   {
     slug: 'gadgets-under-10',
     keywords: ['kitchen gadgets under 10', 'useful gadgets cheap', 'home gadgets', 'organization tools', 'small kitchen tools'],
-    name: { en: 'Gadgets Under €10', he: 'גאדג\'טים ב-₪40', fr: 'Gadgets à Moins de 10€', de: 'Gadgets unter 10€', es: 'Gadgets por menos de 10€', it: 'Gadget Sotto i 10€' },
+    name: { en: 'Gadgets Under €10', he: 'גאדג׳טים בפחות מ-₪40', fr: 'Gadgets à Moins de 10€', de: 'Gadgets unter 10€', es: 'Gadgets por menos de 10€', it: 'Gadget Sotto i 10€' },
     desc: { en: 'Smart little tools under €10 that make daily life easier', he: 'כלים קטנים וחכמים בפחות מ-₪40 שמקלים על החיים', fr: 'Petits outils malins à moins de 10€', de: 'Clevere kleine Helfer unter 10€', es: 'Pequeñas herramientas inteligentes por menos de 10€', it: 'Piccoli strumenti intelligenti sotto 10€' },
     icon: 'bulb',
   },
@@ -190,7 +287,7 @@ export const COLLECTIONS: CollectionDef[] = [
     slug: 'nail-care',
     keywords: ['UV nail lamp', 'nail drill file', 'nail art stamp kit', 'nail polish set', 'cuticle oil kit'],
     name: { en: 'Nail Art & Care', he: 'טיפוח ציפורניים' },
-    desc: { en: 'DIY nail art tools and care kits for perfect manicures at home', he: 'ערכות טיפוח ציפורניים לעשה זאת בעצמך למניקור מושלם בבית' },
+    desc: { en: 'DIY nail art tools and care kits for perfect manicures at home', he: 'ערכות טיפוח ציפורניים לעשות בעצמכם — מניקור מושלם בבית' },
     icon: 'sun',
     googleCategory: '469',
   },
@@ -213,7 +310,7 @@ export const COLLECTIONS: CollectionDef[] = [
   {
     slug: 'korean-skincare',
     keywords: ['Korean essence', 'snail mucin', 'sheet masks', 'vitamin C brightening', 'centella asiatica'],
-    name: { en: 'K-Beauty Routine', he: 'שגרת קוריאנית' },
+    name: { en: 'K-Beauty Routine', he: 'טיפוח קוריאני' },
     desc: { en: 'Korean skincare step-by-step — essence and sheet masks', he: 'שגרת טיפוח קוריאנית צעד אחר צעד' },
     icon: 'mask',
     googleCategory: '469',
@@ -229,15 +326,15 @@ export const COLLECTIONS: CollectionDef[] = [
   {
     slug: 'acne-care',
     keywords: ['salicylic acid cleanser', 'benzoyl peroxide spot treatment', 'niacinamide serum', 'tea tree oil', 'clay mask'],
-    name: { en: 'Acne Care', he: 'טיפול באקנה' },
-    desc: { en: 'Clear skin solutions for acne-prone skin — spot treatments and cleansers', he: 'פתרונות לעור נוטה לאקנה — טיפולים מקומיים ותכשירי ניקוי' },
+    name: { en: 'Acne Care', he: 'טיפול בפצעונים' },
+    desc: { en: 'Clear skin solutions for acne-prone skin — spot treatments and cleansers', he: 'פתרונות לעור נוטה לפצעונים — טיפולים מקומיים ותכשירי ניקוי' },
     icon: 'mask',
     googleCategory: '469',
   },
   {
     slug: 'facial-tools',
     keywords: ['face roller', 'jade roller', 'gua sha tool', 'facial steamer', 'microcurrent device'],
-    name: { en: 'Facial Tools', he: 'כלי פנים' },
+    name: { en: 'Facial Tools', he: 'כלי טיפוח לפנים' },
     desc: { en: 'Professional facial tools for spa-level skincare at home', he: 'כלי טיפוח מקצועיים ברמת ספא בבית' },
     icon: 'bulb',
     googleCategory: '469',
@@ -309,8 +406,8 @@ export const COLLECTIONS: CollectionDef[] = [
   {
     slug: 'perfume-fragrance',
     keywords: ['perfume oil', 'perfume sample set', 'body mist', 'roll-on fragrance', 'solid perfume'],
-    name: { en: 'Perfume & Fragrance', he: 'בשמים וריחות' },
-    desc: { en: 'Long-lasting perfumes and fragrance oils for every occasion', he: 'בשמים וניחוחות עמידים לכל אירוח' },
+    name: { en: 'Perfume & Fragrance', he: 'בשמים וניחוחות' },
+    desc: { en: 'Long-lasting perfumes and fragrance oils for every occasion', he: 'בשמים וניחוחות עמידים לכל אירוע' },
     icon: 'run',
     googleCategory: '469',
   },
@@ -462,7 +559,7 @@ export const COLLECTIONS: CollectionDef[] = [
     slug: 'hair-coloring',
     keywords: ['ammonia-free hair dye', 'hair bleach kit', 'hair color brush', 'hair developer', 'toning shampoo'],
     name: { en: 'Hair Coloring', he: 'צביעת שיער' },
-    desc: { en: 'DIY hair coloring kits and tools for salon results at home', he: 'ערכות צביעת שיער לעשה זאת בעצמך לתוצאות כמו במספרה' },
+    desc: { en: 'DIY hair coloring kits and tools for salon results at home', he: 'ערכות צביעת שיער ביתיות לתוצאות כמו במספרה' },
     icon: 'run',
     googleCategory: '469',
   },
@@ -549,7 +646,7 @@ export const COLLECTIONS: CollectionDef[] = [
   {
     slug: 'tanning-bronzing',
     keywords: ['self tanner mousse', 'tanning drops', 'bronzing powder', 'tanning mitt', 'gradual tan lotion'],
-    name: { en: 'Tanning & Bronzing', he: 'שיזוף ושיזוף מלאכותי' },
+    name: { en: 'Tanning & Bronzing', he: 'שיזוף עצמי וברונזרים' },
     desc: { en: 'Self-tanning products and bronzers for a sun-kissed glow', he: 'מוצרי שיזוף עצמי ומברונזרים לגוון שזוף' },
     icon: 'sun',
     googleCategory: '469',
