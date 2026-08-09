@@ -58,8 +58,8 @@ test('a persistently rate-limited call gives up rather than hanging', async () =
   const { state, restore } = stubFetch([LIMITED]);
   try {
     const products = await getProductsByIds(['123'], 'us');
-    // 3 attempts on productdetail.get, then 3 on the product.query fallback.
-    assert.equal(state.calls, 6);
+    // 2 attempts on productdetail.get, then 2 on the product.query fallback.
+    assert.equal(state.calls, 4);
     assert.deepEqual(products, []);
   } finally {
     restore();

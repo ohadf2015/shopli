@@ -56,6 +56,10 @@ async function ensureTable(sql: any): Promise<boolean> {
         seen_on    DATE NOT NULL DEFAULT CURRENT_DATE,
         PRIMARY KEY (product_id, region, seen_on)
       )`;
+    // Added after the table shipped, so it is a separate statement rather than
+    // a column in the CREATE — existing rows keep a NULL price, which reads
+    // correctly as "no reading that day".
+    await sql`ALTER TABLE product_volume_snapshots ADD COLUMN IF NOT EXISTS price NUMERIC(12,2)`;
     ensured = true;
     return true;
   } catch {
@@ -69,7 +73,7 @@ async function ensureTable(sql: any): Promise<boolean> {
  */
 export async function recordVolumes(
   region: string,
-  products: Array<{ id?: string; volume?: number }>
+  products: Array<{ id?: string; volume?: number; price?: number }>
 ): Promise<number> {
   const sql = db();
   if (!sql) return 0;
@@ -84,12 +88,18 @@ export async function recordVolumes(
   try {
     const ids = rows.map((p) => p.id as string);
     const volumes = rows.map((p) => String(p.volume));
+    // Price rides along in the same statement. AliExpress "discounts" are quoted
+    // against a list price the seller sets and can move at will, so the only way
+    // to answer "is this actually cheap?" is our own record of what it cost on
+    // previous days. Nothing reads this yet — it needs two readings to say
+    // anything — but a day not collected is a day that cannot be backfilled.
+    const prices = rows.map((p) => (typeof p.price === 'number' && p.price > 0 ? String(p.price) : null));
     await sql`
-      INSERT INTO product_volume_snapshots (product_id, region, volume)
-      SELECT id, ${region}, vol
-      FROM UNNEST(${ids}::text[], ${volumes}::bigint[]) AS t(id, vol)
+      INSERT INTO product_volume_snapshots (product_id, region, volume, price)
+      SELECT id, ${region}, vol, pr
+      FROM UNNEST(${ids}::text[], ${volumes}::bigint[], ${prices}::numeric[]) AS t(id, vol, pr)
       ON CONFLICT (product_id, region, seen_on)
-      DO UPDATE SET volume = EXCLUDED.volume`;
+      DO UPDATE SET volume = EXCLUDED.volume, price = COALESCE(EXCLUDED.price, product_volume_snapshots.price)`;
     return rows.length;
   } catch {
     return 0;

@@ -70,8 +70,13 @@ function release(): void {
  * it out costs one slow request and keeps the page.
  *
  * The timestamp is part of the signature, so each attempt is re-signed.
+ *
+ * One retry, not several: the ban the API actually reports is one second, so a
+ * single wait covers the evidence. Deeper retries would multiply against the
+ * in-flight cap and put seconds of sleep on a page's worst case to chase a
+ * failure mode we have never observed.
  */
-async function callApi(params: Record<string, string>, attempts = 3): Promise<any> {
+async function callApi(params: Record<string, string>, attempts = 2): Promise<any> {
   await acquire();
   try {
     let last: any = null;

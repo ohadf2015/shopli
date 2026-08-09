@@ -13,5 +13,8 @@ import type { ServerResponse } from 'http';
  * the real thing.
  */
 export function cacheIfNotEmpty(res: ServerResponse, hasContent: boolean, value: string): void {
-  res.setHeader('Cache-Control', hasContent ? value : 'public, s-maxage=0, must-revalidate');
+  // 30s, not 0: during an API bad patch every request would otherwise re-render
+  // and pay the retry backoff, which is a thundering herd at exactly the wrong
+  // moment. Short enough that recovery is still seconds away.
+  res.setHeader('Cache-Control', hasContent ? value : 'public, s-maxage=30, must-revalidate');
 }
