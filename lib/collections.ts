@@ -669,6 +669,61 @@ export const COLLECTIONS: CollectionDef[] = [
   },
 ];
 
+/**
+ * Seasonal hero ordering: month (0-based) -> prioritized collection slugs.
+ * The homepage hero shows the first N collections, so this map controls the
+ * highest-CTR real estate on the page. Anything not listed for the month
+ * falls back to declaration order after the prioritized slugs.
+ */
+const FEATURED_ORDER_GLOBAL: Record<number, string[]> = {
+  0: ['home-gym', 'home-office', 'coffee-ritual', 'sleep-sanctuary', 'wireless-audio', 'gadgets-under-10'], // Jan: New Year fitness / resets
+  1: ['travel', 'home-gym', 'coffee-ritual', 'sleep-sanctuary', 'wireless-audio', 'phone-accessories'], // Feb
+  2: ['balcony-garden', 'travel', 'camping', 'home-office', 'lighting', 'kitchen'], // Mar: spring
+  3: ['camping', 'balcony-garden', 'travel', 'home-gym', 'car', 'kitchen'], // Apr
+  4: ['camping', 'summer-essentials', 'balcony-garden', 'travel', 'car', 'wireless-audio'], // May
+  5: ['summer-essentials', 'camping', 'travel', 'wireless-audio', 'balcony-garden', 'car'], // Jun
+  6: ['summer-essentials', 'travel', 'camping', 'wireless-audio', 'phone-accessories', 'car'], // Jul: peak summer
+  7: ['back-to-school', 'summer-essentials', 'home-office', 'wireless-audio', 'phone-accessories', 'lighting'], // Aug: BTS ramps
+  8: ['back-to-school', 'halloween', 'home-office', 'coffee-ritual', 'lighting', 'kitchen'], // Sep: BTS + Halloween ramp
+  9: ['halloween', 'lighting', 'coffee-ritual', 'kitchen', 'sleep-sanctuary', 'gadgets-under-10'], // Oct: Halloween peak
+  10: ['gadgets-under-10', 'wireless-audio', 'phone-accessories', 'smart-home', 'kitchen', 'home-office'], // Nov: Black Friday gifting
+  11: ['gadgets-under-10', 'coffee-ritual', 'wireless-audio', 'smart-home', 'sleep-sanctuary', 'kitchen'], // Dec: holiday gifts
+};
+
+/**
+ * Israel overrides. Costume season in IL is Purim (Feb-Mar), NOT Halloween —
+ * so 'halloween' (the costumes collection) leads only in Feb-Mar and is never
+ * boosted in Sep-Oct for the IL locale.
+ */
+const FEATURED_ORDER_IL: Record<number, string[]> = {
+  1: ['halloween', 'travel', 'home-gym', 'coffee-ritual', 'wireless-audio', 'phone-accessories'], // Feb: Purim costumes
+  2: ['halloween', 'balcony-garden', 'travel', 'camping', 'lighting', 'kitchen'], // Mar: Purim (when late) + spring
+  7: ['back-to-school', 'summer-essentials', 'home-office', 'wireless-audio', 'phone-accessories', 'lighting'], // Aug: Israeli school year starts Sep 1
+  8: ['back-to-school', 'home-office', 'coffee-ritual', 'lighting', 'kitchen', 'wireless-audio'], // Sep: no Halloween push in IL
+  9: ['lighting', 'coffee-ritual', 'kitchen', 'sleep-sanctuary', 'gadgets-under-10', 'smart-home'], // Oct: no Halloween push in IL
+};
+
+/**
+ * Featured collections for the homepage hero, ordered seasonally for the
+ * given region and date. `count` caps the result; remaining collections
+ * (not prioritized this month) fill the tail in declaration order.
+ */
+export function getFeaturedCollections(region = 'eu', count = 6, now: Date = new Date()): CollectionDef[] {
+  const month = now.getMonth();
+  const priority = (region === 'il' && FEATURED_ORDER_IL[month]) || FEATURED_ORDER_GLOBAL[month] || [];
+  const seen = new Set<string>();
+  const out: CollectionDef[] = [];
+  for (const slug of priority) {
+    const c = COLLECTIONS.find((x) => x.slug === slug);
+    if (c && c.name && !seen.has(c.slug)) { out.push(c); seen.add(c.slug); }
+  }
+  for (const c of COLLECTIONS) {
+    if (out.length >= count) break;
+    if (c.name && !seen.has(c.slug)) { out.push(c); seen.add(c.slug); }
+  }
+  return out.slice(0, count);
+}
+
 export function getAllCollections() {
   return COLLECTIONS;
 }
