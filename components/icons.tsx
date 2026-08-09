@@ -9,6 +9,37 @@ type IconName = 'search' | 'cart' | 'star' | 'truck' | 'shield' | 'globe' | 'che
 const SVG = ({ sz = 20, children, viewBox = "0 0 24 24", ...attrs }: { sz?: number; viewBox?: string; children: React.ReactNode; [key: string]: any }) =>
   <svg width={sz} height={sz} viewBox={viewBox} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...attrs}>{children}</svg>;
 
+/**
+ * Flags are flat colour, never stroked in `currentColor`, and are rounded by the
+ * SVG viewport rather than per-shape. The old icons rounded every stripe with its
+ * own `rx`, which notched each band's inner corners instead of the flag's outline.
+ */
+const Flag = ({ sz, children }: { sz: number; children: React.ReactNode }) =>
+  <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke="none" aria-hidden="true"
+    style={{ borderRadius: Math.max(2, sz / 7), display: 'block' }}>
+    {children}
+    {/* Every surface these sit on is white, so the white band of the French,
+        Italian, Russian and US flags would otherwise bleed into the background
+        and leave a flag with a hole in it. rx matches the CSS clip radius. */}
+    <rect x="0.5" y="0.5" width="23" height="23" rx="3.43" fill="none" stroke="rgba(0,0,0,0.18)"/>
+  </svg>;
+
+// 12 stars on a circle — the actual EU device. The old icon drew two concentric
+// rings and a crosshair, which read as a target, not a flag.
+const EU_STARS = Array.from({ length: 12 }, (_, i) => {
+  const a = (i * Math.PI) / 6 - Math.PI / 2;
+  return <circle key={i} cx={12 + 7 * Math.cos(a)} cy={12 + 7 * Math.sin(a)} r="1.1" fill="#FFCC00"/>;
+});
+
+// 13 stripes, red on white, starting and ending red.
+const STRIPE_H = 24 / 13;
+const US_STRIPES = Array.from({ length: 7 }, (_, i) =>
+  <rect key={i} y={i * 2 * STRIPE_H} width="24" height={STRIPE_H} fill="#b22234"/>);
+
+// A 4x3 dot grid stands in for 50 stars; individual stars are sub-pixel at 20px.
+const US_STARS = Array.from({ length: 12 }, (_, i) =>
+  <circle key={i} cx={1.7 + (i % 4) * 2.1} cy={2.6 + Math.floor(i / 4) * 3.9} r="0.62" fill="#fff"/>);
+
 const icons: Record<IconName, (p: { size?: number }) => React.ReactNode> = {
   search: ({ size = 20 }) => <SVG sz={size}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></SVG>,
   cart: ({ size = 20 }) => <SVG sz={size}><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></SVG>,
@@ -38,15 +69,21 @@ const icons: Record<IconName, (p: { size?: number }) => React.ReactNode> = {
   auto: ({ size = 24 }) => <SVG sz={size}><path d="M5 17H4a2 2 0 01-2-2V9a2 2 0 012-2h1l2-3h10l2 3h1a2 2 0 012 2v6a2 2 0 01-2 2h-1"/><circle cx="7" cy="15" r="2"/><circle cx="17" cy="15" r="2"/><path d="M9 17h6"/></SVG>,
   outdoor: ({ size = 24 }) => <SVG sz={size}><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></SVG>,
   kids: ({ size = 24 }) => <SVG sz={size}><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5z"/><path d="M4 20v-1a4 4 0 014-4h8a4 4 0 014 4v1"/></SVG>,
-  'il-flag': ({ size = 20 }) => <SVG sz={size} fill="none" stroke="none" viewBox="0 0 24 24"><rect width="24" height="24" rx="2" fill="#fff"/><rect y="3" width="24" height="4" fill="#0038b8"/><rect y="17" width="24" height="4" fill="#0038b8"/><path d="M12 6l2 4h-4zM12 18l2-4h-4z" fill="#0038b8"/><rect x="10.5" y="10" width="3" height="4" fill="#0038b8"/></SVG>,
-  'eu-flag': ({ size = 20 }) => <SVG sz={size} fill="none" stroke="none" viewBox="0 0 24 24"><rect width="24" height="24" rx="2" fill="#003399"/><circle cx="12" cy="12" r="4" fill="none" stroke="#ffcc00" strokeWidth="0.8"/><circle cx="12" cy="12" r="5" fill="none" stroke="#ffcc00" strokeWidth="0.4"/><line x1="12" y1="6" x2="12" y2="18" stroke="#ffcc00" strokeWidth="0.4"/><line x1="6" y1="12" x2="18" y2="12" stroke="#ffcc00" strokeWidth="0.4"/></SVG>,
-  'us-flag': ({ size = 20 }) => <SVG sz={size} fill="none" stroke="none" viewBox="0 0 24 24"><rect width="24" height="24" rx="2" fill="#f0f0f0"/><rect y="0" width="24" height="2.18" fill="#bf0a30"/><rect y="4.36" width="24" height="2.18" fill="#bf0a30"/><rect y="8.72" width="24" height="2.18" fill="#bf0a30"/><rect y="13.08" width="24" height="2.18" fill="#bf0a30"/><rect y="17.44" width="24" height="2.18" fill="#bf0a30"/><rect y="21.8" width="24" height="2.18" fill="#bf0a30"/><rect width="9.6" height="10.9" fill="#002868"/></SVG>,
-  'uk-flag': ({ size = 20 }) => <SVG sz={size} fill="none" stroke="none" viewBox="0 0 24 24"><rect width="24" height="24" rx="2" fill="#012169"/><path d="M0 0l12 12M24 0L12 12M0 24l12-12M24 24L12 12" stroke="#fff" strokeWidth="3"/><path d="M0 0l12 12M24 0L12 12M0 24l12-12M24 24L12 12" stroke="#c8102e" strokeWidth="1.5"/><rect x="0" y="10" width="24" height="4" fill="#fff"/><rect x="0" y="10" width="24" height="4" fill="#c8102e"/><rect x="10" y="0" width="4" height="24" fill="#fff"/><rect x="10" y="0" width="4" height="24" fill="#c8102e"/></SVG>,
-  'fr-flag': ({ size = 20 }) => <SVG sz={size} fill="none" stroke="none" viewBox="0 0 24 24"><rect x="0" width="8" height="24" rx="2" fill="#002395"/><rect x="8" width="8" height="24" fill="#fff"/><rect x="16" width="8" height="24" rx="2" fill="#ED2939"/></SVG>,
-  'de-flag': ({ size = 20 }) => <SVG sz={size} fill="none" stroke="none" viewBox="0 0 24 24"><rect y="0" width="24" height="8" rx="2" fill="#000"/><rect y="8" width="24" height="8" fill="#DD0000"/><rect y="16" width="24" height="8" rx="2" fill="#FFCE00"/></SVG>,
-  'es-flag': ({ size = 20 }) => <SVG sz={size} fill="none" stroke="none" viewBox="0 0 24 24"><rect y="6" width="24" height="12" fill="#C60B1E"/><rect y="0" width="24" height="6" rx="2" fill="#FFC400"/><rect y="18" width="24" height="6" rx="2" fill="#FFC400"/></SVG>,
-  'it-flag': ({ size = 20 }) => <SVG sz={size} fill="none" stroke="none" viewBox="0 0 24 24"><rect x="0" width="8" height="24" rx="2" fill="#009246"/><rect x="8" width="8" height="24" fill="#fff"/><rect x="16" width="8" height="24" rx="2" fill="#CE2B37"/></SVG>,
-  'ru-flag': ({ size = 20 }) => <SVG sz={size} fill="none" stroke="none" viewBox="0 0 24 24"><rect y="0" width="24" height="8" rx="2" fill="#fff"/><rect y="8" width="24" height="8" fill="#0039A6"/><rect y="16" width="24" height="8" rx="2" fill="#D52B1E"/></SVG>,
+  'il-flag': ({ size = 20 }) => <Flag sz={size}><rect width="24" height="24" fill="#fff"/><rect y="4" width="24" height="2.6" fill="#0038b8"/><rect y="17.4" width="24" height="2.6" fill="#0038b8"/><path d="M12 8.6 14.94 13.7 9.06 13.7Z" fill="none" stroke="#0038b8" strokeWidth="1"/><path d="M12 15.4 9.06 10.3 14.94 10.3Z" fill="none" stroke="#0038b8" strokeWidth="1"/></Flag>,
+  'eu-flag': ({ size = 20 }) => <Flag sz={size}><rect width="24" height="24" fill="#003399"/>{EU_STARS}</Flag>,
+  'us-flag': ({ size = 20 }) => <Flag sz={size}><rect width="24" height="24" fill="#fff"/>{US_STRIPES}<rect width="9.6" height="12.92" fill="#3c3b6e"/>{US_STARS}</Flag>,
+  'uk-flag': ({ size = 20 }) => <Flag sz={size}>
+    <rect width="24" height="24" fill="#012169"/>
+    <path d="M0 0 24 24M24 0 0 24" stroke="#fff" strokeWidth="5"/>
+    <path d="M0 0 24 24M24 0 0 24" stroke="#c8102e" strokeWidth="2.4"/>
+    <path d="M12 0V24M0 12H24" stroke="#fff" strokeWidth="7.5"/>
+    <path d="M12 0V24M0 12H24" stroke="#c8102e" strokeWidth="4.5"/>
+  </Flag>,
+  'fr-flag': ({ size = 20 }) => <Flag sz={size}><rect width="8" height="24" fill="#002395"/><rect x="8" width="8" height="24" fill="#fff"/><rect x="16" width="8" height="24" fill="#ED2939"/></Flag>,
+  'de-flag': ({ size = 20 }) => <Flag sz={size}><rect width="24" height="8" fill="#000"/><rect y="8" width="24" height="8" fill="#DD0000"/><rect y="16" width="24" height="8" fill="#FFCE00"/></Flag>,
+  'es-flag': ({ size = 20 }) => <Flag sz={size}><rect width="24" height="24" fill="#AA151B"/><rect y="6" width="24" height="12" fill="#F1BF00"/></Flag>,
+  'it-flag': ({ size = 20 }) => <Flag sz={size}><rect width="8" height="24" fill="#009246"/><rect x="8" width="8" height="24" fill="#fff"/><rect x="16" width="8" height="24" fill="#CE2B37"/></Flag>,
+  'ru-flag': ({ size = 20 }) => <Flag sz={size}><rect width="24" height="8" fill="#fff"/><rect y="8" width="24" height="8" fill="#0039A6"/><rect y="16" width="24" height="8" fill="#D52B1E"/></Flag>,
   language: ({ size = 20 }) => <SVG sz={size} strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></SVG>,
 
   // New collection icons

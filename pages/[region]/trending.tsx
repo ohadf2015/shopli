@@ -17,6 +17,7 @@ import { getTrendCategories } from '../../lib/trend-calendar';
 import { computeVolumeVelocity, getVolumeBaselines } from '../../lib/trend-velocity';
 import { dedupeByTitle } from '../../lib/trending';
 import type { RegionConfig } from '../../lib/regions';
+import { cacheIfNotEmpty } from '../../lib/cache';
 
 interface TrendingProduct extends SearchProduct {
   trendReason: string;
@@ -365,7 +366,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
   // SEO landing page updated daily — let the edge cache absorb renders (1h, SWR 24h).
   // Short SWR: this page emits Product offers.price, and a long stale window
   // would serve stale prices in structured data.
-  res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=3600');
+  cacheIfNotEmpty(res, products.length > 0, 'public, s-maxage=3600, stale-while-revalidate=3600');
 
   return {
     props: {

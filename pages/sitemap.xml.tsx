@@ -1,6 +1,7 @@
 import { GetServerSideProps } from 'next';
 import { REGIONS } from '../lib/regions';
 import { DEMO_PRODUCT_IDS } from '../lib/demo-products';
+import { cacheIfNotEmpty } from '../lib/cache';
 import { SITE_URL, getCollectionOgImage } from '../lib/seo';
 import { COLLECTION_CONTENT } from '../lib/collection-content';
 import { searchCollection } from '../lib/aliexpress';
@@ -250,7 +251,9 @@ ${urls.map(buildUrlEntry).join('\n')}
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
   // Fresh sitemap: revalidate hourly, serve stale for a day.
   // Do not send X-Robots-Tag here: sitemaps must be trusted by crawlers.
-  res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+  // A rate-limited sweep yields a sitemap missing its product URLs. Never cache
+  // that for an hour — a short sitemap tells Google the pages were removed.
+  cacheIfNotEmpty(res, dynamicProductIds.size > 0, 'public, s-maxage=3600, stale-while-revalidate=86400');
   res.write(xml);
   res.end();
 

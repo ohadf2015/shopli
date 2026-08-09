@@ -7,6 +7,7 @@ import { getComparison } from '../../../lib/comparisons';
 import { productImage } from '../../../lib/img';
 import { listingAggregateFields } from '../../../lib/pdp';
 import { articleJsonLd, breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
+import { cacheIfNotEmpty } from '../../../lib/cache';
 
 export default function ComparisonPage({ region, config, comparison, prod1Items, prod2Items, rtl, error }: any) {
   if (error) {
@@ -196,7 +197,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
     prod2Items = p2 || [];
   } catch {}
 
-  res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=3600');
+  cacheIfNotEmpty(res, prod1Items.length > 0 || prod2Items.length > 0, 'public, s-maxage=3600, stale-while-revalidate=3600');
 
   return {
     props: { region, config, comparison, prod1Items, prod2Items, rtl },

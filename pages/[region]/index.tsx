@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next';
 import Header from '../../components/Header';
 import Icon from '../../components/icons';
-import ProductCard from '../../components/ProductCard';
+import ProductCard, { ProductCardProduct } from '../../components/ProductCard';
 import WhatsAppShare from '../../components/WhatsAppShare';
 import SeoHead from '../../components/SeoHead';
 import TrendingRail, { TrendingItem } from '../../components/TrendingRail';
@@ -12,6 +12,7 @@ import { buildTrending, dedupeAcrossSections } from '../../lib/trending';
 import { trendingEnabled } from '../../lib/flags';
 import type { RegionConfig } from '../../lib/regions';
 import type { Product } from '../../lib/types';
+import { cacheIfNotEmpty } from '../../lib/cache';
 
 interface FlatProduct extends Product { collectionSlug?: string; collectionName?: string; }
 
@@ -23,12 +24,37 @@ interface CollectionGroup {
   products: FlatProduct[];
 }
 
+interface CardGroup extends Omit<CollectionGroup, 'products'> { products: ProductCardProduct[]; }
+
 interface HomePageProps {
   region: RegionCode;
   config: RegionConfig;
-  groups: CollectionGroup[];
+  groups: CardGroup[];
   rtl: boolean;
   trending: TrendingItem[];
+}
+
+/**
+ * Keep only what ProductCard renders. The raw AliExpress record carries an
+ * images array, sku, shopId, categoryPath and commission rate that no card
+ * reads, and Next serialises every prop into __NEXT_DATA__ — so shipping the
+ * raw record duplicated ~50KB of dead JSON into every homepage response.
+ */
+function toCardProduct(p: any): ProductCardProduct {
+  return {
+    id: p.id,
+    title: p.title,
+    price: p.price,
+    originalPrice: p.originalPrice ?? null,
+    imageUrl: p.imageUrl || '',
+    affiliateLink: p.affiliateLink || '',
+    rating: p.rating,
+    reviewCount: p.reviewCount,
+    volume: p.volume,
+    discount: p.discount,
+    freeShipping: p.freeShipping,
+    shopName: p.shopName,
+  };
 }
 
 async function fetchCollectionProducts(region: string, keywords: string[], limit = 4): Promise<FlatProduct[]> {
@@ -358,10 +384,18 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
   const collections = getAllCollections().slice(0, 6);
   const groups: CollectionGroup[] = [];
 
-  for (const coll of collections) {
-    // Fetch double the display count: title-dedupe against the rail and
-    // earlier sections can drop relistings, and sections should still fill.
-    const products = await fetchCollectionProducts(region, [coll.keywords[0]], 8);
+  // Six collections, fetched together rather than one after another: these are
+  // six independent AliExpress searches and awaiting them in sequence made the
+  // homepage's TTFB their sum. lib/aliexpress caps real concurrency, so this
+  // cannot stampede the rate limiter.
+  // Fetch double the display count: title-dedupe against the rail and
+  // earlier sections can drop relistings, and sections should still fill.
+  const fetched = await Promise.all(
+    collections.map((coll) => fetchCollectionProducts(region, [coll.keywords[0]], 8))
+  );
+
+  collections.forEach((coll, i) => {
+    const products = fetched[i];
     if (products.length > 0) {
       groups.push({
         slug: coll.slug,
@@ -371,11 +405,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
         products,
       });
     }
-  }
+  });
 
   // Homepage content is fully keyed by region (in the URL) — no cookies/auth —
   // so it's safe to cache at the CDN. Revalidate every 5 min, serve stale up to a day.
-  res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
+  cacheIfNotEmpty(res, groups.length > 0, 'public, s-maxage=300, stale-while-revalidate=86400');
 
   // Trending rail reuses the already-fetched collection pool — zero extra
   // AliExpress calls, no render-blocking work for the hero.
@@ -393,7 +427,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
     (p) => p.title || ''
   );
   const finalGroups = groups
-    .map((g, i) => ({ ...g, products: dedupedSections[i].slice(0, 4) as FlatProduct[] }))
+    .map((g, i) => ({ ...g, products: dedupedSections[i].slice(0, 4).map(toCardProduct) }))
     .filter((g) => g.products.length > 0);
 
   return {

@@ -9,6 +9,9 @@ const REGION_MAP: Record<string, { language: string; currency: string; shipToCou
   de: { language: 'DE', currency: 'EUR', shipToCountry: 'DE' },
   es: { language: 'ES', currency: 'EUR', shipToCountry: 'ES' },
   it: { language: 'IT', currency: 'EUR', shipToCountry: 'IT' },
+  // Russian-language Israel (regions.ts): ILS, ships to IL. Without this entry it
+  // fell through to the EU default and priced every product in EUR under a ₪ header.
+  ru: { language: 'RU', currency: 'ILS', shipToCountry: 'IL' },
 };
 
 const ALIE_KEY = process.env.ALIEXPRESS_APP_KEY || '';
@@ -28,6 +31,67 @@ function getTimestamp(): string {
 function signParams(params: Record<string, string>, secret: string): string {
   const keys = Object.keys(params).sort();
   return crypto.createHash('md5').update(secret + keys.map(k => k + params[k]).join('') + secret, 'utf8').digest('hex').toUpperCase();
+}
+
+const API_URL = 'https://api-sg.aliexpress.com/sync';
+
+const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+
+// The affiliate API rate-limits per app key, not per connection, and it bans on
+// burst. A page like /trending fans out one search per category at once, which
+// is self-inflicted 429s. Four in flight is enough to keep those pages fast.
+const MAX_IN_FLIGHT = 4;
+let inFlight = 0;
+const waiting: Array<() => void> = [];
+
+async function acquire(): Promise<void> {
+  if (inFlight < MAX_IN_FLIGHT) {
+    inFlight++;
+    return;
+  }
+  await new Promise<void>(resolve => waiting.push(resolve));
+  inFlight++;
+}
+
+function release(): void {
+  inFlight--;
+  waiting.shift()?.();
+}
+
+/**
+ * One signed call to the affiliate API, retried past the rate limiter.
+ *
+ * Measured 2026-08-09: ~10% of calls return
+ * `{"error_response":{"code":"ApiCallLimit","msg":"...this ban will last 1 seconds"}}`
+ * instead of products — sequentially, so it is the app key's own quota, not our
+ * concurrency. Every caller read that empty result as "no such product", and the
+ * pages then froze it at the CDN for up to an hour, which is what turned live
+ * products into "Product not found". The ban is measured in seconds, so waiting
+ * it out costs one slow request and keeps the page.
+ *
+ * The timestamp is part of the signature, so each attempt is re-signed.
+ */
+async function callApi(params: Record<string, string>, attempts = 3): Promise<any> {
+  await acquire();
+  try {
+    let last: any = null;
+    for (let attempt = 0; attempt < attempts; attempt++) {
+      const signed: Record<string, string> = { ...params, timestamp: getTimestamp() };
+      signed.sign = signParams(signed, ALIE_SECRET);
+      try {
+        const res = await fetch(API_URL + '?' + new URLSearchParams(signed));
+        const data = await res.json();
+        if (!data?.error_response) return data;
+        last = data;
+      } catch {
+        last = null;
+      }
+      if (attempt < attempts - 1) await sleep(1200 * (attempt + 1));
+    }
+    return last ?? {};
+  } finally {
+    release();
+  }
 }
 
 export interface SearchProduct {
@@ -54,9 +118,8 @@ export interface SearchProduct {
 
 export async function searchAliExpress(keywords: string, region: string, pageSize = 10): Promise<SearchProduct[]> {
   const cfg = REGION_MAP[region] || REGION_MAP.eu;
-  const params: Record<string, string> = {
+  const data = await callApi({
     app_key: ALIE_KEY,
-    timestamp: getTimestamp(),
     format: 'json',
     v: '2.0',
     sign_method: 'md5',
@@ -68,11 +131,7 @@ export async function searchAliExpress(keywords: string, region: string, pageSiz
     ship_to_country: cfg.shipToCountry,
     page_size: String(pageSize),
     sort: 'LAST_VOLUME_DESC',
-  };
-  params.sign = signParams(params, ALIE_SECRET);
-  const url = 'https://api-sg.aliexpress.com/sync?' + new URLSearchParams(params);
-  const res = await fetch(url);
-  const data = await res.json();
+  });
   const result = data?.aliexpress_affiliate_product_query_response?.resp_result?.result;
   const products = result?.products?.product || [];
   return products.map((p: any) => ({
@@ -172,9 +231,8 @@ export async function getProductsByIds(ids: string[], region: string): Promise<S
 
   // Prefer productdetail.get for accurate multi-product fetch
   try {
-    const params: Record<string, string> = {
+    const data = await callApi({
       app_key: ALIE_KEY,
-      timestamp: getTimestamp(),
       format: 'json',
       v: '2.0',
       sign_method: 'md5',
@@ -184,11 +242,7 @@ export async function getProductsByIds(ids: string[], region: string): Promise<S
       target_language: cfg.language,
       target_currency: cfg.currency,
       ship_to_country: cfg.shipToCountry,
-    };
-    params.sign = signParams(params, ALIE_SECRET);
-    const url = 'https://api-sg.aliexpress.com/sync?' + new URLSearchParams(params);
-    const res = await fetch(url);
-    const data = await res.json();
+    });
     const result = data?.aliexpress_affiliate_productdetail_get_response?.resp_result?.result;
     const products = result?.products?.product || result?.ae_item_list || [];
     const list = Array.isArray(products) ? products : products ? [products] : [];
@@ -203,9 +257,8 @@ export async function getProductsByIds(ids: string[], region: string): Promise<S
 
   // Fallback: product.query with product_ids
   try {
-    const params: Record<string, string> = {
+    const data = await callApi({
       app_key: ALIE_KEY,
-      timestamp: getTimestamp(),
       format: 'json',
       v: '2.0',
       sign_method: 'md5',
@@ -216,11 +269,7 @@ export async function getProductsByIds(ids: string[], region: string): Promise<S
       target_currency: cfg.currency,
       ship_to_country: cfg.shipToCountry,
       page_size: String(cleanIds.length),
-    };
-    params.sign = signParams(params, ALIE_SECRET);
-    const url = 'https://api-sg.aliexpress.com/sync?' + new URLSearchParams(params);
-    const res = await fetch(url);
-    const data = await res.json();
+    });
     const result = data?.aliexpress_affiliate_product_query_response?.resp_result?.result;
     const products = result?.products?.product || [];
     const list = Array.isArray(products) ? products : [];

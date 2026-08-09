@@ -8,6 +8,7 @@ import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getCollection } from '../../../lib/collections';
 import { listingAggregateFields } from '../../../lib/pdp';
 import { COLLECTION_CONTENT } from '../../../lib/collection-content';
+import { cacheIfNotEmpty } from '../../../lib/cache';
 import {
   articleJsonLd,
   breadcrumbJsonLd,
@@ -302,7 +303,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
     const noindex = !content && sections.length === 0;
 
     // Each section is a live AliExpress search; uncached this is a 5s+ SSR per hit.
-    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=3600');
+    cacheIfNotEmpty(res, sections.length > 0, 'public, s-maxage=3600, stale-while-revalidate=3600');
 
     return {
       props: {

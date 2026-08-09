@@ -8,6 +8,7 @@ import SeoHead from '../../components/SeoHead';
 import { getRegion, isValidRegion, RegionCode, RegionConfig } from '../../lib/regions';
 import { breadcrumbJsonLd, itemListJsonLd, productJsonLd, SITE_URL } from '../../lib/seo';
 import type { SearchProduct } from '../../lib/aliexpress';
+import { cacheIfNotEmpty } from '../../lib/cache';
 
 interface SearchPageProps {
   region: RegionCode;
@@ -228,7 +229,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
     }
   }
 
-  res.setHeader('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=600');
+  cacheIfNotEmpty(res, products.length > 0, 'public, s-maxage=120, stale-while-revalidate=600');
 
   return {
     props: {

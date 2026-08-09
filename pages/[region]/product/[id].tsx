@@ -4,6 +4,7 @@ import SeoHead from '../../../components/SeoHead';
 import Icon from '../../../components/icons';
 import WhatsAppShare from '../../../components/WhatsAppShare';
 import FindSimilar from '../../../components/FindSimilar';
+import { cacheIfNotEmpty } from '../../../lib/cache';
 import { trendingEnabled } from '../../../lib/flags';
 import { productImage } from '../../../lib/img';
 import { getRegion, RegionCode, RegionConfig } from '../../../lib/regions';
@@ -176,7 +177,8 @@ export default function ProductPage({
                   alt={product.title}
                   className="w-full h-full object-contain p-4 sm:p-8"
                   loading="eager"
-                  fetchPriority="high"
+                  // lowercase — React 18 drops the camelCase prop, see TrendingRail.
+                  fetchpriority="high"
                 />
               ) : (
                 <div style={{ color: 'var(--shopli-warm-gray)' }}>
@@ -414,10 +416,6 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
     return { notFound: true };
   }
 
-  // PDPs were served with the GSSP default no-store — cache at the edge (10m, SWR 1h)
-  // so repeat views don't re-hit the AliExpress API. Prices can lag by up to ~10m, acceptable.
-  context.res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=3600');
-
   let product: SearchProduct | null = null;
 
   try {
@@ -430,6 +428,12 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
   if (!product) {
     product = getDemoProductById(productId, region, config.currency);
   }
+
+  // Cache at the edge (10m, SWR 1h) so repeat views don't re-hit the AliExpress
+  // API — but only once we actually have a product. This header used to be set
+  // before the fetch, so a rate-limited call pinned "Product not found" over a
+  // live product for ten minutes.
+  cacheIfNotEmpty(context.res, !!product, 'public, s-maxage=600, stale-while-revalidate=3600');
 
   const lang = config.lang || 'en';
   const collName = (c: CollectionDef) =>

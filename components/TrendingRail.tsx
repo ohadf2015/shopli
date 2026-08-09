@@ -122,7 +122,9 @@ export function TrendCard({
               alt={p.title}
               className="w-full h-full object-cover"
               loading={eagerImage ? 'eager' : 'lazy'}
-              fetchPriority={eagerImage ? 'high' : 'auto'}
+              // lowercase: React 18 drops the camelCase `fetchPriority` prop with a
+              // warning (it only landed in React 19), so the LCP hint never reached the DOM.
+              fetchpriority={eagerImage ? 'high' : 'auto'}
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
               }}

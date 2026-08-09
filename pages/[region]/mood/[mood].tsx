@@ -6,6 +6,7 @@ import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getMoodBoard, getMoodBoardsByTag } from '../../../lib/moodboards';
 import { productImage } from '../../../lib/img';
 import { articleJsonLd, breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
+import { cacheIfNotEmpty } from '../../../lib/cache';
 
 interface Product { id: string; title: string; price: number; originalPrice: number | null; currency: string; imageUrl: string; affiliateLink: string; rating: number; reviewCount: number; volume: number; shopName: string; discount: string; }
 interface ItemGroup { caption: string; note: string; products: Product[]; }
@@ -239,7 +240,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
 
     // Mood boards are curated + slow to build (several AliExpress searches each).
     // Without this every crawl and every visitor pays a 5-8s uncached SSR.
-    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=3600');
+    cacheIfNotEmpty(res, itemGroups.length > 0, 'public, s-maxage=3600, stale-while-revalidate=3600');
 
     return {
       props: {
