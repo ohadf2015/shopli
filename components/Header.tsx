@@ -235,10 +235,16 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             </button>
 
             {regionOpen && (
+              /* `end-0` is inset-inline-end, resolved against this element's OWN
+                 direction — so the `direction: ltr` that keeps the locale names
+                 readable was also flipping the anchor to the right edge. On the
+                 Hebrew site the button sits at the far left, and the 200px menu
+                 hung 52px off the viewport, clipping the flags. Direction now
+                 applies to the contents; the anchoring stays with the page. */
               <div
                 className="absolute top-full mt-1 end-0 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden min-w-[200px] z-50"
-                style={{ direction: 'ltr' }}
               >
+                <div style={{ direction: 'ltr' }}>
                 {ALL_REGIONS.map((r) => (
                   <Link
                     key={r.code}
@@ -264,6 +270,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
                     )}
                   </Link>
                 ))}
+                </div>
               </div>
             )}
           </div>
