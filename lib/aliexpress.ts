@@ -139,10 +139,12 @@ export async function searchAliExpress(keywords: string, region: string, pageSiz
   });
   const result = data?.aliexpress_affiliate_product_query_response?.resp_result?.result;
   const products = result?.products?.product || [];
-  return products.map((p: any) => ({
+  return products.map((p: any) => {
+    const rawTitle: string = p.product_title || 'Product';
+    return {
     id: String(p.product_id),
     sku: p.sku_id || '',
-    title: p.product_title || 'Product',
+    title: cfg.language === 'HE' ? sanitizeHebrewTitle(rawTitle) : rawTitle,
     price: parseFloat(p.target_sale_price || '0'),
     originalPrice: p.target_original_price ? parseFloat(p.target_original_price) : null,
     currency: p.target_sale_price_currency || cfg.currency,
@@ -159,7 +161,8 @@ export async function searchAliExpress(keywords: string, region: string, pageSiz
     discount: p.discount && !p.discount.startsWith('0') ? p.discount : '',
     commissionRate: parseFloat(String(p.commission_rate || '0').replace('%', '')),
     freeShipping: false,
-  }));
+    };
+  });
 }
 
 export async function searchCollection(region: string, keywords: string[], limit = 4): Promise<SearchProduct[]> {
@@ -185,11 +188,14 @@ export async function searchCollection(region: string, keywords: string[], limit
 /**
  * Clean up common machine-translation artifacts in Hebrew product titles
  * returned by the AliExpress API (broken geresh spacing like "גאדג 'טים",
- * doubled spaces). Applied only when the request language is HE.
+ * Latin words fused into Hebrew ones like "Nonלהחליק", doubled spaces).
+ * Applied only when the request language is HE.
  */
 function sanitizeHebrewTitle(title: string): string {
   return title
     .replace(/([א-ת])\s*['`]\s*([א-ת])/g, '$1׳$2')
+    .replace(/([A-Za-z])(?=[א-ת])/g, '$1 ')
+    .replace(/([א-ת])(?=[A-Za-z])/g, '$1 ')
     .replace(/\s{2,}/g, ' ')
     .trim();
 }
