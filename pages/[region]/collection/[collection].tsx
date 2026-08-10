@@ -3,6 +3,7 @@ import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
 import ProductCard from '../../../components/ProductCard';
 import WhatsAppShare from '../../../components/WhatsAppShare';
+import DealAlertsForm from '../../../components/DealAlertsForm';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getCollection } from '../../../lib/collections';
@@ -248,6 +249,9 @@ export default function CollectionPage({ region, config, collection, content, se
             />
           </div>
         </section>
+
+        {/* Deal alerts — company-brain interest rail capture (data-interest="shopli") */}
+        <DealAlertsForm source="collection" rtl={rtl} />
       </main>
     </>
   );

@@ -341,7 +341,21 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs, tr
                   const data = await res.json();
                   status.textContent = data.message;
                   status.style.display = 'block';
-                  if (data.ok) input.value = '';
+                  if (data.ok) {
+                    // Mirror onto the company-brain interest rail (deal-alerts list)
+                    // so every homepage signup pings Telegram and lands in the
+                    // central interest table. Fire-and-forget: the Neon row above
+                    // is the primary store, the rail must never block or fail it.
+                    fetch('https://company-brain-production-841e.up.railway.app/interest', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        product: 'shopli', kind: 'notify', source: 'home',
+                        email: input.value, website: '',
+                      }),
+                    }).catch(() => {});
+                    input.value = '';
+                  }
                 } catch {
                   status.textContent = rtl ? 'שגיאה, נסו שוב' : 'Error, try again';
                   status.style.display = 'block';

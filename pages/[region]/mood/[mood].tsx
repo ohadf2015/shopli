@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
 import SeoHead from '../../../components/SeoHead';
+import DealAlertsForm from '../../../components/DealAlertsForm';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getMoodBoard, getMoodBoardsByTag } from '../../../lib/moodboards';
 import { productImage } from '../../../lib/img';
@@ -203,6 +204,9 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
             </div>
           </section>
         )}
+
+        {/* Deal alerts — company-brain interest rail capture (data-interest="shopli") */}
+        <DealAlertsForm source="mood" rtl={rtl} />
       </main>
     </>
   );
