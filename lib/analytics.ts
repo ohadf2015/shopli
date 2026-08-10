@@ -114,6 +114,23 @@ export function trackFindSimilarError(props: {
   capture('find_similar_error', props);
 }
 
+// ------------------------------------------------------------------
+// Share bar (mood / collection / compare / blog / PDP) — spec: t_281f2ede
+// One-tap WhatsApp/Telegram/native sharing is the only realistic growth
+// loop at current traffic, so every share tap is measured.
+// ------------------------------------------------------------------
+
+export type SharePageType = 'mood' | 'collection' | 'compare' | 'blog' | 'product';
+export type ShareNetwork = 'whatsapp' | 'telegram' | 'native';
+
+export function trackShareClick(props: {
+  page_type: SharePageType;
+  network: ShareNetwork;
+  region?: string;
+}) {
+  capture('share_click', props);
+}
+
 const AFFILIATE_HOST_RE = /(^|\.)aliexpress\.com$|(^|\.)s\.click\.aliexpress\.com$/;
 
 function isAffiliateUrl(url: URL): boolean {

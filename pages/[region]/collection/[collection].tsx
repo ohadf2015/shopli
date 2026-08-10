@@ -2,7 +2,7 @@ import { GetServerSideProps } from 'next';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
 import ProductCard from '../../../components/ProductCard';
-import WhatsAppShare from '../../../components/WhatsAppShare';
+import ShareBar from '../../../components/ShareBar';
 import DealAlertsForm from '../../../components/DealAlertsForm';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
@@ -240,11 +240,14 @@ export default function CollectionPage({ region, config, collection, content, se
             <p className="text-sm font-medium" style={{ color: 'var(--shopli-warm-gray)' }}>
               {rtl ? 'אהבתם את האוסף? שתפו עם חברים' : 'Like this collection? Share it with friends'}
             </p>
-            <WhatsAppShare
+            <ShareBar
               title={rtl ? `אוסף ${collection.name} — שופלי` : `${collection.name} collection — Shopli`}
               url={pageUrl}
               description={description}
+              pageType="collection"
+              region={region}
               locale={lang}
+              rtl={rtl}
               size="md"
             />
           </div>

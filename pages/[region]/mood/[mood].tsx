@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
 import SeoHead from '../../../components/SeoHead';
+import ShareBar from '../../../components/ShareBar';
 import DealAlertsForm from '../../../components/DealAlertsForm';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getMoodBoard, getMoodBoardsByTag } from '../../../lib/moodboards';
@@ -93,6 +94,21 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
               {get(board.totalEstimate)}
             </div>
           )}
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <span className="text-xs font-semibold" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {rtl ? 'אהבתם את הערכה? שתפו:' : 'Like this look? Share it:'}
+            </span>
+            <ShareBar
+              title={get(board.h1)}
+              url={pageUrl}
+              description={get(board.metaDesc)}
+              pageType="mood"
+              region={region}
+              locale={lang}
+              rtl={rtl}
+              size="md"
+            />
+          </div>
         </section>
 
         {/* TAG INDICATOR */}
