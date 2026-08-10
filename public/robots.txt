@@ -1,7 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /*/google-shopping-feed
 Disallow: /admin
 Disallow: /test
 Disallow: /*/wishlist
