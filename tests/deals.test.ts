@@ -51,3 +51,44 @@ test('deals page fetch config stays within AliExpress API rate limits', () => {
   assert.ok(DEALS_COLLECTIONS_COUNT <= 10, 'too many collections per SSR request');
   assert.ok(DEALS_PRODUCTS_PER_COLLECTION <= 8, 'too many products per collection');
 });
+
+test('cacheIfNotEmpty sets must-revalidate for empty content', async () => {
+  const { cacheIfNotEmpty } = await import('../lib/cache');
+  const headers: Record<string, string> = {};
+  const mockRes = {
+    setHeader: (name: string, value: string) => {
+      headers[name] = value;
+    },
+  } as any;
+
+  // Empty content should use short-cache must-revalidate
+  cacheIfNotEmpty(mockRes, false, 'public, s-maxage=3600, stale-while-revalidate=86400');
+  assert.ok(headers['Cache-Control'].includes('must-revalidate'), 'empty results must have must-revalidate');
+  assert.ok(headers['Cache-Control'].includes('s-maxage=30'), 'empty results should have short 30s max-age');
+});
+
+test('cacheIfNotEmpty sets both Cache-Control and Vercel-CDN-Cache-Control', async () => {
+  const { cacheIfNotEmpty } = await import('../lib/cache');
+  const headers: Record<string, string> = {};
+  const mockRes = {
+    setHeader: (name: string, value: string) => {
+      headers[name] = value;
+    },
+  } as any;
+
+  // With content, both headers should use the long cache
+  cacheIfNotEmpty(mockRes, true, 'public, s-maxage=3600, stale-while-revalidate=86400');
+  assert.equal(headers['Cache-Control'], 'public, s-maxage=3600, stale-while-revalidate=86400');
+  assert.equal(headers['Vercel-CDN-Cache-Control'], 'public, s-maxage=3600, stale-while-revalidate=86400');
+
+  // Verify empty content sets the same short cache on both headers
+  const headers2: Record<string, string> = {};
+  const mockRes2 = {
+    setHeader: (name: string, value: string) => {
+      headers2[name] = value;
+    },
+  } as any;
+  cacheIfNotEmpty(mockRes2, false, 'public, s-maxage=3600, stale-while-revalidate=86400');
+  assert.equal(headers2['Cache-Control'], headers2['Vercel-CDN-Cache-Control'], 'both headers must match');
+  assert.ok(headers2['Vercel-CDN-Cache-Control'].includes('must-revalidate'), 'Vercel header must also block long cache');
+});

@@ -16,5 +16,9 @@ export function cacheIfNotEmpty(res: ServerResponse, hasContent: boolean, value:
   // 30s, not 0: during an API bad patch every request would otherwise re-render
   // and pay the retry backoff, which is a thundering herd at exactly the wrong
   // moment. Short enough that recovery is still seconds away.
-  res.setHeader('Cache-Control', hasContent ? value : 'public, s-maxage=30, must-revalidate');
+  const cacheControl = hasContent ? value : 'public, s-maxage=30, must-revalidate';
+  res.setHeader('Cache-Control', cacheControl);
+  // On Vercel, Vercel-CDN-Cache-Control takes precedence for edge caching, so set it too.
+  // This ensures empty responses cannot be long-cached even if a caller sets both headers.
+  res.setHeader('Vercel-CDN-Cache-Control', cacheControl);
 }
