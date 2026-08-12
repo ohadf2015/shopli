@@ -6,7 +6,7 @@ import WhatsAppShare from '../../components/WhatsAppShare';
 import SeoHead from '../../components/SeoHead';
 import TrendingRail, { TrendingItem } from '../../components/TrendingRail';
 import { getRegion, isValidRegion, RegionCode } from '../../lib/regions';
-import { getAllCollections } from '../../lib/collections';
+import { getAllCollections, getFeaturedCollections } from '../../lib/collections';
 import { breadcrumbJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
 import { buildTrending, dedupeAcrossSections } from '../../lib/trending';
 import { trendingEnabled } from '../../lib/flags';
@@ -31,6 +31,7 @@ interface HomePageProps {
   config: RegionConfig;
   groups: CardGroup[];
   rtl: boolean;
+  orderedSlugs: string[];
   trending: TrendingItem[];
 }
 
@@ -64,7 +65,7 @@ async function fetchCollectionProducts(region: string, keywords: string[], limit
   } catch { return []; }
 }
 
-export default function HomePage({ region, config, groups, rtl, trending }: HomePageProps) {
+export default function HomePage({ region, config, groups, rtl, orderedSlugs, trending }: HomePageProps) {
   const t = (text?: Record<string, string> | null) => text?.[config.lang] || text?.en || '';
 
   const heroTitle = rtl ? 'מצאו את הדילים הכי שווים מאליאקספרס' : 'The Best AliExpress Deals, Curated for You';
@@ -104,7 +105,7 @@ export default function HomePage({ region, config, groups, rtl, trending }: Home
               {heroDesc}
             </p>
             <div className="flex flex-wrap gap-3">
-              <a href="#categories" className="btn-primary">
+              <a href={`/${region}/collection/${groups[0]?.slug || orderedSlugs[0] || 'home-gym'}`} className="btn-primary">
                 <Icon name="tag" size={16} />
                 {rtl ? 'כל המבצעים' : 'Browse All Deals'}
               </a>
@@ -185,7 +186,14 @@ export default function HomePage({ region, config, groups, rtl, trending }: Home
               {rtl ? 'מוצרים מקובצים לפי נושא — בחרו מה שמעניין אתכם' : 'Products grouped by theme — pick what interests you'}
             </p>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              {getAllCollections().filter(coll => coll.name).map(coll => {
+              {getAllCollections()
+                .filter(coll => coll.name)
+                .sort((a, b) => {
+                  const ia = orderedSlugs.indexOf(a.slug);
+                  const ib = orderedSlugs.indexOf(b.slug);
+                  return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+                })
+                .map(coll => {
                 const name = t(coll.name);
                 const desc = t(coll.desc);
                 return (
@@ -333,7 +341,21 @@ export default function HomePage({ region, config, groups, rtl, trending }: Home
                   const data = await res.json();
                   status.textContent = data.message;
                   status.style.display = 'block';
-                  if (data.ok) input.value = '';
+                  if (data.ok) {
+                    // Mirror onto the company-brain interest rail (deal-alerts list)
+                    // so every homepage signup pings Telegram and lands in the
+                    // central interest table. Fire-and-forget: the Neon row above
+                    // is the primary store, the rail must never block or fail it.
+                    fetch('https://company-brain-production-841e.up.railway.app/interest', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        product: 'shopli', kind: 'notify', source: 'home',
+                        email: input.value, website: '',
+                      }),
+                    }).catch(() => {});
+                    input.value = '';
+                  }
                 } catch {
                   status.textContent = rtl ? 'שגיאה, נסו שוב' : 'Error, try again';
                   status.style.display = 'block';
@@ -381,7 +403,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
 
   const t = (text: Record<string, string>) => text[config.lang] || text.en || '';
 
-  const collections = getAllCollections().slice(0, 6);
+  const collections = getFeaturedCollections(region, 6);
+  const orderedSlugs = getFeaturedCollections(region, 100).map((c) => c.slug);
   const groups: CollectionGroup[] = [];
 
   // Six collections, fetched together rather than one after another: these are
@@ -436,6 +459,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
       config,
       groups: finalGroups,
       rtl,
+      orderedSlugs,
       trending,
     },
   };

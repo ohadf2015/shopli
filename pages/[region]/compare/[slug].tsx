@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
 import SeoHead from '../../../components/SeoHead';
+import ShareBar from '../../../components/ShareBar';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getComparison } from '../../../lib/comparisons';
 import { productImage } from '../../../lib/img';
@@ -79,7 +80,18 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
         </div>
 
         <h1 className="text-2xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--shopli-navy)' }}>{t(c.title)}</h1>
-        <p className="max-w-3xl text-base leading-relaxed mb-8" style={{ color: 'var(--shopli-warm-gray)' }}>{t(c.intro)}</p>
+        <p className="max-w-3xl text-base leading-relaxed mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>{t(c.intro)}</p>
+        <div className="mb-8">
+          <ShareBar
+            title={t(c.title)}
+            url={pageUrl}
+            description={description}
+            pageType="compare"
+            region={region}
+            locale={lang}
+            rtl={rtl}
+          />
+        </div>
 
         {/* Side-by-side comparison */}
         <div className="grid md:grid-cols-2 gap-6 mb-10">

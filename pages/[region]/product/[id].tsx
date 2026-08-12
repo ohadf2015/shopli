@@ -2,7 +2,7 @@ import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Header from '../../../components/Header';
 import SeoHead from '../../../components/SeoHead';
 import Icon from '../../../components/icons';
-import WhatsAppShare from '../../../components/WhatsAppShare';
+import ShareBar from '../../../components/ShareBar';
 import FindSimilar from '../../../components/FindSimilar';
 import { cacheIfNotEmpty } from '../../../lib/cache';
 import { trendingEnabled } from '../../../lib/flags';
@@ -284,10 +284,13 @@ export default function ProductPage({
                 <Icon name="external" size={16} />
                 {rtl ? 'קנו עכשיו באליאקספרס' : 'Buy now on AliExpress'}
               </a>
-              <WhatsAppShare
+              <ShareBar
                 title={product.title}
                 url={pageUrl}
+                pageType="product"
+                region={region}
                 locale={lang}
+                rtl={rtl}
                 size="md"
               />
             </div>

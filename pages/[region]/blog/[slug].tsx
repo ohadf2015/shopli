@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import Header from '../../../components/Header';
 import SeoHead from '../../../components/SeoHead';
+import ShareBar from '../../../components/ShareBar';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getBlogPost, isBlogPostInRegion } from '../../../lib/blog';
 import { blogPostingJsonLd, breadcrumbJsonLd, faqJsonLd, SITE_URL } from '../../../lib/seo';
@@ -115,6 +116,17 @@ export default function BlogPostPage({ region, config, post, rtl, regionOnly, er
             <time className="text-xs mt-3 block" style={{ color: 'var(--shopli-warm-gray)' }} dateTime={p.publishDate}>
               {new Date(p.publishDate).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
             </time>
+            <div className="mt-4">
+              <ShareBar
+                title={t(p.title)}
+                url={pageUrl}
+                description={description}
+                pageType="blog"
+                region={region}
+                locale={lang}
+                rtl={rtl}
+              />
+            </div>
           </header>
 
           <div className="prose prose-gray max-w-none" style={{ color: 'var(--shopli-navy)' }}>

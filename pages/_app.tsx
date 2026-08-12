@@ -1,5 +1,6 @@
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
+import Script from 'next/script';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { Assistant } from 'next/font/google';
@@ -69,6 +70,13 @@ export default function ShopliApp({ Component, pageProps }: AppProps) {
         }
       `}</style>
       <Component {...pageProps} />
+      {/* Company-brain interest rail: delegated submit listener that powers every
+          data-interest="shopli" form (deal alerts on mood/collection pages).
+          afterInteractive so the affiliate-click listener in analytics stays first. */}
+      <Script
+        src="https://company-brain-production-841e.up.railway.app/interest.js"
+        strategy="afterInteractive"
+      />
       {/* One footer for every page: FTC affiliate disclosure (legally required
           on a site where every outbound CTA is sponsored) plus the internal
           links that give the long-tail collection/guide pages a crawl path. */}
