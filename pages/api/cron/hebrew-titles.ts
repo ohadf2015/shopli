@@ -51,20 +51,22 @@ Input:
 ${JSON.stringify(items.map((i) => ({ id: i.id, title: i.title, category: i.productType })))}`;
 
   const body: Record<string, unknown> = {
-    models: MODELS,
     messages: [{ role: 'user', content: prompt }],
     temperature: 0.2,
     // Kept low on purpose: OpenRouter gates requests by max_tokens against
     // remaining credits, so a bloated ceiling can 402 even a :free model.
     max_tokens: 800,
+    // nemotron is a reasoning model — without this it burns the whole token
+    // budget on chain-of-thought and never emits the JSON array.
+    reasoning: { enabled: false },
   };
-  let data: any = await callOpenRouter(apiKey, body);
+  // Try the free model pinned (NOT the models-array: a paid candidate in the
+  // array makes OpenRouter's credit gate 402 the whole request when the
+  // balance is empty). Only on an empty/failed parse, retry the paid flash.
+  let data: any = await callOpenRouter(apiKey, { ...body, model: MODELS[0] });
   let rows = parseGeneratedTitles(data?.choices?.[0]?.message?.content || '');
-  // The free model sometimes answers 200 with empty/whitespace content,
-  // which does not trigger OpenRouter's models-array fallback — retry once
-  // pinned to the paid fallback so a degraded free tier can't stall a sweep.
   if (!rows.length) {
-    data = await callOpenRouter(apiKey, { ...body, models: undefined, model: MODELS[1] });
+    data = await callOpenRouter(apiKey, { ...body, model: MODELS[1] });
     rows = parseGeneratedTitles(data?.choices?.[0]?.message?.content || '');
   }
   const byId = new Map(items.map((i) => [i.id, i]));
