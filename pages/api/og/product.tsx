@@ -18,24 +18,46 @@ const PALETTE = {
 };
 
 /**
- * Per-product Open Graph image (1200×630).
- * Usage: /api/og/product?title=...&price=...&currencySymbol=...&originalPrice=...&discount=...&lang=...
- * Shows the product image (right) + title + price (left) + Shopli branding.
+ * Fetch the product image bytes ourselves instead of letting satori fetch the
+ * remote URL. AliExpress CDNs content-negotiate to WebP for modern browser
+ * User-Agents, and satori/resvg cannot decode WebP — the whole OG render
+ * then fails and the endpoint returns an empty body. Requesting only
+ * image/png,image/jpeg in Accept (no wildcard) makes the CDN serve the
+ * original JPEG/PNG. Returns null on any failure so the card degrades to
+ * the branded placeholder instead of breaking the image.
  */
-export default async function handler(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const title = searchParams.get('title') || 'Product';
-  const price = searchParams.get('price');
-  const currencySymbol = searchParams.get('currencySymbol') || '₪';
-  const originalPrice = searchParams.get('originalPrice');
-  const discount = searchParams.get('discount');
-  const lang = searchParams.get('lang') || 'en';
-  const rtl = lang === 'he';
-  const productImage = searchParams.get('image');
+async function fetchProductImage(url: string): Promise<ArrayBuffer | null> {
+  try {
+    const res = await fetch(url, {
+      headers: {
+        // No wildcard/webp in Accept => CDN serves the original JPEG/PNG.
+        Accept: 'image/png,image/jpeg',
+      },
+      signal: AbortSignal.timeout(4000),
+    });
+    if (!res.ok) return null;
+    const type = (res.headers.get('content-type') || '').toLowerCase();
+    if (!type.includes('png') && !type.includes('jpeg') && !type.includes('jpg')) return null;
+    const buf = await res.arrayBuffer();
+    if (buf.byteLength === 0 || buf.byteLength > 2_000_000) return null;
+    return buf;
+  } catch {
+    return null;
+  }
+}
 
-  const truncatedTitle = title.length > 70 ? title.slice(0, 67) + '…' : title;
-  const hasDiscount = originalPrice != null && Number(originalPrice) > Number(price || 0);
+interface OgParams {
+  truncatedTitle: string;
+  price: string | null;
+  currencySymbol: string;
+  originalPrice: string | null;
+  discount: string | null;
+  hasDiscount: boolean;
+  rtl: boolean;
+  imageData: ArrayBuffer | null;
+}
 
+function renderOg(p: OgParams): ImageResponse {
   return new ImageResponse(
     (
       <div
@@ -45,7 +67,7 @@ export default async function handler(req: NextRequest) {
           display: 'flex',
           background: PALETTE.cream,
           fontFamily: 'system-ui, "Segoe UI", Arial, sans-serif',
-          direction: rtl ? 'rtl' : 'ltr',
+          direction: p.rtl ? 'rtl' : 'ltr',
         }}
       >
         {/* Left panel: text content */}
@@ -108,7 +130,7 @@ export default async function handler(req: NextRequest) {
             />
             <div
               style={{
-                fontSize: truncatedTitle.length > 50 ? 32 : 38,
+                fontSize: p.truncatedTitle.length > 50 ? 32 : 38,
                 fontWeight: 800,
                 lineHeight: 1.2,
                 color: PALETTE.navy,
@@ -120,12 +142,12 @@ export default async function handler(req: NextRequest) {
                 WebkitBoxOrient: 'vertical',
               }}
             >
-              {rtl ? truncatedTitle : truncatedTitle}
+              {p.truncatedTitle}
             </div>
 
             {/* Price row */}
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
-              {price && (
+              {p.price && (
                 <div
                   style={{
                     fontSize: 42,
@@ -134,10 +156,10 @@ export default async function handler(req: NextRequest) {
                     letterSpacing: -1,
                   }}
                 >
-                  {currencySymbol}{Number(price).toFixed(2)}
+                  {`${p.currencySymbol}${Number(p.price).toFixed(2)}`}
                 </div>
               )}
-              {hasDiscount && (
+              {p.hasDiscount && (
                 <div
                   style={{
                     fontSize: 26,
@@ -146,10 +168,10 @@ export default async function handler(req: NextRequest) {
                     textDecoration: 'line-through',
                   }}
                 >
-                  {currencySymbol}{Number(originalPrice).toFixed(2)}
+                  {`${p.currencySymbol}${Number(p.originalPrice).toFixed(2)}`}
                 </div>
               )}
-              {discount && (
+              {p.discount && (
                 <div
                   style={{
                     fontSize: 20,
@@ -160,7 +182,7 @@ export default async function handler(req: NextRequest) {
                     borderRadius: 999,
                   }}
                 >
-                  -{discount}
+                  {`-${p.discount}`}
                 </div>
               )}
             </div>
@@ -177,13 +199,13 @@ export default async function handler(req: NextRequest) {
               color: PALETTE.orange,
             }}
           >
-            <span>{rtl ? 'גלה באליאקספרס' : 'See on AliExpress'}</span>
+            <span>{p.rtl ? 'גלה באליאקספרס' : 'See on AliExpress'}</span>
             <span style={{ fontSize: 18 }}>→</span>
           </div>
         </div>
 
         {/* Right panel: product image */}
-        {productImage ? (
+        {p.imageData ? (
           <div
             style={{
               width: 504,
@@ -197,7 +219,7 @@ export default async function handler(req: NextRequest) {
             }}
           >
             <img
-              src={productImage}
+              src={p.imageData as unknown as string}
               alt=""
               style={{
                 width: '100%',
@@ -248,4 +270,44 @@ export default async function handler(req: NextRequest) {
       },
     }
   );
+}
+
+/**
+ * Per-product Open Graph image (1200×630).
+ * Usage: /api/og/product?title=...&price=...&currencySymbol=...&originalPrice=...&discount=...&lang=...
+ * Shows the product image (right) + title + price (left) + Shopli branding.
+ */
+export default async function handler(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const title = searchParams.get('title') || 'Product';
+  const price = searchParams.get('price');
+  const currencySymbol = searchParams.get('currencySymbol') || '₪';
+  const originalPrice = searchParams.get('originalPrice');
+  const discount = searchParams.get('discount');
+  const lang = searchParams.get('lang') || 'en';
+  const rtl = lang === 'he';
+  const productImage = searchParams.get('image');
+
+  const truncatedTitle = title.length > 70 ? title.slice(0, 67) + '…' : title;
+  const hasDiscount = originalPrice != null && Number(originalPrice) > Number(price || 0);
+  const imageData = productImage ? await fetchProductImage(productImage) : null;
+
+  const params: OgParams = {
+    truncatedTitle,
+    price,
+    currencySymbol,
+    originalPrice,
+    discount,
+    hasDiscount,
+    rtl,
+    imageData,
+  };
+
+  try {
+    return renderOg(params);
+  } catch {
+    // Never return an empty body: retry without the product image so the
+    // shared link still gets a branded preview card.
+    return renderOg({ ...params, imageData: null });
+  }
 }
