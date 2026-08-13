@@ -35,6 +35,8 @@ async function callOpenRouter(apiKey: string, body: Record<string, unknown>): Pr
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
+    // A hung provider must not eat the function's whole deadline.
+    signal: AbortSignal.timeout(60_000),
   });
   return res.json().catch(() => null);
 }
