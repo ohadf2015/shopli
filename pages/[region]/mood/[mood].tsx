@@ -247,7 +247,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
         caption: item.caption?.[config.lang] || item.caption?.en || '',
         note: item.note?.[config.lang] || item.note?.en || '',
         products: products.map((p: any) => ({
-          id: p.id, title: p.title, price: p.price, originalPrice: p.originalPrice,
+          id: p.id, title: p.title, originalTitle: p.originalTitle, price: p.price, originalPrice: p.originalPrice,
           currency: p.currency, imageUrl: p.imageUrl, affiliateLink: p.affiliateLink,
           rating: p.rating, reviewCount: p.reviewCount, volume: p.volume,
           shopName: p.shopName, discount: p.discount,
