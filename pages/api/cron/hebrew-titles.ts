@@ -27,6 +27,18 @@ const BATCH_SIZE = 10;
 // Leaves headroom under the function's 300s ceiling; each LLM call is 5-15s.
 const DEADLINE_MS = 240_000;
 
+async function callOpenRouter(apiKey: string, body: Record<string, unknown>): Promise<any> {
+  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  return res.json().catch(() => null);
+}
+
 async function generateBatch(
   apiKey: string,
   items: Array<{ id: string; title: string; productType: string }>
@@ -38,26 +50,26 @@ Return ONLY a JSON array: [{"id":"...","title":"..."}]
 Input:
 ${JSON.stringify(items.map((i) => ({ id: i.id, title: i.title, category: i.productType })))}`;
 
-  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      models: MODELS,
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.2,
-      // The account key enforces a low per-call token ceiling; this batch
-      // needs only a few hundred.
-      max_tokens: 1500,
-    }),
-  });
-  const data: any = await res.json().catch(() => null);
-  const text: string = data?.choices?.[0]?.message?.content || '';
+  const body: Record<string, unknown> = {
+    models: MODELS,
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.2,
+    // The account key enforces a low per-call token ceiling; this batch
+    // needs only a few hundred.
+    max_tokens: 1500,
+  };
+  let data: any = await callOpenRouter(apiKey, body);
+  let rows = parseGeneratedTitles(data?.choices?.[0]?.message?.content || '');
+  // The free model sometimes answers 200 with empty/whitespace content,
+  // which does not trigger OpenRouter's models-array fallback — retry once
+  // pinned to the paid fallback so a degraded free tier can't stall a sweep.
+  if (!rows.length) {
+    data = await callOpenRouter(apiKey, { ...body, models: undefined, model: MODELS[1] });
+    rows = parseGeneratedTitles(data?.choices?.[0]?.message?.content || '');
+  }
   const byId = new Map(items.map((i) => [i.id, i]));
   const out: Array<{ id: string; title: string; sourceTitle: string }> = [];
-  for (const row of parseGeneratedTitles(text)) {
+  for (const row of rows) {
     const item = byId.get(String(row.id));
     if (!item) continue;
     const title = cleanGeneratedTitle(row.title, item.title);
