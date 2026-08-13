@@ -54,9 +54,9 @@ ${JSON.stringify(items.map((i) => ({ id: i.id, title: i.title, category: i.produ
     models: MODELS,
     messages: [{ role: 'user', content: prompt }],
     temperature: 0.2,
-    // The account key enforces a low per-call token ceiling; this batch
-    // needs only a few hundred.
-    max_tokens: 1500,
+    // Kept low on purpose: OpenRouter gates requests by max_tokens against
+    // remaining credits, so a bloated ceiling can 402 even a :free model.
+    max_tokens: 800,
   };
   let data: any = await callOpenRouter(apiKey, body);
   let rows = parseGeneratedTitles(data?.choices?.[0]?.message?.content || '');
