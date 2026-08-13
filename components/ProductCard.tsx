@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Icon from './icons';
 import WhatsAppShare from './WhatsAppShare';
+import { SITE_URL } from '../lib/seo';
 import { isInWishlist, syncAdd, syncRemove } from '../lib/useWishlist';
 import { productImage } from '../lib/img';
 
@@ -92,6 +93,13 @@ export default function ProductCard({
   const externalHref = product.affiliateLink || fallbackUrl || '#';
   const isExternal = !productPageUrl;
   const cardHref = productPageUrl || externalHref;
+  // Shares always point at the on-site product page (canonical URL) so every
+  // share is a site acquisition event; the affiliate link stays one tap away
+  // on the PDP. Falls back to the external link only when no PDP is possible.
+  const shareUrl =
+    region && product.id
+      ? `${SITE_URL}/${region}/product/${encodeURIComponent(product.id)}`
+      : externalHref;
 
   const toggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -259,7 +267,7 @@ export default function ProductCard({
           {showShare && (
             <WhatsAppShare
               title={product.title}
-              url={externalHref}
+              url={shareUrl}
               locale={(locale as 'he' | 'en' | 'fr' | 'de' | 'es' | 'it' | 'ru') || 'en'}
               size="sm"
             />
