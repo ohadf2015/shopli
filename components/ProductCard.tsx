@@ -8,6 +8,8 @@ import { productImage } from '../lib/img';
 export interface ProductCardProduct {
   id: string;
   title: string;
+  /** Full source title, shown as the h3 tooltip when `title` is a short override. */
+  originalTitle?: string;
   price: number;
   originalPrice?: number | null;
   imageUrl?: string;
@@ -207,6 +209,7 @@ export default function ProductCard({
             compact ? 'text-[0.7rem]' : 'text-xs sm:text-sm'
           }`}
           style={{ color: 'var(--shopli-navy)' }}
+          title={product.originalTitle || undefined}
         >
           {product.title}
         </h3>

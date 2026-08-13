@@ -1,4 +1,5 @@
 import type { GmcFeedItem } from './gmc-feed';
+import { getHebrewTitles } from './hebrew-titles';
 
 /**
  * First-party product cache behind the Google Merchant Center feed.
@@ -115,7 +116,7 @@ export async function getFeedProducts(region: string, limit = 500): Promise<GmcF
       WHERE region = ${region}
       ORDER BY volume DESC, updated_at DESC
       LIMIT ${limit}`;
-    return rows.map((r) => ({
+    const items = rows.map((r) => ({
       id: r.product_id,
       title: r.title,
       description: r.title,
@@ -127,6 +128,19 @@ export async function getFeedProducts(region: string, limit = 500): Promise<GmcF
       googleCategory: r.google_category,
       volume: Number(r.volume || 0),
     }));
+    // The il feed should show the same natural Hebrew titles as the site, not
+    // the API's literal translations (lib/hebrew-titles.ts).
+    if (region === 'il' && items.length) {
+      const overrides = await getHebrewTitles(items.map((i) => String(i.id)));
+      for (const item of items) {
+        const title = overrides.get(String(item.id));
+        if (title) {
+          item.title = title;
+          item.description = title;
+        }
+      }
+    }
+    return items;
   } catch {
     return [];
   }

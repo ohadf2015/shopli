@@ -18,46 +18,58 @@ const PALETTE = {
 };
 
 /**
- * Fetch the product image bytes ourselves instead of letting satori fetch the
- * remote URL. AliExpress CDNs content-negotiate to WebP for modern browser
- * User-Agents, and satori/resvg cannot decode WebP — the whole OG render
- * then fails and the endpoint returns an empty body. Requesting only
- * image/png,image/jpeg in Accept (no wildcard) makes the CDN serve the
- * original JPEG/PNG. Returns null on any failure so the card degrades to
- * the branded placeholder instead of breaking the image.
+ * Fetch a remote product image and inline it as a data URI so satori never
+ * has to fetch during render (a failed render-time fetch kills the whole
+ * ImageResponse stream -> empty 200 body). Returns null on any failure.
  */
-async function fetchProductImage(url: string): Promise<ArrayBuffer | null> {
+async function fetchImageAsDataUri(url: string | null): Promise<string | null> {
+  if (!url || !/^https:\/\//i.test(url)) return null;
   try {
     const res = await fetch(url, {
-      headers: {
-        // No wildcard/webp in Accept => CDN serves the original JPEG/PNG.
-        Accept: 'image/png,image/jpeg',
-      },
       signal: AbortSignal.timeout(4000),
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; shopli-og/1.0)' },
     });
     if (!res.ok) return null;
-    const type = (res.headers.get('content-type') || '').toLowerCase();
-    if (!type.includes('png') && !type.includes('jpeg') && !type.includes('jpg')) return null;
-    const buf = await res.arrayBuffer();
-    if (buf.byteLength === 0 || buf.byteLength > 2_000_000) return null;
-    return buf;
+    const contentType = (res.headers.get('content-type') || '').split(';')[0].trim();
+    if (!contentType.startsWith('image/')) return null;
+    const buf = new Uint8Array(await res.arrayBuffer());
+    if (buf.byteLength === 0 || buf.byteLength > 3 * 1024 * 1024) return null;
+    let binary = '';
+    const CHUNK = 0x8000;
+    for (let i = 0; i < buf.length; i += CHUNK) {
+      binary += String.fromCharCode(...buf.subarray(i, i + CHUNK));
+    }
+    return `data:${contentType};base64,${btoa(binary)}`;
   } catch {
     return null;
   }
 }
 
-interface OgParams {
-  truncatedTitle: string;
-  price: string | null;
-  currencySymbol: string;
-  originalPrice: string | null;
-  discount: string | null;
-  hasDiscount: boolean;
-  rtl: boolean;
-  imageData: ArrayBuffer | null;
-}
+/**
+ * Per-product Open Graph image (1200×630).
+ * Usage: /api/og/product?title=...&price=...&currencySymbol=...&originalPrice=...&discount=...&lang=...
+ * Shows the product image (right) + title + price (left) + Shopli branding.
+ */
+export default async function handler(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const title = searchParams.get('title') || 'Product';
+  const price = searchParams.get('price');
+  const currencySymbol = searchParams.get('currencySymbol') || '₪';
+  const originalPrice = searchParams.get('originalPrice');
+  const discount = searchParams.get('discount');
+  const lang = searchParams.get('lang') || 'en';
+  const rtl = lang === 'he';
+  const imageParam = searchParams.get('image');
 
-function renderOg(p: OgParams): ImageResponse {
+  const truncatedTitle = title.length > 70 ? title.slice(0, 67) + '…' : title;
+  const hasDiscount = originalPrice != null && Number(originalPrice) > Number(price || 0);
+
+  // Satori fetches <img> URLs during render; if that fetch fails/returns
+  // non-image, the whole ImageResponse stream errors and Vercel emits a
+  // 200 with an EMPTY body. Pre-fetch with a timeout and inline as a data
+  // URI; on any failure fall back to the text-only layout.
+  const productImage = await fetchImageAsDataUri(imageParam);
+
   return new ImageResponse(
     (
       <div
@@ -67,7 +79,7 @@ function renderOg(p: OgParams): ImageResponse {
           display: 'flex',
           background: PALETTE.cream,
           fontFamily: 'system-ui, "Segoe UI", Arial, sans-serif',
-          direction: p.rtl ? 'rtl' : 'ltr',
+          direction: rtl ? 'rtl' : 'ltr',
         }}
       >
         {/* Left panel: text content */}
@@ -130,48 +142,46 @@ function renderOg(p: OgParams): ImageResponse {
             />
             <div
               style={{
-                fontSize: p.truncatedTitle.length > 50 ? 32 : 38,
+                fontSize: truncatedTitle.length > 50 ? 32 : 38,
                 fontWeight: 800,
                 lineHeight: 1.2,
                 color: PALETTE.navy,
                 letterSpacing: -0.5,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                display: '-webkit-box',
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: 'vertical',
+                display: 'flex',
               }}
             >
-              {p.truncatedTitle}
+              {truncatedTitle}
             </div>
 
             {/* Price row */}
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
-              {p.price && (
+              {price && (
                 <div
                   style={{
                     fontSize: 42,
                     fontWeight: 900,
                     color: PALETTE.teal,
                     letterSpacing: -1,
+                    display: 'flex',
                   }}
                 >
-                  {`${p.currencySymbol}${Number(p.price).toFixed(2)}`}
+                  {currencySymbol}{Number(price).toFixed(2)}
                 </div>
               )}
-              {p.hasDiscount && (
+              {hasDiscount && (
                 <div
                   style={{
                     fontSize: 26,
                     fontWeight: 600,
                     color: PALETTE.muted,
                     textDecoration: 'line-through',
+                    display: 'flex',
                   }}
                 >
-                  {`${p.currencySymbol}${Number(p.originalPrice).toFixed(2)}`}
+                  {currencySymbol}{Number(originalPrice).toFixed(2)}
                 </div>
               )}
-              {p.discount && (
+              {discount && (
                 <div
                   style={{
                     fontSize: 20,
@@ -180,9 +190,10 @@ function renderOg(p: OgParams): ImageResponse {
                     background: '#fef2f2',
                     padding: '4px 14px',
                     borderRadius: 999,
+                    display: 'flex',
                   }}
                 >
-                  {`-${p.discount}`}
+                  -{discount}
                 </div>
               )}
             </div>
@@ -199,13 +210,13 @@ function renderOg(p: OgParams): ImageResponse {
               color: PALETTE.orange,
             }}
           >
-            <span>{p.rtl ? 'גלה באליאקספרס' : 'See on AliExpress'}</span>
+            <span>{rtl ? 'גלה באליאקספרס' : 'See on AliExpress'}</span>
             <span style={{ fontSize: 18 }}>→</span>
           </div>
         </div>
 
         {/* Right panel: product image */}
-        {p.imageData ? (
+        {productImage ? (
           <div
             style={{
               width: 504,
@@ -219,7 +230,7 @@ function renderOg(p: OgParams): ImageResponse {
             }}
           >
             <img
-              src={p.imageData as unknown as string}
+              src={productImage}
               alt=""
               style={{
                 width: '100%',
@@ -270,44 +281,4 @@ function renderOg(p: OgParams): ImageResponse {
       },
     }
   );
-}
-
-/**
- * Per-product Open Graph image (1200×630).
- * Usage: /api/og/product?title=...&price=...&currencySymbol=...&originalPrice=...&discount=...&lang=...
- * Shows the product image (right) + title + price (left) + Shopli branding.
- */
-export default async function handler(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const title = searchParams.get('title') || 'Product';
-  const price = searchParams.get('price');
-  const currencySymbol = searchParams.get('currencySymbol') || '₪';
-  const originalPrice = searchParams.get('originalPrice');
-  const discount = searchParams.get('discount');
-  const lang = searchParams.get('lang') || 'en';
-  const rtl = lang === 'he';
-  const productImage = searchParams.get('image');
-
-  const truncatedTitle = title.length > 70 ? title.slice(0, 67) + '…' : title;
-  const hasDiscount = originalPrice != null && Number(originalPrice) > Number(price || 0);
-  const imageData = productImage ? await fetchProductImage(productImage) : null;
-
-  const params: OgParams = {
-    truncatedTitle,
-    price,
-    currencySymbol,
-    originalPrice,
-    discount,
-    hasDiscount,
-    rtl,
-    imageData,
-  };
-
-  try {
-    return renderOg(params);
-  } catch {
-    // Never return an empty body: retry without the product image so the
-    // shared link still gets a branded preview card.
-    return renderOg({ ...params, imageData: null });
-  }
 }
