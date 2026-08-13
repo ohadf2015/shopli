@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { getHebrewTitles } from './hebrew-titles';
 
 const REGION_MAP: Record<string, { language: string; currency: string; shipToCountry: string }> = {
   il: { language: 'HE', currency: 'ILS', shipToCountry: 'IL' },
@@ -103,6 +104,8 @@ export interface SearchProduct {
   id: string;
   sku: string;
   title: string;
+  /** Full API title, kept when `title` carries a generated Hebrew override. */
+  originalTitle?: string;
   price: number;
   originalPrice: number | null;
   currency: string;
@@ -139,7 +142,7 @@ export async function searchAliExpress(keywords: string, region: string, pageSiz
   });
   const result = data?.aliexpress_affiliate_product_query_response?.resp_result?.result;
   const products = result?.products?.product || [];
-  return products.map((p: any) => {
+  const mapped = products.map((p: any) => {
     const rawTitle: string = p.product_title || 'Product';
     return {
     id: String(p.product_id),
@@ -163,6 +166,7 @@ export async function searchAliExpress(keywords: string, region: string, pageSiz
     freeShipping: false,
     };
   });
+  return cfg.language === 'HE' ? applyHebrewOverrides(mapped) : mapped;
 }
 
 export async function searchCollection(region: string, keywords: string[], limit = 4): Promise<SearchProduct[]> {
@@ -198,6 +202,22 @@ function sanitizeHebrewTitle(title: string): string {
     .replace(/([א-ת])(?=[A-Za-z])/g, '$1 ')
     .replace(/\s{2,}/g, ' ')
     .trim();
+}
+
+/**
+ * Swap in LLM-written natural Hebrew titles (lib/hebrew-titles.ts) for the
+ * API's literal machine translations. One DB round-trip per page; fail-open,
+ * so a store outage changes nothing. The full API title survives on
+ * `originalTitle` for tooltips and anywhere the long form is still wanted.
+ */
+async function applyHebrewOverrides(products: SearchProduct[]): Promise<SearchProduct[]> {
+  if (!products.length) return products;
+  const overrides = await getHebrewTitles(products.map((p) => p.id));
+  if (!overrides.size) return products;
+  return products.map((p) => {
+    const title = overrides.get(p.id);
+    return title ? { ...p, originalTitle: p.title, title } : p;
+  });
 }
 
 function mapRawProduct(p: any, cfg: { language: string; currency: string; shipToCountry: string }): SearchProduct {
@@ -260,9 +280,10 @@ export async function getProductsByIds(ids: string[], region: string): Promise<S
     if (list.length > 0) {
       const mapped = list.map((p: any) => mapRawProduct(p, cfg));
       // Preserve requested order
-      return cleanIds
+      const ordered = cleanIds
         .map(id => mapped.find((p: SearchProduct) => p.id === id))
         .filter(Boolean) as SearchProduct[];
+      return cfg.language === 'HE' ? applyHebrewOverrides(ordered) : ordered;
     }
   } catch { /* fall through */ }
 
@@ -286,9 +307,10 @@ export async function getProductsByIds(ids: string[], region: string): Promise<S
     const list = Array.isArray(products) ? products : [];
     if (list.length > 0) {
       const mapped = list.map((p: any) => mapRawProduct(p, cfg));
-      return cleanIds
+      const ordered = cleanIds
         .map(id => mapped.find((p: SearchProduct) => p.id === id))
         .filter(Boolean) as SearchProduct[];
+      return cfg.language === 'HE' ? applyHebrewOverrides(ordered) : ordered;
     }
   } catch { /* ignore */ }
 

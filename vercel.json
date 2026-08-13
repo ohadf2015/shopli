@@ -5,9 +5,11 @@
   "installCommand": "npm install",
   "outputDirectory": ".next",
   "crons": [
-    { "path": "/api/cron/trend-snapshot", "schedule": "0 3 * * *" }
+    { "path": "/api/cron/trend-snapshot", "schedule": "0 3 * * *" },
+    { "path": "/api/cron/hebrew-titles", "schedule": "30 3 * * *" }
   ],
   "functions": {
-    "pages/api/cron/trend-snapshot.ts": { "maxDuration": 300 }
+    "pages/api/cron/trend-snapshot.ts": { "maxDuration": 300 },
+    "pages/api/cron/hebrew-titles.ts": { "maxDuration": 300 }
   }
 }
