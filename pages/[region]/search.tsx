@@ -223,7 +223,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
   if (q) {
     try {
       const { searchAliExpress } = await import('../../lib/aliexpress');
-      products = await searchAliExpress(q, region, 20);
+      const { filterQuality } = await import('../../lib/quality');
+      // Same floor as every other surface — a search result is a recommendation.
+      products = filterQuality(await searchAliExpress(q, region, 20));
     } catch (e: any) {
       error = e?.message || String(e);
     }

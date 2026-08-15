@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { searchAliExpress } from '../../../lib/aliexpress';
+import { filterQuality } from '../../../lib/quality';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { q = '', region = 'eu', limit = '8' } = req.query;
@@ -10,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const products = await searchAliExpress(q as string, region as string, pageSize);
+    const products = filterQuality(await searchAliExpress(q as string, region as string, pageSize));
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
     res.status(200).json({ success: true, query: q, products, total: products.length });
   } catch (error: any) {

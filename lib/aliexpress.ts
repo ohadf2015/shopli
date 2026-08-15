@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { passesQualityGate } from './quality';
 
 const REGION_MAP: Record<string, { language: string; currency: string; shipToCountry: string }> = {
   il: { language: 'HE', currency: 'ILS', shipToCountry: 'IL' },
@@ -191,9 +192,21 @@ export async function searchCollection(region: string, keywords: string[], limit
       }
     } catch { /* ignore */ }
   }
+  // Drop the products we would not stand behind before ranking what is left.
+  // Measured over 395 live products, the floor removes ~13% and still leaves
+  // every keyword with results (lib/quality.ts). This is the one place every
+  // collection, mood and trending surface funnels through, so gating here
+  // covers all of them; PDPs fetch by id and are deliberately not affected, so
+  // an already-indexed product page never starts 404ing because of this.
+  //
+  // Fails open: if the floor would empty a non-empty result, the unfiltered
+  // list is ranked instead. An empty section is worse than a mediocre product.
+  const kept = all.filter(passesQualityGate);
+  const ranked = kept.length > 0 ? kept : all;
+
   // Sort by volume (most sold), then rating, then commission
-  all.sort((a, b) => (b.volume * 10 + b.rating * 3 + b.commissionRate) - (a.volume * 10 + a.rating * 3 + a.commissionRate));
-  return all.slice(0, limit);
+  ranked.sort((a, b) => (b.volume * 10 + b.rating * 3 + b.commissionRate) - (a.volume * 10 + a.rating * 3 + a.commissionRate));
+  return ranked.slice(0, limit);
 }
 
 /**
