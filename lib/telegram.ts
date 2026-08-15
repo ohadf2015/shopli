@@ -37,7 +37,7 @@ const COPY: Record<string, {
   he: {
     header: 'מה זז היום בשופלי',
     reason: { surging: 'מזנק', price_drop: 'ירידת מחיר אמיתית', bestseller: 'רב מכר' },
-    perDay: (n) => `${n} נמכרו היום`,
+    perDay: (n) => `${n} נמכרים ביום עכשיו`,
     surge: (x) => `פי ${x} מהקצב הרגיל שלו`,
     drop: (p, d) => `${p}% מתחת למחיר החציוני שלו ב-${d} הימים האחרונים`,
     rating: (r) => `${r}% משוב חיובי`,
@@ -47,7 +47,7 @@ const COPY: Record<string, {
   en: {
     header: "What's actually moving on Shopli",
     reason: { surging: 'Surging', price_drop: 'Real price drop', bestseller: 'Best seller' },
-    perDay: (n) => `${n} sold today`,
+    perDay: (n) => `${n} selling a day right now`,
     surge: (x) => `${x}x its usual rate`,
     drop: (p, d) => `${p}% below its own median price over ${d} days`,
     rating: (r) => `${r}% positive feedback`,

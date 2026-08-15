@@ -1,5 +1,6 @@
 import { passesQualityGate, qualityScore } from './quality';
 import { ensureFeedProductsTable } from './feed-store';
+import { titleTokenOverlap } from './similar';
 
 /**
  * "What's actually interesting today", computed from our own history.
@@ -58,6 +59,8 @@ export interface Pick extends PickMetrics {
   imageUrl: string;
   rating: number;
   volume: number;
+  /** The collection or trend label this product was swept under. */
+  category: string;
   reason: PickReason;
   score: number;
 }
@@ -66,6 +69,39 @@ export interface Pick extends PickMetrics {
 const SURGE_MIN_PER_DAY = 3;
 const SURGE_RATIO = 2;
 const DROP_MIN_PCT = 10;
+
+/**
+ * A discount on something nobody buys is not a deal, it is a clearance shelf.
+ * Measured on live picks, this was letting through a sunscreen selling 0/day
+ * and a ₪98 bath-bomb set at 5/day purely because the price moved.
+ */
+const DROP_MIN_PER_DAY = 3;
+
+/** "Best seller" has to mean something; 1 unit a day is not a best seller. */
+const BESTSELLER_MIN_PER_DAY = 10;
+
+/**
+ * Picks are the showcase — the Telegram post, the game, the rails — so they
+ * clear a higher bar than the catalogue floor (lib/quality.ts, 90%). Measured
+ * over 395 live products, 65% of the catalogue is 94%+, which is far more than
+ * a dozen picks needs.
+ */
+const PICK_MIN_RATE = 94;
+
+/** Two titles this similar are the same product from a different seller. */
+const DUPLICATE_OVERLAP = 0.45;
+
+/**
+ * One per category. Nobody wants a list of five smart plugs — and measured
+ * across regions, one-per-category still yields 9-12 picks (il 12, us 9, eu 10,
+ * de 9, uk 9), which is more than the five a post or a game round uses. Two per
+ * category filled the list to 12 but collapsed it to 7-8 distinct ideas.
+ *
+ * Non-IL regions bottom out around 9 because only IL sweeps the 78 collections;
+ * the others see the ~10 trend categories (see the ponytail note in
+ * /api/cron/trend-snapshot).
+ */
+const MAX_PER_CATEGORY = 1;
 
 /**
  * Collapse one product's snapshots into the numbers a pick is judged on.
@@ -114,9 +150,39 @@ export function aggregateSnapshots(snaps: PickSnapshot[]): PickMetrics | null {
 
 export function pickReason(m: PickMetrics): PickReason | null {
   if (m.recentPerDay >= SURGE_MIN_PER_DAY && m.surge >= SURGE_RATIO) return 'surging';
-  if (m.dropPct >= DROP_MIN_PCT) return 'price_drop';
-  if (m.perDay > 0) return 'bestseller';
+  if (m.dropPct >= DROP_MIN_PCT && m.recentPerDay >= DROP_MIN_PER_DAY) return 'price_drop';
+  if (m.perDay >= BESTSELLER_MIN_PER_DAY) return 'bestseller';
   return null;
+}
+
+/**
+ * Drop the same product sold by five different sellers, and stop one category
+ * from eating the list.
+ *
+ * Live US picks before this: three Tuya smart sockets and two mini fans out of
+ * twelve. Each was independently a legitimate mover — they are simply the same
+ * thing, and a reader scanning the list sees one idea, not twelve.
+ *
+ * Title overlap reuses lib/similar.ts rather than a second implementation, and
+ * runs on the already-ranked list so the best of each cluster is the one kept.
+ */
+export function dedupePicks<T extends { title: string; category?: string }>(
+  ranked: T[],
+  { maxPerCategory = MAX_PER_CATEGORY }: { maxPerCategory?: number } = {}
+): T[] {
+  const out: T[] = [];
+  const perCategory = new Map<string, number>();
+  for (const p of ranked) {
+    if (out.some((k) => titleTokenOverlap(k.title, p.title) >= DUPLICATE_OVERLAP)) continue;
+    const cat = p.category || '';
+    if (cat) {
+      const n = perCategory.get(cat) || 0;
+      if (n >= maxPerCategory) continue;
+      perCategory.set(cat, n + 1);
+    }
+    out.push(p);
+  }
+  return out;
 }
 
 /**
@@ -192,7 +258,7 @@ export async function getPicks(
   try {
     rows = await sql`
       SELECT s.product_id, s.seen_on, s.volume, s.price,
-             f.title, f.currency, f.image_url, f.rating
+             f.title, f.currency, f.image_url, f.rating, f.product_type
       FROM product_volume_snapshots s
       JOIN feed_products f ON f.product_id = s.product_id AND f.region = s.region
       WHERE s.region = ${region}
@@ -222,6 +288,9 @@ export async function getPicks(
     const volume = snaps[snaps.length - 1].volume;
     // Quality first: a surging product nobody should buy is not a good pick.
     if (!passesQualityGate({ rating, volume })) continue;
+    // And picks clear the higher showcase bar, not just the catalogue floor.
+    // A rating of 0 means the sweep has not rated it yet, not that it is bad.
+    if (rating > 0 && rating < PICK_MIN_RATE) continue;
     const why = pickReason(m);
     if (!why) continue;
     if (reason && why !== reason) continue;
@@ -233,14 +302,17 @@ export async function getPicks(
       imageUrl: String(meta.image_url || ''),
       rating,
       volume,
+      category: String(meta.product_type || ''),
       reason: why,
       score: scorePick(m, rating, volume),
     });
   }
 
-  const ranked = picks
-    .filter((p) => p.title && p.imageUrl && p.price > 0)
-    .sort((a, b) => b.score - a.score || a.productId.localeCompare(b.productId));
+  const ranked = dedupePicks(
+    picks
+      .filter((p) => p.title && p.imageUrl && p.price > 0)
+      .sort((a, b) => b.score - a.score || a.productId.localeCompare(b.productId))
+  );
 
   // A caller that asked for one reason already has the list it wants.
   return reason ? ranked.slice(0, limit) : diversifyPicks(ranked, limit);

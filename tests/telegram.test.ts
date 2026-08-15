@@ -6,7 +6,7 @@ import type { Pick, PickReason } from '../lib/picks';
 function pick(over: Partial<Pick> = {}): Pick {
   return {
     productId: '1005001', title: 'Silicone Face Brush', price: 5.98, currency: 'ILS',
-    imageUrl: 'x', rating: 96, volume: 4000, reason: 'surging' as PickReason, score: 80,
+    imageUrl: 'x', rating: 96, volume: 4000, category: 'Beauty', reason: 'surging' as PickReason, score: 80,
     perDay: 551, recentPerDay: 2178, surge: 3.95, spanDays: 4,
     priceNow: 5.98, priceMedian: 6.92, dropPct: 14, ...over,
   };
@@ -21,7 +21,7 @@ test('the post states why each product is in it', () => {
   const msg = buildPicksMessage('us', [pick(), pick({ productId: '2', reason: 'price_drop', dropPct: 28 })], {
     currencySymbol: '$',
   })!;
-  assert.match(msg, /2178 sold today/);
+  assert.match(msg, /2178 selling a day right now/);
   assert.match(msg, /4\\\.0x its usual rate/);
   assert.match(msg, /28% below its own median price over 4 days/);
 });

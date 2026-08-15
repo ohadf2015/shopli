@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { aggregateSnapshots, buildPriceOptions, diversifyPicks, pickReason, scorePick, type Pick, type PickReason, type PickSnapshot } from '../lib/picks';
+import { aggregateSnapshots, buildPriceOptions, dedupePicks, diversifyPicks, pickReason, scorePick, type Pick, type PickReason, type PickSnapshot } from '../lib/picks';
 
 function snaps(rows: Array<[string, number, number | null]>): PickSnapshot[] {
   return rows.map(([seenOn, volume, price]) => ({ productId: 'p1', seenOn, volume, price }));
@@ -49,9 +49,9 @@ test('a discount is measured against the products OWN median price', () => {
   // nothing. Ours is the only honest one.
   const m = aggregateSnapshots(snaps([
     ['2026-08-11', 500, 100],
-    ['2026-08-12', 501, 100],
-    ['2026-08-13', 502, 100],
-    ['2026-08-14', 503, 70],
+    ['2026-08-12', 530, 100],
+    ['2026-08-13', 560, 100],
+    ['2026-08-14', 590, 70],
   ]))!;
   assert.equal(m.priceMedian, 100);
   assert.equal(m.dropPct, 30);
@@ -61,7 +61,7 @@ test('a discount is measured against the products OWN median price', () => {
 test('a price rise is not a drop', () => {
   const m = aggregateSnapshots(snaps([
     ['2026-08-13', 500, 100],
-    ['2026-08-14', 505, 130],
+    ['2026-08-14', 560, 130],
   ]))!;
   assert.ok(m.dropPct < 0);
   assert.equal(pickReason(m), 'bestseller');
@@ -94,7 +94,7 @@ function pick(id: string, reason: PickReason, score: number): Pick {
   return {
     productId: id, reason, score, perDay: 1, recentPerDay: 1, surge: 1, spanDays: 7,
     priceNow: 10, priceMedian: 10, dropPct: 0, title: id, price: 10, currency: 'ILS',
-    imageUrl: 'x', rating: 95, volume: 1000,
+    imageUrl: 'x', rating: 95, volume: 1000, category: id,
   };
 }
 
@@ -135,4 +135,46 @@ test('cheap products still get three distinct options', () => {
     const opts = buildPriceOptions(0.6, id);
     assert.equal(new Set(opts).size, 3);
   }
+});
+
+test('the same product from five sellers appears once', () => {
+  // Live US picks were three Tuya smart sockets and two mini fans out of twelve.
+  const out = dedupePicks([
+    { title: 'TNCE Tuya EU Plug WiFi Zigbee Smart Socket Power Monitor', category: 'Smart Home' },
+    { title: 'Tuya Smart Socket EU 16A Wifi Smart Plug Power Monitor', category: 'Smart Home' },
+    { title: 'Stainless Steel Vegetable Peeler Kitchen', category: 'Kitchen' },
+  ]);
+  assert.equal(out.length, 2);
+  assert.match(out[1].title, /Peeler/);
+});
+
+test('one category cannot eat the list', () => {
+  const out = dedupePicks([
+    { title: 'Wifi Smart Socket Power Monitor', category: 'Smart Home' },
+    { title: 'Motion Sensor Night Light Hallway', category: 'Smart Home' },
+    { title: 'Video Doorbell Camera Wireless Chime', category: 'Smart Home' },
+    { title: 'Dog Grooming Comb Brush', category: 'Pet' },
+  ]);
+  // One per category: the best Smart Home mover, not the three best.
+  assert.deepEqual(out.map((p) => p.category), ['Smart Home', 'Pet']);
+});
+
+test('a discount on a product nobody buys is not a deal', () => {
+  const dead = aggregateSnapshots(snaps([
+    ['2026-08-11', 500, 100], ['2026-08-12', 500, 100], ['2026-08-13', 500, 100], ['2026-08-14', 500, 70],
+  ]))!;
+  assert.equal(dead.dropPct, 30);
+  assert.equal(pickReason(dead), null); // was 'price_drop'
+
+  const alive = aggregateSnapshots(snaps([
+    ['2026-08-11', 500, 100], ['2026-08-12', 520, 100], ['2026-08-13', 540, 100], ['2026-08-14', 560, 70],
+  ]))!;
+  assert.equal(pickReason(alive), 'price_drop');
+});
+
+test('a best seller has to actually sell', () => {
+  const trickle = aggregateSnapshots(snaps([['2026-08-08', 500, 10], ['2026-08-15', 505, 10]]))!;
+  assert.equal(pickReason(trickle), null);
+  const real = aggregateSnapshots(snaps([['2026-08-08', 500, 10], ['2026-08-15', 1200, 10]]))!;
+  assert.equal(pickReason(real), 'bestseller');
 });
