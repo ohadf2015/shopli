@@ -1,0 +1,329 @@
+{
+ "data": {
+  "currentPage": 1,
+  "evaViewList": [
+   {
+    "aigc": false,
+    "anonymous": true,
+    "buyerAddFbDays": 0,
+    "buyerCountry": "US",
+    "buyerEval": 80,
+    "buyerFbType": {
+     "crowdSourcingPersonName": "AliExpress Shopper",
+     "sourceLang": "en",
+     "typeTranslationAccepted": "crowdsourcing"
+    },
+    "buyerFeedback": "Great for the price. if there is nothing playing, you can hear a very light buzzing sound, my daughter said it was loud on her iPhone but connected to android I could barely hear it. sound quality is good, volume is loud enough without getting to the point of hurting your ear. touch sensitivity is a little much will pause music or activate voice commands when youre just trying to adjust them but overall great for the price",
+    "buyerName": "AliExpress Shopper",
+    "buyerProductFeedBack": "",
+    "buyerTranslationFeedback": "Great for the price. If there is nothing playing, you can hear a very light buzzing sound, my daughter said it was loud on her iphone but connected to android i could barely hear it. Sound quality is good, volume is loud enough without getting to the point of hurting your ear. Touch sensitivity is a little much will pause music or activate voice commands when youre just trying to adjust them but overall great for the price",
+    "downVoteCount": 0,
+    "evalDate": "02 Mar 2026",
+    "evaluationId": 60095705938744260,
+    "evaluationIdStr": "60095705938744253",
+    "independentSite": false,
+    "logistics": "AliExpress Selection Standard Shipping",
+    "reviewLabel1": "Quality of sound",
+    "reviewLabel2": "Durability",
+    "reviewLabel3": "User Friendly ",
+    "reviewLabelValue1": "Fits ok ",
+    "reviewLabelValue2": "Fast",
+    "reviewLabelValue3": "Good",
+    "reviewType": "REVIEW",
+    "samePurchaseSuggestion": "Buy the same",
+    "selectedReview": false,
+    "skuInfo": "Color:LP40 white ",
+    "status": "1",
+    "thirdParty": false,
+    "trendyol": false,
+    "upVoteCount": 0
+   },
+   {
+    "aigc": false,
+    "anonymous": true,
+    "buyerAddFbDays": 0,
+    "buyerCountry": "US",
+    "buyerEval": 100,
+    "buyerFbType": {
+     "crowdSourcingPersonName": "AliExpress Shopper",
+     "sourceLang": "en",
+     "typeTranslationAccepted": "crowdsourcing"
+    },
+    "buyerFeedback": "it exceeded my expectations . quality is decent . it was easy to connect  to devices . the case is smaller than expected  but  overall   it is a great buy.",
+    "buyerName": "AliExpress Shopper",
+    "buyerProductFeedBack": "",
+    "buyerTranslationFeedback": "It exceeded my expectations . quality is decent . it was easy to connect  to devices . the case is smaller than expected  but  overall   it is a great buy.",
+    "downVoteCount": 0,
+    "evalDate": "13 Jun 2026",
+    "evaluationId": 60097241752126020,
+    "evaluationIdStr": "60097241752126014",
+    "independentSite": false,
+    "logistics": "AliExpress Selection Standard Shipping",
+    "reviewLabel1": "Quality of sound",
+    "reviewLabel2": "Durability",
+    "reviewLabel3": "User Friendly ",
+    "reviewLabelValue1": "Fits ok ",
+    "reviewLabelValue2": "Fits ok ",
+    "reviewLabelValue3": "Good",
+    "reviewType": "REVIEW",
+    "samePurchaseSuggestion": "Buy the same",
+    "selectedReview": false,
+    "skuInfo": "Color:LP40 white ",
+    "status": "1",
+    "thirdParty": false,
+    "trendyol": false,
+    "upVoteCount": 0
+   },
+   {
+    "aigc": false,
+    "anonymous": true,
+    "buyerAddFbDays": 0,
+    "buyerCountry": "US",
+    "buyerEval": 100,
+    "buyerFbType": {
+     "crowdSourcingPersonName": "AliExpress Shopper",
+     "sourceLang": "en",
+     "typeTranslationAccepted": "crowdsourcing"
+    },
+    "buyerFeedback": "Fast delivery! Package came within estimate delivery. The headphones came in perfect condition, and the sound and connection is very nice. Worth the money! Would definitely recommend it.",
+    "buyerName": "AliExpress Shopper",
+    "buyerProductFeedBack": "",
+    "buyerTranslationFeedback": "Fast delivery! Package came within estimate delivery. The headphones came in perfect condition, and the sound and connection is very nice. Worth the money! Would definitely recommend it.",
+    "downVoteCount": 0,
+    "evalDate": "29 Nov 2025",
+    "evaluationId": 60094105248269976,
+    "evaluationIdStr": "60094105248269979",
+    "images": [
+     "https://ae-pic-a1.aliexpress-media.com/kf/Ab1b4386f35a14c28b499f08897b6fea0y.jpg",
+     "https://ae-pic-a1.aliexpress-media.com/kf/Abf49f996bde0488d9828839d6317efd0P.jpg"
+    ],
+    "independentSite": false,
+    "logistics": "Aliexpress Selection Standard",
+    "reviewLabel1": "Quality of sound",
+    "reviewLabel2": "Durability",
+    "reviewLabel3": "User Friendly ",
+    "reviewLabelValue1": "Fast",
+    "reviewLabelValue2": "Fast",
+    "reviewLabelValue3": "Good",
+    "reviewType": "REVIEW",
+    "samePurchaseSuggestion": "Buy the same",
+    "selectedIcon": "https://ae-pic-a1.aliexpress-media.com/kf/S2df5f3fa0d8242b1a0bbb1cc92cab109P/221x221.png",
+    "selectedReview": true,
+    "skuInfo": "Color:LP40 white ",
+    "status": "1",
+    "thirdParty": false,
+    "thumbnails": [
+     "https://ae-pic-a1.aliexpress-media.com/kf/Ab1b4386f35a14c28b499f08897b6fea0y.jpg_220x220.jpg",
+     "https://ae-pic-a1.aliexpress-media.com/kf/Abf49f996bde0488d9828839d6317efd0P.jpg_220x220.jpg"
+    ],
+    "trendyol": false,
+    "upVoteCount": 0
+   }
+  ],
+  "explanatoryCopy": "The reviews displayed are from various sellers for similar product in AliExpress.",
+  "filterInfo": {
+   "currentFilter": "all",
+   "filterStatistic": [
+    {
+     "filterCode": "additional",
+     "filterCount": 47
+    },
+    {
+     "filterCode": "local",
+     "filterCount": 70
+    },
+    {
+     "filterCode": "with_personal",
+     "filterCount": 0
+    },
+    {
+     "filterCode": "image",
+     "filterCount": 354
+    },
+    {
+     "filterCode": "all",
+     "filterCount": 1186
+    }
+   ]
+  },
+  "impressionDTOList": [
+   {
+    "content": "good sound",
+    "emotion": 1,
+    "id": "17973870",
+    "num": 80,
+    "productId": 3256806852323474,
+    "type": "impression"
+   },
+   {
+    "content": "satisfactory",
+    "emotion": 1,
+    "id": "10571480",
+    "num": 80,
+    "productId": 3256806852323474,
+    "type": "impression"
+   },
+   {
+    "content": "fast delivery",
+    "emotion": 1,
+    "id": "17973896",
+    "num": 65,
+    "productId": 3256806852323474,
+    "type": "impression"
+   },
+   {
+    "content": "good value for price",
+    "emotion": 1,
+    "id": "17973871",
+    "num": 60,
+    "productId": 3256806852323474,
+    "type": "impression"
+   },
+   {
+    "content": "excellent",
+    "emotion": 1,
+    "id": "17973951",
+    "num": 49,
+    "productId": 3256806852323474,
+    "type": "impression"
+   },
+   {
+    "content": "good sound quality",
+    "emotion": 1,
+    "id": "10571485",
+    "num": 39,
+    "productId": 3256806852323474,
+    "type": "impression"
+   }
+  ],
+  "pageSize": 20,
+  "productEvaluationStatistic": {
+   "evarageStar": 4.9,
+   "evarageStarRage": 98,
+   "fiveStarNum": 5225,
+   "fiveStarRate": 76.7,
+   "fourStarNum": 1032,
+   "fourStarRate": 15.1,
+   "negativeNum": 0,
+   "negativeRate": 0,
+   "neutralNum": 557,
+   "neutralRate": 8.2,
+   "oneStarNum": 0,
+   "oneStarRate": 0,
+   "positiveNum": 6257,
+   "positiveRate": 91.8,
+   "threeStarNum": 557,
+   "threeStarRate": 8.2,
+   "totalNum": 1186,
+   "twoStarNum": 0,
+   "twoStarRate": 0
+  },
+  "productType": "HYPERCHAIN",
+  "reviewStructuredLabelDTOList": [],
+  "totalNum": 1186,
+  "totalPage": 60,
+  "version": "0.0.0"
+ },
+ "helpful": {
+  "50212395791565126": {
+   "showButton": "yes",
+   "useful": 3,
+   "useless": 0
+  },
+  "60097241752126014": {
+   "showButton": "yes",
+   "useful": 0,
+   "useless": 0
+  },
+  "60096053647678628": {
+   "showButton": "yes",
+   "useful": 2,
+   "useless": 0
+  },
+  "60091944166919234": {
+   "showButton": "yes",
+   "useful": 2,
+   "useless": 0
+  },
+  "60094255444990727": {
+   "showButton": "yes",
+   "useful": 3,
+   "useless": 0
+  },
+  "60097265638807328": {
+   "showButton": "yes",
+   "useful": 0,
+   "useless": 0
+  },
+  "30102648558906568": {
+   "showButton": "yes",
+   "useful": 0,
+   "useless": 0
+  },
+  "60096216908700587": {
+   "showButton": "yes",
+   "useful": 0,
+   "useless": 0
+  },
+  "60095997169631254": {
+   "showButton": "yes",
+   "useful": 0,
+   "useless": 0
+  },
+  "60094105248269979": {
+   "showButton": "yes",
+   "useful": 1,
+   "useless": 0
+  },
+  "60095500077606022": {
+   "showButton": "yes",
+   "useful": 3,
+   "useless": 0
+  },
+  "60093881073568130": {
+   "showButton": "yes",
+   "useful": 1,
+   "useless": 0
+  },
+  "60093088174041766": {
+   "showButton": "yes",
+   "useful": 0,
+   "useless": 0
+  },
+  "60095705938744253": {
+   "showButton": "yes",
+   "useful": 2,
+   "useless": 0
+  },
+  "60095615271196594": {
+   "showButton": "yes",
+   "useful": 3,
+   "useless": 0
+  },
+  "60095696217041064": {
+   "showButton": "yes",
+   "useful": 0,
+   "useless": 0
+  },
+  "60093868666811488": {
+   "showButton": "yes",
+   "useful": 1,
+   "useless": 0
+  },
+  "60096135532875640": {
+   "showButton": "yes",
+   "useful": 0,
+   "useless": 0
+  },
+  "60097215236442624": {
+   "showButton": "yes",
+   "useful": 0,
+   "useless": 0
+  },
+  "60095840291197882": {
+   "showButton": "yes",
+   "useful": 1,
+   "useless": 0
+  }
+ }
+}
