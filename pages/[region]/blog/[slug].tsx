@@ -6,51 +6,95 @@ import ShareBar from '../../../components/ShareBar';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getBlogPost, isBlogPostInRegion } from '../../../lib/blog';
 import { blogPostingJsonLd, breadcrumbJsonLd, faqJsonLd, SITE_URL } from '../../../lib/seo';
+import ProductCard, { ProductCardProduct } from '../../../components/ProductCard';
+import { searchAliExpress } from '../../../lib/aliexpress';
+import { filterQuality } from '../../../lib/quality';
+import { getReviewCounts } from '../../../lib/review-store';
+import { cacheIfNotEmpty } from '../../../lib/cache';
+
+interface PickProduct extends ProductCardProduct {
+  pickName: string;
+}
 
 /**
- * The one route from a guide to something buyable.
+ * The picks from a guide, as products.
  *
- * This used to link `/compare/<slugified keyword>`, but /compare/[slug] only
- * resolves the 15 curated comparison slugs — "adjustable dumbbells set" is a
- * search phrase, not one of them, so every link in every post 404'd. Search
- * takes the keyword directly and returns live listings with affiliate links.
+ * This section used to be a row of text chips linking to a search page: the
+ * guide named "adjustable dumbbells set", and the reader got a link, a click,
+ * a search results page, and only then something to look at. Buying guides are
+ * the bottom of the funnel — the products belong in the guide.
+ *
+ * Each pick is resolved to a real listing at render time, quality-gated the
+ * same way every other surface is (lib/quality.ts). A pick that resolves to
+ * nothing falls back to its old chip rather than disappearing from the guide.
  */
 function ShopThePicks({
   region,
   rtl,
+  lang,
+  currencySymbol,
+  products,
   items,
 }: {
   region: string;
   rtl: boolean;
+  lang: string;
+  currencySymbol: string;
+  products?: PickProduct[];
   items?: Array<{ name: string; keyword: string }>;
 }) {
   if (!items?.length) return null;
+  const resolved = products || [];
+  const unresolved = items.filter((it) => !resolved.some((p) => p.pickName === it.name));
+
   return (
     <div className="mt-6 p-4 sm:p-5 rounded-xl border border-orange-100 bg-orange-50/50">
       <h3 className="text-sm font-semibold mb-1" style={{ color: 'var(--shopli-navy)' }}>
-        {rtl ? 'לראות את הפריטים מהמדריך' : 'See the picks from this guide'}
+        {rtl ? 'הפריטים מהמדריך' : 'The picks from this guide'}
       </h3>
-      <p className="text-xs mb-3" style={{ color: 'var(--shopli-warm-gray)' }}>
-        {rtl ? 'מחירים חיים מאליאקספרס — נפתח בחיפוש באתר.' : 'Live AliExpress prices — opens a search on Shopli.'}
+      <p className="text-xs mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
+        {rtl ? 'מחירים חיים מאליאקספרס, אחרי סינון איכות.' : 'Live AliExpress prices, quality-filtered.'}
       </p>
-      <div className="flex flex-wrap gap-2">
-        {items.map((rp) => (
-          <a
-            key={rp.keyword}
-            href={`/${region}/search?q=${encodeURIComponent(rp.keyword)}`}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-white border border-orange-200 hover:border-orange-400 hover:shadow-sm transition-all"
-            style={{ color: 'var(--shopli-orange)' }}
-          >
-            {rp.name}
-            <span aria-hidden="true">{rtl ? '←' : '→'}</span>
-          </a>
-        ))}
-      </div>
+
+      {resolved.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {resolved.map((product) => (
+            <div key={product.id}>
+              <div className="text-xs font-semibold mb-1.5 truncate" style={{ color: 'var(--shopli-orange)' }}>
+                {product.pickName}
+              </div>
+              <ProductCard
+                product={product}
+                currencySymbol={currencySymbol}
+                rtl={rtl}
+                locale={lang}
+                region={region}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {unresolved.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-3">
+          {unresolved.map((rp) => (
+            <a
+              key={rp.keyword}
+              href={`/${region}/search?q=${encodeURIComponent(rp.keyword)}`}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-white border border-orange-200 hover:border-orange-400 hover:shadow-sm transition-all"
+              style={{ color: 'var(--shopli-orange)' }}
+            >
+              {rp.name}
+              <span aria-hidden="true">{rtl ? '←' : '→'}</span>
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-export default function BlogPostPage({ region, config, post, rtl, regionOnly, error }: any) {
+export default function BlogPostPage({ region, config, post, rtl, regionOnly, pickProducts, error }: any) {
   if (error) {
     return <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>Error: {error}</div>;
   }
@@ -140,7 +184,16 @@ export default function BlogPostPage({ region, config, post, rtl, regionOnly, er
                     {t(section.body)}
                   </p>
 
-                  {i === 0 && <ShopThePicks region={region} rtl={rtl} items={p.relatedProducts} />}
+                  {i === 0 && (
+                    <ShopThePicks
+                      region={region}
+                      rtl={rtl}
+                      lang={lang}
+                      currencySymbol={config?.currencySymbol || ''}
+                      products={pickProducts}
+                      items={p.relatedProducts}
+                    />
+                  )}
                 </div>
               </section>
             ))}
@@ -167,7 +220,14 @@ export default function BlogPostPage({ region, config, post, rtl, regionOnly, er
             {/* Readers who reach the end of a buying guide are the ones ready
                 to buy, so repeat the route out rather than ending on the FAQ. */}
             <section className="pt-4">
-              <ShopThePicks region={region} rtl={rtl} items={p.relatedProducts} />
+              <ShopThePicks
+                region={region}
+                rtl={rtl}
+                lang={lang}
+                currencySymbol={config?.currencySymbol || ''}
+                products={pickProducts}
+                items={p.relatedProducts}
+              />
             </section>
           </div>
         </article>
@@ -191,12 +251,51 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
   const post = getBlogPost(slug);
   if (!post) return { notFound: true };
 
-  // Editorial content only — it changes when we deploy, not per request.
-  res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
+  // Resolve each pick to a real listing. Bounded to six: these are six
+  // independent AliExpress searches, and lib/aliexpress caps real concurrency,
+  // so this cannot stampede the rate limiter.
+  const picks = (post.relatedProducts || []).slice(0, 6);
+  const found = await Promise.all(
+    picks.map(async (pick: { name: string; keyword: string }) => {
+      const products = await searchAliExpress(pick.keyword, region, 6).catch(() => []);
+      const best = filterQuality(products)[0];
+      return best ? { pick, best } : null;
+    })
+  );
+
+  const resolved = found.filter(Boolean) as Array<{ pick: { name: string }; best: any }>;
+  // One query for real rating counts, for the products whose reviews we already
+  // hold. Cards show nothing rather than a zero for the rest.
+  const counts = await getReviewCounts(region, resolved.map((r) => r.best.id)).catch(() => ({}));
+
+  const pickProducts = resolved.map(({ pick, best }) => ({
+    id: best.id,
+    title: best.title,
+    price: best.price,
+    originalPrice: best.originalPrice ?? null,
+    imageUrl: best.imageUrl || '',
+    affiliateLink: best.affiliateLink || '',
+    rating: best.rating,
+    // null, not undefined: Next refuses to serialize undefined props.
+    reviewCount: counts[best.id]?.ratingCount ?? null,
+    volume: best.volume,
+    discount: best.discount,
+    freeShipping: best.freeShipping,
+    shopName: best.shopName,
+    pickName: pick.name,
+  }));
+
+  // Editorial content is stable, but these are live listings — and an empty
+  // result must not be frozen at the CDN for a day (lib/cache.ts).
+  cacheIfNotEmpty(
+    res,
+    pickProducts.length > 0 || picks.length === 0,
+    'public, s-maxage=3600, stale-while-revalidate=86400'
+  );
 
   return {
     // regionOnly suppresses hreflang: the alternates would point at the eight
     // locales where this post 404s.
-    props: { region, config, post, rtl, regionOnly: !!post.regions },
+    props: { region, config, post, rtl, regionOnly: !!post.regions, pickProducts },
   };
 };

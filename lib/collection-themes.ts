@@ -29,7 +29,7 @@ export interface Theme {
 export const THEMES: Theme[] = [
   {
     key: 'skin-body',
-    icon: 'sparkles',
+    icon: 'sun',
     name: { en: 'Skin & Body', he: 'עור וגוף', fr: 'Peau & Corps', de: 'Haut & Körper', es: 'Piel y Cuerpo', it: 'Pelle e Corpo' },
     slugs: [
       'skincare-routine', 'korean-skincare', 'anti-aging', 'acne-care', 'facial-tools',
@@ -40,7 +40,7 @@ export const THEMES: Theme[] = [
   },
   {
     key: 'makeup-nails',
-    icon: 'sparkles',
+    icon: 'heart',
     name: { en: 'Makeup & Nails', he: 'איפור וציפורניים', fr: 'Maquillage & Ongles', de: 'Make-up & Nägel', es: 'Maquillaje y Uñas', it: 'Trucco e Unghie' },
     slugs: [
       'makeup-essentials', 'makeup-brushes', 'eye-makeup', 'lip-care', 'false-lashes',
@@ -50,7 +50,7 @@ export const THEMES: Theme[] = [
   },
   {
     key: 'hair-grooming',
-    icon: 'scissors',
+    icon: 'fashion',
     name: { en: 'Hair & Grooming', he: 'שיער וטיפוח', fr: 'Cheveux & Soins', de: 'Haare & Pflege', es: 'Cabello y Cuidado', it: 'Capelli e Cura' },
     slugs: [
       'hair-styling', 'hair-growth', 'curly-hair', 'hair-accessories', 'hair-coloring',
@@ -60,7 +60,7 @@ export const THEMES: Theme[] = [
   },
   {
     key: 'fragrance',
-    icon: 'flower',
+    icon: 'moon',
     name: { en: 'Fragrance & Wellness', he: 'ניחוחות ורוגע', fr: 'Parfums & Bien-être', de: 'Duft & Wohlbefinden', es: 'Fragancia y Bienestar', it: 'Profumi e Benessere' },
     slugs: ['perfume-fragrance', 'fragrance-oils', 'aromatherapy', 'essential-oils', 'desk-wellness'],
   },
@@ -94,7 +94,9 @@ export const THEMES: Theme[] = [
 ];
 
 export interface ThemeGroup extends Theme {
-  collections: Array<{ slug: string; name: string; icon?: string }>;
+  // icon is `string | null`, never undefined: these groups are passed straight
+  // through getServerSideProps, and Next refuses to serialize undefined.
+  collections: Array<{ slug: string; name: string; icon: string | null }>;
 }
 
 const collectionName = (c: CollectionDef, lang: string) =>
@@ -107,7 +109,7 @@ export function getThemeGroups(lang = 'en'): ThemeGroup[] {
     collections: t.slugs
       .map((slug) => COLLECTIONS.find((c) => c.slug === slug))
       .filter((c): c is CollectionDef => Boolean(c))
-      .map((c) => ({ slug: c.slug, name: collectionName(c, lang), icon: c.icon })),
+      .map((c) => ({ slug: c.slug, name: collectionName(c, lang), icon: c.icon ?? null })),
   })).filter((t) => t.collections.length > 0);
 }
 

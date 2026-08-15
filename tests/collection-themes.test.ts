@@ -39,3 +39,15 @@ test('a collection can name its theme', () => {
   assert.equal(themeForCollection('gel-nails')?.key, 'makeup-nails');
   assert.equal(themeForCollection('not-a-collection'), undefined);
 });
+
+test('groups survive getServerSideProps serialization', () => {
+  // Next refuses to serialize `undefined`, and CollectionDef.icon is optional —
+  // which 500'd every homepage and the hub until icon defaulted to null.
+  const groups = getThemeGroups('en');
+  const seen: string[] = [];
+  JSON.stringify(groups, (k, v) => {
+    if (v === undefined) seen.push(k);
+    return v;
+  });
+  assert.deepEqual(seen, []);
+});
