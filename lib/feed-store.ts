@@ -29,6 +29,15 @@ function db() {
 }
 
 let ensured = false;
+/**
+ * Exported because lib/picks.ts reads this table with its own connection and
+ * needs the `rating` column to exist. Schema stays owned here rather than being
+ * duplicated at the reader.
+ */
+export async function ensureFeedProductsTable(sql: any): Promise<boolean> {
+  return ensureTable(sql);
+}
+
 async function ensureTable(sql: any): Promise<boolean> {
   if (ensured) return true;
   try {
@@ -47,6 +56,10 @@ async function ensureTable(sql: any): Promise<boolean> {
         updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
         PRIMARY KEY (product_id, region)
       )`;
+    // Added after the table shipped, so it is a separate statement rather than a
+    // column in the CREATE. lib/picks.ts quality-gates on it; existing rows keep
+    // 0, which reads as "unknown" and passes the gate rather than being culled.
+    await sql`ALTER TABLE feed_products ADD COLUMN IF NOT EXISTS rating NUMERIC(5,2) NOT NULL DEFAULT 0`;
     ensured = true;
     return true;
   } catch {
@@ -69,8 +82,8 @@ export async function recordFeedProducts(region: string, items: GmcFeedItem[]): 
 
   try {
     await sql`
-      INSERT INTO feed_products (product_id, region, title, price, currency, image_url, brand, product_type, google_category, volume)
-      SELECT id, ${region}, t, pr, cur, img, br, pt, gc, vol
+      INSERT INTO feed_products (product_id, region, title, price, currency, image_url, brand, product_type, google_category, volume, rating)
+      SELECT id, ${region}, t, pr, cur, img, br, pt, gc, vol, rt
       FROM UNNEST(
         ${rows.map((p) => p.id)}::text[],
         ${rows.map((p) => p.title.slice(0, 500))}::text[],
@@ -80,8 +93,9 @@ export async function recordFeedProducts(region: string, items: GmcFeedItem[]): 
         ${rows.map((p) => (p.brand || '').slice(0, 200))}::text[],
         ${rows.map((p) => (p.productType || '').slice(0, 200))}::text[],
         ${rows.map((p) => p.googleCategory || '')}::text[],
-        ${rows.map((p) => String(p.volume ?? 0))}::bigint[]
-      ) AS t(id, t, pr, cur, img, br, pt, gc, vol)
+        ${rows.map((p) => String(p.volume ?? 0))}::bigint[],
+        ${rows.map((p) => String(p.rating ?? 0))}::numeric[]
+      ) AS t(id, t, pr, cur, img, br, pt, gc, vol, rt)
       ON CONFLICT (product_id, region)
       DO UPDATE SET
         title           = EXCLUDED.title,
@@ -92,6 +106,7 @@ export async function recordFeedProducts(region: string, items: GmcFeedItem[]): 
         product_type    = EXCLUDED.product_type,
         google_category = EXCLUDED.google_category,
         volume          = EXCLUDED.volume,
+        rating          = EXCLUDED.rating,
         updated_at      = now()`;
     return rows.length;
   } catch {

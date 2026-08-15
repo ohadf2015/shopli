@@ -29,6 +29,12 @@ export interface GmcFeedItem {
   googleCategory: string;
   /** Lifetime units sold — used only to order the feed, best sellers first. */
   volume?: number;
+  /**
+   * AliExpress positive-feedback percentage, 0-100. Not part of the GMC feed —
+   * it rides along so the daily sweep persists it, which is what lets
+   * lib/picks.ts quality-gate its picks without a live API call.
+   */
+  rating?: number;
 }
 
 // Google product category mapping for our collection categories

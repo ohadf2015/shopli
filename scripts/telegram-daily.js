@@ -1,144 +1,117 @@
 #!/usr/bin/env node
 /**
- * Daily Telegram batch post for Shopli
- * Posts 2-3 curated collections per day with rotation
+ * Daily Telegram post for Shopli.
+ *
+ * This script used to be a second, drifting copy of the site: 13 hardcoded
+ * collections (the site has 78), a fixed weekday rotation that said "Tuesday
+ * means balcony-garden" no matter what was actually selling, and links that
+ * went straight to AliExpress — so the channel sent its audience past the
+ * product pages, the reviews and the site entirely.
+ *
+ * Now it reads /api/products/picks, the same endpoint the site's own rails use.
+ * The picks come from our own daily price and order-count snapshots
+ * (lib/picks.ts), so a product is in the post because it is selling unusually
+ * fast or is genuinely below its own median price — never because of what day
+ * of the week it is. Every link goes to the Shopli product page.
+ *
  * Usage: node scripts/telegram-daily.js [region] [count]
  */
 
-require('dotenv').config({ path: '.env.local' });
-
-const SHOPLI_BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://shopli-neon.vercel.app';
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID;
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL || 'https://tryshopli.com').replace(/\/$/, '');
 
-if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHANNEL_ID) {
-  console.error('❌ Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHANNEL_ID in env');
-  process.exit(1);
-}
-
-// Import collections from lib (using dynamic require for TS files)
-// For now, inline the collection list
-const COLLECTIONS = {
-  'home-gym': { name: { en: 'Home Gym Essentials', he: 'ציוד חדר כושר ביתי' }, keywords: ['adjustable dumbbells', 'resistance bands', 'pull up bar', 'yoga mat', 'kettlebell'] },
-  'coffee-ritual': { name: { en: 'Coffee Ritual', he: 'טקס קפה' }, keywords: ['burr grinder', 'french press', 'gooseneck kettle', 'coffee scale', 'pour over dripper'] },
-  'content-creator': { name: { en: 'Content Creator Kit', he: 'ערכת יוצר תוכן' }, keywords: ['ring light', 'usb microphone', 'phone tripod', 'capture card', 'stream deck'] },
-  'balcony-garden': { name: { en: 'Balcony Garden', he: 'גינת מרפסת' }, keywords: ['plant pots', 'vertical planter', 'solar lights', 'watering can', 'grow bags'] },
-  'sleep-sanctuary': { name: { en: 'Sleep Sanctuary', he: 'מקדש שינה' }, keywords: ['weighted blanket', 'silk pillowcase', 'white noise machine', 'blackout curtains', 'aroma diffuser'] },
-  'home-office': { name: { en: 'Home Office Setup', he: 'משרד ביתי' }, keywords: ['monitor arm', 'mechanical keyboard', 'ergonomic chair', 'desk lamp', 'cable organizer'] },
-  'smart-home': { name: { en: 'Smart Home', he: 'בית חכם' }, keywords: ['smart plug', 'motion sensor', 'smart bulb', 'video doorbell', 'smart lock'] },
-  'kitchen-gadgets': { name: { en: 'Pro Kitchen Tools', he: 'כלי מטבח מקצועיים' }, keywords: ['mandoline', 'instant read thermometer', 'silicone mat', 'kitchen shears', 'fish spatula'] },
-  'travel-gear': { name: { en: 'Travel Essentials', he: 'ציוד נסיעות' }, keywords: ['packing cubes', 'travel adapter', 'power bank', 'luggage scale', 'neck pillow'] },
-  'camping': { name: { en: 'Camping Gear', he: 'ציוד קמפינג' }, keywords: ['portable stove', 'camping lantern', 'sleeping bag', 'camp chair', 'cooler box'] },
-  'pet-essentials': { name: { en: 'Pet Essentials', he: 'מוצרים לחיות מחמד' }, keywords: ['pet bed', 'slow feeder', 'water fountain', 'grooming brush', 'nail grinder'] },
-  'car-accessories': { name: { en: 'Car Accessories', he: 'אביזרים לרכב' }, keywords: ['phone mount', 'dash cam', 'seat organizer', 'trash can', 'charger adapter'] },
-  'lighting': { name: { en: 'Lighting', he: 'תאורה' }, keywords: ['led strip', 'floor lamp', 'desk lamp', 'smart bulb', 'night light'] },
+const LANG = {
+  il: 'he', ru: 'ru', us: 'en', uk: 'en', eu: 'en', fr: 'fr', de: 'de', es: 'es', it: 'it',
+};
+const FLAG = {
+  il: '🇮🇱', ru: '🇮🇱', us: '🇺🇸', uk: '🇬🇧', eu: '🇪🇺', fr: '🇫🇷', de: '🇩🇪', es: '🇪🇸', it: '🇮🇹',
 };
 
-const REGIONS = {
-  il: { currency: 'ILS', symbol: '₪', lang: 'he', flag: '🇮🇱' },
-  eu: { currency: 'EUR', symbol: '€', lang: 'en', flag: '🇪🇺' },
-  us: { currency: 'USD', symbol: '$', lang: 'en', flag: '🇺🇸' },
-  uk: { currency: 'GBP', symbol: '£', lang: 'en', flag: '🇬🇧' },
-  fr: { currency: 'EUR', symbol: '€', lang: 'fr', flag: '🇫🇷' },
-  de: { currency: 'EUR', symbol: '€', lang: 'de', flag: '🇩🇪' },
-  es: { currency: 'EUR', symbol: '€', lang: 'es', flag: '🇪🇸' },
-  it: { currency: 'EUR', symbol: '€', lang: 'it', flag: '🇮🇹' },
+const COPY = {
+  he: {
+    header: 'מה זז היום בשופלי',
+    surging: 'מזנק',
+    price_drop: 'ירידת מחיר אמיתית',
+    bestseller: 'רב מכר',
+    perDay: (n) => `${n} נמכרו היום`,
+    surge: (x) => `פי ${x} מהקצב הרגיל שלו`,
+    drop: (p, d) => `${p}% מתחת למחיר החציוני שלו ב-${d} הימים האחרונים`,
+    rating: (r) => `${r}% משוב חיובי`,
+    footer: 'כל המוצרים נבדקו מול דירוג המוכר וכמות ההזמנות — מה שלא עובר, לא נכנס.',
+  },
+  en: {
+    header: "What's actually moving on Shopli",
+    surging: 'Surging',
+    price_drop: 'Real price drop',
+    bestseller: 'Best seller',
+    perDay: (n) => `${n} sold today`,
+    surge: (x) => `${x}x its usual rate`,
+    drop: (p, d) => `${p}% below its own median price over ${d} days`,
+    rating: (r) => `${r}% positive feedback`,
+    footer: 'Every pick is checked against seller rating and order count — what fails is not shown.',
+  },
 };
+const copy = (lang) => COPY[lang] || COPY.en;
 
-// Rotating schedule: each day picks different collections
-const DAILY_ROTATION = {
-  0: ['home-gym', 'coffee-ritual', 'sleep-sanctuary'], // Sunday
-  1: ['content-creator', 'home-office', 'smart-home'], // Monday
-  2: ['balcony-garden', 'kitchen-gadgets', 'lighting'], // Tuesday
-  3: ['travel-gear', 'camping', 'car-accessories'], // Wednesday
-  4: ['pet-essentials', 'home-gym', 'coffee-ritual'], // Thursday
-  5: ['content-creator', 'balcony-garden', 'sleep-sanctuary'], // Friday
-  6: ['home-office', 'kitchen-gadgets', 'travel-gear'], // Saturday
-};
+const ICON = { surging: '🚀', price_drop: '💸', bestseller: '🏆' };
 
-async function searchProducts(keyword, region, limit = 3) {
-  try {
-    const url = `${SHOPLI_BASE_URL}/api/products/search?q=${encodeURIComponent(keyword)}&region=${region}&limit=${limit}`;
-    const response = await fetch(url);
-    if (!response.ok) return [];
-    const data = await response.json();
-    return data.products || [];
-  } catch (e) {
-    console.error(`Search failed for ${keyword}:`, e.message);
-    return [];
-  }
-}
-
-function formatPrice(price, region) {
-  const r = REGIONS[region];
-  if (!r) return price;
-  return `${r.symbol}${price.toLocaleString(r.lang === 'he' ? 'he-IL' : 'en-US', { minimumFractionDigits: 2 })}`;
+/** AliExpress titles are keyword soup; cut at a word so the post stays readable. */
+function shortTitle(title, max = 70) {
+  const t = String(title).trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max);
+  const space = cut.lastIndexOf(' ');
+  return (space > max * 0.6 ? cut.slice(0, space) : cut).trim() + '…';
 }
 
 function escapeMarkdown(text) {
   return String(text).replace(/[_*[\]()~`>#+=|{}.!-]/g, '\\$&');
 }
 
-async function generatePost(collectionSlug, region) {
-  const collection = COLLECTIONS[collectionSlug];
-  const r = REGIONS[region];
-  
-  if (!collection || !r) {
-    throw new Error(`Unknown collection ${collectionSlug} or region ${region}`);
-  }
+async function fetchPicks(region, limit) {
+  const url = `${SITE}/api/products/picks?region=${region}&limit=${limit}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`picks endpoint ${res.status}`);
+  const data = await res.json();
+  if (!data.success) throw new Error(data.error || 'picks endpoint failed');
+  return data;
+}
 
-  const name = collection.name[r.lang] || collection.name.en;
-  const keyword = collection.keywords[0];
-  
-  const products = await searchProducts(keyword, region, 4);
-  
-  if (products.length === 0) {
-    throw new Error(`No products found for ${keyword} in ${region}`);
-  }
+/**
+ * One post. The reason a product is here is stated in the post, with the number
+ * behind it — that is the whole point of computing it rather than rotating a
+ * list, and it is what makes the channel worth subscribing to.
+ */
+function buildMessage(region, data, count) {
+  const lang = LANG[region] || 'en';
+  const c = copy(lang);
+  const picks = data.picks.slice(0, count);
+  if (!picks.length) return null;
 
-  const lang = r.lang;
-  const isHebrew = lang === 'he';
-  
-  let message = '';
-  
-  if (isHebrew) {
-    message += `🛍 *${escapeMarkdown(name)}* — ${r.flag} שופלי\n\n`;
-    message += `מצאנו לכם את המוצרים הכי טובים ב‑AliExpress:\n\n`;
-  } else {
-    message += `🛍 *${escapeMarkdown(name)}* — ${r.flag} Shopli\n\n`;
-    message += `We found the best AliExpress picks for you:\n\n`;
-  }
+  const sym = data.currencySymbol || '';
+  let msg = `${FLAG[region] || '🛍'} *${escapeMarkdown(c.header)}*\n\n`;
 
-  for (let i = 0; i < Math.min(products.length, 4); i++) {
-    const p = products[i];
-    const price = formatPrice(p.salePrice || p.originalPrice || 0, region);
-    const origPrice = p.originalPrice && p.originalPrice > p.salePrice 
-      ? formatPrice(p.originalPrice, region) 
-      : null;
-    const discount = p.discount && p.discount > 0 ? ` −${p.discount}%` : '';
-    const rating = p.rating ? ` ⭐ ${p.rating.toFixed(1)}` : '';
-    const sold = p.volume ? ` 📦 ${(p.volume/1000).toFixed(1)}k sold` : '';
-    
-    const title = escapeMarkdown(p.title || 'Product');
-    const link = p.promotionLink || p.productDetailUrl || `${SHOPLI_BASE_URL}/${region}`;
-    
-    message += `*${i+1}. ${title}*${discount}${rating}${sold}\n`;
-    message += `💰 ${price}${origPrice ? ` ~~${origPrice}~~` : ''}\n`;
-    message += `[${isHebrew ? 'לרכישה' : 'Buy'}](${link})\n\n`;
-  }
+  picks.forEach((p, i) => {
+    const facts = [];
+    if (p.reason === 'surging') {
+      facts.push(c.perDay(Math.round(p.recentPerDay)));
+      facts.push(c.surge(p.surge.toFixed(1)));
+    } else if (p.reason === 'price_drop') {
+      facts.push(c.drop(p.dropPct, p.spanDays));
+    } else {
+      facts.push(c.perDay(Math.round(p.perDay)));
+    }
+    if (p.rating > 0) facts.push(c.rating(Math.round(p.rating)));
 
-  const collectionUrl = `${SHOPLI_BASE_URL}/${region}/collection/${collectionSlug}`;
-  if (isHebrew) {
-    message += `👉 *${escapeMarkdown('לכל הקולקציה')}*\n`;
-    message += `${collectionUrl}\n\n`;
-    message += `#Shopli #${escapeMarkdown(name)} #AliExpress`;
-  } else {
-    message += `👉 *${escapeMarkdown('Full Collection')}*\n`;
-    message += `${collectionUrl}\n\n`;
-    message += `#Shopli #${escapeMarkdown(name)} #AliExpress`;
-  }
+    msg += `${ICON[p.reason]} *${i + 1}\\. ${escapeMarkdown(shortTitle(p.title))}*\n`;
+    msg += `${escapeMarkdown(`${sym}${p.price.toFixed(2)}`)} · _${escapeMarkdown(c[p.reason])}_\n`;
+    msg += `${escapeMarkdown(facts.join(' · '))}\n`;
+    msg += `${p.url}\n\n`;
+  });
 
-  return message;
+  msg += `_${escapeMarkdown(c.footer)}_`;
+  return msg;
 }
 
 async function sendTelegramMessage(message) {
@@ -150,52 +123,48 @@ async function sendTelegramMessage(message) {
       chat_id: TELEGRAM_CHANNEL_ID,
       text: message,
       parse_mode: 'MarkdownV2',
+      // The first link's preview is the product page's own OG card, which the
+      // site already renders with image, title and price.
       disable_web_page_preview: false,
     }),
   });
-  
   const result = await response.json();
-  if (!result.ok) {
-    throw new Error(`Telegram API error: ${result.description}`);
-  }
+  if (!result.ok) throw new Error(`Telegram API error: ${result.description}`);
   return result;
 }
 
 async function main() {
-  const args = process.argv.slice(2);
-  const region = args[0] || 'eu';
-  const count = parseInt(args[1]) || 3;
-  
-  if (!REGIONS[region]) {
-    console.error(`❌ Unknown region: ${region}`);
+  const [region = 'il', countArg] = process.argv.slice(2);
+  const count = parseInt(countArg, 10) || 5;
+  const dryRun = process.env.DRY_RUN === '1';
+
+  if (!dryRun && (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHANNEL_ID)) {
+    console.error('❌ Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHANNEL_ID in env');
     process.exit(1);
   }
 
-  const today = new Date().getDay(); // 0 = Sunday
-  const collections = DAILY_ROTATION[today] || DAILY_ROTATION[0];
-  const selected = collections.slice(0, count);
-
-  console.log(`📅 Daily post for ${region} (${selected.length} collections)`);
-  console.log(`Collections: ${selected.join(', ')}`);
-
-  for (const slug of selected) {
-    try {
-      console.log(`📝 Generating: ${slug}...`);
-      const message = await generatePost(slug, region);
-      
-      console.log(`📤 Sending...`);
-      const result = await sendTelegramMessage(message);
-      
-      console.log(`✅ Sent: ${slug} (msg_id: ${result.result.message_id})`);
-      
-      // Rate limit: 1 msg/sec
-      await new Promise(r => setTimeout(r, 1100));
-    } catch (error) {
-      console.error(`❌ Failed ${slug}:`, error.message);
-    }
+  const data = await fetchPicks(region, Math.max(count, 12));
+  const message = buildMessage(region, data, count);
+  if (!message) {
+    // No picks means the snapshot cron has not produced two readings yet.
+    // Posting a filler roundup is what made the old channel worthless.
+    console.log(`⏭  No picks for ${region} today — nothing worth posting.`);
+    return;
   }
 
-  console.log('🎉 Daily batch complete!');
+  if (dryRun) {
+    console.log(message);
+    return;
+  }
+  const result = await sendTelegramMessage(message);
+  console.log(`✅ Sent ${data.picks.length ? count : 0} picks for ${region} (msg_id: ${result.result.message_id})`);
 }
 
-main();
+if (require.main === module) {
+  main().catch((e) => {
+    console.error('❌', e.message);
+    process.exit(1);
+  });
+}
+
+module.exports = { buildMessage, escapeMarkdown };

@@ -55,6 +55,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               productType,
               googleCategory,
               volume: p.volume,
+              // Persisted so lib/picks.ts can quality-gate without a live call.
+              rating: p.rating,
             });
           }
         }
