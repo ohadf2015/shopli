@@ -5,9 +5,11 @@ import ProductCard, { ProductCardProduct } from '../../components/ProductCard';
 import WhatsAppShare from '../../components/WhatsAppShare';
 import SeoHead from '../../components/SeoHead';
 import TrendingRail, { TrendingItem } from '../../components/TrendingRail';
+import MoversRail, { MoverItem } from '../../components/MoversRail';
 import { getRegion, isValidRegion, RegionCode } from '../../lib/regions';
 import { getFeaturedCollections } from '../../lib/collections';
 import { getThemeGroups, type ThemeGroup } from '../../lib/collection-themes';
+import { getPicks } from '../../lib/picks';
 import { breadcrumbJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
 import { buildTrending, dedupeAcrossSections } from '../../lib/trending';
 import { trendingEnabled } from '../../lib/flags';
@@ -35,6 +37,7 @@ interface HomePageProps {
   orderedSlugs: string[];
   themes: ThemeGroup[];
   trending: TrendingItem[];
+  movers: MoverItem[];
 }
 
 /**
@@ -67,7 +70,7 @@ async function fetchCollectionProducts(region: string, keywords: string[], limit
   } catch { return []; }
 }
 
-export default function HomePage({ region, config, groups, rtl, orderedSlugs, themes, trending }: HomePageProps) {
+export default function HomePage({ region, config, groups, rtl, orderedSlugs, themes, trending, movers }: HomePageProps) {
   const t = (text?: Record<string, string> | null) => text?.[config.lang] || text?.en || '';
 
   const heroTitle = rtl ? 'מצאו את הדילים הכי שווים מאליאקספרס' : 'The Best AliExpress Deals, Curated for You';
@@ -143,6 +146,15 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs, th
             rtl={rtl}
           />
         )}
+
+        {/* MOVERS — what our own price/volume history says is moving today */}
+        <MoversRail
+          items={movers}
+          region={region}
+          rtl={rtl}
+          lang={config.lang || 'en'}
+          currencySymbol={config.currencySymbol}
+        />
 
         {/* COLLECTIONS GRID */}
         {groups.filter(g => g.products.length > 0).slice(0, 6).map((group, gi) => (
@@ -463,6 +475,24 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
     ? buildTrending(groups.flatMap((g) => g.products), 8)
     : [];
 
+  // Movers: our own snapshot history, no AliExpress call. Fails to [] without
+  // a database, which just hides the rail. Only the fields the rail renders are
+  // passed through — Next serialises every prop into __NEXT_DATA__, and a Pick
+  // carries snapshot internals no card reads.
+  const movers: MoverItem[] = (await getPicks(region, { limit: 8 }).catch(() => [])).map((p) => ({
+    productId: p.productId,
+    title: p.title,
+    imageUrl: p.imageUrl,
+    price: p.price,
+    reason: p.reason,
+    recentPerDay: p.recentPerDay,
+    perDay: p.perDay,
+    surge: p.surge,
+    dropPct: p.dropPct,
+    spanDays: p.spanDays,
+    rating: p.rating,
+  }));
+
   // Same supplier item is often relisted under new IDs, so ID-dedupe alone
   // lets one title appear in the rail AND a section (or twice across
   // sections). Rail wins the title; sections are filtered against the rail
@@ -485,6 +515,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
       orderedSlugs,
       themes: getThemeGroups(config.lang || 'en'),
       trending,
+      movers,
     },
   };
 };
