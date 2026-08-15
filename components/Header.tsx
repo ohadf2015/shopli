@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Icon from './icons';
 import { ALL_REGIONS, getRegion, RegionCode } from '../lib/regions';
-import { getCollectionNavItems } from '../lib/collections';
+import { getThemeGroups } from '../lib/collection-themes';
 import { getWishlistSnapshot } from '../lib/useWishlist';
 
 export default function Header({ currentRegion, dir }: { currentRegion: RegionCode; dir?: string }) {
@@ -21,7 +21,10 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
   const rtl = region.direction === 'rtl';
   const lang = region.lang || 'en';
 
-  const collections = getCollectionNavItems(lang).slice(0, 14);
+  // Seven themes, not 78 collections. The flat list put 50 beauty niches in
+  // front of anyone looking for a lamp; every collection is still one click
+  // away on /collections. See lib/collection-themes.ts.
+  const themes = getThemeGroups(lang);
 
   useEffect(() => {
     // Read initial + listen for changes
@@ -146,26 +149,29 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
               <Icon name="chevron-down" size={14} />
             </button>
             {catOpen && (
-              <div className="absolute top-full mt-1 start-0 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden min-w-[220px] max-h-[70vh] overflow-y-auto z-50">
-                <a
-                  href={`/${currentRegion}#categories`}
-                  onClick={() => setCatOpen(false)}
-                  className="block px-4 py-2.5 text-sm font-semibold border-b border-gray-50 hover:bg-orange-50/50"
-                  style={{ color: 'var(--shopli-orange)' }}
-                >
-                  {rtl ? 'כל הקטגוריות' : 'All categories'}
-                </a>
-                {collections.map((c) => (
+              <div className="absolute top-full mt-1 start-0 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden min-w-[260px] max-h-[70vh] overflow-y-auto z-50">
+                {themes.map((th) => (
                   <Link
-                    key={c.slug}
-                    href={`/${currentRegion}/collection/${c.slug}`}
+                    key={th.key}
+                    href={`/${currentRegion}/collections#${th.key}`}
                     onClick={() => setCatOpen(false)}
-                    className="block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+                    className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
                     style={{ color: 'var(--shopli-navy)' }}
                   >
-                    {c.name}
+                    <span className="font-medium">{th.name[lang] || th.name.en}</span>
+                    <span className="text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
+                      {th.collections.length}
+                    </span>
                   </Link>
                 ))}
+                <Link
+                  href={`/${currentRegion}/collections`}
+                  onClick={() => setCatOpen(false)}
+                  className="block px-4 py-2.5 text-sm font-semibold border-t border-gray-50 hover:bg-orange-50/50"
+                  style={{ color: 'var(--shopli-orange)' }}
+                >
+                  {rtl ? 'כל הקטגוריות ←' : 'All categories →'}
+                </Link>
               </div>
             )}
           </div>
@@ -375,25 +381,28 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             >
               {rtl ? 'קטגוריות' : 'Categories'}
             </p>
-            {collections.map((c) => (
+            {themes.map((th) => (
               <Link
-                key={c.slug}
-                href={`/${currentRegion}/collection/${c.slug}`}
-                className="block px-3 py-2.5 rounded-lg text-sm hover:bg-gray-50 min-h-[44px]"
+                key={th.key}
+                href={`/${currentRegion}/collections#${th.key}`}
+                className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm hover:bg-gray-50 min-h-[44px]"
                 style={{ color: 'var(--shopli-navy)' }}
                 onClick={() => setMenuOpen(false)}
               >
-                {c.name}
+                <span>{th.name[lang] || th.name.en}</span>
+                <span className="text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
+                  {th.collections.length}
+                </span>
               </Link>
             ))}
-            <a
-              href={`/${currentRegion}#categories`}
+            <Link
+              href={`/${currentRegion}/collections`}
               className="block px-3 py-2.5 rounded-lg text-sm font-semibold"
               style={{ color: 'var(--shopli-orange)' }}
               onClick={() => setMenuOpen(false)}
             >
               {rtl ? 'הצג הכל ←' : 'View all →'}
-            </a>
+            </Link>
           </div>
         </div>
       )}

@@ -112,6 +112,13 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       lastmod: today,
       images: [getCollectionOgImage('trending', 'Trending Products 2026', 'en')],
     });
+    // Collections hub — links every collection page, grouped by theme
+    urls.push({
+      loc: `${SITE_URL}/${region}/collections`,
+      changefreq: 'weekly',
+      priority: 0.8,
+      lastmod: today,
+    });
     // Search landing (noindex when empty; still useful for discovery of path)
     urls.push({
       loc: `${SITE_URL}/${region}/search`,

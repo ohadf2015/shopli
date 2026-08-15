@@ -6,7 +6,8 @@ import WhatsAppShare from '../../components/WhatsAppShare';
 import SeoHead from '../../components/SeoHead';
 import TrendingRail, { TrendingItem } from '../../components/TrendingRail';
 import { getRegion, isValidRegion, RegionCode } from '../../lib/regions';
-import { getAllCollections, getFeaturedCollections } from '../../lib/collections';
+import { getFeaturedCollections } from '../../lib/collections';
+import { getThemeGroups, type ThemeGroup } from '../../lib/collection-themes';
 import { breadcrumbJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
 import { buildTrending, dedupeAcrossSections } from '../../lib/trending';
 import { trendingEnabled } from '../../lib/flags';
@@ -32,6 +33,7 @@ interface HomePageProps {
   groups: CardGroup[];
   rtl: boolean;
   orderedSlugs: string[];
+  themes: ThemeGroup[];
   trending: TrendingItem[];
 }
 
@@ -65,7 +67,7 @@ async function fetchCollectionProducts(region: string, keywords: string[], limit
   } catch { return []; }
 }
 
-export default function HomePage({ region, config, groups, rtl, orderedSlugs, trending }: HomePageProps) {
+export default function HomePage({ region, config, groups, rtl, orderedSlugs, themes, trending }: HomePageProps) {
   const t = (text?: Record<string, string> | null) => text?.[config.lang] || text?.en || '';
 
   const heroTitle = rtl ? 'מצאו את הדילים הכי שווים מאליאקספרס' : 'The Best AliExpress Deals, Curated for You';
@@ -185,28 +187,45 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs, tr
             <p className="text-sm mb-8" style={{ color: 'var(--shopli-warm-gray)' }}>
               {rtl ? 'מוצרים מקובצים לפי נושא — בחרו מה שמעניין אתכם' : 'Products grouped by theme — pick what interests you'}
             </p>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              {getAllCollections()
-                .filter(coll => coll.name)
-                .sort((a, b) => {
-                  const ia = orderedSlugs.indexOf(a.slug);
-                  const ib = orderedSlugs.indexOf(b.slug);
-                  return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
-                })
-                .map(coll => {
-                const name = t(coll.name);
-                const desc = t(coll.desc);
-                return (
-                  <a key={coll.slug} href={`/${region}/collection/${coll.slug}`}
-                    className="p-4 rounded-xl border border-gray-100 hover:border-orange-200 hover:bg-orange-50/30 transition-all">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style={{ background: 'oklch(90% 0.06 45)', color: 'var(--shopli-orange)' }}>
-                      <Icon name={coll.icon as any} size={16} />
+            {/*
+              Was: all 78 collections as one wall of tiles, 50 of them beauty
+              niches, sorted by a seasonal order nobody could see. Now: seven
+              themes, each showing its first few collections with the rest one
+              click away on /collections. Nothing was deleted — see
+              lib/collection-themes.ts.
+            */}
+            <div className="space-y-6">
+              {themes.map((th) => (
+                <div key={th.key}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'oklch(90% 0.06 45)', color: 'var(--shopli-orange)' }}>
+                      <Icon name={th.icon as any} size={14} />
                     </div>
-                    <h3 className="font-bold text-sm mb-1" style={{ color: 'var(--shopli-navy)' }}>{name}</h3>
-                    <p className="text-xs leading-snug" style={{ color: 'var(--shopli-warm-gray)' }}>{desc}</p>
-                  </a>
-                );
-              })}
+                    <h3 className="font-bold text-sm" style={{ color: 'var(--shopli-navy)' }}>
+                      {th.name[config.lang || 'en'] || th.name.en}
+                    </h3>
+                    <a
+                      href={`/${region}/collections#${th.key}`}
+                      className="text-xs font-medium hover:underline"
+                      style={{ color: 'var(--shopli-orange)' }}
+                    >
+                      {rtl ? `כל ${th.collections.length} ←` : `all ${th.collections.length} →`}
+                    </a>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                    {th.collections.slice(0, 5).map((coll) => (
+                      <a
+                        key={coll.slug}
+                        href={`/${region}/collection/${coll.slug}`}
+                        className="flex items-center gap-2 p-3 rounded-xl border border-gray-100 hover:border-orange-200 hover:bg-orange-50/30 transition-all"
+                      >
+                        <Icon name={(coll.icon || 'package') as any} size={16} />
+                        <span className="text-sm font-medium" style={{ color: 'var(--shopli-navy)' }}>{coll.name}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -460,6 +479,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
       groups: finalGroups,
       rtl,
       orderedSlugs,
+      themes: getThemeGroups(config.lang || 'en'),
       trending,
     },
   };
