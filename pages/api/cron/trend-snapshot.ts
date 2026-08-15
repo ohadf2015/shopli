@@ -4,6 +4,8 @@ import { getTrendCategories } from '../../../lib/trend-calendar';
 import { getAllCollections } from '../../../lib/collections';
 import { recordVolumes } from '../../../lib/trend-velocity';
 import { recordFeedProducts, pruneFeedProducts } from '../../../lib/feed-store';
+import { getPicks } from '../../../lib/picks';
+import { getProductReviews } from '../../../lib/review-store';
 import { collectionGoogleCategory, DEFAULT_GOOGLE_CATEGORY, GmcFeedItem } from '../../../lib/gmc-feed';
 import { ALL_REGIONS, getRegion } from '../../../lib/regions';
 
@@ -33,6 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // back to back and the whole sweep measured 343s, past the function limit.
   const results: Record<string, number> = {};
   const feedResults: Record<string, number> = {};
+  const reviewResults: Record<string, number> = {};
   await Promise.all(
     ALL_REGIONS.map(async ({ code }) => {
       const seen = new Map<string, { id: string; volume?: number; price?: number }>();
@@ -104,9 +107,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       results[code] = await recordVolumes(code, Array.from(seen.values()));
       feedResults[code] = await recordFeedProducts(code, Array.from(feedItems.values()));
       await pruneFeedProducts(code);
+
+      // Warm buyer reviews for today's picks, now that this run has recorded
+      // the snapshot they are computed from. These are the products the
+      // homepage rail, the swipe game and the Telegram post will show, so their
+      // cards can carry a real rating count instead of nothing.
+      //
+      // Bounded to the picks on purpose: warming the whole catalogue would be
+      // ~800 requests to an undocumented endpoint inside a 300s function.
+      // Everything else fills in naturally the first time someone opens the PDP.
+      try {
+        const picks = await getPicks(code, { limit: 8 });
+        for (const p of picks) {
+          await getProductReviews(p.productId, code, { timeoutMs: 3000 });
+        }
+        reviewResults[code] = picks.length;
+      } catch {
+        reviewResults[code] = 0;
+      }
     })
   );
 
   res.setHeader('Cache-Control', 'no-store');
-  return res.status(200).json({ ok: true, recorded: results, feed: feedResults });
+  return res.status(200).json({ ok: true, recorded: results, feed: feedResults, reviewsWarmed: reviewResults });
 }

@@ -177,6 +177,14 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
           </div>
 
           <Link
+            href={`/${currentRegion}/game`}
+            className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors"
+            style={{ color: 'var(--shopli-navy)' }}
+          >
+            {rtl ? 'משחק' : 'Game'}
+          </Link>
+
+          <Link
             href={`/${currentRegion}/compare`}
             className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors"
             style={{ color: 'var(--shopli-navy)' }}
@@ -335,6 +343,13 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             onClick={() => setMenuOpen(false)}
           >
             {rtl ? 'טרנדים' : 'Trending'}
+          </Link>
+          <Link
+            href={`/${currentRegion}/game`}
+            className="block px-3 py-3 rounded-lg font-medium text-sm hover:bg-gray-100 min-h-[44px]"
+            onClick={() => setMenuOpen(false)}
+          >
+            {rtl ? 'משחק' : 'Game'}
           </Link>
           <Link
             href={`/${currentRegion}/compare`}

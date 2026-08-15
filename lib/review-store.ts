@@ -114,6 +114,27 @@ export async function getProductReviews(
  * the real count for the products a PDP view or the cron has already warmed,
  * and shows nothing for the rest. Nothing is honest; "0 reviews" was not.
  */
+export async function getReviewsBatch(
+  region: string,
+  productIds: string[]
+): Promise<Record<string, ProductReviews>> {
+  const sql = db();
+  if (!sql || !productIds.length) return {};
+  if (!(await ensureTable(sql))) return {};
+  try {
+    const rows: Array<{ product_id: string; payload: any }> = await sql`
+      SELECT product_id, payload FROM product_reviews
+      WHERE region = ${region} AND product_id = ANY(${productIds})`;
+    const out: Record<string, ProductReviews> = {};
+    for (const r of rows) {
+      out[r.product_id] = (typeof r.payload === 'string' ? JSON.parse(r.payload) : r.payload) as ProductReviews;
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
 export async function getReviewCounts(
   region: string,
   productIds: string[]

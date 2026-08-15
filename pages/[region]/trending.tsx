@@ -41,7 +41,6 @@ interface TrendingPageProps {
 
 function getTrendReason(p: SearchProduct, lang: string): string {
   const volume = p.volume || 0;
-  const recent = p.reviewCount || 0;
   const rating = (p.rating || 0) / 20;
   const discount = p.discount ? parseInt(p.discount.replace(/[^0-9]/g, ''), 10) || 0 : 0;
 
@@ -55,7 +54,6 @@ function getTrendReason(p: SearchProduct, lang: string): string {
     if (discount >= 30) return `הנחה ענקית ${discount}% — מוביל במכירות`;
     if (volume >= 10000) return `נמכר ${soldLabel(volume)} פעמים`;
     if (rating >= 4.7 && volume >= 1000) return `דירוג מעולה ${rating.toFixed(1)} · ${soldLabel(volume)} נמכרו`;
-    if (recent >= 100) return `מכירות חמות — ${soldLabel(recent)} בשבוע האחרון`;
     if (rating >= 4.5) return `דירוג גבוה ${rating.toFixed(1)}`;
     return `טרנד חם עכשיו`;
   }
@@ -64,7 +62,6 @@ function getTrendReason(p: SearchProduct, lang: string): string {
   if (discount >= 30) return `Up to ${discount}% off — top seller`;
   if (volume >= 10000) return `${soldLabel(volume)} sold`;
   if (rating >= 4.7 && volume >= 1000) return `Rated ${rating.toFixed(1)} · ${soldLabel(volume)} sold`;
-  if (recent >= 100) return `Hot this week — ${soldLabel(recent)} sold`;
   if (rating >= 4.5) return `Top rated ${rating.toFixed(1)}`;
   return `Trending now`;
 }
@@ -87,11 +84,13 @@ function risingReason(perDay: number, lang: string): string {
 
 function scoreTrending(p: SearchProduct, soldPerDay?: number): number {
   const volume = p.volume || 0;
-  const recent = p.reviewCount || 0;
   const rating = p.rating || 0;
   const discount = p.discount ? parseInt(p.discount.replace(/[^0-9]/g, ''), 10) || 0 : 0;
   const commission = p.commissionRate || 0;
-  const base = volume * 15 + recent * 25 + rating * 5 + discount * 50 + commission * 2;
+  // `recent * 25` used to sit here, reading SearchProduct.reviewCount — a field
+  // the affiliate API does not return, so the heaviest-looking term in this
+  // formula contributed exactly nothing on every product.
+  const base = volume * 15 + rating * 5 + discount * 50 + commission * 2;
   // Measured momentum, where we have it. Lifetime volume tells you what sold
   // well once; units-sold-per-day tells you what is selling now, which is the
   // question this page asks — so it dominates when a reading exists.

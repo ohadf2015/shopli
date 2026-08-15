@@ -4,12 +4,15 @@ import SeoHead from '../../../components/SeoHead';
 import Icon from '../../../components/icons';
 import ShareBar from '../../../components/ShareBar';
 import FindSimilar from '../../../components/FindSimilar';
+import BuyerReviews from '../../../components/BuyerReviews';
 import { cacheIfNotEmpty } from '../../../lib/cache';
 import { trendingEnabled } from '../../../lib/flags';
 import { productImage } from '../../../lib/img';
 import { getRegion, RegionCode, RegionConfig } from '../../../lib/regions';
 import { getProductsByIds, SearchProduct } from '../../../lib/aliexpress';
 import { getDemoProductById } from '../../../lib/demo-products';
+import { getProductReviews } from '../../../lib/review-store';
+import type { ProductReviews } from '../../../lib/reviews';
 import {
   buildPdpDescription,
   buildPdpSpecs,
@@ -35,6 +38,7 @@ interface ProductPageProps {
   faq: FaqItem[];
   related: Array<{ slug: string; name: string }>;
   similarEnabled: boolean;
+  reviews: ProductReviews | null;
 }
 
 function ratingStars(rating: number): number {
@@ -60,6 +64,7 @@ export default function ProductPage({
   faq,
   related,
   similarEnabled,
+  reviews,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const lang = config.lang || 'en';
   const pageUrl = `${SITE_URL}/${region}/product/${productId}`;
@@ -114,7 +119,10 @@ export default function ProductPage({
   const stars = ratingStars(product.rating);
   const originalPrice = product.originalPrice != null && product.originalPrice > product.price ? product.originalPrice : null;
 
-  // v1: no aggregateRating — Shopli has no on-site reviews yet (docs/PDP-V1-SPEC.md).
+  // Still no aggregateRating, deliberately, now that the page HAS reviews: they
+  // are AliExpress buyers' reviews republished with attribution, and marking up
+  // third-party review content as this site's own is a manual-action pattern
+  // (docs/PDP-V1-SPEC.md). Displayed, not claimed.
   const structuredData = [
     breadcrumbJsonLd([
       { name: rtl ? 'דף הבית' : 'Home', url: `${SITE_URL}/${region}` },
@@ -214,10 +222,17 @@ export default function ProductPage({
                   </span>
                 </div>
               )}
-              {(product.reviewCount || 0) > 0 && (
-                <span className="text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
-                  ({product.reviewCount?.toLocaleString()} AliExpress {rtl ? 'ביקורות' : 'reviews'})
-                </span>
+              {/*
+                Was product.reviewCount, which reads last_5_days_trade_count —
+                a field the affiliate API does not return, so this said "0" on
+                every product and rendered nothing at all. The count now comes
+                from the buyer reviews themselves.
+              */}
+              {reviews && reviews.ratingCount > 0 && (
+                <a href="#buyer-reviews" className="text-xs hover:underline" style={{ color: 'var(--shopli-warm-gray)' }}>
+                  ({reviews.ratingCount.toLocaleString(lang === 'he' ? 'he-IL' : 'en-US')}{' '}
+                  {rtl ? 'דירוגים מקונים' : 'buyer ratings'})
+                </a>
               )}
               {product.shopName && (
                 <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100" style={{ color: 'var(--shopli-warm-gray)' }}>
@@ -313,6 +328,13 @@ export default function ProductPage({
             )}
           </div>
         </div>
+
+        {/* What buyers say — real reviews, clearly attributed to AliExpress */}
+        {reviews && (
+          <div id="buyer-reviews" className="scroll-mt-24">
+            <BuyerReviews reviews={reviews} rtl={rtl} lang={lang} />
+          </div>
+        )}
 
         {/* Specs */}
         <section className="mt-10 fade-in" aria-label={rtl ? 'מפרט' : 'Specifications'}>
@@ -442,6 +464,12 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
   const collName = (c: CollectionDef) =>
     c.name?.[lang] || c.name?.en || c.tag?.[lang] || c.tag?.en || c.slug;
 
+  // Buyer reviews, from the read-through store (lib/review-store.ts): a cached
+  // row costs one cheap query, and only a product nobody has opened in a week
+  // pays a live fetch. Bounded tightly and null on any failure — this section
+  // enriches the page, it must never be why the page is slow or blank.
+  const reviews = product ? await getProductReviews(productId, region, { timeoutMs: 2500 }) : null;
+
   const description = product ? buildPdpDescription(product, rtl) : '';
   const { pros, cons } = product
     ? buildPdpProsCons(product, rtl)
@@ -463,6 +491,7 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
         ? relatedCollections(product).map((c) => ({ slug: c.slug, name: collName(c) }))
         : [],
       similarEnabled: trendingEnabled(),
+      reviews,
     },
   };
 };

@@ -110,6 +110,17 @@ export interface SearchProduct {
   images: string[];
   affiliateLink: string;
   rating: number;           // 0-100 (evaluate_rate %)
+  /**
+   * Always 0. It used to be read from `last_5_days_trade_count`, a field the
+   * affiliate API does not return — verified 2026-08-15 against a live
+   * response, whose key list has no such entry. So every product on the site
+   * claimed 0 reviews, and anything scoring on it was scoring on a constant.
+   *
+   * Kept on the type because the compare table and wishlist entries still carry
+   * the shape. Real counts come from lib/reviews.ts, which reads AliExpress'
+   * own review endpoint, and are surfaced per page rather than smuggled in
+   * here.
+   */
   reviewCount: number;
   volume: number;            // lastest_volume (total sold)
   category: string;
@@ -152,7 +163,7 @@ export async function searchAliExpress(keywords: string, region: string, pageSiz
     images: p.product_small_image_urls?.string || [],
     affiliateLink: p.promotion_link || p.product_detail_url || '',
     rating: parseFloat(String(p.evaluate_rate || '0').replace('%', '')),
-    reviewCount: typeof p.last_5_days_trade_count === 'string' ? parseInt(p.last_5_days_trade_count) : (p.last_5_days_trade_count || 0),
+    reviewCount: 0, // see the field docs on SearchProduct
     volume: parseInt(p.lastest_volume || '0'),
     category: p.first_level_category_name || '',
     categoryPath: (p.first_level_category_name || '') + ' > ' + (p.second_level_category_name || ''),
@@ -215,9 +226,7 @@ function mapRawProduct(p: any, cfg: { language: string; currency: string; shipTo
     images: p.product_small_image_urls?.string || [],
     affiliateLink: p.promotion_link || p.product_detail_url || '',
     rating: parseFloat(String(p.evaluate_rate || '0').replace('%', '')),
-    reviewCount: typeof p.last_5_days_trade_count === 'string'
-      ? parseInt(p.last_5_days_trade_count, 10)
-      : (p.last_5_days_trade_count || 0),
+    reviewCount: 0, // see the field docs on SearchProduct
     volume: parseInt(p.lastest_volume || '0', 10),
     category: p.first_level_category_name || '',
     categoryPath: (p.first_level_category_name || '') + ' > ' + (p.second_level_category_name || ''),

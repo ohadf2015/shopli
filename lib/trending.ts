@@ -313,9 +313,11 @@ export function toTrendCandidate(p: any): TrendCandidate {
     discount: p.discount || '',
     rating: Number(p.rating) || 0,
     volume: Number(p.volume) || 0,
-    // reviewCount on SearchProduct is AliExpress last_5_days_trade_count —
-    // the best freshness/recent-momentum proxy in the catalog.
-    recentTrades: Number(p.reviewCount) || 0,
+    // Was Number(p.reviewCount), described as a recent-momentum proxy. The
+    // affiliate API never returns that field, so it was a constant 0 dressed
+    // up as a signal. Real momentum comes from our own volume snapshots
+    // (lib/trend-velocity.ts), which this page already applies.
+    recentTrades: 0,
     category: p.category || 'general',
     imageUrl: p.imageUrl || '',
     affiliateLink: p.affiliateLink || '',

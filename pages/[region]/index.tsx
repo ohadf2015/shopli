@@ -117,6 +117,10 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs, th
                   {rtl ? 'ערוץ טלגרם' : 'Telegram Channel'}
                 </a>
               )}
+              <a href={`/${region}/game`} className="btn-secondary">
+                <Icon name="star" size={16} />
+                {rtl ? 'נחשו את המחיר' : 'Guess the Price'}
+              </a>
               <WhatsAppShare
                 title={rtl ? 'שופלי — הדילים הכי שווים מאליאקספרס' : 'Shopli — The Best AliExpress Deals'}
                 url={`${SITE_URL}/${region}`}
