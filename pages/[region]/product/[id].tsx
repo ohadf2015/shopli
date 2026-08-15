@@ -209,6 +209,7 @@ export default function ProductPage({
             <h1
               className="text-2xl sm:text-3xl font-extrabold leading-tight mb-3"
               style={{ color: 'var(--shopli-navy)' }}
+              title={product.originalTitle || undefined}
             >
               {product.title}
             </h1>

@@ -50,6 +50,7 @@ function toCardProduct(p: any): ProductCardProduct {
   return {
     id: p.id,
     title: p.title,
+    originalTitle: p.originalTitle,
     price: p.price,
     originalPrice: p.originalPrice ?? null,
     imageUrl: p.imageUrl || '',

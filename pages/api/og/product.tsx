@@ -18,6 +18,34 @@ const PALETTE = {
 };
 
 /**
+ * Fetch a remote product image and inline it as a data URI so satori never
+ * has to fetch during render (a failed render-time fetch kills the whole
+ * ImageResponse stream -> empty 200 body). Returns null on any failure.
+ */
+async function fetchImageAsDataUri(url: string | null): Promise<string | null> {
+  if (!url || !/^https:\/\//i.test(url)) return null;
+  try {
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(4000),
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; shopli-og/1.0)' },
+    });
+    if (!res.ok) return null;
+    const contentType = (res.headers.get('content-type') || '').split(';')[0].trim();
+    if (!contentType.startsWith('image/')) return null;
+    const buf = new Uint8Array(await res.arrayBuffer());
+    if (buf.byteLength === 0 || buf.byteLength > 3 * 1024 * 1024) return null;
+    let binary = '';
+    const CHUNK = 0x8000;
+    for (let i = 0; i < buf.length; i += CHUNK) {
+      binary += String.fromCharCode(...buf.subarray(i, i + CHUNK));
+    }
+    return `data:${contentType};base64,${btoa(binary)}`;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Per-product Open Graph image (1200×630).
  * Usage: /api/og/product?title=...&price=...&currencySymbol=...&originalPrice=...&discount=...&lang=...
  * Shows the product image (right) + title + price (left) + Shopli branding.
@@ -31,10 +59,16 @@ export default async function handler(req: NextRequest) {
   const discount = searchParams.get('discount');
   const lang = searchParams.get('lang') || 'en';
   const rtl = lang === 'he';
-  const productImage = searchParams.get('image');
+  const imageParam = searchParams.get('image');
 
   const truncatedTitle = title.length > 70 ? title.slice(0, 67) + '…' : title;
   const hasDiscount = originalPrice != null && Number(originalPrice) > Number(price || 0);
+
+  // Satori fetches <img> URLs during render; if that fetch fails/returns
+  // non-image, the whole ImageResponse stream errors and Vercel emits a
+  // 200 with an EMPTY body. Pre-fetch with a timeout and inline as a data
+  // URI; on any failure fall back to the text-only layout.
+  const productImage = await fetchImageAsDataUri(imageParam);
 
   return new ImageResponse(
     (
@@ -113,14 +147,10 @@ export default async function handler(req: NextRequest) {
                 lineHeight: 1.2,
                 color: PALETTE.navy,
                 letterSpacing: -0.5,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                display: '-webkit-box',
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: 'vertical',
+                display: 'flex',
               }}
             >
-              {rtl ? truncatedTitle : truncatedTitle}
+              {truncatedTitle}
             </div>
 
             {/* Price row */}
@@ -132,6 +162,7 @@ export default async function handler(req: NextRequest) {
                     fontWeight: 900,
                     color: PALETTE.teal,
                     letterSpacing: -1,
+                    display: 'flex',
                   }}
                 >
                   {currencySymbol}{Number(price).toFixed(2)}
@@ -144,6 +175,7 @@ export default async function handler(req: NextRequest) {
                     fontWeight: 600,
                     color: PALETTE.muted,
                     textDecoration: 'line-through',
+                    display: 'flex',
                   }}
                 >
                   {currencySymbol}{Number(originalPrice).toFixed(2)}
@@ -158,6 +190,7 @@ export default async function handler(req: NextRequest) {
                     background: '#fef2f2',
                     padding: '4px 14px',
                     borderRadius: 999,
+                    display: 'flex',
                   }}
                 >
                   -{discount}
