@@ -9,7 +9,11 @@ export interface ProductCardProduct {
   id: string;
   title: string;
   /** Full source title, shown as the h3 tooltip when `title` is a short override. */
-  originalTitle?: string;
+  /**
+   * `string | null`, never undefined: these products are passed straight
+   * through getServerSideProps and Next refuses to serialize undefined.
+   */
+  originalTitle?: string | null;
   price: number;
   originalPrice?: number | null;
   imageUrl?: string;
