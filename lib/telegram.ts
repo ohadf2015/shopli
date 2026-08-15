@@ -112,10 +112,16 @@ export function buildPicksMessage(
   return msg + `_${escapeMarkdown(c.footer)}_`;
 }
 
-export async function sendTelegramMessage(text: string): Promise<{ ok: boolean; error?: string }> {
+/**
+ * `chatId` is required rather than defaulting to TELEGRAM_CHANNEL_ID: the
+ * caller loops regions, and a default would have posted every region's message
+ * into the same channel — nine posts in eight languages, once a day, on a live
+ * public channel.
+ */
+export async function sendTelegramMessage(text: string, chatId: string): Promise<{ ok: boolean; error?: string }> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chat = process.env.TELEGRAM_CHANNEL_ID;
-  if (!token || !chat) return { ok: false, error: 'TELEGRAM_BOT_TOKEN or TELEGRAM_CHANNEL_ID not set' };
+  const chat = chatId;
+  if (!token || !chat) return { ok: false, error: 'TELEGRAM_BOT_TOKEN or chat id not set' };
 
   try {
     const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {

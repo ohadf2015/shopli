@@ -6,7 +6,7 @@ import SeoHead from '../../components/SeoHead';
 import Icon from '../../components/icons';
 import WhatsAppShare from '../../components/WhatsAppShare';
 import { getRegion, isValidRegion, RegionCode, RegionConfig } from '../../lib/regions';
-import { getPicks } from '../../lib/picks';
+import { getPicks, buildPriceOptions } from '../../lib/picks';
 import { getReviewsBatch } from '../../lib/review-store';
 import { productImage } from '../../lib/img';
 import { SITE_URL } from '../../lib/seo';
@@ -256,21 +256,6 @@ export default function GamePage({ region, config, rtl, rounds }: GamePageProps)
   );
 }
 
-/**
- * Two decoys around the real price, derived from the product id so the answer
- * is not always in the same slot and the page is stable between renders.
- */
-function buildOptions(price: number, productId: string): number[] {
-  const round2 = (n: number) => Math.round(n * 100) / 100;
-  const low = round2(Math.max(0.5, price * 0.42));
-  const high = round2(price * 2.1);
-  const seed = Number(productId.slice(-2)) || 0;
-  const opts = [price, low, high];
-  // Rotate by the seed: deterministic, and every slot is used across a game.
-  const shift = seed % 3;
-  return [...opts.slice(shift), ...opts.slice(0, shift)];
-}
-
 export const getServerSideProps: GetServerSideProps = async ({ params, res }) => {
   const region = ((params?.region as string) || 'eu') as RegionCode;
   if (!isValidRegion(region)) return { notFound: true };
@@ -292,7 +277,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
         title: p.title,
         imageUrl: p.imageUrl,
         price: Math.round(p.price * 100) / 100,
-        options: buildOptions(Math.round(p.price * 100) / 100, p.productId),
+        options: buildPriceOptions(Math.round(p.price * 100) / 100, p.productId),
         reason: p.reason,
         perDay: p.recentPerDay,
         dropPct: p.dropPct,

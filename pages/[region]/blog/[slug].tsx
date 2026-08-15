@@ -258,7 +258,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
   const found = await Promise.all(
     picks.map(async (pick: { name: string; keyword: string }) => {
       const products = await searchAliExpress(pick.keyword, region, 6).catch(() => []);
-      const best = filterQuality(products)[0];
+      // Best-quality of the top three results, not of all six: the API returns
+      // them in relevance order and filterQuality re-sorts on quality alone, so
+      // scoring the whole set can answer "adjustable dumbbells set" with the
+      // sixth-most relevant listing.
+      const best = filterQuality(products.slice(0, 3))[0];
       return best ? { pick, best } : null;
     })
   );

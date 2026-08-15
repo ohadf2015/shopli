@@ -245,3 +245,37 @@ export async function getPicks(
   // A caller that asked for one reason already has the list it wants.
   return reason ? ranked.slice(0, limit) : diversifyPicks(ranked, limit);
 }
+
+/**
+ * Two decoys around the real price.
+ *
+ * The first version always returned {0.42x, 1x, 2.1x} and rotated the order,
+ * which meant the answer was ALWAYS the middle number when sorted — sort the
+ * three, take the median, win every round without looking at the product. The
+ * shape of the spread now varies too: sometimes both decoys are above the real
+ * price, sometimes both below, sometimes either side.
+ *
+ * Derived from the product id rather than a random number, so today's game is
+ * the same for everyone and the server and client render identically.
+ */
+export function buildPriceOptions(price: number, productId: string): number[] {
+  const round2 = (n: number) => Math.round(n * 100) / 100;
+  const seed = [...productId].reduce((a, ch) => a + ch.charCodeAt(0), 0);
+
+  const shapes: Array<[number, number]> = [
+    [0.42, 2.1],   // one either side
+    [1.55, 2.4],   // both above — the real price is the cheapest option
+    [0.34, 0.62],  // both below — the real price is the dearest option
+  ];
+  const [a, b] = shapes[seed % shapes.length];
+
+  const opts = [price, round2(Math.max(0.5, price * a)), round2(Math.max(0.5, price * b))];
+  // Rounding can collide on cheap items (0.5 floor, or two multipliers landing
+  // on the same cent). A duplicate option would give the answer away.
+  for (let i = 1; i < opts.length; i++) {
+    while (opts.slice(0, i).includes(opts[i])) opts[i] = round2(opts[i] + 0.5);
+  }
+
+  const shift = Math.floor(seed / shapes.length) % opts.length;
+  return [...opts.slice(shift), ...opts.slice(0, shift)];
+}

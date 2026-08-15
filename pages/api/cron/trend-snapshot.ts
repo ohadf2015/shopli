@@ -4,8 +4,6 @@ import { getTrendCategories } from '../../../lib/trend-calendar';
 import { getAllCollections } from '../../../lib/collections';
 import { recordVolumes } from '../../../lib/trend-velocity';
 import { recordFeedProducts, pruneFeedProducts } from '../../../lib/feed-store';
-import { getPicks } from '../../../lib/picks';
-import { getProductReviews } from '../../../lib/review-store';
 import { collectionGoogleCategory, DEFAULT_GOOGLE_CATEGORY, GmcFeedItem } from '../../../lib/gmc-feed';
 import { ALL_REGIONS, getRegion } from '../../../lib/regions';
 
@@ -35,7 +33,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // back to back and the whole sweep measured 343s, past the function limit.
   const results: Record<string, number> = {};
   const feedResults: Record<string, number> = {};
-  const reviewResults: Record<string, number> = {};
   await Promise.all(
     ALL_REGIONS.map(async ({ code }) => {
       const seen = new Map<string, { id: string; volume?: number; price?: number }>();
@@ -108,26 +105,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       feedResults[code] = await recordFeedProducts(code, Array.from(feedItems.values()));
       await pruneFeedProducts(code);
 
-      // Warm buyer reviews for today's picks, now that this run has recorded
-      // the snapshot they are computed from. These are the products the
-      // homepage rail, the swipe game and the Telegram post will show, so their
-      // cards can carry a real rating count instead of nothing.
-      //
-      // Bounded to the picks on purpose: warming the whole catalogue would be
-      // ~800 requests to an undocumented endpoint inside a 300s function.
-      // Everything else fills in naturally the first time someone opens the PDP.
-      try {
-        const picks = await getPicks(code, { limit: 8 });
-        for (const p of picks) {
-          await getProductReviews(p.productId, code, { timeoutMs: 3000 });
-        }
-        reviewResults[code] = picks.length;
-      } catch {
-        reviewResults[code] = 0;
-      }
+      // Review warming deliberately does NOT happen here. It needs today's
+      // picks, which need this sweep's snapshot — but this function's headroom
+      // against its 300s ceiling is unmeasured (the last number anyone has is
+      // the 343s run that forced the parallel rewrite), and a snapshot day lost
+      // to a timeout cannot be backfilled. /api/cron/telegram-daily warms them
+      // at 06:00 instead, on its own budget, right before it needs them.
     })
   );
 
   res.setHeader('Cache-Control', 'no-store');
-  return res.status(200).json({ ok: true, recorded: results, feed: feedResults, reviewsWarmed: reviewResults });
+  return res.status(200).json({ ok: true, recorded: results, feed: feedResults });
 }

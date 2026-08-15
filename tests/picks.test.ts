@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { aggregateSnapshots, diversifyPicks, pickReason, scorePick, type Pick, type PickReason, type PickSnapshot } from '../lib/picks';
+import { aggregateSnapshots, buildPriceOptions, diversifyPicks, pickReason, scorePick, type Pick, type PickReason, type PickSnapshot } from '../lib/picks';
 
 function snaps(rows: Array<[string, number, number | null]>): PickSnapshot[] {
   return rows.map(([seenOn, volume, price]) => ({ productId: 'p1', seenOn, volume, price }));
@@ -110,4 +110,29 @@ test('a list mixes reasons instead of showing five surging in a row', () => {
 test('an empty reason costs nothing', () => {
   const out = diversifyPicks([pick('s1', 'surging', 90), pick('s2', 'surging', 80)], 5);
   assert.deepEqual(out.map((p) => p.productId), ['s1', 's2']);
+});
+
+test('the game answer is not recoverable by sorting', () => {
+  // v1 always used {0.42x, 1x, 2.1x}: sort the three, take the middle, 2/2
+  // every round without looking at the product.
+  const ids = ['1005010285372955', '3256806852323474', '1005008248087608', '1005006782788933', '3256809395889247'];
+  const medians = ids.map((id) => {
+    const opts = buildPriceOptions(19.9, id);
+    const sorted = [...opts].sort((a, b) => a - b);
+    return sorted[1] === 19.9;
+  });
+  assert.ok(medians.includes(false), 'the real price is the median for every product id');
+  for (const id of ids) {
+    const opts = buildPriceOptions(19.9, id);
+    assert.equal(new Set(opts).size, 3, 'duplicate option gives the answer away');
+    assert.ok(opts.includes(19.9));
+    assert.equal(buildPriceOptions(19.9, id).join(), opts.join()); // deterministic
+  }
+});
+
+test('cheap products still get three distinct options', () => {
+  for (const id of ['1', '22', '333', '4444']) {
+    const opts = buildPriceOptions(0.6, id);
+    assert.equal(new Set(opts).size, 3);
+  }
 });

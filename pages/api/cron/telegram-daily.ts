@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getPicks } from '../../../lib/picks';
+import { getProductReviews } from '../../../lib/review-store';
 import { buildPicksMessage, sendTelegramMessage } from '../../../lib/telegram';
 import { getRegion, ALL_REGIONS } from '../../../lib/regions';
 
@@ -10,9 +11,10 @@ import { getRegion, ALL_REGIONS } from '../../../lib/regions';
  * an npm script someone had to remember. A channel that posts when a laptop is
  * open is not a channel.
  *
- * Runs after the snapshot cron so today's picks exist. `?dry=1` returns the
- * message without sending, which is the only safe way to check formatting
- * against a live channel.
+ * Runs at 06:00, three hours after the snapshot sweep, so today's picks exist.
+ * `?dry=1` returns the messages without sending; `scripts/telegram-preview.mjs`
+ * does the same locally without needing CRON_SECRET, which is a Vercel
+ * Sensitive variable and cannot be read back to trigger this by hand.
  */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const secret = process.env.CRON_SECRET;
@@ -23,13 +25,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const dry = req.query.dry === '1';
   const only = String(req.query.region || '').toLowerCase();
-  const regions = only ? ALL_REGIONS.filter((r) => r.code === only) : ALL_REGIONS;
   const count = Math.min(parseInt(String(req.query.count || '5'), 10) || 5, 10);
 
+  /**
+   * A region posts only if it declares its own channel, and each channel is
+   * posted to once. Two regions currently share one channel (il and ru are both
+   * Israel, in Hebrew and Russian) — without the dedupe that channel would get
+   * the same products twice a day in two languages.
+   *
+   * The env channel is only a manual override for an explicit ?region= run, so
+   * a misconfigured variable cannot turn one cron into nine broadcasts.
+   */
+  const targets: Array<{ code: string; chatId: string }> = [];
+  const seenChannels = new Set<string>();
+  for (const { code } of ALL_REGIONS) {
+    if (only && code !== only) continue;
+    const channel = getRegion(code).tgChannel;
+    const chatId = channel ? `@${channel}` : only === code ? process.env.TELEGRAM_CHANNEL_ID || '' : '';
+    if (!chatId || seenChannels.has(chatId)) continue;
+    seenChannels.add(chatId);
+    targets.push({ code, chatId });
+  }
+
   const out: Record<string, string> = {};
-  for (const { code } of regions) {
-    // Sequential: Telegram rate-limits a bot to roughly one message a second,
-    // and nine regions in parallel is exactly how a bot gets throttled.
+  for (const { code, chatId } of targets) {
     const picks = await getPicks(code, { limit: 12 }).catch(() => []);
     const message = buildPicksMessage(code, picks, {
       currencySymbol: getRegion(code).currencySymbol,
@@ -44,11 +63,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       out[code] = message;
       continue;
     }
-    const sent = await sendTelegramMessage(message);
-    out[code] = sent.ok ? 'sent' : `failed: ${sent.error}`;
+
+    // Warm the reviews for what we are about to broadcast, so the product pages
+    // these links land on already have them. This lives here rather than in the
+    // snapshot cron: that function's headroom against its 300s ceiling is
+    // unmeasured, and a snapshot day that gets truncated cannot be backfilled.
+    for (const p of picks.slice(0, count)) {
+      await getProductReviews(p.productId, code, { timeoutMs: 3000 }).catch(() => null);
+    }
+
+    const sent = await sendTelegramMessage(message, chatId);
+    out[code] = sent.ok ? `sent to ${chatId}` : `failed: ${sent.error}`;
+    // Telegram throttles a bot at roughly one message a second.
     await new Promise((r) => setTimeout(r, 1200));
   }
 
   res.setHeader('Cache-Control', 'no-store');
-  return res.status(200).json({ ok: true, dry, results: out });
+  return res.status(200).json({ ok: true, dry, targets: targets.map((t) => t.code), results: out });
 }

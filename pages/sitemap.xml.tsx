@@ -112,6 +112,15 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       lastmod: today,
       images: [getCollectionOgImage('trending', 'Trending Products 2026', 'en')],
     });
+    // Guess the Price — indexable when it has rounds; the empty state sets
+    // noindex on itself, which is the thin-page case rather than a different
+    // policy.
+    urls.push({
+      loc: `${SITE_URL}/${region}/game`,
+      changefreq: 'daily',
+      priority: 0.5,
+      lastmod: today,
+    });
     // Collections hub — links every collection page, grouped by theme
     urls.push({
       loc: `${SITE_URL}/${region}/collections`,
