@@ -72,7 +72,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       await getProductReviews(p.productId, code, { timeoutMs: 3000 }).catch(() => null);
     }
 
-    const sent = await sendTelegramMessage(message, chatId);
+    let sent = await sendTelegramMessage(message, chatId);
+    // A channel can be addressed by @username or by numeric id, and which one
+    // works depends on how the bot was added and whether the channel is public.
+    // The old scripts used TELEGRAM_CHANNEL_ID; if the handle is rejected, try
+    // that before giving up, so day one is not a silent dead channel.
+    const fallback = process.env.TELEGRAM_CHANNEL_ID;
+    if (!sent.ok && fallback && fallback !== chatId) {
+      const retry = await sendTelegramMessage(message, fallback);
+      if (retry.ok) sent = { ok: true };
+      else sent = { ok: false, error: `${sent.error} (fallback: ${retry.error})` };
+    }
     out[code] = sent.ok ? `sent to ${chatId}` : `failed: ${sent.error}`;
     // Telegram throttles a bot at roughly one message a second.
     await new Promise((r) => setTimeout(r, 1200));

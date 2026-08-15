@@ -168,11 +168,15 @@ export function pickReason(m: PickMetrics): PickReason | null {
  */
 export function dedupePicks<T extends { title: string; category?: string }>(
   ranked: T[],
-  { maxPerCategory = MAX_PER_CATEGORY }: { maxPerCategory?: number } = {}
+  { maxPerCategory = MAX_PER_CATEGORY, seed = [] as T[] }: { maxPerCategory?: number; seed?: T[] } = {}
 ): T[] {
-  const out: T[] = [];
+  const out: T[] = [...seed];
   const perCategory = new Map<string, number>();
+  for (const p of out) {
+    if (p.category) perCategory.set(p.category, (perCategory.get(p.category) || 0) + 1);
+  }
   for (const p of ranked) {
+    if (out.includes(p)) continue;
     if (out.some((k) => titleTokenOverlap(k.title, p.title) >= DUPLICATE_OVERLAP)) continue;
     const cat = p.category || '';
     if (cat) {
@@ -308,11 +312,29 @@ export async function getPicks(
     });
   }
 
-  const ranked = dedupePicks(
-    picks
-      .filter((p) => p.title && p.imageUrl && p.price > 0)
-      .sort((a, b) => b.score - a.score || a.productId.localeCompare(b.productId))
-  );
+  const scored = picks
+    .filter((p) => p.title && p.imageUrl && p.price > 0)
+    .sort((a, b) => b.score - a.score || a.productId.localeCompare(b.productId));
+
+  /**
+   * Reserve one slot for each reason before the category cap is applied.
+   *
+   * Momentum outscores a discount by construction, so with one product per
+   * category the best-scoring member of a category is almost always the surging
+   * one — and it evicts that category's price_drop before the round-robin ever
+   * sees it. Measured on live US data: one price-drop candidate existed and
+   * zero survived. Seeding the best of each reason first means a genuine
+   * discount cannot be starved by a surge in the same aisle.
+   */
+  const seed: Pick[] = [];
+  for (const r of ['surging', 'price_drop', 'bestseller'] as PickReason[]) {
+    const best = scored.find(
+      (p) => p.reason === r && !seed.some((s) => titleTokenOverlap(s.title, p.title) >= DUPLICATE_OVERLAP)
+    );
+    if (best) seed.push(best);
+  }
+
+  const ranked = dedupePicks(scored, { seed });
 
   // A caller that asked for one reason already has the list it wants.
   return reason ? ranked.slice(0, limit) : diversifyPicks(ranked, limit);

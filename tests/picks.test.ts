@@ -178,3 +178,16 @@ test('a best seller has to actually sell', () => {
   const real = aggregateSnapshots(snaps([['2026-08-08', 500, 10], ['2026-08-15', 1200, 10]]))!;
   assert.equal(pickReason(real), 'bestseller');
 });
+
+test('a reserved seed cannot be starved by the category cap', () => {
+  // Momentum outscores a discount by construction, so without a reserved slot
+  // the surging item in a category evicts that category's price drop. Measured
+  // on live US data: one price-drop candidate, zero survivors.
+  const items = [
+    { title: 'Wifi Smart Socket Power Monitor', category: 'Smart Home', reason: 'surging' },
+    { title: 'Motion Sensor Night Light Hallway', category: 'Smart Home', reason: 'price_drop' },
+  ];
+  assert.equal(dedupePicks(items).length, 1);
+  assert.equal(dedupePicks(items, { seed: [items[1]] }).length, 1);
+  assert.equal(dedupePicks(items, { seed: [items[1]] })[0].reason, 'price_drop');
+});
