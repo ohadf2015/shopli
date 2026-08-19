@@ -19,6 +19,8 @@ import {
   buildPdpProsCons,
   buildPdpFaq,
   relatedCollections,
+  resolvePdpProduct,
+  pdpGsspWhenMissing,
   SpecRow,
   FaqItem,
 } from '../../../lib/pdp';
@@ -442,17 +444,13 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
     return { notFound: true };
   }
 
-  let product: SearchProduct | null = null;
-
-  try {
-    const products = await getProductsByIds([productId], region);
-    product = products[0] || null;
-  } catch {
-    product = null;
-  }
-
+  // Dual-source: AliExpress → demo catalog. Both miss → hard 404 (not soft-404 props).
+  const product = await resolvePdpProduct(productId, region, config.currency, {
+    getProductsByIds,
+    getDemoProductById,
+  });
   if (!product) {
-    product = getDemoProductById(productId, region, config.currency);
+    return pdpGsspWhenMissing();
   }
 
   // Cache at the edge (10m, SWR 1h) so repeat views don't re-hit the AliExpress
@@ -484,7 +482,7 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
       productId,
       rtl,
       description,
-      specs: product ? buildPdpSpecs(product, rtl) : [],
+      specs: buildPdpSpecs(product, rtl),
       pros,
       cons,
       faq: product ? buildPdpFaq(product, rtl) : [],

@@ -176,3 +176,42 @@ export function listingAggregateFields(
   if (p.id) return { ratingValue: undefined, reviewCount: undefined };
   return whenNotPdp;
 }
+
+/**
+ * Dual-source product resolution for PDP GSSP (docs/specs/pdp-hard-404.md).
+ * Order: AliExpress by-id fetch, then local demo catalog. Returns null only
+ * when both miss — GSSP must map that to `{ notFound: true }` (hard 404).
+ * Deps are injectable so tests can cover outage/stale-id paths without network.
+ */
+export type ResolvePdpProductDeps = {
+  getProductsByIds: (ids: string[], region: string) => Promise<SearchProduct[]>;
+  getDemoProductById: (
+    id: string,
+    region: string,
+    currency: string
+  ) => SearchProduct | null;
+};
+
+export async function resolvePdpProduct(
+  productId: string,
+  region: string,
+  currency: string,
+  deps: ResolvePdpProductDeps
+): Promise<SearchProduct | null> {
+  let product: SearchProduct | null = null;
+  try {
+    const products = await deps.getProductsByIds([productId], region);
+    product = products[0] || null;
+  } catch {
+    product = null;
+  }
+  if (!product) {
+    product = deps.getDemoProductById(productId, region, currency);
+  }
+  return product;
+}
+
+/** Next.js GSSP return when product cannot be resolved from any source. */
+export function pdpGsspWhenMissing(): { notFound: true } {
+  return { notFound: true };
+}
