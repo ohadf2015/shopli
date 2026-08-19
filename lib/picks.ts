@@ -1,6 +1,6 @@
-import { passesQualityGate, qualityScore } from './quality';
+import { passesQualityGate } from './quality';
 import { ensureFeedProductsTable } from './feed-store';
-import { titleTokenOverlap } from './similar';
+import { rankPicks, scoreTerms, type PickReason } from './ranking';
 
 /**
  * "What's actually interesting today", computed from our own history.
@@ -26,9 +26,19 @@ import { titleTokenOverlap } from './similar';
  *
  * Deterministic: same snapshots in, same ranking out, ties broken by product id.
  * No sampling, no shuffling, no model in the loop.
+ *
+ * This file is the measurement half — reading snapshots, deciding what counts
+ * as a mover. The scoring and ordering half lives in lib/ranking.ts, which is
+ * pure and database-free so a browser can re-run it over the inputs we publish
+ * and check the order it was served (/api/products/picks?verify=1).
  */
 
-export type PickReason = 'surging' | 'price_drop' | 'bestseller';
+// Only the two the existing callers use. Everything else — rankPicks,
+// RANKING_SPEC, verifyRanking — is imported from lib/ranking directly, because
+// reaching them through this file drags feed-store, and with it the Neon
+// driver, into whatever bundle does the reaching.
+export { dedupePicks, diversifyPicks } from './ranking';
+export type { PickReason, ScoreInput, ScoreTerms } from './ranking';
 
 export interface PickSnapshot {
   productId: string;
@@ -88,21 +98,6 @@ const BESTSELLER_MIN_PER_DAY = 10;
  */
 const PICK_MIN_RATE = 94;
 
-/** Two titles this similar are the same product from a different seller. */
-const DUPLICATE_OVERLAP = 0.45;
-
-/**
- * One per category. Nobody wants a list of five smart plugs — and measured
- * across regions, one-per-category still yields 9-12 picks (il 12, us 9, eu 10,
- * de 9, uk 9), which is more than the five a post or a game round uses. Two per
- * category filled the list to 12 but collapsed it to 7-8 distinct ideas.
- *
- * Non-IL regions bottom out around 9 because only IL sweeps the 78 collections;
- * the others see the ~10 trend categories (see the ponytail note in
- * /api/cron/trend-snapshot).
- */
-const MAX_PER_CATEGORY = 1;
-
 /**
  * Collapse one product's snapshots into the numbers a pick is judged on.
  * Pure, so the thresholds are testable without a database.
@@ -156,78 +151,11 @@ export function pickReason(m: PickMetrics): PickReason | null {
 }
 
 /**
- * Drop the same product sold by five different sellers, and stop one category
- * from eating the list.
- *
- * Live US picks before this: three Tuya smart sockets and two mini fans out of
- * twelve. Each was independently a legitimate mover — they are simply the same
- * thing, and a reader scanning the list sees one idea, not twelve.
- *
- * Title overlap reuses lib/similar.ts rather than a second implementation, and
- * runs on the already-ranked list so the best of each cluster is the one kept.
- */
-export function dedupePicks<T extends { title: string; category?: string }>(
-  ranked: T[],
-  { maxPerCategory = MAX_PER_CATEGORY, seed = [] as T[] }: { maxPerCategory?: number; seed?: T[] } = {}
-): T[] {
-  const out: T[] = [...seed];
-  const perCategory = new Map<string, number>();
-  for (const p of out) {
-    if (p.category) perCategory.set(p.category, (perCategory.get(p.category) || 0) + 1);
-  }
-  for (const p of ranked) {
-    if (out.includes(p)) continue;
-    if (out.some((k) => titleTokenOverlap(k.title, p.title) >= DUPLICATE_OVERLAP)) continue;
-    const cat = p.category || '';
-    if (cat) {
-      const n = perCategory.get(cat) || 0;
-      if (n >= maxPerCategory) continue;
-      perCategory.set(cat, n + 1);
-    }
-    out.push(p);
-  }
-  return out;
-}
-
-/**
- * How interesting, 0-100ish. Momentum and a real discount are what make a
- * product worth interrupting someone for; quality decides whether it is worth
- * showing at all (that gate runs before this).
+ * How interesting, 0-100ish. The terms and their weights live in
+ * lib/ranking.ts, which is what the client re-runs.
  */
 export function scorePick(m: PickMetrics, rating: number, volume: number): number {
-  const momentum = Math.min(40, Math.log10(m.recentPerDay + 1) * 30);
-  const surge = Math.min(25, Math.max(0, (m.surge - 1) * 12));
-  const discount = Math.min(20, Math.max(0, m.dropPct));
-  const quality = (qualityScore({ rating, volume }) / 100) * 15;
-  return Math.round((momentum + surge + discount + quality) * 10) / 10;
-}
-
-/**
- * Round-robin across the three reasons, best first within each.
- *
- * Straight score order gives an all-surging list — momentum scores higher than
- * a discount by construction — and a page or a post that says "surging" five
- * times running is less useful than one that shows what is moving AND what
- * genuinely got cheaper. Round-robin, not a quota, so a reason with nothing in
- * it costs nothing: the remaining reasons just fill the list.
- *
- * Deterministic: same input order in, same output order out.
- */
-export function diversifyPicks(picks: Pick[], limit: number): Pick[] {
-  const order: PickReason[] = ['surging', 'price_drop', 'bestseller'];
-  const buckets = order.map((r) => picks.filter((p) => p.reason === r));
-  const out: Pick[] = [];
-  for (let round = 0; out.length < limit; round++) {
-    let added = false;
-    for (const bucket of buckets) {
-      if (round >= bucket.length) continue;
-      out.push(bucket[round]);
-      added = true;
-      if (out.length === limit) break;
-    }
-    if (!added) break; // every bucket exhausted
-  }
-  return out;
+  return scoreTerms({ ...m, rating, volume }).total;
 }
 
 function db() {
@@ -242,15 +170,20 @@ function db() {
 }
 
 /**
- * Today's picks for a region, best first.
+ * Every product that qualifies as a pick today, scored, best first — before
+ * de-duplication and diversification pick the published dozen.
+ *
+ * This is the disclosed input to the ranking: /api/products/picks?verify=1
+ * serves it so a client can re-run rankPicks() over it and confirm the order it
+ * was given.
  *
  * Reads only our own tables — no AliExpress call — so this is safe to hit from
  * a cron, an API route and a page render alike. Fails open: with no database
  * the caller gets [] and falls back to whatever it showed before.
  */
-export async function getPicks(
+export async function getPickCandidates(
   region: string,
-  { limit = 12, windowDays = 14, reason }: { limit?: number; windowDays?: number; reason?: PickReason } = {}
+  { windowDays = 14, reason }: { windowDays?: number; reason?: PickReason } = {}
 ): Promise<Pick[]> {
   const sql = db();
   if (!sql) return [];
@@ -312,32 +245,17 @@ export async function getPicks(
     });
   }
 
-  const scored = picks
+  return picks
     .filter((p) => p.title && p.imageUrl && p.price > 0)
     .sort((a, b) => b.score - a.score || a.productId.localeCompare(b.productId));
+}
 
-  /**
-   * Reserve one slot for each reason before the category cap is applied.
-   *
-   * Momentum outscores a discount by construction, so with one product per
-   * category the best-scoring member of a category is almost always the surging
-   * one — and it evicts that category's price_drop before the round-robin ever
-   * sees it. Measured on live US data: one price-drop candidate existed and
-   * zero survived. Seeding the best of each reason first means a genuine
-   * discount cannot be starved by a surge in the same aisle.
-   */
-  const seed: Pick[] = [];
-  for (const r of ['surging', 'price_drop', 'bestseller'] as PickReason[]) {
-    const best = scored.find(
-      (p) => p.reason === r && !seed.some((s) => titleTokenOverlap(s.title, p.title) >= DUPLICATE_OVERLAP)
-    );
-    if (best) seed.push(best);
-  }
-
-  const ranked = dedupePicks(scored, { seed });
-
-  // A caller that asked for one reason already has the list it wants.
-  return reason ? ranked.slice(0, limit) : diversifyPicks(ranked, limit);
+/** Today's published picks for a region, best first. */
+export async function getPicks(
+  region: string,
+  { limit = 12, windowDays = 14, reason }: { limit?: number; windowDays?: number; reason?: PickReason } = {}
+): Promise<Pick[]> {
+  return rankPicks(await getPickCandidates(region, { windowDays, reason }), { limit, reason });
 }
 
 /**
