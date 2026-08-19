@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getPicks, type PickReason } from '../../../lib/picks';
+import { getPickCandidates, type PickReason } from '../../../lib/picks';
+import { RANKING_SPEC, rankPicks, scoreTerms } from '../../../lib/ranking';
 import { getRegion, ALL_REGIONS } from '../../../lib/regions';
 import { SITE_URL } from '../../../lib/seo';
 
@@ -14,6 +15,13 @@ import { SITE_URL } from '../../../lib/seo';
  * the quality signals are.
  *
  * Reads only our own tables, so it is cheap and safe to cache.
+ *
+ * The ranking is disclosed, not asserted: every response carries the algorithm
+ * spec and each pick carries the score broken into its terms, and `?verify=1`
+ * adds the full scored candidate list the ranking ran over. A client that wants
+ * to check the order it was given imports lib/ranking.ts (pure, no database)
+ * and calls verifyRanking(candidates, picks) — same code the server ran, so a
+ * mismatch means a real mismatch.
  */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const region = String(req.query.region || 'il').toLowerCase();
@@ -25,7 +33,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const reason = (['surging', 'price_drop', 'bestseller'] as PickReason[]).find((r) => r === reasonParam);
 
   try {
-    const picks = await getPicks(region, { limit, reason });
+    const candidates = await getPickCandidates(region, { reason });
+    const picks = rankPicks(candidates, { limit, reason });
     const config = getRegion(region);
     // Empty is never cached long: the picks table is filled by a daily cron, and
     // a cron that has not run yet must not freeze an empty answer at the CDN.
@@ -38,10 +47,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       region,
       currency: config.currency,
       currencySymbol: config.currencySymbol,
+      ranking: { ...RANKING_SPEC, limit, reason: reason || null },
       picks: picks.map((p) => ({
         ...p,
+        terms: scoreTerms(p),
         url: `${SITE_URL}/${region}/product/${p.productId}`,
       })),
+      // Only on request: the candidate list is every qualifying product, which
+      // is an order of magnitude more rows than the dozen we publish.
+      ...(String(req.query.verify || '') === '1'
+        ? {
+            candidates: candidates.map((p) => ({
+              productId: p.productId,
+              title: p.title,
+              category: p.category,
+              reason: p.reason,
+              score: p.score,
+              recentPerDay: p.recentPerDay,
+              surge: p.surge,
+              dropPct: p.dropPct,
+              rating: p.rating,
+              volume: p.volume,
+            })),
+          }
+        : {}),
     });
   } catch (error: any) {
     res.status(200).json({ success: false, error: error.message, picks: [] });
