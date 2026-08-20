@@ -60,6 +60,8 @@ export interface PickMetrics {
   priceMedian: number | null;
   /** Percent below its own median price. Negative means it got more expensive. */
   dropPct: number;
+  /** Date (YYYY-MM-DD) of the most recent snapshot behind these numbers. */
+  asOf: string;
 }
 
 export interface Pick extends PickMetrics {
@@ -140,6 +142,7 @@ export function aggregateSnapshots(snaps: PickSnapshot[]): PickMetrics | null {
     priceNow,
     priceMedian,
     dropPct,
+    asOf: last.seenOn,
   };
 }
 

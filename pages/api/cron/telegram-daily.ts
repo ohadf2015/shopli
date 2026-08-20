@@ -50,9 +50,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const out: Record<string, string> = {};
   for (const { code, chatId } of targets) {
     const picks = await getPicks(code, { limit: 12 }).catch(() => []);
+    // Build a map of productId -> { writtenCount } for the reviews we are about to warm.
+    const reviewsMap: Record<string, { writtenCount?: number }> = {};
+    for (const p of picks.slice(0, count)) {
+      const reviews = await getProductReviews(p.productId, code, { timeoutMs: 3000 }).catch(() => null);
+      if (reviews) {
+        reviewsMap[p.productId] = { writtenCount: reviews.writtenCount };
+      }
+      // Warm the reviews for what we are about to broadcast, so the product pages
+      // these links land on already have them. This lives here rather than in the
+      // snapshot cron: that function's headroom against its 300s ceiling is
+      // unmeasured, and a snapshot day that gets truncated cannot be backfilled.
+      await getProductReviews(p.productId, code, { timeoutMs: 3000 }).catch(() => null);
+    }
+
     const message = buildPicksMessage(code, picks, {
       currencySymbol: getRegion(code).currencySymbol,
       count,
+      reviews: reviewsMap,
     });
 
     if (!message) {

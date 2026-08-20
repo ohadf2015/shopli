@@ -31,6 +31,7 @@ const COPY: Record<string, {
   surge: (x: string) => string;
   drop: (p: number, d: number) => string;
   rating: (r: number) => string;
+  reviews: (n: string) => string;
   footer: string;
   see: string;
 }> = {
@@ -41,6 +42,7 @@ const COPY: Record<string, {
     surge: (x) => `פי ${x} מהקצב הרגיל שלו`,
     drop: (p, d) => `${p}% מתחת למחיר החציוני שלו ב-${d} הימים האחרונים`,
     rating: (r) => `${r}% משוב חיובי`,
+    reviews: (n) => `${n} ביקורות קונים`,
     footer: 'כל מוצר נבדק מול דירוג המוכר וכמות ההזמנות — מה שלא עובר, לא נכנס.',
     see: 'לצפייה בשופלי',
   },
@@ -51,6 +53,7 @@ const COPY: Record<string, {
     surge: (x) => `${x}x its usual rate`,
     drop: (p, d) => `${p}% below its own median price over ${d} days`,
     rating: (r) => `${r}% positive feedback`,
+    reviews: (n) => `${n} buyer reviews`,
     footer: 'Every pick is checked against seller rating and order count — what fails is not shown.',
     see: 'See it on Shopli',
   },
@@ -79,12 +82,22 @@ export function shortTitle(title: string, max = 70): string {
 export function buildPicksMessage(
   region: string,
   picks: Pick[],
-  { currencySymbol = '', count = 5 }: { currencySymbol?: string; count?: number } = {}
+  { currencySymbol = '', count = 5, reviews }: {
+    currencySymbol?: string;
+    count?: number;
+    /**
+     * Buyer review counts by product id (lib/review-store.ts, sourced from
+     * feedback.aliexpress.com). Optional: without it the post simply omits
+     * review counts rather than printing "0 reviews".
+     */
+    reviews?: Record<string, { writtenCount?: number }>;
+  } = {}
 ): string | null {
   const chosen = picks.slice(0, count);
   if (!chosen.length) return null;
 
   const c = COPY[LANG[region] || 'en'] || COPY.en;
+  const locale = LANG[region] === 'he' ? 'he-IL' : 'en-US';
   let msg = `${FLAG[region] || '🛍'} *${escapeMarkdown(c.header)}*\n\n`;
 
   chosen.forEach((p, i) => {
@@ -98,6 +111,8 @@ export function buildPicksMessage(
       facts.push(c.perDay(Math.round(p.perDay)));
     }
     if (p.rating > 0) facts.push(c.rating(Math.round(p.rating)));
+    const written = reviews?.[p.productId]?.writtenCount ?? 0;
+    if (written > 0) facts.push(c.reviews(written.toLocaleString(locale)));
 
     msg += `${ICON[p.reason]} *${i + 1}\\. ${escapeMarkdown(shortTitle(p.title))}*\n`;
     msg += `${escapeMarkdown(`${currencySymbol}${p.price.toFixed(2)}`)} · _${escapeMarkdown(c.reason[p.reason])}_\n`;

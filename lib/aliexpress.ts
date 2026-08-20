@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { passesQualityGate } from './quality';
 import { getHebrewTitles } from './hebrew-titles';
+import { cleanTitle } from './titles';
 
 const REGION_MAP: Record<string, { language: string; currency: string; shipToCountry: string }> = {
   il: { language: 'HE', currency: 'ILS', shipToCountry: 'IL' },
@@ -159,7 +160,7 @@ export async function searchAliExpress(keywords: string, region: string, pageSiz
     return {
     id: String(p.product_id),
     sku: p.sku_id || '',
-    title: cfg.language === 'HE' ? sanitizeHebrewTitle(rawTitle) : rawTitle,
+    title: cfg.language === 'HE' ? sanitizeHebrewTitle(rawTitle) : cleanTitle(rawTitle),
     price: parseFloat(p.target_sale_price || '0'),
     originalPrice: p.target_original_price ? parseFloat(p.target_original_price) : null,
     currency: p.target_sale_price_currency || cfg.currency,
@@ -249,7 +250,7 @@ function mapRawProduct(p: any, cfg: { language: string; currency: string; shipTo
   return {
     id: String(p.product_id),
     sku: p.sku_id || '',
-    title: cfg.language === 'HE' ? sanitizeHebrewTitle(rawTitle) : rawTitle,
+    title: cfg.language === 'HE' ? sanitizeHebrewTitle(rawTitle) : cleanTitle(rawTitle),
     price: parseFloat(p.target_sale_price || p.sale_price || '0'),
     originalPrice: (p.target_original_price || p.original_price)
       ? parseFloat(p.target_original_price || p.original_price)

@@ -29,6 +29,10 @@ export interface MoverItem {
   dropPct: number;
   spanDays: number;
   rating: number;
+  /** 1-5 average from real buyer ratings; 0 when the store has none yet. */
+  stars: number;
+  /** Written buyer reviews (feedback endpoint's writtenCount); 0 = unknown, render nothing. */
+  reviewCount: number;
 }
 
 const COPY = {
@@ -41,6 +45,8 @@ const COPY = {
     perDay: (n: string) => `${n} a day right now`,
     surge: (x: string) => `${x}× its usual rate`,
     drop: (p: number, d: number) => `${p}% below its own ${d}-day median`,
+    reviews: (n: string) => `${n} reviews`,
+    asOf: (d: string) => `as of ${d}`,
     all: 'Play Guess the Price',
   },
   he: {
@@ -52,6 +58,8 @@ const COPY = {
     perDay: (n: string) => `${n} ביום עכשיו`,
     surge: (x: string) => `פי ${x} מהקצב הרגיל שלו`,
     drop: (p: number, d: number) => `${p}% מתחת לחציון של ${d} ימים`,
+    reviews: (n: string) => `${n} ביקורות`,
+    asOf: (d: string) => `נכון ל-${d}`,
     all: 'למשחק נחשו את המחיר',
   },
 };
@@ -68,23 +76,35 @@ export default function MoversRail({
   rtl,
   lang,
   currencySymbol,
+  asOf,
 }: {
   items: MoverItem[];
   region: string;
   rtl: boolean;
   lang: string;
   currencySymbol: string;
+  /** YYYY-MM-DD of the newest snapshot behind the rail; empty hides the date. */
+  asOf?: string;
 }) {
   if (!items.length) return null;
   const c = rtl ? COPY.he : COPY.en;
   const locale = lang === 'he' ? 'he-IL' : 'en-US';
   const num = (n: number) => Math.round(n).toLocaleString(locale);
+  // "Moving right now" is only honest with its date attached: the numbers come
+  // from the daily snapshot sweep, so the rail says which day they describe.
+  const asOfLabel = asOf
+    ? c.asOf(new Date(`${asOf}T00:00:00`).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' }))
+    : '';
 
   const fact = (m: MoverItem) => {
     if (m.reason === 'price_drop') return c.drop(m.dropPct, m.spanDays);
     if (m.reason === 'surging') return `${c.perDay(num(m.recentPerDay))} · ${c.surge(m.surge.toFixed(1))}`;
     return c.perDay(num(m.perDay));
   };
+
+  // Prefer the real buyer average; fall back to the seller's positive-feedback
+  // rate (0-100) mapped onto the same 1-5 scale. 0 means render nothing.
+  const starsOf = (m: MoverItem) => m.stars > 0 ? m.stars : m.rating > 0 ? m.rating / 20 : 0;
 
   return (
     <section className="py-10 md:py-12 bg-white">
@@ -97,6 +117,11 @@ export default function MoversRail({
             <p className="text-sm max-w-2xl" style={{ color: 'var(--shopli-warm-gray)' }}>
               {c.lead}
             </p>
+            {asOfLabel && (
+              <p className="text-[11px] mt-1 font-medium" style={{ color: 'var(--shopli-warm-gray)' }}>
+                {asOfLabel}
+              </p>
+            )}
           </div>
           <Link
             href={`/${region}/game`}
@@ -131,6 +156,14 @@ export default function MoversRail({
                 >
                   {BADGE[m.reason].icon} {c[m.reason]}
                 </span>
+                {m.dropPct > 0 && (
+                  <span
+                    className="absolute top-2 end-2 text-[11px] font-bold px-2 py-1 rounded-full bg-white/95 backdrop-blur-sm shadow-sm"
+                    style={{ color: 'var(--shopli-orange)' }}
+                  >
+                    -{m.dropPct}%
+                  </span>
+                )}
               </div>
               <div className="p-3">
                 <h3 className="text-sm font-semibold line-clamp-2 mb-1" style={{ color: 'var(--shopli-navy)' }}>
@@ -139,6 +172,23 @@ export default function MoversRail({
                 <div className="text-base font-bold mb-1" style={{ color: 'var(--shopli-orange)' }}>
                   {currencySymbol}{m.price.toFixed(2)}
                 </div>
+                {(starsOf(m) > 0 || m.reviewCount > 0) && (
+                  <div className="flex items-center gap-1 flex-wrap mb-1" style={{ color: 'var(--shopli-warm-gray)' }}>
+                    {starsOf(m) > 0 && (
+                      <>
+                        <Icon name="star" size={11} className="text-yellow-500 shrink-0" />
+                        <span className="text-[11px] font-medium tabular-nums">
+                          {starsOf(m).toFixed(1)}
+                        </span>
+                      </>
+                    )}
+                    {m.reviewCount > 0 && (
+                      <span className="text-[11px]">
+                        ({m.reviewCount > 999 ? `${(m.reviewCount / 1000).toFixed(1)}k` : num(m.reviewCount)})
+                      </span>
+                    )}
+                  </div>
+                )}
                 <p className="text-[11px] leading-snug" style={{ color: 'var(--shopli-warm-gray)' }}>
                   {fact(m)}
                 </p>
