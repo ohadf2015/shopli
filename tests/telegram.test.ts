@@ -8,7 +8,7 @@ function pick(over: Partial<Pick> = {}): Pick {
     productId: '1005001', title: 'Silicone Face Brush', price: 5.98, currency: 'ILS',
     imageUrl: 'x', rating: 96, volume: 4000, category: 'Beauty', reason: 'surging' as PickReason, score: 80,
     perDay: 551, recentPerDay: 2178, surge: 3.95, spanDays: 4,
-    priceNow: 5.98, priceMedian: 6.92, dropPct: 14, ...over,
+    priceNow: 5.98, priceMedian: 6.92, dropPct: 14, asOf: '2026-08-15', ...over,
   };
 }
 
@@ -24,6 +24,23 @@ test('the post states why each product is in it', () => {
   assert.match(msg, /2178 selling a day right now/);
   assert.match(msg, /4\\\.0x its usual rate/);
   assert.match(msg, /28% below its own median price over 4 days/);
+});
+
+test('review counts appear in the post when provided', () => {
+  const msg = buildPicksMessage('us', [pick()], {
+    currencySymbol: '$',
+    reviews: { '1005001': { writtenCount: 124 } },
+  })!;
+  assert.match(msg, /124 buyer reviews/);
+});
+
+test('missing review count omits the line rather than showing zero', () => {
+  const msg = buildPicksMessage('us', [pick()], {
+    currencySymbol: '$',
+    // No review data provided for this product
+  })!;
+  // No "0 buyer reviews" or similar line should appear
+  assert.equal(msg.split('\n').filter(line => line.includes('buyer reviews')).length, 0);
 });
 
 test('links go to Shopli, never straight to AliExpress', () => {

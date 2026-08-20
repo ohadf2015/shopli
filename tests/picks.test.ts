@@ -34,6 +34,14 @@ test('surge compares the latest day against the products own rate', () => {
   assert.equal(pickReason(m), 'surging');
 });
 
+test('the freshness date is the latest reading behind the numbers', () => {
+  const m = aggregateSnapshots(snaps([
+    ['2026-08-10', 100, 10],
+    ['2026-08-15', 150, 10],
+  ]))!;
+  assert.equal(m.asOf, '2026-08-15');
+});
+
 test('a slow product selling one extra unit is not surging', () => {
   const m = aggregateSnapshots(snaps([
     ['2026-08-12', 100, 10],
@@ -93,7 +101,7 @@ test('scoring is deterministic and rewards momentum over popularity', () => {
 function pick(id: string, reason: PickReason, score: number): Pick {
   return {
     productId: id, reason, score, perDay: 1, recentPerDay: 1, surge: 1, spanDays: 7,
-    priceNow: 10, priceMedian: 10, dropPct: 0, title: id, price: 10, currency: 'ILS',
+    priceNow: 10, priceMedian: 10, dropPct: 0, asOf: '2026-08-15', title: id, price: 10, currency: 'ILS',
     imageUrl: 'x', rating: 95, volume: 1000, category: id,
   };
 }

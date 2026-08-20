@@ -45,11 +45,13 @@ test('il search titles get MT-artifact cleanup (geresh spacing, fused Latin)', a
   }
 });
 
-test('non-HE regions keep raw titles untouched', async () => {
+test('non-HE titles go through cleanTitle (conservative: whitespace, filler, misspellings)', async () => {
   const restore = stubFetch(queryResponse(["Nonלהחליק gadget 's  mix"]));
   try {
     const products = await searchAliExpress('kitchen', 'us', 1);
-    assert.equal(products[0].title, "Nonלהחליק gadget 's  mix");
+    // cleanTitle only collapses the doubled space here — an unfamiliar title
+    // is otherwise passed through untouched.
+    assert.equal(products[0].title, "Nonלהחליק gadget 's mix");
   } finally {
     restore();
   }

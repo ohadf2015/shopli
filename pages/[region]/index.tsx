@@ -10,6 +10,7 @@ import { getRegion, isValidRegion, RegionCode } from '../../lib/regions';
 import { getFeaturedCollections } from '../../lib/collections';
 import { getThemeGroups, type ThemeGroup } from '../../lib/collection-themes';
 import { getPicks } from '../../lib/picks';
+import { getReviewsBatch } from '../../lib/review-store';
 import { breadcrumbJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
 import { buildTrending, dedupeAcrossSections } from '../../lib/trending';
 import { trendingEnabled } from '../../lib/flags';
@@ -38,6 +39,8 @@ interface HomePageProps {
   themes: ThemeGroup[];
   trending: TrendingItem[];
   movers: MoverItem[];
+  /** YYYY-MM-DD of the newest snapshot behind the movers rail; '' when unknown. */
+  moversAsOf: string;
 }
 
 /**
@@ -71,7 +74,7 @@ async function fetchCollectionProducts(region: string, keywords: string[], limit
   } catch { return []; }
 }
 
-export default function HomePage({ region, config, groups, rtl, orderedSlugs, themes, trending, movers }: HomePageProps) {
+export default function HomePage({ region, config, groups, rtl, orderedSlugs, themes, trending, movers, moversAsOf }: HomePageProps) {
   const t = (text?: Record<string, string> | null) => text?.[config.lang] || text?.en || '';
 
   const heroTitle = rtl ? 'מצאו את הדילים הכי שווים מאליאקספרס' : 'The Best AliExpress Deals, Curated for You';
@@ -155,6 +158,7 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs, th
           rtl={rtl}
           lang={config.lang || 'en'}
           currencySymbol={config.currencySymbol}
+          asOf={moversAsOf}
         />
 
         {/* COLLECTIONS GRID */}
@@ -480,7 +484,14 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
   // a database, which just hides the rail. Only the fields the rail renders are
   // passed through — Next serialises every prop into __NEXT_DATA__, and a Pick
   // carries snapshot internals no card reads.
-  const movers: MoverItem[] = (await getPicks(region, { limit: 8 }).catch(() => [])).map((p) => ({
+  const picks = await getPicks(region, { limit: 8 }).catch(() => []);
+  // Trust data from the review store (feedback.aliexpress.com, warmed by the
+  // daily cron and PDP views). Store-only — a homepage render must not fan out
+  // upstream calls; a product nobody has warmed simply shows no count.
+  const moverReviews = picks.length
+    ? await getReviewsBatch(region, picks.map((p) => p.productId)).catch(() => ({}))
+    : {};
+  const movers: MoverItem[] = picks.map((p) => ({
     productId: p.productId,
     title: p.title,
     imageUrl: p.imageUrl,
@@ -492,7 +503,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
     dropPct: p.dropPct,
     spanDays: p.spanDays,
     rating: p.rating,
+    stars: moverReviews[p.productId]?.averageStars ?? 0,
+    reviewCount: moverReviews[p.productId]?.writtenCount ?? 0,
   }));
+  // The rail's freshness date is the newest snapshot any pick is ranked on.
+  const moversAsOf = picks.map((p) => p.asOf).sort().pop() ?? '';
 
   // Same supplier item is often relisted under new IDs, so ID-dedupe alone
   // lets one title appear in the rail AND a section (or twice across
@@ -517,6 +532,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
       themes: getThemeGroups(config.lang || 'en'),
       trending,
       movers,
+      moversAsOf,
     },
   };
 };
