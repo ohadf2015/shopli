@@ -88,7 +88,7 @@ export default function SeoHead({
         <script
           key={`ld-${i}`}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, '\\u003c') }}
         />
       ))}
       {children}
