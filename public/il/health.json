@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "version": "2.1.0",
+  "generatedAt": "2026-08-31T04:50:43.592Z",
+  "lastUpdated": "2026-08-31T04:50:43.592Z",
+  "trackingId": "fish",
+  "totalDeals": 120,
+  "site": "https://www.tryshopli.com/il",
+  "checks": {
+    "dealsJson": "https://www.tryshopli.com/il/data/deals.json",
+    "categories": [
+      "tech",
+      "smart-home",
+      "audio",
+      "gadgets",
+      "fashion",
+      "tools",
+      "sport",
+      "kitchen",
+      "car",
+      "pets"
+    ]
+  }
+}
