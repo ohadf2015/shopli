@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 
 // Shared validation core (plain JS, no build step needed)
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -19,11 +20,22 @@ function existingSlugs(): string[] {
 
 function authorized(req: NextApiRequest): boolean {
   const token = process.env.ADMIN_TOKEN;
-  if (!token) return false; // no token configured => server-side commit disabled
-  return req.headers['x-admin-token'] === token;
+  if (!token) return false; // fail closed if unset
+  const header = req.headers['x-admin-token'];
+  const provided = typeof header === 'string' ? header : Array.isArray(header) ? header[0] : undefined;
+  if (typeof provided !== 'string') return false;
+  const a = Buffer.from(provided);
+  const b = Buffer.from(token);
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (!authorized(req)) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
   if (req.method === 'GET') {
     res.status(200).json({ template: TEMPLATE_CSV });
     return;
