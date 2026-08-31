@@ -426,6 +426,11 @@ export default function ProductComparePage({
                           target="_blank"
                           rel="nofollow sponsored noopener noreferrer"
                           className="btn-primary w-full text-xs py-2"
+                          data-product-id={p.id}
+                          data-product-title={p.title}
+                          data-price={p.price.toFixed(2)}
+                          data-currency={config.currencySymbol}
+                          data-category={p.category || ''}
                         >
                           <Icon name="external" size={12} />
                           {rtl ? 'קנו עכשיו' : 'Buy now'}
@@ -557,6 +562,11 @@ export default function ProductComparePage({
                   target="_blank"
                   rel="nofollow sponsored noopener noreferrer"
                   className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-white hover:border-orange-200 hover:shadow-sm transition-all"
+                  data-product-id={p.id}
+                  data-product-title={p.title}
+                  data-price={p.price.toFixed(2)}
+                  data-currency={config.currencySymbol}
+                  data-category={p.category || ''}
                 >
                   {p.imageUrl && (
                     <img

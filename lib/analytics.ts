@@ -137,12 +137,24 @@ function isAffiliateUrl(url: URL): boolean {
   return AFFILIATE_HOST_RE.test(url.hostname) || url.hostname.endsWith('.aliexpress.com');
 }
 
+function regionFromPath(path: string): string | undefined {
+  const m = path.match(/^\/([a-z]{2})(?:\/|$)/);
+  return m?.[1];
+}
+
+function numericPrice(raw: string | undefined | null): number | undefined {
+  if (raw == null || raw === '') return undefined;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : undefined;
+}
+
 /**
  * Installs ONE delegated click listener on document that fires:
  *  - affiliate_click for any anchor pointing at AliExpress (incl. s.click short links)
  *  - outbound_click for Telegram / WhatsApp links
- * Product metadata is read from data-* attributes on the closest `.product-card`
- * (rendered by components/ProductCard.tsx) or the anchor itself.
+ * Product metadata is read from data-* attributes on the closest `[data-product-id]`
+ * / `.product-card` ancestor (rendered by components/ProductCard.tsx) or the anchor
+ * itself, so direct affiliate CTAs on compare/mood/PDP pages are all tracked.
  * Returns an uninstall function.
  */
 export function installClickTracking(): () => void {
@@ -168,8 +180,9 @@ export function installClickTracking(): () => void {
         product: attr(card, 'data-product-title'),
         product_id: attr(card, 'data-product-id'),
         category: attr(card, 'data-category'),
-        price: attr(card, 'data-price'),
+        price: numericPrice(attr(card, 'data-price')),
         currency: attr(card, 'data-currency'),
+        region: attr(card, 'data-region') || regionFromPath(page),
         page,
         url: anchor.href,
       };
@@ -181,9 +194,9 @@ export function installClickTracking(): () => void {
     }
 
     if (url.hostname === 't.me' || url.hostname === 'telegram.me') {
-      capture('outbound_click', { target: 'telegram', page, url: anchor.href });
+      capture('outbound_click', { target: 'telegram', page, url: anchor.href, region: regionFromPath(page) });
     } else if (url.hostname === 'wa.me' || url.hostname.endsWith('.whatsapp.com')) {
-      capture('outbound_click', { target: 'whatsapp', page, url: anchor.href });
+      capture('outbound_click', { target: 'whatsapp', page, url: anchor.href, region: regionFromPath(page) });
     }
   };
 

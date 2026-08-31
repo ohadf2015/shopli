@@ -136,7 +136,13 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
                     <div className="grid grid-cols-2 gap-2">
                       {items.slice(0, 4).map((item: any, i: number) => (
                         <a key={i} href={item.affiliateLink} target="_blank" rel="nofollow sponsored noopener noreferrer"
-                          className="block bg-gray-50 rounded-lg p-2 hover:shadow transition">
+                          className="block bg-gray-50 rounded-lg p-2 hover:shadow transition"
+                          data-product-id={item.id}
+                          data-product-title={item.title}
+                          data-price={typeof item.price === 'number' ? item.price.toFixed(2) : String(item.price)}
+                          data-currency={config?.currencySymbol || item.currency || ''}
+                          data-category={item.category || ''}
+                        >
                           <img
                             {...productImage(item.imageUrl || item.image, 200)}
                             alt={item.title}

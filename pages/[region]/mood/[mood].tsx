@@ -10,7 +10,7 @@ import { productImage } from '../../../lib/img';
 import { articleJsonLd, breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
 import { cacheIfNotEmpty } from '../../../lib/cache';
 
-interface Product { id: string; title: string; price: number; originalPrice: number | null; currency: string; imageUrl: string; affiliateLink: string; rating: number; reviewCount: number; volume: number; shopName: string; discount: string; }
+interface Product { id: string; title: string; price: number; originalPrice: number | null; currency: string; imageUrl: string; affiliateLink: string; rating: number; reviewCount: number; volume: number; shopName: string; discount: string; category?: string; }
 interface ItemGroup { caption: string; note: string; products: Product[]; }
 
 function Stars({ rating, size = 10 }: { rating: number; size?: number }) {
@@ -143,7 +143,13 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {group.products.slice(0, 4).map((p: Product) => (
                   <a key={p.id} href={p.affiliateLink} target="_blank" rel="noopener noreferrer sponsored"
-                    className="bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">
+                    className="bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all"
+                    data-product-id={p.id}
+                    data-product-title={p.title}
+                    data-price={p.price.toFixed(2)}
+                    data-currency={config?.currencySymbol || p.currency || ''}
+                    data-category={p.category || ''}
+                  >
                     <div className="aspect-square bg-gray-100 overflow-hidden relative">
                       {p.imageUrl ? (
                         <img {...productImage(p.imageUrl, 400, '(max-width: 640px) 50vw, 400px')} alt={p.title} className="w-full h-full object-cover hover:scale-105 transition-transform" />
