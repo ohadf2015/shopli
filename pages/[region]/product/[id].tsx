@@ -298,6 +298,7 @@ export default function ProductPage({
                 data-price={product.price.toFixed(2)}
                 data-currency={config.currencySymbol}
                 data-category={product.category || ''}
+                data-region={region}
               >
                 <Icon name="external" size={16} />
                 {rtl ? 'קנו עכשיו באליאקספרס' : 'Buy now on AliExpress'}

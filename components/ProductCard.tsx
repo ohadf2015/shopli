@@ -138,6 +138,7 @@ export default function ProductCard({
       data-price={price.toFixed(2)}
       data-currency={currencySymbol}
       data-category={category}
+      data-region={region}
       data-trending-hub={trendingHub || undefined}
     >
       {/* Main link covering the entire card */}
