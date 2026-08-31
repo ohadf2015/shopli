@@ -61,7 +61,7 @@ export default function ShopliApp({ Component, pageProps }: AppProps) {
             second, region-less copy here put two WebSite nodes on every page. */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd).replace(/</g, '\\u003c') }}
         />
       </Head>
       <style jsx global>{`
