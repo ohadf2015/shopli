@@ -137,12 +137,12 @@ function isAffiliateUrl(url: URL): boolean {
   return AFFILIATE_HOST_RE.test(url.hostname) || url.hostname.endsWith('.aliexpress.com');
 }
 
-function regionFromPath(path: string): string | undefined {
+export function regionFromPath(path: string): string | undefined {
   const m = path.match(/^\/([a-z]{2})(?:\/|$)/);
   return m?.[1];
 }
 
-function numericPrice(raw: string | undefined | null): number | undefined {
+export function numericPrice(raw: string | undefined | null): number | undefined {
   if (raw == null || raw === '') return undefined;
   const n = Number(raw);
   return Number.isFinite(n) ? n : undefined;
