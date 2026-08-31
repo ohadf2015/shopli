@@ -17,6 +17,16 @@ const PALETTE = {
   'gray-200': '#e5e7eb',
 };
 
+function isAllowedImageHost(hostname: string): boolean {
+  const host = hostname.toLowerCase();
+  return (
+    host === 'alicdn.com' ||
+    host.endsWith('.alicdn.com') ||
+    host === 'aliexpress-media.com' ||
+    host.endsWith('.aliexpress-media.com')
+  );
+}
+
 /**
  * Fetch a remote product image and inline it as a data URI so satori never
  * has to fetch during render (a failed render-time fetch kills the whole
@@ -24,12 +34,27 @@ const PALETTE = {
  */
 async function fetchImageAsDataUri(url: string | null): Promise<string | null> {
   if (!url || !/^https:\/\//i.test(url)) return null;
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return null;
+  }
+  if (parsed.protocol !== 'https:') return null;
+  if (!isAllowedImageHost(parsed.hostname)) return null;
   try {
     const res = await fetch(url, {
       signal: AbortSignal.timeout(4000),
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; shopli-og/1.0)' },
     });
     if (!res.ok) return null;
+    // Re-check the final URL after redirects so we never follow off-allowlist.
+    try {
+      const finalUrl = new URL(res.url);
+      if (finalUrl.protocol !== 'https:' || !isAllowedImageHost(finalUrl.hostname)) return null;
+    } catch {
+      return null;
+    }
     const contentType = (res.headers.get('content-type') || '').split(';')[0].trim();
     if (!contentType.startsWith('image/')) return null;
     const buf = new Uint8Array(await res.arrayBuffer());
