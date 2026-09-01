@@ -3,9 +3,11 @@ import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
+import BrowseNext from '../../../components/BrowseNext';
 import WhatsAppShare from '../../../components/WhatsAppShare';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, isValidRegion, RegionCode, RegionConfig } from '../../../lib/regions';
+import { trackCompareNextAction } from '../../../lib/analytics';
 import type { SearchProduct } from '../../../lib/aliexpress';
 import { productImage } from '../../../lib/img';
 import { listingAggregateFields } from '../../../lib/pdp';
@@ -182,6 +184,26 @@ export default function ProductComparePage({
 
   const emptyState = products.length === 0;
 
+  // "Our pick": the product winning the most differing spec rows, tie-broken by
+  // lowest price. Gives a visitor who finished comparing one obvious next step
+  // instead of a dead end (compare bounce is 97-99%).
+  const bestPick = (() => {
+    if (products.length < MIN_COMPARE_PRODUCTS) return null;
+    const wins = products.map(
+      (_, i) => rows.filter((r) => r.differs && r.bestIndex === i).length
+    );
+    let best = 0;
+    for (let i = 1; i < products.length; i++) {
+      if (
+        wins[i] > wins[best] ||
+        (wins[i] === wins[best] && products[i].price < products[best].price)
+      ) {
+        best = i;
+      }
+    }
+    return { product: products[best], wins: wins[best] };
+  })();
+
   return (
     <>
       <SeoHead
@@ -347,6 +369,19 @@ export default function ProductComparePage({
             >
               {rtl ? 'השוואת דוגמה' : 'Load sample comparison'}
             </a>
+            <p className="mt-4 text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {rtl ? 'או ' : 'or '}
+              <a
+                href={`/${region}/trending`}
+                onClick={() =>
+                  trackCompareNextAction({ region, surface: 'compare_tool', target: 'trending' })
+                }
+                className="font-semibold underline"
+                style={{ color: 'var(--shopli-orange)' }}
+              >
+                {rtl ? 'גלו מה טרנדי עכשיו' : 'browse what is trending now'}
+              </a>
+            </p>
           </div>
         ) : (
           <>
@@ -434,6 +469,21 @@ export default function ProductComparePage({
                         >
                           <Icon name="external" size={12} />
                           {rtl ? 'קנו עכשיו' : 'Buy now'}
+                        </a>
+                        <a
+                          href={`/${region}/product/${encodeURIComponent(p.id)}`}
+                          onClick={() =>
+                            trackCompareNextAction({
+                              region,
+                              surface: 'compare_tool',
+                              target: 'pdp',
+                              product_id: p.id,
+                            })
+                          }
+                          className="mt-1.5 block text-center text-xs font-medium py-1.5 rounded-lg border border-gray-200 hover:border-orange-200 hover:bg-orange-50/50 transition-colors"
+                          style={{ color: 'var(--shopli-navy)' }}
+                        >
+                          {rtl ? 'פרטים ומוצרים דומים' : 'Details & similar'}
                         </a>
                       </div>
                     </div>
@@ -553,6 +603,76 @@ export default function ProductComparePage({
               </div>
             </section>
 
+            {/* Our pick — the single next action after comparing */}
+            {bestPick && (
+              <div className="mt-8 rounded-xl border border-orange-100 bg-gradient-to-r from-orange-50 to-amber-50 p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4">
+                {bestPick.product.imageUrl && (
+                  <img
+                    {...productImage(bestPick.product.imageUrl, 160)}
+                    alt=""
+                    className="w-16 h-16 object-contain rounded-lg bg-white shrink-0 self-center"
+                  />
+                )}
+                <div className="min-w-0 flex-1 text-center sm:text-start">
+                  <p
+                    className="text-xs font-semibold uppercase tracking-wider mb-1 inline-flex items-center gap-1"
+                    style={{ color: 'var(--shopli-orange)' }}
+                  >
+                    <Icon name="check" size={12} />
+                    {rtl ? 'הבחירה שלנו' : 'Our pick'}
+                    {bestPick.wins > 0 &&
+                      (rtl
+                        ? ` — מנצח ב-${bestPick.wins} מפרטים`
+                        : ` — wins ${bestPick.wins} spec${bestPick.wins === 1 ? '' : 's'}`)}
+                  </p>
+                  <p
+                    className="text-sm font-bold line-clamp-2"
+                    style={{ color: 'var(--shopli-navy)' }}
+                  >
+                    {bestPick.product.title}
+                  </p>
+                  <p
+                    className="text-base font-bold mt-0.5"
+                    style={{ color: 'var(--shopli-teal)' }}
+                  >
+                    {config.currencySymbol}
+                    {bestPick.product.price.toFixed(2)}
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2 shrink-0 sm:w-48">
+                  <a
+                    href={`/${region}/product/${encodeURIComponent(bestPick.product.id)}`}
+                    onClick={() =>
+                      trackCompareNextAction({
+                        region,
+                        surface: 'compare_tool',
+                        target: 'best_pick',
+                        product_id: bestPick.product.id,
+                      })
+                    }
+                    className="btn-primary text-sm text-center"
+                  >
+                    {rtl ? 'לפרטים המלאים' : 'View full details'}
+                  </a>
+                  <a
+                    href={bestPick.product.affiliateLink || '#'}
+                    target="_blank"
+                    rel="nofollow sponsored noopener noreferrer"
+                    className="text-xs text-center font-medium py-1 hover:underline inline-flex items-center justify-center gap-1"
+                    style={{ color: 'var(--shopli-warm-gray)' }}
+                    data-product-id={bestPick.product.id}
+                    data-product-title={bestPick.product.title}
+                    data-price={bestPick.product.price.toFixed(2)}
+                    data-currency={config.currencySymbol}
+                    data-category={bestPick.product.category || ''}
+                  >
+                    <Icon name="external" size={12} />
+                    {rtl ? 'קנו ישירות ב-AliExpress' : 'Buy directly on AliExpress'}
+                  </a>
+                </div>
+              </div>
+            )}
+
             {/* CTA row */}
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {products.map((p) => (
@@ -636,6 +756,8 @@ export default function ProductComparePage({
                 />
               </div>
             </div>
+
+            <BrowseNext region={region} rtl={rtl} surface="compare_tool" />
           </>
         )}
       </main>

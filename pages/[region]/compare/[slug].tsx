@@ -1,9 +1,11 @@
 import { GetServerSideProps } from 'next';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
+import BrowseNext from '../../../components/BrowseNext';
 import SeoHead from '../../../components/SeoHead';
 import ShareBar from '../../../components/ShareBar';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
+import { trackCompareNextAction } from '../../../lib/analytics';
 import { getComparison } from '../../../lib/comparisons';
 import { productImage } from '../../../lib/img';
 import { listingAggregateFields } from '../../../lib/pdp';
@@ -135,25 +137,44 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
                     </h3>
                     <div className="grid grid-cols-2 gap-2">
                       {items.slice(0, 4).map((item: any, i: number) => (
-                        <a key={i} href={item.affiliateLink} target="_blank" rel="nofollow sponsored noopener noreferrer"
-                          className="block bg-gray-50 rounded-lg p-2 hover:shadow transition"
-                          data-product-id={item.id}
-                          data-product-title={item.title}
-                          data-price={typeof item.price === 'number' ? item.price.toFixed(2) : String(item.price)}
-                          data-currency={config?.currencySymbol || item.currency || ''}
-                          data-category={item.category || ''}
-                        >
-                          <img
-                            {...productImage(item.imageUrl || item.image, 200)}
-                            alt={item.title}
-                            className="w-full h-20 object-contain mb-1"
-                          />
-                          <p className="text-xs text-gray-700 line-clamp-2">{item.title}</p>
-                          <p className="text-xs font-bold mt-1 tabular-nums" style={{ color: 'var(--shopli-orange)' }} dir="ltr">
-                            {config?.currencySymbol || ''}
-                            {typeof item.price === 'number' ? item.price.toFixed(2) : item.price}
-                          </p>
-                        </a>
+                        <div key={i} className="bg-gray-50 rounded-lg p-2 hover:shadow transition">
+                          <a href={item.affiliateLink} target="_blank" rel="nofollow sponsored noopener noreferrer"
+                            className="block"
+                            data-product-id={item.id}
+                            data-product-title={item.title}
+                            data-price={typeof item.price === 'number' ? item.price.toFixed(2) : String(item.price)}
+                            data-currency={config?.currencySymbol || item.currency || ''}
+                            data-category={item.category || ''}
+                          >
+                            <img
+                              {...productImage(item.imageUrl || item.image, 200)}
+                              alt={item.title}
+                              className="w-full h-20 object-contain mb-1"
+                            />
+                            <p className="text-xs text-gray-700 line-clamp-2">{item.title}</p>
+                            <p className="text-xs font-bold mt-1 tabular-nums" style={{ color: 'var(--shopli-orange)' }} dir="ltr">
+                              {config?.currencySymbol || ''}
+                              {typeof item.price === 'number' ? item.price.toFixed(2) : item.price}
+                            </p>
+                          </a>
+                          {item.id && (
+                            <a
+                              href={`/${region}/product/${encodeURIComponent(item.id)}`}
+                              onClick={() =>
+                                trackCompareNextAction({
+                                  region,
+                                  surface: 'compare_article',
+                                  target: 'pdp',
+                                  product_id: String(item.id),
+                                })
+                              }
+                              className="mt-1 inline-block text-[0.7rem] font-semibold hover:underline"
+                              style={{ color: 'var(--shopli-teal)' }}
+                            >
+                              {rtl ? 'פרטים ומוצרים דומים ←' : 'Details & similar →'}
+                            </a>
+                          )}
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -164,11 +185,38 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
         </div>
 
         {/* Verdict */}
-        <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-6 mb-10 border border-orange-100">
+        <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-6 mb-6 border border-orange-100">
           <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--shopli-navy)' }}>
             {rtl ? 'פסק הדין' : 'The Verdict'}
           </h2>
           <p className="text-gray-700 leading-relaxed text-sm">{t(c.verdict)}</p>
+        </div>
+
+        {/* Next step — route the reader into a real browse path instead of bouncing */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-10">
+          <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--shopli-navy)' }}>
+            {rtl ? 'מוכנים להחליט? הצעד הבא' : 'Ready to decide? Your next step'}
+          </h2>
+          <p className="text-sm mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
+            {rtl
+              ? 'ראו דילים חיים, מחירים ומוצרים דומים לכל צד של ההשוואה:'
+              : 'See live deals, prices and similar products for each side of the comparison:'}
+          </p>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {[c.product1, c.product2].map((prod: any, i: number) => (
+              <a
+                key={i}
+                href={`/${region}/search?q=${encodeURIComponent(prod.keyword)}`}
+                onClick={() =>
+                  trackCompareNextAction({ region, surface: 'compare_article', target: 'search' })
+                }
+                className="btn-primary justify-center text-sm"
+              >
+                <Icon name="search" size={16} />
+                {rtl ? `דילים על ${prod.name}` : `Browse ${prod.name} deals`}
+              </a>
+            ))}
+          </div>
         </div>
 
         {/* FAQ */}
@@ -187,6 +235,8 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
             </div>
           </div>
         )}
+
+        <BrowseNext region={region} rtl={rtl} surface="compare_article" />
       </main>
 
     </>

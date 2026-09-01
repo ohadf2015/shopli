@@ -131,6 +131,21 @@ export function trackShareClick(props: {
   capture('share_click', props);
 }
 
+// ------------------------------------------------------------------
+// Compare-page next actions — spec: t_3315f1df
+// /xx/compare bounces 97-99%; every internal next-action click (PDP, search,
+// trending, deals) is the conversion signal that the new CTAs work.
+// ------------------------------------------------------------------
+
+export function trackCompareNextAction(props: {
+  region: string;
+  surface: 'compare_tool' | 'compare_article';
+  target: 'pdp' | 'best_pick' | 'search' | 'trending' | 'deals';
+  product_id?: string;
+}) {
+  capture('compare_next_action', props);
+}
+
 const AFFILIATE_HOST_RE = /(^|\.)aliexpress\.com$|(^|\.)s\.click\.aliexpress\.com$/;
 
 function isAffiliateUrl(url: URL): boolean {
