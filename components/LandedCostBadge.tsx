@@ -1,0 +1,111 @@
+import React from 'react';
+import Icon from './icons';
+import {
+  estimateLandedCost,
+  USD_TO_ILS_RATE,
+  IL_VAT_RATE,
+} from '../lib/landed-cost';
+
+interface LandedCostBadgeProps {
+  price: number;
+  currency?: string | null;
+  freeShipping?: boolean;
+  shippingIls?: number;
+  /** 'chip' = one-line badge (ProductCard), 'full' = breakdown block (PDP). */
+  variant?: 'chip' | 'full';
+}
+
+const ils = (n: number) => `₪${Math.round(n).toLocaleString('he-IL')}`;
+
+/**
+ * IL landed-cost badge — Hebrew only by design: it renders exclusively on the
+ * /il region (Hebrew, RTL) and encodes Israeli import rules that are
+ * meaningless elsewhere.
+ */
+export default function LandedCostBadge({
+  price,
+  currency,
+  freeShipping,
+  shippingIls,
+  variant = 'chip',
+}: LandedCostBadgeProps) {
+  const est = estimateLandedCost({ price, currency, freeShipping, shippingIls });
+  if (!est) return null;
+
+  const vatPct = Math.round(IL_VAT_RATE * 100);
+
+  if (variant === 'chip') {
+    return (
+      <span
+        className="inline-flex items-center gap-1 text-[0.6rem] sm:text-[0.65rem] font-semibold px-2 py-0.5 rounded-full mt-1 self-start"
+        style={
+          est.dutyFree
+            ? { background: 'rgba(16,185,129,0.1)', color: '#047857' }
+            : { background: 'rgba(245,158,11,0.12)', color: '#b45309' }
+        }
+        data-landed-cost={est.dutyFree ? 'duty-free' : 'vat'}
+        data-landed-total-ils={est.totalIls.toFixed(2)}
+        dir="rtl"
+      >
+        <Icon name="shield" size={10} className="shrink-0" />
+        {est.dutyFree ? (
+          <span>פטור ממכס ומע״ם · מתחת ל-$75</span>
+        ) : (
+          <span>כולל מע״ם {vatPct}% ≈ {ils(est.totalIls)}</span>
+        )}
+      </span>
+    );
+  }
+
+  return (
+    <div
+      className="rounded-xl border p-3 sm:p-4 mb-6"
+      style={
+        est.dutyFree
+          ? { borderColor: 'rgba(16,185,129,0.35)', background: 'rgba(16,185,129,0.06)' }
+          : { borderColor: 'rgba(245,158,11,0.35)', background: 'rgba(245,158,11,0.07)' }
+      }
+      data-landed-cost={est.dutyFree ? 'duty-free' : 'vat'}
+      data-landed-total-ils={est.totalIls.toFixed(2)}
+      dir="rtl"
+    >
+      <div
+        className="flex items-center gap-1.5 text-sm font-bold mb-2"
+        style={{ color: est.dutyFree ? '#047857' : '#b45309' }}
+      >
+        <Icon name="shield" size={14} className="shrink-0" />
+        {est.dutyFree
+          ? 'פטור ממכס וממע״ם — מתחת לתקרת ה-$75'
+          : `מעבר לתקרת ה-$75 — מתווסף מע״ם ${vatPct}%`}
+      </div>
+      <dl className="text-xs sm:text-sm space-y-1" style={{ color: 'var(--shopli-navy)' }}>
+        <div className="flex justify-between gap-4">
+          <dt style={{ color: 'var(--shopli-warm-gray)' }}>מחיר המוצר</dt>
+          <dd className="tabular-nums font-medium" dir="ltr">{ils(est.priceIls)}</dd>
+        </div>
+        <div className="flex justify-between gap-4">
+          <dt style={{ color: 'var(--shopli-warm-gray)' }}>משלוח</dt>
+          <dd className="tabular-nums font-medium" dir="ltr">
+            {est.shippingIls > 0 ? ils(est.shippingIls) : 'חינם'}
+          </dd>
+        </div>
+        {!est.dutyFree && (
+          <div className="flex justify-between gap-4">
+            <dt style={{ color: 'var(--shopli-warm-gray)' }}>מע״ם {vatPct}%</dt>
+            <dd className="tabular-nums font-medium" dir="ltr">{ils(est.vatIls)}</dd>
+          </div>
+        )}
+        <div
+          className="flex justify-between gap-4 pt-1.5 mt-1.5 border-t font-bold"
+          style={{ borderColor: est.dutyFree ? 'rgba(16,185,129,0.25)' : 'rgba(245,158,11,0.25)' }}
+        >
+          <dt>סה״כ משוער לארץ</dt>
+          <dd className="tabular-nums" dir="ltr">{ils(est.totalIls)}</dd>
+        </div>
+      </dl>
+      <p className="text-[0.65rem] mt-2" style={{ color: 'var(--shopli-warm-gray)' }}>
+        הערכה לפי שער {USD_TO_ILS_RATE.toFixed(2)} ₪/$ — החיוב בפועל נקבע לפי רשות המסים ביום השחרור.
+      </p>
+    </div>
+  );
+}

@@ -4,6 +4,7 @@ import WhatsAppShare from './WhatsAppShare';
 import { SITE_URL } from '../lib/seo';
 import { isInWishlist, syncAdd, syncRemove } from '../lib/useWishlist';
 import { productImage } from '../lib/img';
+import LandedCostBadge from './LandedCostBadge';
 
 export interface ProductCardProduct {
   id: string;
@@ -16,6 +17,8 @@ export interface ProductCardProduct {
   originalTitle?: string | null;
   price: number;
   originalPrice?: number | null;
+  /** ISO currency of `price` (IL feed rows are ILS). Drives the IL landed-cost badge. */
+  currency?: string | null;
   imageUrl?: string;
   affiliateLink?: string;
   rating?: number; // 0–100 (AliExpress evaluate_rate)
@@ -245,6 +248,16 @@ export default function ProductCard({
             </span>
           )}
         </div>
+
+        {/* IL landed-cost chip: duty-free under $75 vs +18% VAT, est. total */}
+        {region === 'il' && (
+          <LandedCostBadge
+            variant="chip"
+            price={price}
+            currency={product.currency || 'ILS'}
+            freeShipping={product.freeShipping}
+          />
+        )}
 
         <div
           className="flex items-center gap-1 flex-wrap mt-auto"

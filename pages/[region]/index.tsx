@@ -56,6 +56,7 @@ function toCardProduct(p: any): ProductCardProduct {
     originalTitle: p.originalTitle ?? null,
     price: p.price,
     originalPrice: p.originalPrice ?? null,
+    currency: p.currency ?? null,
     imageUrl: p.imageUrl || '',
     affiliateLink: p.affiliateLink || '',
     rating: p.rating,

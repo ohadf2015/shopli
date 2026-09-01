@@ -5,6 +5,7 @@ import Icon from '../../../components/icons';
 import ShareBar from '../../../components/ShareBar';
 import FindSimilar from '../../../components/FindSimilar';
 import BuyerReviews from '../../../components/BuyerReviews';
+import LandedCostBadge from '../../../components/LandedCostBadge';
 import { cacheIfNotEmpty } from '../../../lib/cache';
 import { trendingEnabled } from '../../../lib/flags';
 import { productImage } from '../../../lib/img';
@@ -264,6 +265,16 @@ export default function ProductPage({
                 </span>
               )}
             </div>
+
+            {/* IL landed-cost breakdown: duty-free under $75 vs +18% VAT */}
+            {region === 'il' && (
+              <LandedCostBadge
+                variant="full"
+                price={product.price}
+                currency={product.currency || config.currency}
+                freeShipping={product.freeShipping}
+              />
+            )}
 
             <p className="text-sm sm:text-base leading-relaxed mb-6" style={{ color: 'var(--shopli-warm-gray)' }}>
               {description}
