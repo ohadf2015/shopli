@@ -81,6 +81,12 @@ export default function ProductCard({
 
   const stars = ratingStars(product.rating || 0);
   const sold = formatSold(product.volume || 0, rtl);
+  // Suppress noise: a "discount" under 10% is rounding, not a deal — don't
+  // burn badge attention on it.
+  const discountPct = product.discount
+    ? parseFloat(String(product.discount).replace('%', '').trim())
+    : 0;
+  const showDiscount = Number.isFinite(discountPct) && discountPct >= 10;
   const price = Number(product.price) || 0;
   const original =
     product.originalPrice != null && product.originalPrice > price
@@ -164,7 +170,7 @@ export default function ProductCard({
           </div>
         )}
 
-        {product.discount && (
+        {showDiscount && (
           <span
             className="absolute top-2 end-2 text-[0.6rem] sm:text-[0.65rem] font-bold px-2 py-0.5 rounded-full bg-white/95 backdrop-blur-sm shadow-sm"
             style={{ color: 'var(--shopli-orange)' }}
@@ -281,6 +287,23 @@ export default function ProductCard({
               {rtl ? 'השווה' : 'Compare'}
             </a>
           )}
+        </div>
+      )}
+
+      {/* Explicit outbound CTA: the card itself links to the on-site PDP, so
+          the money link gets its own unmissable button. */}
+      {!compact && product.affiliateLink && (
+        <div className="px-2 pb-2.5 relative z-10">
+          <a
+            href={product.affiliateLink}
+            target="_blank"
+            rel="noopener noreferrer sponsored"
+            className="flex items-center justify-center gap-1 w-full text-[0.7rem] font-bold px-3 py-2 rounded-lg text-white transition-opacity hover:opacity-90"
+            style={{ background: 'var(--shopli-orange)' }}
+          >
+            {rtl ? 'לצפייה בדיל באליאקספרס' : 'View deal on AliExpress'}
+            <span aria-hidden="true">↗</span>
+          </a>
         </div>
       )}
     </article>
