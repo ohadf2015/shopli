@@ -77,14 +77,13 @@ export default function ShopliApp({ Component, pageProps }: AppProps) {
         src="https://company-brain-production-841e.up.railway.app/interest.js"
         strategy="afterInteractive"
       />
-      {/* Growth Radar analytics: first-party event tracking */}
+      {/* Growth Radar analytics: first-party event tracking. gr.js self-loads
+          the extended tracker; a separate gr-extended.js tag here raced with it
+          and silently disabled capture on tryshopli.com (traffic cliff after
+          2026-08-24), so only this one tag stays. */}
       <Script
         src="https://growthradar.app/gr.js"
         data-key="grw_aad97f8781412c1b33eb0f82b15275cf"
-        strategy="afterInteractive"
-      />
-      <Script
-        src="https://growthradar.app/gr-extended.js"
         strategy="afterInteractive"
       />
       {/* One footer for every page: FTC affiliate disclosure (legally required
