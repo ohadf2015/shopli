@@ -114,7 +114,7 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs, th
               {heroDesc}
             </p>
             <div className="flex flex-wrap gap-3">
-              <a href={`/${region}/collection/${groups[0]?.slug || orderedSlugs[0] || 'home-gym'}`} className="btn-primary">
+              <a href={`/${region}/trending`} className="btn-primary">
                 <Icon name="tag" size={16} />
                 {rtl ? 'כל המבצעים' : 'Browse All Deals'}
               </a>
@@ -162,7 +162,7 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs, th
         />
 
         {/* COLLECTIONS GRID */}
-        {groups.filter(g => g.products.length > 0).slice(0, 6).map((group, gi) => (
+        {groups.filter(g => g.products.length > 0).slice(0, 3).map((group, gi) => (
           <section key={group.slug} className={`py-10 md:py-14 ${gi % 2 === 1 ? 'bg-white' : 'bg-gray-50/50'}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
               <div className="flex items-center justify-between mb-6">
@@ -443,12 +443,14 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
 
   const t = (text: Record<string, string>) => text[config.lang] || text.en || '';
 
-  const collections = getFeaturedCollections(region, 6);
+  // Three rails, not six: cutting the homepage's product sections in half
+  // keeps the primary CTA and trending rail dominant.
+  const collections = getFeaturedCollections(region, 3);
   const orderedSlugs = getFeaturedCollections(region, 100).map((c) => c.slug);
   const groups: CollectionGroup[] = [];
 
-  // Six collections, fetched together rather than one after another: these are
-  // six independent AliExpress searches and awaiting them in sequence made the
+  // Collections are fetched together rather than one after another: these are
+  // independent AliExpress searches and awaiting them in sequence made the
   // homepage's TTFB their sum. lib/aliexpress caps real concurrency, so this
   // cannot stampede the rate limiter.
   // Fetch double the display count: title-dedupe against the rail and
