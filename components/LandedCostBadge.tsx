@@ -2,17 +2,23 @@ import React from 'react';
 import Icon from './icons';
 import {
   estimateLandedCost,
+  estimateKitLandedCost,
   USD_TO_ILS_RATE,
   IL_VAT_RATE,
+  type LandedCostInput,
 } from '../lib/landed-cost';
 
 interface LandedCostBadgeProps {
-  price: number;
+  price?: number;
   currency?: string | null;
   freeShipping?: boolean;
   shippingIls?: number;
-  /** 'chip' = one-line badge (ProductCard), 'full' = breakdown block (PDP). */
+  /** 'chip' = one-line badge (ProductCard), 'full' = breakdown block (PDP / kit). */
   variant?: 'chip' | 'full';
+  /** 'kit' uses the SKU-sum rollup copy; product chip/full stay as in #14. */
+  scope?: 'product' | 'kit';
+  /** When set, roll up these SKUs vs $75 instead of a single price. */
+  skus?: LandedCostInput[];
 }
 
 const ils = (n: number) => `₪${Math.round(n).toLocaleString('he-IL')}`;
@@ -28,11 +34,18 @@ export default function LandedCostBadge({
   freeShipping,
   shippingIls,
   variant = 'chip',
+  scope = 'product',
+  skus,
 }: LandedCostBadgeProps) {
-  const est = estimateLandedCost({ price, currency, freeShipping, shippingIls });
+  const kit = scope === 'kit' || (skus != null && skus.length > 0);
+  const est =
+    skus && skus.length > 0
+      ? estimateKitLandedCost(skus)
+      : estimateLandedCost({ price: price ?? 0, currency, freeShipping, shippingIls });
   if (!est) return null;
 
   const vatPct = Math.round(IL_VAT_RATE * 100);
+  const skuCount = skus && skus.length > 0 ? skus.length : 1;
 
   if (variant === 'chip') {
     return (
@@ -45,13 +58,16 @@ export default function LandedCostBadge({
         }
         data-landed-cost={est.dutyFree ? 'duty-free' : 'vat'}
         data-landed-total-ils={est.totalIls.toFixed(2)}
+        {...(kit ? { 'data-landed-scope': 'kit', 'data-landed-sku-count': skuCount } : {})}
         dir="rtl"
       >
         <Icon name="shield" size={10} className="shrink-0" />
         {est.dutyFree ? (
-          <span>פטור ממכס ומע״ם · מתחת ל-$75</span>
+          <span>{kit ? 'פטור ממכס ומע״ם לערכה · מתחת ל-$75' : 'פטור ממכס ומע״ם · מתחת ל-$75'}</span>
         ) : (
-          <span>כולל מע״ם {vatPct}% ≈ {ils(est.totalIls)}</span>
+          <span>
+            {kit ? 'ערכה כולל מע״ם' : 'כולל מע״ם'} {vatPct}% ≈ {ils(est.totalIls)}
+          </span>
         )}
       </span>
     );
@@ -67,6 +83,7 @@ export default function LandedCostBadge({
       }
       data-landed-cost={est.dutyFree ? 'duty-free' : 'vat'}
       data-landed-total-ils={est.totalIls.toFixed(2)}
+      {...(kit ? { 'data-landed-scope': 'kit', 'data-landed-sku-count': skuCount } : {})}
       dir="rtl"
     >
       <div
@@ -75,12 +92,18 @@ export default function LandedCostBadge({
       >
         <Icon name="shield" size={14} className="shrink-0" />
         {est.dutyFree
-          ? 'פטור ממכס וממע״ם — מתחת לתקרת ה-$75'
-          : `מעבר לתקרת ה-$75 — מתווסף מע״ם ${vatPct}%`}
+          ? kit
+            ? 'פטור ממכס וממע״ם לערכה — מתחת לתקרת ה-$75'
+            : 'פטור ממכס וממע״ם — מתחת לתקרת ה-$75'
+          : kit
+            ? `מעבר לתקרת ה-$75 לערכה — מתווסף מע״ם ${vatPct}%`
+            : `מעבר לתקרת ה-$75 — מתווסף מע״ם ${vatPct}%`}
       </div>
       <dl className="text-xs sm:text-sm space-y-1" style={{ color: 'var(--shopli-navy)' }}>
         <div className="flex justify-between gap-4">
-          <dt style={{ color: 'var(--shopli-warm-gray)' }}>מחיר המוצר</dt>
+          <dt style={{ color: 'var(--shopli-warm-gray)' }}>
+            {kit ? 'מחיר הערכה (סה״כ SKU)' : 'מחיר המוצר'}
+          </dt>
           <dd className="tabular-nums font-medium" dir="ltr">{ils(est.priceIls)}</dd>
         </div>
         <div className="flex justify-between gap-4">
