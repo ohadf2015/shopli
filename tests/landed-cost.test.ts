@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   estimateLandedCost,
+  estimateKitLandedCost,
   USD_TO_ILS_RATE,
   DUTY_FREE_THRESHOLD_USD,
   IL_VAT_RATE,
@@ -83,6 +84,109 @@ test('rejects unusable input instead of rendering a misleading badge', () => {
 
 test('missing currency defaults to ILS (IL feed rows)', () => {
   const est = estimateLandedCost({ price: 36, freeShipping: true });
+  assert.ok(est);
+  assert.equal(est.priceIls, 36);
+  assert.equal(est.usdPrice, 10);
+  assert.equal(est.dutyFree, true);
+});
+
+
+test('kit rollup: two ILS 100+100 stays under $75 ptur', () => {
+  const est = estimateKitLandedCost([
+    { price: 100, currency: 'ILS', freeShipping: true },
+    { price: 100, currency: 'ILS', freeShipping: true },
+  ]);
+  assert.ok(est);
+  assert.equal(est.priceIls, 200);
+  assert.equal(est.dutyFree, true);
+  assert.equal(est.vatIls, 0);
+  assert.equal(est.shippingIls, 0);
+  assert.ok(Math.abs(est.usdPrice - 200 / USD_TO_ILS_RATE) < 1e-9);
+});
+
+test('kit rollup: two ILS 150+150 crosses $75 and adds 18% VAT', () => {
+  const est = estimateKitLandedCost([
+    { price: 150, currency: 'ILS', freeShipping: true },
+    { price: 150, currency: 'ILS', freeShipping: true },
+  ]);
+  assert.ok(est);
+  assert.equal(est.priceIls, 300);
+  assert.equal(est.dutyFree, false);
+  assert.ok(Math.abs(est.vatIls - IL_VAT_RATE * 300) < 1e-9);
+  assert.ok(Math.abs(est.totalIls - 300 * (1 + IL_VAT_RATE)) < 1e-9);
+});
+
+test('kit rollup: each SKU under $75 but the sum is not (the whole point)', () => {
+  const a = estimateLandedCost({ price: 50, currency: 'USD', freeShipping: true });
+  const b = estimateLandedCost({ price: 50, currency: 'USD', freeShipping: true });
+  assert.ok(a && b);
+  assert.equal(a.dutyFree, true);
+  assert.equal(b.dutyFree, true);
+  const kit = estimateKitLandedCost([
+    { price: 50, currency: 'USD', freeShipping: true },
+    { price: 50, currency: 'USD', freeShipping: true },
+  ]);
+  assert.ok(kit);
+  assert.equal(kit.dutyFree, false);
+  assert.ok(kit.vatIls > 0);
+});
+
+test('kit rollup: 37.49+37.49 USD is duty-free; 37.50+37.50 is not', () => {
+  const under = estimateKitLandedCost([
+    { price: 37.49, currency: 'USD', freeShipping: true },
+    { price: 37.49, currency: 'USD', freeShipping: true },
+  ]);
+  const over = estimateKitLandedCost([
+    { price: 37.50, currency: 'USD', freeShipping: true },
+    { price: 37.50, currency: 'USD', freeShipping: true },
+  ]);
+  assert.ok(under && over);
+  assert.equal(under.dutyFree, true);
+  assert.equal(over.dutyFree, false);
+});
+
+test('kit rollup: mixed USD + ILS convert before summing', () => {
+  const est = estimateKitLandedCost([
+    { price: 20, currency: 'USD', freeShipping: true },
+    { price: 20 * USD_TO_ILS_RATE, currency: 'ILS', freeShipping: true },
+  ]);
+  assert.ok(est);
+  assert.equal(est.dutyFree, true);
+  assert.ok(Math.abs(est.priceIls - 20 * USD_TO_ILS_RATE * 2) < 1e-9);
+});
+
+test('kit rollup: shipping is excluded from the $75 threshold but included in VAT base', () => {
+  const est = estimateKitLandedCost([
+    { price: 30, currency: 'USD', freeShipping: false, shippingIls: 50 },
+    { price: 30, currency: 'USD', freeShipping: false, shippingIls: 50 },
+  ]);
+  assert.ok(est);
+  assert.equal(est.dutyFree, true);
+  assert.equal(est.shippingIls, 100);
+  assert.equal(est.vatIls, 0);
+  assert.ok(Math.abs(est.totalIls - (60 * USD_TO_ILS_RATE + 100)) < 1e-9);
+});
+
+test('kit rollup: freeShipping on one SKU zeros that SKU shipping', () => {
+  const est = estimateKitLandedCost([
+    { price: 10, currency: 'ILS', freeShipping: true, shippingIls: 40 },
+    { price: 10, currency: 'ILS', freeShipping: false, shippingIls: 40 },
+  ]);
+  assert.ok(est);
+  assert.equal(est.shippingIls, 40);
+});
+
+test('kit rollup: empty or all-invalid SKUs return null', () => {
+  assert.equal(estimateKitLandedCost([]), null);
+  assert.equal(estimateKitLandedCost([{ price: 0, currency: 'ILS' }]), null);
+  assert.equal(estimateKitLandedCost([{ price: 10, currency: 'EUR' }]), null);
+});
+
+test('kit rollup: unknown-currency SKU is skipped; remaining SKUs still estimate', () => {
+  const est = estimateKitLandedCost([
+    { price: 10, currency: 'EUR' },
+    { price: 36, currency: 'ILS', freeShipping: true },
+  ]);
   assert.ok(est);
   assert.equal(est.priceIls, 36);
   assert.equal(est.usdPrice, 10);

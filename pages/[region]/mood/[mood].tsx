@@ -4,6 +4,7 @@ import Icon from '../../../components/icons';
 import SeoHead from '../../../components/SeoHead';
 import ShareBar from '../../../components/ShareBar';
 import DealAlertsForm from '../../../components/DealAlertsForm';
+import KitAddBar from '../../../components/KitAddBar';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getMoodBoard, getMoodBoardsByTag } from '../../../lib/moodboards';
 import { productImage } from '../../../lib/img';
@@ -25,6 +26,16 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
 
   const relatedBoards = related?.filter((r: any) => r.slug !== board?.slug)?.slice(0, 3) || [];
   const pageUrl = `${SITE_URL}/${region}/mood/${board.slug}`;
+  // Default kit = first SKU in each slot. Rollup vs $75 is on this set, not every alternative.
+  const kitSkus = (itemGroups || [])
+    .map((group: ItemGroup) => group.products?.[0])
+    .filter((p: Product | undefined): p is Product => {
+      if (!p || !p.id) return false;
+      const price = Number(p.price);
+      return Number.isFinite(price) && price > 0;
+    })
+    .map((p: Product) => ({ ...p, currency: p.currency || config?.currency || 'ILS' }));
+
 
   const structuredData: Record<string, unknown>[] = [
     breadcrumbJsonLd([
@@ -109,6 +120,12 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
               size="md"
             />
           </div>
+          <KitAddBar
+            region={region}
+            rtl={rtl}
+            currency={config?.currency || 'ILS'}
+            skus={kitSkus}
+          />
         </section>
 
         {/* TAG INDICATOR */}

@@ -68,3 +68,31 @@ export function estimateLandedCost(input: LandedCostInput): LandedCostEstimate |
     totalIls: priceIls + shippingIls + vatIls,
   };
 }
+
+
+/**
+ * Kit / cart rollup: sum SKU goods vs the same $75 ptur. Each SKU can look
+ * duty-free on a ProductCard while the combined order crosses the threshold —
+ * VAT is assessed on the shipment, not the line item.
+ */
+export function estimateKitLandedCost(skus: LandedCostInput[]): LandedCostEstimate | null {
+  const parts = (skus || [])
+    .map((sku) => estimateLandedCost(sku))
+    .filter((est): est is LandedCostEstimate => est != null);
+  if (parts.length === 0) return null;
+
+  const priceIls = parts.reduce((sum, est) => sum + est.priceIls, 0);
+  const shippingIls = parts.reduce((sum, est) => sum + est.shippingIls, 0);
+  const usdPrice = priceIls / USD_TO_ILS_RATE;
+  const dutyFree = usdPrice < DUTY_FREE_THRESHOLD_USD;
+  const vatIls = dutyFree ? 0 : IL_VAT_RATE * (priceIls + shippingIls);
+
+  return {
+    usdPrice,
+    priceIls,
+    shippingIls,
+    dutyFree,
+    vatIls,
+    totalIls: priceIls + shippingIls + vatIls,
+  };
+}
