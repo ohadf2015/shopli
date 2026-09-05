@@ -6,12 +6,25 @@ import {
   USD_TO_ILS_RATE,
   DUTY_FREE_THRESHOLD_USD,
   IL_VAT_RATE,
+  BOI_CUSTOMS_FX_UPLIFT,
+  customsFxTooltipHe,
 } from '../lib/landed-cost';
 
 test('constants encode the IL import rules', () => {
   assert.equal(DUTY_FREE_THRESHOLD_USD, 75);
   assert.equal(IL_VAT_RATE, 0.18);
   assert.ok(USD_TO_ILS_RATE > 3 && USD_TO_ILS_RATE < 5);
+  // Skills IL foil: goods on a rashimon use BoI representative + 0.5%
+  assert.equal(BOI_CUSTOMS_FX_UPLIFT, 0.005);
+});
+
+test('customs FX tooltip explains BoI representative rate + 0.5%', () => {
+  const tip = customsFxTooltipHe();
+  assert.match(tip, /בנק ישראל/);
+  assert.match(tip, /\+ 0\.5%/);
+  assert.match(tip, /רשומון/);
+  assert.match(tip, new RegExp(USD_TO_ILS_RATE.toFixed(2).replace('.', '\\.')));
+  assert.match(tip, /רשות המסים/);
 });
 
 test('74.99 USD (free shipping) is duty-free: no VAT, total = goods price', () => {

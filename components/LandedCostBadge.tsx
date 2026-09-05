@@ -5,6 +5,7 @@ import {
   estimateKitLandedCost,
   USD_TO_ILS_RATE,
   IL_VAT_RATE,
+  customsFxTooltipHe,
   type LandedCostInput,
 } from '../lib/landed-cost';
 
@@ -47,6 +48,8 @@ export default function LandedCostBadge({
   const vatPct = Math.round(IL_VAT_RATE * 100);
   const skuCount = skus && skus.length > 0 ? skus.length : 1;
 
+  const fxTip = customsFxTooltipHe(USD_TO_ILS_RATE);
+
   if (variant === 'chip') {
     return (
       <span
@@ -58,6 +61,8 @@ export default function LandedCostBadge({
         }
         data-landed-cost={est.dutyFree ? 'duty-free' : 'vat'}
         data-landed-total-ils={est.totalIls.toFixed(2)}
+        data-fx-source="boi-plus-0.5"
+        title={fxTip}
         {...(kit ? { 'data-landed-scope': 'kit', 'data-landed-sku-count': skuCount } : {})}
         dir="rtl"
       >
@@ -69,6 +74,13 @@ export default function LandedCostBadge({
             {kit ? 'ערכה כולל מע״ם' : 'כולל מע״ם'} {vatPct}% ≈ {ils(est.totalIls)}
           </span>
         )}
+        <span
+          className="inline-flex shrink-0 opacity-70"
+          aria-label={fxTip}
+          data-fx-tooltip="boi-plus-0.5"
+        >
+          <Icon name="info" size={10} />
+        </span>
       </span>
     );
   }
@@ -83,6 +95,8 @@ export default function LandedCostBadge({
       }
       data-landed-cost={est.dutyFree ? 'duty-free' : 'vat'}
       data-landed-total-ils={est.totalIls.toFixed(2)}
+      data-fx-source="boi-plus-0.5"
+      title={fxTip}
       {...(kit ? { 'data-landed-scope': 'kit', 'data-landed-sku-count': skuCount } : {})}
       dir="rtl"
     >
@@ -126,8 +140,13 @@ export default function LandedCostBadge({
           <dd className="tabular-nums" dir="ltr">{ils(est.totalIls)}</dd>
         </div>
       </dl>
-      <p className="text-[0.65rem] mt-2" style={{ color: 'var(--shopli-warm-gray)' }}>
-        הערכה לפי שער {USD_TO_ILS_RATE.toFixed(2)} ₪/$ — החיוב בפועל נקבע לפי רשות המסים ביום השחרור.
+      <p
+        className="text-[0.65rem] mt-2 inline-flex items-start gap-1"
+        style={{ color: 'var(--shopli-warm-gray)' }}
+        data-fx-tooltip="boi-plus-0.5"
+      >
+        <Icon name="info" size={11} className="shrink-0 mt-0.5 opacity-70" />
+        <span>{fxTip}</span>
       </p>
     </div>
   );
