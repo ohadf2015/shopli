@@ -8,6 +8,7 @@ import {
   IL_VAT_RATE,
   BOI_CUSTOMS_FX_UPLIFT,
   customsFxTooltipHe,
+  vatFxHonestyStripHe,
 } from '../lib/landed-cost';
 
 test('constants encode the IL import rules', () => {
@@ -26,6 +27,21 @@ test('customs FX tooltip explains BoI representative rate + 0.5%', () => {
   assert.match(tip, new RegExp(USD_TO_ILS_RATE.toFixed(2).replace('.', '\\.')));
   assert.match(tip, /רשות המסים/);
 });
+
+test('VAT/FX honesty strip labels 18% VAT and BoI representative +0.5% (rashimon)', () => {
+  const strip = vatFxHonestyStripHe();
+  assert.match(strip, /מע״ם 18%/);
+  assert.match(strip, /בנק ישראל/);
+  assert.match(strip, /\+ 0\.5%/);
+  assert.match(strip, /רשומון/);
+  // Foil: rivals still publish stale 17% in body — we never label 17%.
+  assert.doesNotMatch(strip, /17%/);
+  // Keep #18 tooltip math/wording independent of the strip.
+  const tip = customsFxTooltipHe();
+  assert.match(tip, /\+ 0\.5%/);
+  assert.notEqual(strip, tip);
+});
+
 
 test('74.99 USD (free shipping) is duty-free: no VAT, total = goods price', () => {
   const est = estimateLandedCost({ price: 74.99, currency: 'USD', freeShipping: true });
