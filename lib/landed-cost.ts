@@ -8,12 +8,33 @@
  *                               only above $500, which is rare for AliExpress
  *                               carts and deliberately not modeled.
  * The $75 threshold is on the goods value alone (shipping excluded); the VAT
- * base includes shipping. Rate is a documented estimate, not a live FX feed.
+ * base includes shipping.
+ *
+ * Customs FX (Skills IL shekel-currency-converter foil): imported goods on a
+ * rashimon use the Tax Authority customs rate = Bank of Israel representative
+ * rate (shaar yatzig) + 0.5%. USD_TO_ILS_RATE is a documented estimate of that
+ * customs FX, not a live BoI feed. Badge UI explains this via tooltip — do not
+ * confuse with reverse-charge imported services (plain representative rate).
  */
 
+/** Documented estimate of customs FX (≈ BoI representative + 0.5%), not live. */
 export const USD_TO_ILS_RATE = 3.6;
+/** Tax Authority uplift on BoI representative rate for goods (rashimon). */
+export const BOI_CUSTOMS_FX_UPLIFT = 0.005;
 export const DUTY_FREE_THRESHOLD_USD = 75;
 export const IL_VAT_RATE = 0.18;
+
+/**
+ * Hebrew FX tooltip for IL landed-cost badges. Explains customs FX only —
+ * does not change kit rollup math.
+ */
+export function customsFxTooltipHe(rate: number = USD_TO_ILS_RATE): string {
+  const pct = (BOI_CUSTOMS_FX_UPLIFT * 100).toFixed(1);
+  return (
+    `שער המכס לרשומון: שער יציג של בנק ישראל + ${pct}%. ` +
+    `הערכה לפי ${rate.toFixed(2)} ₪/$ — החיוב בפועל נקבע ברשות המסים ביום השחרור.`
+  );
+}
 
 export interface LandedCostInput {
   price: number;
