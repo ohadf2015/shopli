@@ -6,6 +6,7 @@ import {
   USD_TO_ILS_RATE,
   IL_VAT_RATE,
   customsFxTooltipHe,
+  vatFxHonestyStripHe,
   type LandedCostInput,
 } from '../lib/landed-cost';
 
@@ -49,37 +50,48 @@ export default function LandedCostBadge({
   const skuCount = skus && skus.length > 0 ? skus.length : 1;
 
   const fxTip = customsFxTooltipHe(USD_TO_ILS_RATE);
+  const honesty = vatFxHonestyStripHe();
 
   if (variant === 'chip') {
     return (
-      <span
-        className="inline-flex items-center gap-1 text-[0.6rem] sm:text-[0.65rem] font-semibold px-2 py-0.5 rounded-full mt-1 self-start"
-        style={
-          est.dutyFree
-            ? { background: 'rgba(16,185,129,0.1)', color: '#047857' }
-            : { background: 'rgba(245,158,11,0.12)', color: '#b45309' }
-        }
-        data-landed-cost={est.dutyFree ? 'duty-free' : 'vat'}
-        data-landed-total-ils={est.totalIls.toFixed(2)}
-        data-fx-source="boi-plus-0.5"
-        title={fxTip}
-        {...(kit ? { 'data-landed-scope': 'kit', 'data-landed-sku-count': skuCount } : {})}
-        dir="rtl"
-      >
-        <Icon name="shield" size={10} className="shrink-0" />
-        {est.dutyFree ? (
-          <span>{kit ? 'פטור ממכס ומע״ם לערכה · מתחת ל-$75' : 'פטור ממכס ומע״ם · מתחת ל-$75'}</span>
-        ) : (
-          <span>
-            {kit ? 'ערכה כולל מע״ם' : 'כולל מע״ם'} {vatPct}% ≈ {ils(est.totalIls)}
-          </span>
-        )}
+      <span className="inline-flex flex-col items-stretch gap-0.5 mt-1 self-start" dir="rtl">
         <span
-          className="inline-flex shrink-0 opacity-70"
-          aria-label={fxTip}
-          data-fx-tooltip="boi-plus-0.5"
+          className="inline-flex items-center gap-1 text-[0.6rem] sm:text-[0.65rem] font-semibold px-2 py-0.5 rounded-full"
+          style={
+            est.dutyFree
+              ? { background: 'rgba(16,185,129,0.1)', color: '#047857' }
+              : { background: 'rgba(245,158,11,0.12)', color: '#b45309' }
+          }
+          data-landed-cost={est.dutyFree ? 'duty-free' : 'vat'}
+          data-landed-total-ils={est.totalIls.toFixed(2)}
+          data-fx-source="boi-plus-0.5"
+          data-vat-rate={String(vatPct)}
+          title={fxTip}
+          {...(kit ? { 'data-landed-scope': 'kit', 'data-landed-sku-count': skuCount } : {})}
         >
-          <Icon name="info" size={10} />
+          <Icon name="shield" size={10} className="shrink-0" />
+          {est.dutyFree ? (
+            <span>{kit ? 'פטור ממכס ומע״ם לערכה · מתחת ל-$75' : 'פטור ממכס ומע״ם · מתחת ל-$75'}</span>
+          ) : (
+            <span>
+              {kit ? 'ערכה כולל מע״ם' : 'כולל מע״ם'} {vatPct}% ≈ {ils(est.totalIls)}
+            </span>
+          )}
+          <span
+            className="inline-flex shrink-0 opacity-70"
+            aria-label={fxTip}
+            data-fx-tooltip="boi-plus-0.5"
+          >
+            <Icon name="info" size={10} />
+          </span>
+        </span>
+        <span
+          className="text-[0.55rem] sm:text-[0.6rem] font-medium px-2 leading-tight"
+          style={{ color: 'var(--shopli-warm-gray)' }}
+          data-honesty-strip="vat-18-boi-0.5"
+          data-vat-rate={String(vatPct)}
+        >
+          {honesty}
         </span>
       </span>
     );
@@ -96,6 +108,7 @@ export default function LandedCostBadge({
       data-landed-cost={est.dutyFree ? 'duty-free' : 'vat'}
       data-landed-total-ils={est.totalIls.toFixed(2)}
       data-fx-source="boi-plus-0.5"
+      data-vat-rate={String(vatPct)}
       title={fxTip}
       {...(kit ? { 'data-landed-scope': 'kit', 'data-landed-sku-count': skuCount } : {})}
       dir="rtl"
@@ -113,6 +126,17 @@ export default function LandedCostBadge({
             ? `מעבר לתקרת ה-$75 לערכה — מתווסף מע״ם ${vatPct}%`
             : `מעבר לתקרת ה-$75 — מתווסף מע״ם ${vatPct}%`}
       </div>
+      <p
+        className="text-[0.65rem] font-semibold mb-2 px-2 py-1 rounded-md inline-block"
+        style={{
+          color: 'var(--shopli-navy)',
+          background: 'rgba(15, 23, 42, 0.04)',
+        }}
+        data-honesty-strip="vat-18-boi-0.5"
+        data-vat-rate={String(vatPct)}
+      >
+        {honesty}
+      </p>
       <dl className="text-xs sm:text-sm space-y-1" style={{ color: 'var(--shopli-navy)' }}>
         <div className="flex justify-between gap-4">
           <dt style={{ color: 'var(--shopli-warm-gray)' }}>
