@@ -13,12 +13,17 @@ import {
   DUTY_FREE_THRESHOLD_USD,
   DUTY_WAIVER_CEILING_USD,
   estimateLandedCost,
+  estimateKitLandedCost,
+  type LandedCostInput,
 } from '../lib/landed-cost';
 import {
   parseProductUrl,
+  parseKitUrls,
   customsStampCopyHe,
   dutyWaiverBandRows,
   classifyDutyWaiverBand,
+  kitTippingHint,
+  kitTippingCopyHe,
   type ParsedProductUrl,
 } from '../lib/landed-url';
 
@@ -26,6 +31,9 @@ const PAGE_URL = `${SITE_URL}/landed`;
 const VAT_PCT = Math.round(IL_VAT_RATE * 100);
 const FX_PCT = (BOI_CUSTOMS_FX_UPLIFT * 100).toFixed(1);
 const SKILLS_IL = 'v1.4.0';
+const KIT_MAX = 5;
+
+type QuoteMode = 'single' | 'kit';
 
 function sourceLabelHe(source: ParsedProductUrl['source']): string {
   if (source === 'amazon') return 'Amazon';
@@ -33,25 +41,44 @@ function sourceLabelHe(source: ParsedProductUrl['source']): string {
   return 'קישור מוצר';
 }
 
+function emptyKitPrices(n = KIT_MAX): string[] {
+  return Array.from({ length: n }, () => '');
+}
+
 /**
- * /landed — paste Amazon/product URL → IL landed-cost quote.
- * Moat: surfaces $75 ptur + $75–$500 VAT-only duty-waiver bands with
- * 18% + BoI+0.5% stamp (Skills IL v1.4.0 Sep 6; foil iWishBag 17% body vs 18% table).
- * Estimator math is unchanged from #18/#19/#20.
+ * /landed — paste Amazon/product URL(s) → IL landed-cost quote.
+ * Moat 10:31: multi-SKU kit rollup (2–5 URLs) vs $75 ptur + $75–$500 VAT-only
+ * bands after #21; Skills IL v1.4.0 Sep 6 stamp; single-SKU miss kit tipping.
+ * Estimator math unchanged from #18/#19/#20/#21.
  */
 export default function LandedPage() {
   const router = useRouter();
+  const [mode, setMode] = useState<QuoteMode>('single');
   const [urlInput, setUrlInput] = useState('');
   const [price, setPrice] = useState('');
+  const [kitUrlsRaw, setKitUrlsRaw] = useState('');
+  const [kitPrices, setKitPrices] = useState<string[]>(() => emptyKitPrices());
   const [currency, setCurrency] = useState('USD');
   const [shippingIls, setShippingIls] = useState('');
   const [freeShipping, setFreeShipping] = useState(true);
   const [hydrated, setHydrated] = useState(false);
 
-  // Prefill from shareable ?url=&price=&currency=
+  // Prefill from shareable ?url=&price=&currency= or ?kit=1&urls=&prices=
   useEffect(() => {
     if (!router.isReady || hydrated) return;
     const q = router.query;
+    if (q.kit === '1' || (typeof q.urls === 'string' && q.urls)) {
+      setMode('kit');
+      if (typeof q.urls === 'string' && q.urls) setKitUrlsRaw(q.urls.replace(/\|/g, '\n'));
+      if (typeof q.prices === 'string' && q.prices) {
+        const parts = q.prices.split('|').slice(0, KIT_MAX);
+        const next = emptyKitPrices();
+        parts.forEach((p, i) => {
+          next[i] = p;
+        });
+        setKitPrices(next);
+      }
+    }
     if (typeof q.url === 'string' && q.url) setUrlInput(q.url);
     if (typeof q.price === 'string' && q.price) setPrice(q.price);
     if (typeof q.currency === 'string' && q.currency) {
@@ -67,34 +94,104 @@ export default function LandedPage() {
   }, [router.isReady, router.query, hydrated]);
 
   const parsed = useMemo(() => parseProductUrl(urlInput), [urlInput]);
+  const kitParsed = useMemo(() => parseKitUrls(kitUrlsRaw), [kitUrlsRaw]);
   const priceNum = Number(price);
   const shipNum = freeShipping ? 0 : Math.max(0, Number(shippingIls) || 0);
-  const canQuote = Number.isFinite(priceNum) && priceNum > 0;
+
+  const kitSkus: LandedCostInput[] = useMemo(() => {
+    return kitParsed
+      .map((_, i) => {
+        const n = Number(kitPrices[i]);
+        if (!Number.isFinite(n) || n <= 0) return null;
+        return {
+          price: n,
+          currency,
+          freeShipping: true, // per-SKU goods; shared ship applied once below
+          shippingIls: 0,
+        } as LandedCostInput;
+      })
+      .filter((s): s is LandedCostInput => s != null);
+  }, [kitParsed, kitPrices, currency]);
+
+  // Shared shipping on kit: attach to first SKU only so threshold stays goods-only
+  const kitSkusWithShip: LandedCostInput[] = useMemo(() => {
+    if (kitSkus.length === 0) return [];
+    if (shipNum <= 0) return kitSkus;
+    return kitSkus.map((s, i) =>
+      i === 0 ? { ...s, freeShipping: false, shippingIls: shipNum } : s
+    );
+  }, [kitSkus, shipNum]);
+
+  const canQuoteSingle = Number.isFinite(priceNum) && priceNum > 0;
+  const canQuoteKit = kitSkusWithShip.length >= 2;
 
   const quoteEst = useMemo(() => {
-    if (!canQuote) return null;
+    if (!canQuoteSingle) return null;
     return estimateLandedCost({
       price: priceNum,
       currency,
       freeShipping,
       shippingIls: shipNum,
     });
-  }, [canQuote, priceNum, currency, freeShipping, shipNum]);
+  }, [canQuoteSingle, priceNum, currency, freeShipping, shipNum]);
 
-  const activeBand = quoteEst ? classifyDutyWaiverBand(quoteEst.usdPrice) : null;
+  const kitEst = useMemo(() => {
+    if (!canQuoteKit) return null;
+    return estimateKitLandedCost(kitSkusWithShip);
+  }, [canQuoteKit, kitSkusWithShip]);
+
+  const tipping = useMemo(() => kitTippingHint(kitSkusWithShip), [kitSkusWithShip]);
+
+  const activeBand =
+    mode === 'kit'
+      ? kitEst
+        ? classifyDutyWaiverBand(kitEst.usdPrice)
+        : null
+      : quoteEst
+        ? classifyDutyWaiverBand(quoteEst.usdPrice)
+        : null;
   const bands = useMemo(() => dutyWaiverBandRows(), []);
 
   const syncQuery = useCallback(() => {
     if (!router.isReady) return;
     const next: Record<string, string> = {};
-    if (urlInput.trim()) next.url = urlInput.trim();
-    if (price.trim()) next.price = price.trim();
+    if (mode === 'kit') {
+      next.kit = '1';
+      if (kitUrlsRaw.trim()) next.urls = kitParsed.map((p) => p.canonicalUrl || `https://${p.host}`).join('|');
+      const priced = kitParsed
+        .map((_, i) => kitPrices[i]?.trim() || '')
+        .filter(Boolean);
+      if (priced.length) next.prices = kitParsed.map((_, i) => kitPrices[i]?.trim() || '').join('|');
+    } else {
+      if (urlInput.trim()) next.url = urlInput.trim();
+      if (price.trim()) next.price = price.trim();
+    }
     if (currency && currency !== 'USD') next.currency = currency;
     if (!freeShipping && shippingIls.trim()) next.shippingIls = shippingIls.trim();
     router.replace({ pathname: '/landed', query: next }, undefined, { shallow: true });
-  }, [router, urlInput, price, currency, freeShipping, shippingIls]);
+  }, [
+    router,
+    mode,
+    kitUrlsRaw,
+    kitParsed,
+    kitPrices,
+    urlInput,
+    price,
+    currency,
+    freeShipping,
+    shippingIls,
+  ]);
 
   const stamp = customsStampCopyHe();
+  const tipCopy = kitTippingCopyHe();
+
+  const setKitPriceAt = (idx: number, value: string) => {
+    setKitPrices((prev) => {
+      const next = [...prev];
+      next[idx] = value;
+      return next;
+    });
+  };
 
   return (
     <>
@@ -103,8 +200,8 @@ export default function LandedPage() {
         path="/landed"
         canonical={PAGE_URL}
         hreflang={false}
-        title={`מחשבון עלות לישראל — פטור $${DUTY_FREE_THRESHOLD_USD} · מע״ם ${VAT_PCT}% · BoI+${FX_PCT}% | Shopli`}
-        description={`הדביקו קישור Amazon / מוצר וקבלו הצעת מחיר לארץ: פטור $${DUTY_FREE_THRESHOLD_USD}, פס $${DUTY_FREE_THRESHOLD_USD}–$${DUTY_WAIVER_CEILING_USD} מע״ם בלבד (ויתור מכס), חותמת Skills IL ${SKILLS_IL} (מע״ם ${VAT_PCT}% · שער יציג בנק ישראל + ${FX_PCT}%). לא 17%.`}
+        title={`מחשבון עלות לישראל — פטור $${DUTY_FREE_THRESHOLD_USD} · ערכה 2–5 · מע״ם ${VAT_PCT}% · BoI+${FX_PCT}% | Shopli`}
+        description={`הדביקו קישור Amazon / ערכה של 2–5 קישורים וקבלו הצעת מחיר לארץ: פטור $${DUTY_FREE_THRESHOLD_USD}, פס $${DUTY_FREE_THRESHOLD_USD}–$${DUTY_WAIVER_CEILING_USD} מע״ם בלבד (ויתור מכס), חותמת Skills IL ${SKILLS_IL} (מע״ם ${VAT_PCT}% · שער יציג בנק ישראל + ${FX_PCT}%). לא 17%.`}
       />
       <Header currentRegion="il" dir="rtl" />
 
@@ -115,6 +212,13 @@ export default function LandedPage() {
         data-page="landed"
         data-skills-il={SKILLS_IL}
         data-duty-bands="ptur-vat-waiver"
+        data-landed-mode={mode}
+        {...(mode === 'kit'
+          ? {
+              'data-landed-kit': '1',
+              'data-kit-sku-count': String(kitSkusWithShip.length),
+            }
+          : {})}
       >
         <section className="max-w-3xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-10">
           <div
@@ -127,12 +231,13 @@ export default function LandedPage() {
             className="text-3xl md:text-4xl font-extrabold leading-tight mb-3"
             style={{ color: 'var(--shopli-navy)' }}
           >
-            הדביקו קישור → הצעת מחיר לישראל
+            הדביקו קישור או ערכה → הצעת מחיר לישראל
           </h1>
           <p className="text-base leading-relaxed mb-6" style={{ color: 'var(--shopli-warm-gray)' }}>
             מחשבון עלות כוללת ליבוא אישי: תקרת פטור ${DUTY_FREE_THRESHOLD_USD}, פס ויתור מכס $
             {DUTY_FREE_THRESHOLD_USD}–${DUTY_WAIVER_CEILING_USD} (מע״ם {VAT_PCT}% בלבד), וחותמת שער מכס
             (שער יציג בנק ישראל + {FX_PCT}% לרשומון) לפי Skills IL {SKILLS_IL} — בלי סקרייפ חי מ־Amazon.
+            ערכה של 2–5 קישורים מגלגלת מול אותה תקרה (פריט בודד יכול להיראות פטור).
           </p>
 
           {/* Customs stamp callout */}
@@ -214,6 +319,45 @@ export default function LandedPage() {
             </ul>
           </div>
 
+          {/* Mode toggle: single vs kit */}
+          <div
+            className="flex flex-wrap gap-2 mb-4"
+            role="tablist"
+            aria-label="מצב הצעת מחיר"
+            data-landed-mode-toggle="1"
+          >
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === 'single'}
+              className="px-3 py-2 rounded-xl text-sm font-semibold border"
+              style={{
+                borderColor: mode === 'single' ? 'rgba(249,115,22,0.45)' : 'rgba(15,23,42,0.12)',
+                background: mode === 'single' ? 'rgba(249,115,22,0.1)' : 'transparent',
+                color: 'var(--shopli-navy)',
+              }}
+              onClick={() => setMode('single')}
+              data-landed-mode-btn="single"
+            >
+              קישור בודד
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === 'kit'}
+              className="px-3 py-2 rounded-xl text-sm font-semibold border"
+              style={{
+                borderColor: mode === 'kit' ? 'rgba(249,115,22,0.45)' : 'rgba(15,23,42,0.12)',
+                background: mode === 'kit' ? 'rgba(249,115,22,0.1)' : 'transparent',
+                color: 'var(--shopli-navy)',
+              }}
+              onClick={() => setMode('kit')}
+              data-landed-mode-btn="kit"
+            >
+              ערכה (2–5 קישורים)
+            </button>
+          </div>
+
           <form
             className="space-y-4 mb-8"
             onSubmit={(e) => {
@@ -221,78 +365,158 @@ export default function LandedPage() {
               syncQuery();
             }}
           >
-            <label className="block">
-              <span className="text-sm font-semibold mb-1.5 block" style={{ color: 'var(--shopli-navy)' }}>
-                קישור מוצר (Amazon / AliExpress / אחר)
-              </span>
-              <input
-                type="url"
-                inputMode="url"
-                dir="ltr"
-                value={urlInput}
-                onChange={(e) => setUrlInput(e.target.value)}
-                placeholder="https://www.amazon.com/dp/B0XXXXXXXX"
-                className="w-full px-4 py-3 rounded-xl border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
-                style={{ borderColor: 'rgba(15,23,42,0.12)' }}
-                data-landed-url-input="1"
-              />
-            </label>
-
-            {parsed && (
-              <div
-                className="text-xs px-3 py-2 rounded-lg flex flex-wrap gap-x-3 gap-y-1"
-                style={{ background: 'rgba(15,23,42,0.04)', color: 'var(--shopli-warm-gray)' }}
-                data-landed-url-parsed={parsed.source}
-                data-landed-product-id={parsed.productId || ''}
-              >
-                <span>
-                  מקור: <strong style={{ color: 'var(--shopli-navy)' }}>{sourceLabelHe(parsed.source)}</strong>
-                </span>
-                <span dir="ltr">{parsed.host}</span>
-                {parsed.productId && (
-                  <span dir="ltr">
-                    ID: <strong>{parsed.productId}</strong>
+            {mode === 'single' ? (
+              <>
+                <label className="block">
+                  <span className="text-sm font-semibold mb-1.5 block" style={{ color: 'var(--shopli-navy)' }}>
+                    קישור מוצר (Amazon / AliExpress / אחר)
                   </span>
-                )}
-              </div>
-            )}
+                  <input
+                    type="url"
+                    inputMode="url"
+                    dir="ltr"
+                    value={urlInput}
+                    onChange={(e) => setUrlInput(e.target.value)}
+                    placeholder="https://www.amazon.com/dp/B0XXXXXXXX"
+                    className="w-full px-4 py-3 rounded-xl border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    style={{ borderColor: 'rgba(15,23,42,0.12)' }}
+                    data-landed-url-input="1"
+                  />
+                </label>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <label className="block">
-                <span className="text-sm font-semibold mb-1.5 block" style={{ color: 'var(--shopli-navy)' }}>
-                  מחיר מוצר (ללא משלוח)
-                </span>
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  min="0"
-                  step="0.01"
-                  dir="ltr"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="89.99"
-                  className="w-full px-4 py-3 rounded-xl border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
-                  style={{ borderColor: 'rgba(15,23,42,0.12)' }}
-                  data-landed-price-input="1"
-                  required
-                />
-              </label>
-              <label className="block">
-                <span className="text-sm font-semibold mb-1.5 block" style={{ color: 'var(--shopli-navy)' }}>
-                  מטבע
-                </span>
-                <select
-                  value={currency}
-                  onChange={(e) => setCurrency(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-400"
-                  style={{ borderColor: 'rgba(15,23,42,0.12)' }}
-                  data-landed-currency-input="1"
-                >
-                  <option value="USD">USD ($)</option>
-                  <option value="ILS">ILS (₪)</option>
-                </select>
-              </label>
-            </div>
+                {parsed && (
+                  <div
+                    className="text-xs px-3 py-2 rounded-lg flex flex-wrap gap-x-3 gap-y-1"
+                    style={{ background: 'rgba(15,23,42,0.04)', color: 'var(--shopli-warm-gray)' }}
+                    data-landed-url-parsed={parsed.source}
+                    data-landed-product-id={parsed.productId || ''}
+                  >
+                    <span>
+                      מקור: <strong style={{ color: 'var(--shopli-navy)' }}>{sourceLabelHe(parsed.source)}</strong>
+                    </span>
+                    <span dir="ltr">{parsed.host}</span>
+                    {parsed.productId && (
+                      <span dir="ltr">
+                        ID: <strong>{parsed.productId}</strong>
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <label className="block">
+                    <span className="text-sm font-semibold mb-1.5 block" style={{ color: 'var(--shopli-navy)' }}>
+                      מחיר מוצר (ללא משלוח)
+                    </span>
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      min="0"
+                      step="0.01"
+                      dir="ltr"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      placeholder="89.99"
+                      className="w-full px-4 py-3 rounded-xl border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                      style={{ borderColor: 'rgba(15,23,42,0.12)' }}
+                      data-landed-price-input="1"
+                      required
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-semibold mb-1.5 block" style={{ color: 'var(--shopli-navy)' }}>
+                      מטבע
+                    </span>
+                    <select
+                      value={currency}
+                      onChange={(e) => setCurrency(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                      style={{ borderColor: 'rgba(15,23,42,0.12)' }}
+                      data-landed-currency-input="1"
+                    >
+                      <option value="USD">USD ($)</option>
+                      <option value="ILS">ILS (₪)</option>
+                    </select>
+                  </label>
+                </div>
+              </>
+            ) : (
+              <>
+                <label className="block">
+                  <span className="text-sm font-semibold mb-1.5 block" style={{ color: 'var(--shopli-navy)' }}>
+                    קישורים לערכה (2–5, שורה או פסיק לכל קישור)
+                  </span>
+                  <textarea
+                    dir="ltr"
+                    rows={4}
+                    value={kitUrlsRaw}
+                    onChange={(e) => setKitUrlsRaw(e.target.value)}
+                    placeholder={'https://www.amazon.com/dp/B0AAA11111\nhttps://www.amazon.com/dp/B0BBB22222'}
+                    className="w-full px-4 py-3 rounded-xl border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 font-mono"
+                    style={{ borderColor: 'rgba(15,23,42,0.12)' }}
+                    data-landed-kit-urls="1"
+                  />
+                </label>
+
+                {kitParsed.length > 0 && (
+                  <div
+                    className="space-y-2"
+                    data-landed-kit-lines={String(kitParsed.length)}
+                  >
+                    <div className="text-xs font-semibold" style={{ color: 'var(--shopli-navy)' }}>
+                      מחיר לכל פריט בערכה ({kitParsed.length} קישורים שנקלטו
+                      {kitParsed.length >= KIT_MAX ? ' · מקס׳ 5' : ''})
+                    </div>
+                    {kitParsed.map((p, i) => (
+                      <div
+                        key={`${p.canonicalUrl || p.host}-${i}`}
+                        className="grid grid-cols-1 sm:grid-cols-[1fr_140px] gap-2 items-center rounded-xl border px-3 py-2"
+                        style={{ borderColor: 'rgba(15,23,42,0.1)' }}
+                        data-kit-line={String(i)}
+                        data-landed-url-parsed={p.source}
+                        data-landed-product-id={p.productId || ''}
+                      >
+                        <div className="text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
+                          <strong style={{ color: 'var(--shopli-navy)' }}>{sourceLabelHe(p.source)}</strong>
+                          {' · '}
+                          <span dir="ltr">{p.productId || p.host}</span>
+                        </div>
+                        <input
+                          type="number"
+                          inputMode="decimal"
+                          min="0"
+                          step="0.01"
+                          dir="ltr"
+                          value={kitPrices[i] || ''}
+                          onChange={(e) => setKitPriceAt(i, e.target.value)}
+                          placeholder="40.00"
+                          className="w-full px-3 py-2 rounded-lg border text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                          style={{ borderColor: 'rgba(15,23,42,0.12)' }}
+                          data-kit-price-input={String(i)}
+                          required={i < 2}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <label className="block">
+                  <span className="text-sm font-semibold mb-1.5 block" style={{ color: 'var(--shopli-navy)' }}>
+                    מטבע (לכל פריטי הערכה)
+                  </span>
+                  <select
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                    className="w-full sm:w-48 px-4 py-3 rounded-xl border text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    style={{ borderColor: 'rgba(15,23,42,0.12)' }}
+                    data-landed-currency-input="1"
+                  >
+                    <option value="USD">USD ($)</option>
+                    <option value="ILS">ILS (₪)</option>
+                  </select>
+                </label>
+              </>
+            )}
 
             <label className="flex items-center gap-2 text-sm" style={{ color: 'var(--shopli-navy)' }}>
               <input
@@ -308,7 +532,7 @@ export default function LandedPage() {
             {!freeShipping && (
               <label className="block">
                 <span className="text-sm font-semibold mb-1.5 block" style={{ color: 'var(--shopli-navy)' }}>
-                  עלות משלוח (₪)
+                  עלות משלוח (₪){mode === 'kit' ? ' · לערכה כולה' : ''}
                 </span>
                 <input
                   type="number"
@@ -328,11 +552,57 @@ export default function LandedPage() {
 
             <button type="submit" className="btn-primary w-full sm:w-auto">
               <Icon name="tag" size={16} />
-              חשבו עלות לארץ
+              {mode === 'kit' ? 'חשבו עלות ערכה לארץ' : 'חשבו עלות לארץ'}
             </button>
           </form>
 
-          {canQuote ? (
+          {mode === 'kit' ? (
+            canQuoteKit ? (
+              <div
+                data-landed-quote="1"
+                data-landed-kit="1"
+                data-kit-sku-count={String(kitSkusWithShip.length)}
+                data-active-duty-band={activeBand || ''}
+                data-kit-tipping={tipping.tipped ? '1' : '0'}
+              >
+                <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--shopli-navy)' }}>
+                  הצעת מחיר לערכה ({kitSkusWithShip.length} פריטים)
+                </h2>
+                {tipping.tipped && (
+                  <aside
+                    className="rounded-xl border p-3 mb-4"
+                    style={{
+                      borderColor: 'rgba(245,158,11,0.45)',
+                      background: 'rgba(245,158,11,0.08)',
+                    }}
+                    data-kit-tipping="1"
+                    data-kit-tipping-foil="single-sku-miss"
+                  >
+                    <div className="text-sm font-bold mb-1" style={{ color: '#b45309' }}>
+                      זהירות · פריט בודד מפספס את הטיפ של הערכה
+                    </div>
+                    <p className="text-xs leading-relaxed" style={{ color: 'var(--shopli-warm-gray)' }}>
+                      {tipCopy}
+                    </p>
+                  </aside>
+                )}
+                <LandedCostBadge
+                  variant="full"
+                  scope="kit"
+                  skus={kitSkusWithShip}
+                />
+                <p className="text-xs mt-2" style={{ color: 'var(--shopli-warm-gray)' }}>
+                  שער הערכה מתועד: {USD_TO_ILS_RATE.toFixed(2)} ₪/$ (≈ BoI יציג + {FX_PCT}%). החיוב בפועל
+                  נקבע ברשות המסים ביום השחרור — לא פיד חי.
+                </p>
+              </div>
+            ) : (
+              <p className="text-sm" style={{ color: 'var(--shopli-warm-gray)' }} data-landed-quote="empty-kit">
+                הדביקו לפחות 2 קישורים תקינים והזינו מחיר לכל פריט כדי לגלגל מול תקרת ה-$
+                {DUTY_FREE_THRESHOLD_USD}.
+              </p>
+            )
+          ) : canQuoteSingle ? (
             <div data-landed-quote="1" data-active-duty-band={activeBand || ''}>
               <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--shopli-navy)' }}>
                 הצעת מחיר משוערת לדלת
@@ -360,6 +630,7 @@ export default function LandedPage() {
             {DUTY_FREE_THRESHOLD_USD} על ערך הסחורה בלבד; מע״ם {VAT_PCT}% על סחורה+משלוח בפס $
             {DUTY_FREE_THRESHOLD_USD}–${DUTY_WAIVER_CEILING_USD} עם ויתור מכס) ואת חותמת שער המכס לרשומון
             לפי Skills IL {SKILLS_IL}. מכס מעל ${DUTY_WAIVER_CEILING_USD} / מס קנייה לפי HS לא ממודל כאן.
+            בערכה — הסף על סכום ה־SKU, לא על כל שורה בנפרד.
           </p>
         </section>
       </main>

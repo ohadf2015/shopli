@@ -2,9 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   parseProductUrl,
+  parseKitUrls,
   customsStampCopyHe,
   classifyDutyWaiverBand,
   dutyWaiverBandRows,
+  kitTippingHint,
+  kitTippingCopyHe,
 } from '../lib/landed-url';
 import {
   IL_VAT_RATE,
@@ -13,6 +16,7 @@ import {
   DUTY_FREE_THRESHOLD_USD,
   DUTY_WAIVER_CEILING_USD,
   estimateLandedCost,
+  estimateKitLandedCost,
   customsFxTooltipHe,
   vatFxHonestyStripHe,
 } from '../lib/landed-cost';
@@ -55,6 +59,78 @@ test('parseProductUrl: empty / garbage → null', () => {
   assert.equal(parseProductUrl('   '), null);
   assert.equal(parseProductUrl('not a url'), null);
   assert.equal(parseProductUrl('ftp://amazon.com/dp/B0EXAMPLE1'), null);
+});
+
+test('parseKitUrls: 2–5 amazon URLs, blanks ignored, invalid skipped, cap 5', () => {
+  const raw = `
+https://www.amazon.com/dp/B0AAA11111
+not-a-url
+https://www.amazon.com/dp/B0BBB22222
+
+https://www.amazon.com/dp/B0CCC33333, https://www.amazon.com/dp/B0DDD44444
+https://www.amazon.com/dp/B0EEE55555
+https://www.amazon.com/dp/B0FFF66666
+`;
+  const kit = parseKitUrls(raw);
+  assert.equal(kit.length, 5);
+  assert.equal(kit[0].productId, 'B0AAA11111');
+  assert.equal(kit[4].productId, 'B0EEE55555');
+  assert.ok(kit.every((p) => p.source === 'amazon'));
+});
+
+test('parseKitUrls: dedupes canonical ASIN and tolerates empty', () => {
+  assert.deepEqual(parseKitUrls(''), []);
+  assert.deepEqual(parseKitUrls('   \n  '), []);
+  const d = parseKitUrls(
+    'https://www.amazon.com/dp/B0AAA11111\nhttps://www.amazon.com/Some/dp/B0AAA11111?psc=1'
+  );
+  assert.equal(d.length, 1);
+  assert.equal(d[0].productId, 'B0AAA11111');
+});
+
+test('kit tipping: 37.49+37.49 USD stays ptur (no tip); 40+40 tips into vat-only', () => {
+  const under = kitTippingHint([
+    { price: 37.49, currency: 'USD', freeShipping: true },
+    { price: 37.49, currency: 'USD', freeShipping: true },
+  ]);
+  assert.equal(under.tipped, false);
+  assert.equal(under.singleAllPtur, true);
+  assert.equal(under.kitDutyFree, true);
+  assert.equal(under.kitBand, 'ptur');
+
+  const tip = kitTippingHint([
+    { price: 40, currency: 'USD', freeShipping: true },
+    { price: 40, currency: 'USD', freeShipping: true },
+  ]);
+  assert.equal(tip.tipped, true);
+  assert.equal(tip.singleAllPtur, true);
+  assert.equal(tip.kitDutyFree, false);
+  assert.equal(tip.kitBand, 'vat-only');
+
+  const kit = estimateKitLandedCost([
+    { price: 40, currency: 'USD', freeShipping: true },
+    { price: 40, currency: 'USD', freeShipping: true },
+  ]);
+  assert.ok(kit);
+  assert.equal(classifyDutyWaiverBand(kit.usdPrice), 'vat-only');
+});
+
+test('kit tipping: one SKU already over $75 is not single-miss tip', () => {
+  const h = kitTippingHint([
+    { price: 80, currency: 'USD', freeShipping: true },
+    { price: 20, currency: 'USD', freeShipping: true },
+  ]);
+  assert.equal(h.tipped, false);
+  assert.equal(h.singleAllPtur, false);
+  assert.equal(h.kitDutyFree, false);
+  assert.equal(h.kitBand, 'vat-only');
+});
+
+test('kit tipping copy mentions $75 threshold and never 17% VAT', () => {
+  const c = kitTippingCopyHe();
+  assert.match(c, /\$75/);
+  assert.match(c, /ערכה|פטור/);
+  assert.doesNotMatch(c, /מע״ם 17%/);
 });
 
 test('customs stamp copy: Skills IL v1.4.0, 18% VAT, BoI+0.5%, bands, never 17%', () => {

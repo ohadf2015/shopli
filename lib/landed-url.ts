@@ -2,6 +2,7 @@
  * Product-URL parser + duty-waiver band copy for /landed
  * (paste Amazon / AliExpress / any URL → IL quote).
  * Provenance only — no live scraping. Quote math stays in lib/landed-cost.ts (#14/#18/#19/#20).
+ * Kit paste (2–5 URLs) + single-SKU miss tipping: Moat after #21.
  */
 
 import {
@@ -9,6 +10,9 @@ import {
   DUTY_WAIVER_CEILING_USD,
   IL_VAT_RATE,
   BOI_CUSTOMS_FX_UPLIFT,
+  estimateLandedCost,
+  estimateKitLandedCost,
+  type LandedCostInput,
 } from './landed-cost';
 
 export type LandedUrlSource = 'amazon' | 'aliexpress' | 'other';
@@ -41,6 +45,8 @@ const ALIEXPRESS_HOST = /(?:^|\.)aliexpress\.(?:com|us|ru)(?:$|:)/i;
 const ASIN_RE = /(?:\/(?:dp|gp\/product|gp\/aw\/d|product)\/)([A-Z0-9]{10})(?:[/?]|$)/i;
 /** AliExpress item id in /item/{id}.html or /i/{id}.html */
 const AE_ITEM_RE = /\/(?:item|i)\/(\d{6,})(?:\.html)?/i;
+
+const KIT_URL_MAX = 5;
 
 function normalizeUrl(raw: string): URL | null {
   const trimmed = (raw || '').trim();
@@ -100,6 +106,76 @@ export function parseProductUrl(raw: string): ParsedProductUrl | null {
   }
 
   return { host, source, productId, canonicalUrl };
+}
+
+/**
+ * Parse a multi-line / comma / whitespace paste of product URLs for /landed kit mode.
+ * Returns up to 5 valid parses (Moat: 2–5 Amazon URLs). Blanks and garbage skipped.
+ */
+export function parseKitUrls(raw: string): ParsedProductUrl[] {
+  const parts = String(raw || '')
+    .split(/[\s,;]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const out: ParsedProductUrl[] = [];
+  const seen = new Set<string>();
+  for (const part of parts) {
+    if (out.length >= KIT_URL_MAX) break;
+    const p = parseProductUrl(part);
+    if (!p) continue;
+    const key = (p.canonicalUrl || `${p.host}|${p.productId || ''}`).toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(p);
+  }
+  return out;
+}
+
+export interface KitTippingHint {
+  /** True when every valid single SKU is under $75 ptur but the kit sum is not. */
+  tipped: boolean;
+  singleAllPtur: boolean;
+  kitDutyFree: boolean | null;
+  kitBand: DutyWaiverBand | null;
+  skuCount: number;
+}
+
+/**
+ * Single-SKU miss kit tipping: each line looks ptur on a ProductCard / single quote,
+ * but the combined shipment crosses $75 (VAT assessed on the kit, not the line).
+ */
+export function kitTippingHint(skus: LandedCostInput[]): KitTippingHint {
+  const list = skus || [];
+  const singles = list
+    .map((sku) => estimateLandedCost(sku))
+    .filter((est): est is NonNullable<typeof est> => est != null);
+  const kit = estimateKitLandedCost(list);
+  const skuCount = singles.length;
+  if (skuCount < 2 || !kit) {
+    return {
+      tipped: false,
+      singleAllPtur: skuCount > 0 && singles.every((s) => s.dutyFree),
+      kitDutyFree: kit ? kit.dutyFree : null,
+      kitBand: kit ? classifyDutyWaiverBand(kit.usdPrice) : null,
+      skuCount,
+    };
+  }
+  const singleAllPtur = singles.every((s) => s.dutyFree);
+  const tipped = singleAllPtur && !kit.dutyFree;
+  return {
+    tipped,
+    singleAllPtur,
+    kitDutyFree: kit.dutyFree,
+    kitBand: classifyDutyWaiverBand(kit.usdPrice),
+    skuCount,
+  };
+}
+
+export function kitTippingCopyHe(): string {
+  return (
+    `כל פריט לבד מתחת ל-$${DUTY_FREE_THRESHOLD_USD} (נראה פטור), ` +
+    `אבל סכום הערכה חוצה את תקרת הפטור — מע״ם נגבה על המשלוח המשותף, לא על השורה.`
+  );
 }
 
 /**
