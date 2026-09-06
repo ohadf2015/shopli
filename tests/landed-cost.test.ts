@@ -5,6 +5,7 @@ import {
   estimateKitLandedCost,
   USD_TO_ILS_RATE,
   DUTY_FREE_THRESHOLD_USD,
+  DUTY_WAIVER_CEILING_USD,
   IL_VAT_RATE,
   BOI_CUSTOMS_FX_UPLIFT,
   customsFxTooltipHe,
@@ -13,6 +14,7 @@ import {
 
 test('constants encode the IL import rules', () => {
   assert.equal(DUTY_FREE_THRESHOLD_USD, 75);
+  assert.equal(DUTY_WAIVER_CEILING_USD, 500);
   assert.equal(IL_VAT_RATE, 0.18);
   assert.ok(USD_TO_ILS_RATE > 3 && USD_TO_ILS_RATE < 5);
   // Skills IL foil: goods on a rashimon use BoI representative + 0.5%
