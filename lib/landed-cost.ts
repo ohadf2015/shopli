@@ -22,6 +22,8 @@ export const USD_TO_ILS_RATE = 3.6;
 /** Tax Authority uplift on BoI representative rate for goods (rashimon). */
 export const BOI_CUSTOMS_FX_UPLIFT = 0.005;
 export const DUTY_FREE_THRESHOLD_USD = 75;
+/** Personal-import duty waiver ceiling (USD). $75–$500: VAT only; duty not modeled above. */
+export const DUTY_WAIVER_CEILING_USD = 500;
 export const IL_VAT_RATE = 0.18;
 
 /**

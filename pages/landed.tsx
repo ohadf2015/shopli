@@ -6,16 +6,26 @@ import SeoHead from '../components/SeoHead';
 import LandedCostBadge from '../components/LandedCostBadge';
 import Icon from '../components/icons';
 import { SITE_URL } from '../lib/seo';
-import { IL_VAT_RATE, USD_TO_ILS_RATE, BOI_CUSTOMS_FX_UPLIFT } from '../lib/landed-cost';
+import {
+  IL_VAT_RATE,
+  USD_TO_ILS_RATE,
+  BOI_CUSTOMS_FX_UPLIFT,
+  DUTY_FREE_THRESHOLD_USD,
+  DUTY_WAIVER_CEILING_USD,
+  estimateLandedCost,
+} from '../lib/landed-cost';
 import {
   parseProductUrl,
   customsStampCopyHe,
+  dutyWaiverBandRows,
+  classifyDutyWaiverBand,
   type ParsedProductUrl,
 } from '../lib/landed-url';
 
 const PAGE_URL = `${SITE_URL}/landed`;
 const VAT_PCT = Math.round(IL_VAT_RATE * 100);
 const FX_PCT = (BOI_CUSTOMS_FX_UPLIFT * 100).toFixed(1);
+const SKILLS_IL = 'v1.4.0';
 
 function sourceLabelHe(source: ParsedProductUrl['source']): string {
   if (source === 'amazon') return 'Amazon';
@@ -25,8 +35,9 @@ function sourceLabelHe(source: ParsedProductUrl['source']): string {
 
 /**
  * /landed — paste Amazon/product URL → IL landed-cost quote.
- * Moat vs rivals that still body-claim 17% VAT: we stamp 18% + BoI+0.5%
- * (Skills IL v2.2.0). Estimator math is unchanged from #18/#19.
+ * Moat: surfaces $75 ptur + $75–$500 VAT-only duty-waiver bands with
+ * 18% + BoI+0.5% stamp (Skills IL v1.4.0 Sep 6; foil iWishBag 17% body vs 18% table).
+ * Estimator math is unchanged from #18/#19/#20.
  */
 export default function LandedPage() {
   const router = useRouter();
@@ -60,6 +71,19 @@ export default function LandedPage() {
   const shipNum = freeShipping ? 0 : Math.max(0, Number(shippingIls) || 0);
   const canQuote = Number.isFinite(priceNum) && priceNum > 0;
 
+  const quoteEst = useMemo(() => {
+    if (!canQuote) return null;
+    return estimateLandedCost({
+      price: priceNum,
+      currency,
+      freeShipping,
+      shippingIls: shipNum,
+    });
+  }, [canQuote, priceNum, currency, freeShipping, shipNum]);
+
+  const activeBand = quoteEst ? classifyDutyWaiverBand(quoteEst.usdPrice) : null;
+  const bands = useMemo(() => dutyWaiverBandRows(), []);
+
   const syncQuery = useCallback(() => {
     if (!router.isReady) return;
     const next: Record<string, string> = {};
@@ -79,8 +103,8 @@ export default function LandedPage() {
         path="/landed"
         canonical={PAGE_URL}
         hreflang={false}
-        title={`מחשבון עלות לישראל — מע״ם ${VAT_PCT}% + שער מכס BoI+${FX_PCT}% | Shopli`}
-        description={`הדביקו קישור Amazon / מוצר וקבלו הצעת מחיר לארץ: מע״ם ${VAT_PCT}% ותקרת פטור $75, עם חותמת מכס Skills IL v2.2.0 (שער יציג בנק ישראל + ${FX_PCT}%). לא 17%.`}
+        title={`מחשבון עלות לישראל — פטור $${DUTY_FREE_THRESHOLD_USD} · מע״ם ${VAT_PCT}% · BoI+${FX_PCT}% | Shopli`}
+        description={`הדביקו קישור Amazon / מוצר וקבלו הצעת מחיר לארץ: פטור $${DUTY_FREE_THRESHOLD_USD}, פס $${DUTY_FREE_THRESHOLD_USD}–$${DUTY_WAIVER_CEILING_USD} מע״ם בלבד (ויתור מכס), חותמת Skills IL ${SKILLS_IL} (מע״ם ${VAT_PCT}% · שער יציג בנק ישראל + ${FX_PCT}%). לא 17%.`}
       />
       <Header currentRegion="il" dir="rtl" />
 
@@ -89,7 +113,8 @@ export default function LandedPage() {
         className="min-h-screen"
         style={{ fontFamily: 'var(--font-assistant), system-ui, sans-serif' }}
         data-page="landed"
-        data-skills-il="v2.2.0"
+        data-skills-il={SKILLS_IL}
+        data-duty-bands="ptur-vat-waiver"
       >
         <section className="max-w-3xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-10">
           <div
@@ -105,21 +130,21 @@ export default function LandedPage() {
             הדביקו קישור → הצעת מחיר לישראל
           </h1>
           <p className="text-base leading-relaxed mb-6" style={{ color: 'var(--shopli-warm-gray)' }}>
-            מחשבון עלות כוללת ליבוא אישי: תקרת פטור $75, מע״ם {VAT_PCT}% מעל הסף, וחותמת שער מכס
-            (שער יציג בנק ישראל + {FX_PCT}% לרשומון) לפי Skills IL v2.2.0 — בלי הסתמכות על סקרייפ חי
-            מ־Amazon.
+            מחשבון עלות כוללת ליבוא אישי: תקרת פטור ${DUTY_FREE_THRESHOLD_USD}, פס ויתור מכס $
+            {DUTY_FREE_THRESHOLD_USD}–${DUTY_WAIVER_CEILING_USD} (מע״ם {VAT_PCT}% בלבד), וחותמת שער מכס
+            (שער יציג בנק ישראל + {FX_PCT}% לרשומון) לפי Skills IL {SKILLS_IL} — בלי סקרייפ חי מ־Amazon.
           </p>
 
           {/* Customs stamp callout */}
           <aside
-            className="rounded-xl border p-3 sm:p-4 mb-8"
+            className="rounded-xl border p-3 sm:p-4 mb-6"
             style={{
               borderColor: 'rgba(249,115,22,0.35)',
               background: 'rgba(249,115,22,0.07)',
             }}
             data-customs-stamp="boi-plus-0.5"
             data-vat-rate={String(VAT_PCT)}
-            data-skills-il="v2.2.0"
+            data-skills-il={SKILLS_IL}
           >
             <div
               className="flex items-start gap-2 text-sm font-bold mb-1"
@@ -127,13 +152,67 @@ export default function LandedPage() {
             >
               <Icon name="shield" size={16} className="shrink-0 mt-0.5" />
               <span>
-                חותמת מכס · מע״ם {VAT_PCT}% · BoI + {FX_PCT}%
+                חותמת מכס · מע״ם {VAT_PCT}% · BoI + {FX_PCT}% · Skills IL {SKILLS_IL}
               </span>
             </div>
             <p className="text-xs leading-relaxed" style={{ color: 'var(--shopli-warm-gray)' }}>
               {stamp}
             </p>
           </aside>
+
+          {/* Duty-waiver bands (ptur + VAT-only) */}
+          <div
+            className="mb-8"
+            data-duty-waiver-bands="1"
+            data-ptur-usd={String(DUTY_FREE_THRESHOLD_USD)}
+            data-duty-waiver-ceiling-usd={String(DUTY_WAIVER_CEILING_USD)}
+          >
+            <h2 className="text-sm font-bold mb-2" style={{ color: 'var(--shopli-navy)' }}>
+              פסי יבוא אישי · פטור ${DUTY_FREE_THRESHOLD_USD} + ויתור מכס עד ${DUTY_WAIVER_CEILING_USD}
+            </h2>
+            <ul className="space-y-2">
+              {bands.map((row) => {
+                const active = activeBand === row.id;
+                return (
+                  <li
+                    key={row.id}
+                    className="rounded-xl border px-3 py-2.5"
+                    style={{
+                      borderColor: active
+                        ? 'rgba(249,115,22,0.45)'
+                        : 'rgba(15,23,42,0.1)',
+                      background: active
+                        ? 'rgba(249,115,22,0.08)'
+                        : 'rgba(15,23,42,0.02)',
+                    }}
+                    data-duty-band={row.id}
+                    data-duty-band-active={active ? '1' : '0'}
+                  >
+                    <div
+                      className="text-sm font-bold mb-0.5"
+                      style={{ color: 'var(--shopli-navy)' }}
+                    >
+                      {row.titleHe}
+                      {active && (
+                        <span
+                          className="ms-2 text-[0.65rem] font-semibold px-1.5 py-0.5 rounded-full"
+                          style={{
+                            background: 'rgba(249,115,22,0.15)',
+                            color: '#c2410c',
+                          }}
+                        >
+                          הפס של ההצעה
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs leading-relaxed" style={{ color: 'var(--shopli-warm-gray)' }}>
+                      {row.detailHe}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
 
           <form
             className="space-y-4 mb-8"
@@ -254,7 +333,7 @@ export default function LandedPage() {
           </form>
 
           {canQuote ? (
-            <div data-landed-quote="1">
+            <div data-landed-quote="1" data-active-duty-band={activeBand || ''}>
               <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--shopli-navy)' }}>
                 הצעת מחיר משוערת לדלת
               </h2>
@@ -277,9 +356,10 @@ export default function LandedPage() {
           )}
 
           <p className="text-xs mt-10 leading-relaxed" style={{ color: 'var(--shopli-warm-gray)' }}>
-            הערה: שופלי אינה רשות המסים. המחשבון משקף כללי יבוא אישי נפוצים (פטור מתחת ל-$75 על ערך
-            הסחורה בלבד; מע״ם {VAT_PCT}% על סחורה+משלוח מעל הסף) ואת חותמת שער המכס לרשומון לפי Skills
-            IL v2.2.0. מכס מעל $500 / מס קנייה לפי HS לא ממודל כאן.
+            הערה: שופלי אינה רשות המסים. המחשבון משקף כללי יבוא אישי נפוצים (פטור מתחת ל-$
+            {DUTY_FREE_THRESHOLD_USD} על ערך הסחורה בלבד; מע״ם {VAT_PCT}% על סחורה+משלוח בפס $
+            {DUTY_FREE_THRESHOLD_USD}–${DUTY_WAIVER_CEILING_USD} עם ויתור מכס) ואת חותמת שער המכס לרשומון
+            לפי Skills IL {SKILLS_IL}. מכס מעל ${DUTY_WAIVER_CEILING_USD} / מס קנייה לפי HS לא ממודל כאן.
           </p>
         </section>
       </main>

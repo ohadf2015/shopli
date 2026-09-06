@@ -1,7 +1,15 @@
 /**
- * Product-URL parser for /landed (paste Amazon / AliExpress / any URL → IL quote).
- * Provenance only — no live scraping. Quote math stays in lib/landed-cost.ts (#14/#18/#19).
+ * Product-URL parser + duty-waiver band copy for /landed
+ * (paste Amazon / AliExpress / any URL → IL quote).
+ * Provenance only — no live scraping. Quote math stays in lib/landed-cost.ts (#14/#18/#19/#20).
  */
+
+import {
+  DUTY_FREE_THRESHOLD_USD,
+  DUTY_WAIVER_CEILING_USD,
+  IL_VAT_RATE,
+  BOI_CUSTOMS_FX_UPLIFT,
+} from './landed-cost';
 
 export type LandedUrlSource = 'amazon' | 'aliexpress' | 'other';
 
@@ -10,6 +18,19 @@ export interface ParsedProductUrl {
   source: LandedUrlSource;
   productId?: string;
   canonicalUrl?: string;
+}
+
+/** Personal-import band for goods value (USD). Matches estimator: under $75 = ptur. */
+export type DutyWaiverBand = 'ptur' | 'vat-only' | 'full';
+
+export interface DutyWaiverBandRow {
+  id: DutyWaiverBand;
+  /** Inclusive lower bound (USD goods). null = open floor. */
+  fromUsd: number | null;
+  /** Exclusive upper bound (USD goods). null = open ceiling. */
+  toUsd: number | null;
+  titleHe: string;
+  detailHe: string;
 }
 
 const AMAZON_HOST =
@@ -27,7 +48,7 @@ function normalizeUrl(raw: string): URL | null {
   try {
     let candidate = trimmed;
     if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) {
-      // Explicit scheme — only http(s); never rewrite ftp/etc into https://ftp//…
+      // Explicit scheme — only http(s); never rewrite ftp/etc into https://ftp://…
       if (!/^https?:\/\//i.test(trimmed)) return null;
     } else {
       candidate = `https://${trimmed}`;
@@ -82,13 +103,64 @@ export function parseProductUrl(raw: string): ParsedProductUrl | null {
 }
 
 /**
- * Hebrew customs-stamp copy for /landed (Skills IL v2.2.0 foil).
+ * Classify goods USD value into personal-import bands (Skills IL v1.4.0).
+ * Aligns with estimator: under $75 = ptur; $75–<$500 = VAT-only duty waiver.
+ * Does not change estimator math (#18/#19/#20).
+ */
+export function classifyDutyWaiverBand(usdGoods: number): DutyWaiverBand | null {
+  const n = Number(usdGoods);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  if (n < DUTY_FREE_THRESHOLD_USD) return 'ptur';
+  if (n < DUTY_WAIVER_CEILING_USD) return 'vat-only';
+  return 'full';
+}
+
+/**
+ * Static band rows for /landed (ptur + VAT-only duty waiver + above-$500 note).
+ * Copy only — estimator still omits HS duty / purchase tax above $500.
+ */
+export function dutyWaiverBandRows(): DutyWaiverBandRow[] {
+  const vatPct = Math.round(IL_VAT_RATE * 100);
+  const fxPct = (BOI_CUSTOMS_FX_UPLIFT * 100).toFixed(1);
+  const ptur = DUTY_FREE_THRESHOLD_USD;
+  const ceiling = DUTY_WAIVER_CEILING_USD;
+  return [
+    {
+      id: 'ptur',
+      fromUsd: null,
+      toUsd: ptur,
+      titleHe: `מתחת ל-$${ptur} · פטור מלא (פטור)`,
+      detailHe:
+        'פטור ממכס וממע״ם על ערך הסחורה בלבד (משלוח לא נספר לתקרה). יבוא אישי רגיל.',
+    },
+    {
+      id: 'vat-only',
+      fromUsd: ptur,
+      toUsd: ceiling,
+      titleHe: `$${ptur}–$${ceiling} · מע״ם בלבד (ויתור מכס)`,
+      detailHe:
+        `מכס נדחה (duty waiver); משלמים מע״ם ${vatPct}% על סחורה+משלוח. שער רשומון: יציג בנק ישראל + ${fxPct}%.`,
+    },
+    {
+      id: 'full',
+      fromUsd: ceiling,
+      toUsd: null,
+      titleHe: `מעל $${ceiling} · מכס אפשרי לפי HS`,
+      detailHe:
+        `מע״ם ${vatPct}% חל; מכס / מס קנייה לפי סיווג HS — לא ממודל במחשבון (הערכה שמרנית: מע״ם בלבד).`,
+    },
+  ];
+}
+
+/**
+ * Hebrew customs-stamp copy for /landed (Skills IL v1.4.0 · Sep 6 foil).
  * Labels 18% VAT + BoI representative +0.5% — never 17%.
  * Does not change estimator math (#18/#19).
  */
 export function customsStampCopyHe(): string {
   return (
-    'חותמת מכס (Skills IL v2.2.0): מע״ם 18% · שער יציג בנק ישראל + 0.5% לרשומון. ' +
+    'חותמת מכס (Skills IL v1.4.0 · Sep 6): מע״ם 18% · שער יציג בנק ישראל + 0.5% לרשומון. ' +
+    'פסים: פטור מתחת ל-$75 · $75–$500 מע״ם בלבד (ויתור מכס). ' +
     'יריבים (למשל iWishBag Amazon→IL) עדיין כותבים "17% VAT" בגוף העמוד בעוד שטבלת המכסים אצלם מציינת 18%.'
   );
 }
