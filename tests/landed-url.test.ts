@@ -8,6 +8,9 @@ import {
   dutyWaiverBandRows,
   kitTippingHint,
   kitTippingCopyHe,
+  ITA_SHAAR_OLAMI_CALC_URL,
+  itaShaarOlamiFoilStripHe,
+  itaShaarOlamiLinkLabelHe,
 } from '../lib/landed-url';
 import {
   IL_VAT_RATE,
@@ -177,7 +180,7 @@ test('duty-waiver bands: $75 ptur + $75–$500 VAT-only + above-$500', () => {
   assert.doesNotMatch(rows.map((r) => r.detailHe).join('\n'), /מע״ם 17%/);
 });
 
-test('keep #18/#19/#20 math: constants + tooltip + honesty strip + estimator untouched', () => {
+test('keep #18–#22 math: constants + tooltip + honesty strip + estimator untouched', () => {
   assert.equal(IL_VAT_RATE, 0.18);
   assert.equal(BOI_CUSTOMS_FX_UPLIFT, 0.005);
   assert.equal(USD_TO_ILS_RATE, 3.6);
@@ -198,4 +201,33 @@ test('keep #18/#19/#20 math: constants + tooltip + honesty strip + estimator unt
   assert.equal(mid.dutyFree, false);
   assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
   assert.ok(Math.abs(mid.totalIls - 200 * USD_TO_ILS_RATE * (1 + IL_VAT_RATE)) < 1e-9);
+});
+
+test('ITA Shaar Olami foil: deep-link + same $75 / $75–$500 bands as רשות המיסים', () => {
+  assert.match(ITA_SHAAR_OLAMI_CALC_URL, /^https:\/\/shaarolami-query\.customs\.mof\.gov\.il\//);
+  assert.match(ITA_SHAAR_OLAMI_CALC_URL, /PersonalImportTax\/Home\/Calc/);
+
+  const strip = itaShaarOlamiFoilStripHe();
+  assert.match(strip, /רשות המיסים|שער עולמי/);
+  assert.match(strip, /\$75/);
+  assert.match(strip, /\$500/);
+  assert.match(strip, /מע״ם בלבד|ויתור מכס/);
+  assert.match(strip, /פטור/);
+  assert.doesNotMatch(strip, /מע״ם 17%/);
+
+  const label = itaShaarOlamiLinkLabelHe();
+  assert.match(label, /שער עולמי/);
+  assert.match(label, /רשות המיסים/);
+});
+
+test('ITA Shaar Olami foil is presentation-only: bands + estimator still match #21/#22', () => {
+  assert.equal(DUTY_FREE_THRESHOLD_USD, 75);
+  assert.equal(DUTY_WAIVER_CEILING_USD, 500);
+  assert.equal(classifyDutyWaiverBand(74.99), 'ptur');
+  assert.equal(classifyDutyWaiverBand(75), 'vat-only');
+  assert.equal(classifyDutyWaiverBand(500), 'full');
+  const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
+  assert.ok(mid);
+  assert.equal(mid.dutyFree, false);
+  assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
 });
