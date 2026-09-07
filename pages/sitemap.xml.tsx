@@ -5,6 +5,7 @@ import { cacheIfNotEmpty } from '../lib/cache';
 import { SITE_URL, getCollectionOgImage } from '../lib/seo';
 import { COLLECTION_CONTENT } from '../lib/collection-content';
 import { searchCollection } from '../lib/aliexpress';
+import { MARKETPLACE_HOW_TOS } from '../lib/landed-url';
 
 function xmlEncode(s: string): string {
   return s
@@ -103,13 +104,9 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     priority: 0.85,
     lastmod: today,
   });
-  for (const path of [
-    '/how-to-etsy-israel',
-    '/how-to-ebay-israel',
-    '/how-to-walmart-israel',
-  ]) {
+  for (const m of MARKETPLACE_HOW_TOS) {
     urls.push({
-      loc: `${SITE_URL}${path}`,
+      loc: `${SITE_URL}${m.path}`,
       changefreq: 'weekly',
       priority: 0.7,
       lastmod: today,

@@ -21,6 +21,8 @@ import {
   IWISHBAG_ETSY_IL_URL,
   IWISHBAG_EBAY_IL_URL,
   IWISHBAG_WALMART_IL_URL,
+  IWISHBAG_ALIEXPRESS_IL_URL,
+  IWISHBAG_AMAZONJP_IL_URL,
   MARKETPLACE_HOW_TOS,
   getMarketplaceHowTo,
   iwishbagMarketplaceSideBySideRows,
@@ -350,20 +352,29 @@ test('side-by-side foil is presentation-only: #18–#24 math + prior foils intac
 });
 
 
-test('marketplace how-tos: Etsy/eBay/Walmart iWishBag URLs + paths', () => {
+test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP iWishBag URLs + paths', () => {
   assert.equal(IWISHBAG_ETSY_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/etsy/israel');
   assert.equal(IWISHBAG_EBAY_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/ebay/israel');
   assert.equal(IWISHBAG_WALMART_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/walmart/israel');
+  assert.equal(IWISHBAG_ALIEXPRESS_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/aliexpress/israel');
+  assert.equal(IWISHBAG_AMAZONJP_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/amazon-japan/israel');
 
-  assert.equal(MARKETPLACE_HOW_TOS.length, 3);
+  assert.equal(MARKETPLACE_HOW_TOS.length, 5);
   const ids = MARKETPLACE_HOW_TOS.map((m) => m.id);
-  assert.deepEqual(ids, ['etsy', 'ebay', 'walmart']);
+  assert.deepEqual(ids, ['etsy', 'ebay', 'walmart', 'aliexpress', 'amazonjp']);
 
   for (const m of MARKETPLACE_HOW_TOS) {
     assert.match(m.path, new RegExp(`^/how-to-${m.id}-israel$`));
     assert.match(m.iwishbagUrl, /iwishbag\.com\/how-to-buy-from\//);
     assert.equal(getMarketplaceHowTo(m.id).path, m.path);
   }
+
+  const ae = getMarketplaceHowTo('aliexpress');
+  assert.equal(ae.nameEn, 'AliExpress');
+  assert.equal(ae.path, '/how-to-aliexpress-israel');
+  const jp = getMarketplaceHowTo('amazonjp');
+  assert.equal(jp.nameEn, 'Amazon JP');
+  assert.equal(jp.path, '/how-to-amazonjp-israel');
 });
 
 test('marketplace foil copy: 18% not 17%, Skills Sep 7 stamp, body still wrong', () => {

@@ -426,7 +426,7 @@ export default function LandedPage() {
             aria-label="Marketplace to Israel how-tos"
           >
             <div className="text-sm font-bold mb-1" style={{ color: 'var(--shopli-navy)' }}>
-              How-tos · Etsy / eBay / Walmart → IL
+              How-tos · {MARKETPLACE_HOW_TOS.map((m) => m.nameEn).join(' / ')} → IL
             </div>
             <p className="text-xs mb-2" style={{ color: 'var(--shopli-warm-gray)' }}>
               Same 「17% body still wrong」 foil on marketplace pages — paste URL back here on /landed.
