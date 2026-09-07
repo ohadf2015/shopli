@@ -152,12 +152,9 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       priority: 0.4,
       lastmod: today,
     });
-    urls.push({
-      loc: `${SITE_URL}/${region}/compare`,
-      changefreq: 'weekly',
-      priority: 0.5,
-      lastmod: today,
-    });
+    // /{region}/compare hub is always empty-state + noindex without ?ids= —
+    // keep it out of the sitemap (t_bc8dc5f7 kill dead SEO compare landings).
+    // Indexed compare URLs are the /compare/<slug> articles below.
     // Legal pages
     urls.push({
       loc: `${SITE_URL}/${region}/about`,
