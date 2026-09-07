@@ -229,17 +229,35 @@ export function dutyWaiverBandRows(): DutyWaiverBandRow[] {
   ];
 }
 
+/** Skills IL customs skill version (duty / VAT bands). Still v1.4.0. */
+export const SKILLS_IL_CUSTOMS = 'v1.4.0';
+/** Skills IL shekel-currency-converter foil version. Still v2.2.0. */
+export const SKILLS_IL_SHEKEL = 'v2.2.0';
+/** Re-stamp date for customs + shekel honesty foil on /landed. */
+export const SKILLS_IL_STAMP_DATE = 'Sep 7';
+
 /**
- * Hebrew customs-stamp copy for /landed (Skills IL v1.4.0 · Sep 6 foil).
- * Labels 18% VAT + BoI representative +0.5% — never 17%.
- * Does not change estimator math (#18/#19).
+ * Hebrew customs-stamp copy for /landed
+ * (Skills IL customs v1.4.0 + shekel v2.2.0 · Sep 7 foil).
+ * Labels 18% VAT + BoI representative +0.5% — explicit "not 17%".
+ * Does not change estimator math (#18–#23).
  */
 export function customsStampCopyHe(): string {
   return (
-    'חותמת מכס (Skills IL v1.4.0 · Sep 6): מע״ם 18% · שער יציג בנק ישראל + 0.5% לרשומון. ' +
+    `חותמת מכס (Skills IL customs ${SKILLS_IL_CUSTOMS} + shekel ${SKILLS_IL_SHEKEL} · ${SKILLS_IL_STAMP_DATE}): ` +
+    'מע״ם בישראל 18% — לא 17%. שער יציג בנק ישראל + 0.5% לרשומון. ' +
     'פסים: פטור מתחת ל-$75 · $75–$500 מע״ם בלבד (ויתור מכס). ' +
-    'יריבים (למשל iWishBag Amazon→IL) עדיין כותבים "17% VAT" בגוף העמוד בעוד שטבלת המכסים אצלם מציינת 18%.'
+    'יריבים (למשל iWishBag Amazon→IL, עדכון אחרון 2026-04-29) עדיין כותבים "17% VAT" בגוף העמוד בעוד שטבלת המכסים אצלם מציינת 18%.'
   );
+}
+
+/**
+ * English honesty foil for /landed — explicit vs iWishBag Apr 29 body bug
+ * (body "17% VAT" vs duties table 18%). Presentation only; keeps BoI+0.5%
+ * FX honesty from #19/#23. Does not change estimator math.
+ */
+export function israelVat18Not17FoilEn(): string {
+  return 'Israel VAT is 18% not 17%.';
 }
 
 /**

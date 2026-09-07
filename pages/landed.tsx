@@ -27,13 +27,19 @@ import {
   ITA_SHAAR_OLAMI_CALC_URL,
   itaShaarOlamiFoilStripHe,
   itaShaarOlamiLinkLabelHe,
+  israelVat18Not17FoilEn,
+  SKILLS_IL_CUSTOMS,
+  SKILLS_IL_SHEKEL,
+  SKILLS_IL_STAMP_DATE,
   type ParsedProductUrl,
 } from '../lib/landed-url';
 
 const PAGE_URL = `${SITE_URL}/landed`;
 const VAT_PCT = Math.round(IL_VAT_RATE * 100);
 const FX_PCT = (BOI_CUSTOMS_FX_UPLIFT * 100).toFixed(1);
-const SKILLS_IL = 'v1.4.0';
+const SKILLS_IL = SKILLS_IL_CUSTOMS;
+const SKILLS_SHEKEL = SKILLS_IL_SHEKEL;
+const SKILLS_STAMP = SKILLS_IL_STAMP_DATE;
 const KIT_MAX = 5;
 
 type QuoteMode = 'single' | 'kit';
@@ -51,9 +57,10 @@ function emptyKitPrices(n = KIT_MAX): string[] {
 /**
  * /landed — paste Amazon/product URL(s) → IL landed-cost quote.
  * Moat: multi-SKU kit rollup (2–5 URLs) vs $75 ptur + $75–$500 VAT-only
- * bands after #21; Skills IL v1.4.0 Sep 6 stamp; single-SKU miss kit tipping.
- * ITA Shaar Olami calculator foil: deep-link honesty strip (same bands as
- * רשות המיסים) — presentation only. Estimator math unchanged (#18–#22).
+ * bands after #21; Skills IL customs v1.4.0 + shekel v2.2.0 Sep 7 stamp;
+ * explicit "Israel VAT is 18% not 17%" foil vs iWishBag Apr 29 body bug;
+ * ITA Shaar Olami calculator foil (#23) kept. Presentation only.
+ * Estimator math unchanged (#18–#23).
  */
 export default function LandedPage() {
   const router = useRouter();
@@ -187,6 +194,7 @@ export default function LandedPage() {
   ]);
 
   const stamp = customsStampCopyHe();
+  const vatFoilEn = israelVat18Not17FoilEn();
   const tipCopy = kitTippingCopyHe();
   const itaFoil = itaShaarOlamiFoilStripHe();
   const itaLinkLabel = itaShaarOlamiLinkLabelHe();
@@ -207,7 +215,7 @@ export default function LandedPage() {
         canonical={PAGE_URL}
         hreflang={false}
         title={`מחשבון עלות לישראל — פטור $${DUTY_FREE_THRESHOLD_USD} · ערכה 2–5 · מע״ם ${VAT_PCT}% · BoI+${FX_PCT}% | Shopli`}
-        description={`הדביקו קישור Amazon / ערכה של 2–5 קישורים וקבלו הצעת מחיר לארץ: פטור $${DUTY_FREE_THRESHOLD_USD}, פס $${DUTY_FREE_THRESHOLD_USD}–$${DUTY_WAIVER_CEILING_USD} מע״ם בלבד (ויתור מכס), חותמת Skills IL ${SKILLS_IL} (מע״ם ${VAT_PCT}% · שער יציג בנק ישראל + ${FX_PCT}%). לא 17%.`}
+        description={`הדביקו קישור Amazon / ערכה של 2–5 קישורים וקבלו הצעת מחיר לארץ: פטור $${DUTY_FREE_THRESHOLD_USD}, פס $${DUTY_FREE_THRESHOLD_USD}–$${DUTY_WAIVER_CEILING_USD} מע״ם בלבד (ויתור מכס), חותמת Skills IL customs ${SKILLS_IL} + shekel ${SKILLS_SHEKEL} · ${SKILLS_STAMP} (מע״ם ${VAT_PCT}% · שער יציג בנק ישראל + ${FX_PCT}%). Israel VAT is 18% not 17%.`}
       />
       <Header currentRegion="il" dir="rtl" />
 
@@ -217,6 +225,9 @@ export default function LandedPage() {
         style={{ fontFamily: 'var(--font-assistant), system-ui, sans-serif' }}
         data-page="landed"
         data-skills-il={SKILLS_IL}
+        data-skills-shekel={SKILLS_SHEKEL}
+        data-skills-stamp={SKILLS_STAMP}
+        data-vat-honesty-foil="18-not-17"
         data-duty-bands="ptur-vat-waiver"
         data-ita-shaar-olami-foil="1"
         data-landed-mode={mode}
@@ -242,12 +253,13 @@ export default function LandedPage() {
           </h1>
           <p className="text-base leading-relaxed mb-6" style={{ color: 'var(--shopli-warm-gray)' }}>
             מחשבון עלות כוללת ליבוא אישי: תקרת פטור ${DUTY_FREE_THRESHOLD_USD}, פס ויתור מכס $
-            {DUTY_FREE_THRESHOLD_USD}–${DUTY_WAIVER_CEILING_USD} (מע״ם {VAT_PCT}% בלבד), וחותמת שער מכס
-            (שער יציג בנק ישראל + {FX_PCT}% לרשומון) לפי Skills IL {SKILLS_IL} — בלי סקרייפ חי מ־Amazon.
-            ערכה של 2–5 קישורים מגלגלת מול אותה תקרה (פריט בודד יכול להיראות פטור).
+            {DUTY_FREE_THRESHOLD_USD}–${DUTY_WAIVER_CEILING_USD} (מע״ם {VAT_PCT}% בלבד — לא 17%), וחותמת שער
+            מכס (שער יציג בנק ישראל + {FX_PCT}% לרשומון) לפי Skills IL customs {SKILLS_IL} + shekel{' '}
+            {SKILLS_SHEKEL} · {SKILLS_STAMP} — בלי סקרייפ חי מ־Amazon. ערכה של 2–5 קישורים מגלגלת מול אותה
+            תקרה (פריט בודד יכול להיראות פטור).
           </p>
 
-          {/* Customs stamp callout */}
+          {/* Customs stamp callout — 18% not 17% + BoI+0.5% · Sep 7 restamp */}
           <aside
             className="rounded-xl border p-3 sm:p-4 mb-6"
             style={{
@@ -256,7 +268,11 @@ export default function LandedPage() {
             }}
             data-customs-stamp="boi-plus-0.5"
             data-vat-rate={String(VAT_PCT)}
+            data-vat-not="17"
             data-skills-il={SKILLS_IL}
+            data-skills-shekel={SKILLS_SHEKEL}
+            data-skills-stamp={SKILLS_STAMP}
+            data-vat-honesty-foil="18-not-17"
           >
             <div
               className="flex items-start gap-2 text-sm font-bold mb-1"
@@ -264,9 +280,18 @@ export default function LandedPage() {
             >
               <Icon name="shield" size={16} className="shrink-0 mt-0.5" />
               <span>
-                חותמת מכס · מע״ם {VAT_PCT}% · BoI + {FX_PCT}% · Skills IL {SKILLS_IL}
+                חותמת מכס · מע״ם {VAT_PCT}% (לא 17%) · BoI + {FX_PCT}% · Skills IL {SKILLS_IL} +{' '}
+                {SKILLS_SHEKEL} · {SKILLS_STAMP}
               </span>
             </div>
+            <p
+              className="text-xs font-bold mb-1"
+              style={{ color: 'var(--shopli-navy)' }}
+              dir="ltr"
+              data-vat-foil-en="18-not-17"
+            >
+              {vatFoilEn}
+            </p>
             <p className="text-xs leading-relaxed" style={{ color: 'var(--shopli-warm-gray)' }}>
               {stamp}
             </p>
@@ -635,7 +660,10 @@ export default function LandedPage() {
                 />
                 <p className="text-xs mt-2" style={{ color: 'var(--shopli-warm-gray)' }}>
                   שער הערכה מתועד: {USD_TO_ILS_RATE.toFixed(2)} ₪/$ (≈ BoI יציג + {FX_PCT}%). החיוב בפועל
-                  נקבע ברשות המסים ביום השחרור — לא פיד חי.
+                  נקבע ברשות המסים ביום השחרור — לא פיד חי. מע״ם בישראל {VAT_PCT}% — לא 17%.
+                </p>
+                <p className="text-xs font-semibold mt-1" dir="ltr" data-vat-foil-en="18-not-17">
+                  {vatFoilEn}
                 </p>
               </div>
             ) : (
@@ -658,7 +686,10 @@ export default function LandedPage() {
               />
               <p className="text-xs mt-2" style={{ color: 'var(--shopli-warm-gray)' }}>
                 שער הערכה מתועד: {USD_TO_ILS_RATE.toFixed(2)} ₪/$ (≈ BoI יציג + {FX_PCT}%). החיוב בפועל
-                נקבע ברשות המסים ביום השחרור — לא פיד חי.
+                נקבע ברשות המסים ביום השחרור — לא פיד חי. מע״ם בישראל {VAT_PCT}% — לא 17%.
+              </p>
+              <p className="text-xs font-semibold mt-1" dir="ltr" data-vat-foil-en="18-not-17">
+                {vatFoilEn}
               </p>
             </div>
           ) : (
@@ -671,7 +702,8 @@ export default function LandedPage() {
             הערה: שופלי אינה רשות המסים. המחשבון משקף כללי יבוא אישי נפוצים (פטור מתחת ל-$
             {DUTY_FREE_THRESHOLD_USD} על ערך הסחורה בלבד; מע״ם {VAT_PCT}% על סחורה+משלוח בפס $
             {DUTY_FREE_THRESHOLD_USD}–${DUTY_WAIVER_CEILING_USD} עם ויתור מכס) ואת חותמת שער המכס לרשומון
-            לפי Skills IL {SKILLS_IL}. מכס מעל ${DUTY_WAIVER_CEILING_USD} / מס קנייה לפי HS לא ממודל כאן.
+            לפי Skills IL customs {SKILLS_IL} + shekel {SKILLS_SHEKEL} · {SKILLS_STAMP}. מכס מעל $
+            {DUTY_WAIVER_CEILING_USD} / מס קנייה לפי HS לא ממודל כאן. מע״ם בישראל {VAT_PCT}% — לא 17%.
             בערכה — הסף על סכום ה־SKU, לא על כל שורה בנפרד.
           </p>
         </section>

@@ -11,6 +11,10 @@ import {
   ITA_SHAAR_OLAMI_CALC_URL,
   itaShaarOlamiFoilStripHe,
   itaShaarOlamiLinkLabelHe,
+  israelVat18Not17FoilEn,
+  SKILLS_IL_CUSTOMS,
+  SKILLS_IL_SHEKEL,
+  SKILLS_IL_STAMP_DATE,
 } from '../lib/landed-url';
 import {
   IL_VAT_RATE,
@@ -136,21 +140,36 @@ test('kit tipping copy mentions $75 threshold and never 17% VAT', () => {
   assert.doesNotMatch(c, /מע״ם 17%/);
 });
 
-test('customs stamp copy: Skills IL v1.4.0, 18% VAT, BoI+0.5%, bands, never 17%', () => {
+test('customs stamp copy: Skills IL customs v1.4.0 + shekel v2.2.0 · Sep 7, 18% not 17%, BoI+0.5%', () => {
+  assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
+  assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+
   const stamp = customsStampCopyHe();
-  assert.match(stamp, /Skills IL v1\.4\.0/);
-  assert.match(stamp, /Sep 6/);
-  assert.match(stamp, /מע״ם 18%/);
+  assert.match(stamp, /Skills IL customs v1\.4\.0/);
+  assert.match(stamp, /shekel v2\.2\.0/);
+  assert.match(stamp, /Sep 7/);
+  assert.doesNotMatch(stamp, /Sep 6/);
+  assert.match(stamp, /מע״ם בישראל 18%/);
+  assert.match(stamp, /לא 17%/);
   assert.match(stamp, /בנק ישראל/);
   assert.match(stamp, /\+ 0\.5%/);
   assert.match(stamp, /רשומון/);
   assert.match(stamp, /\$75/);
   assert.match(stamp, /\$500/);
   assert.match(stamp, /ויתור מכס|מע״ם בלבד/);
-  assert.match(stamp, /iWishBag|17%/); // foil mentions rival 17% claim
-  assert.match(stamp, /מע״ם 18%/);
+  assert.match(stamp, /iWishBag/);
+  assert.match(stamp, /2026-04-29/);
+  assert.match(stamp, /"17% VAT"/); // foil quotes rival body bug
   assert.doesNotMatch(stamp, /מע״ם 17%/);
-  assert.doesNotMatch(stamp, /v2\.2\.0/);
+});
+
+test('English foil: Israel VAT is 18% not 17%', () => {
+  const en = israelVat18Not17FoilEn();
+  assert.equal(en, 'Israel VAT is 18% not 17%.');
+  assert.match(en, /18%/);
+  assert.match(en, /not 17%/);
+  assert.doesNotMatch(en, /BoI|customs math/i);
 });
 
 test('duty-waiver bands: $75 ptur + $75–$500 VAT-only + above-$500', () => {
@@ -180,7 +199,7 @@ test('duty-waiver bands: $75 ptur + $75–$500 VAT-only + above-$500', () => {
   assert.doesNotMatch(rows.map((r) => r.detailHe).join('\n'), /מע״ם 17%/);
 });
 
-test('keep #18–#22 math: constants + tooltip + honesty strip + estimator untouched', () => {
+test('keep #18–#23 math: constants + tooltip + honesty strip + estimator untouched', () => {
   assert.equal(IL_VAT_RATE, 0.18);
   assert.equal(BOI_CUSTOMS_FX_UPLIFT, 0.005);
   assert.equal(USD_TO_ILS_RATE, 3.6);
@@ -189,7 +208,8 @@ test('keep #18–#22 math: constants + tooltip + honesty strip + estimator untou
   assert.match(tip, /\+ 0\.5%/);
   const strip = vatFxHonestyStripHe();
   assert.match(strip, /מע״ם 18%/);
-  assert.doesNotMatch(strip, /17%/);
+  assert.match(strip, /לא 17%/);
+  assert.doesNotMatch(strip, /מע״ם 17%/);
   // Estimator still taxes 75.01 USD at 18% (boundary unchanged)
   const est = estimateLandedCost({ price: 75.01, currency: 'USD', freeShipping: true });
   assert.ok(est);
@@ -201,6 +221,8 @@ test('keep #18–#22 math: constants + tooltip + honesty strip + estimator untou
   assert.equal(mid.dutyFree, false);
   assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
   assert.ok(Math.abs(mid.totalIls - 200 * USD_TO_ILS_RATE * (1 + IL_VAT_RATE)) < 1e-9);
+  // ITA foil from #23 still present
+  assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
 });
 
 test('ITA Shaar Olami foil: deep-link + same $75 / $75–$500 bands as רשות המיסים', () => {
