@@ -289,3 +289,27 @@ export function comparePageDescription(
   }
   return `Side-by-side comparison of ${products.length} products (${prices}). Price, rating, sales volume and shop — differences highlighted.`;
 }
+
+/**
+ * Pick the "Our pick" winner: most differing-spec wins, price tie-break.
+ * Used above-fold so bounce visitors see a primary exit before the table.
+ */
+export function pickBestCompareProduct(
+  products: SearchProduct[],
+  rows: CompareSpecRow[]
+): { product: SearchProduct; wins: number; index: number } | null {
+  if (products.length < MIN_COMPARE_PRODUCTS) return null;
+  const wins = products.map(
+    (_, i) => rows.filter((r) => r.differs && r.bestIndex === i).length
+  );
+  let best = 0;
+  for (let i = 1; i < products.length; i++) {
+    if (
+      wins[i] > wins[best] ||
+      (wins[i] === wins[best] && products[i].price < products[best].price)
+    ) {
+      best = i;
+    }
+  }
+  return { product: products[best], wins: wins[best], index: best };
+}

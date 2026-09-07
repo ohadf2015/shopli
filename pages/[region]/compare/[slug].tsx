@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
 import BrowseNext from '../../../components/BrowseNext';
+import CompareAboveFoldExit from '../../../components/CompareAboveFoldExit';
 import SeoHead from '../../../components/SeoHead';
 import ShareBar from '../../../components/ShareBar';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
@@ -22,6 +23,14 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
 
   const c = comparison;
   if (!c) return null;
+
+  const hasLiveDeals = (prod1Items?.length || 0) + (prod2Items?.length || 0) > 0;
+  const deadLanding = !hasLiveDeals;
+  const verdictTeaser = (() => {
+    const full = t(c.verdict) || '';
+    const cut = full.split(/(?<=[.!?])\s+/)[0] || full;
+    return cut.length > 180 ? cut.slice(0, 177) + '…' : cut;
+  })();
 
   const pageUrl = `${SITE_URL}/${region}/compare/${c.slug}`;
   const title = `${t(c.title)} | ${rtl ? 'שופלי' : 'Shopli'}`;
@@ -72,6 +81,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
         title={title}
         description={description}
         ogType="article"
+        noindex={deadLanding}
         jsonLd={structuredData}
       />
       <Header currentRegion={region} dir={config?.direction} />
@@ -83,7 +93,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
 
         <h1 className="text-2xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--shopli-navy)' }}>{t(c.title)}</h1>
         <p className="max-w-3xl text-base leading-relaxed mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>{t(c.intro)}</p>
-        <div className="mb-8">
+        <div className="mb-6">
           <ShareBar
             title={t(c.title)}
             url={pageUrl}
@@ -94,6 +104,25 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
             rtl={rtl}
           />
         </div>
+
+        {/* Above-fold value + primary exit — #16 CTAs were below the fold (t_bc8dc5f7) */}
+        <CompareAboveFoldExit
+          region={region}
+          rtl={rtl}
+          surface="compare_article"
+          sides={[
+            { name: c.product1.name, keyword: c.product1.keyword },
+            { name: c.product2.name, keyword: c.product2.keyword },
+          ]}
+          valueLine={
+            deadLanding
+              ? rtl
+                ? 'לא הצלחנו לטעון דילים חיים להשוואה הזו. המשיכו לטרנדים או חפשו באתר.'
+                : 'We could not load live deals for this comparison. Keep browsing trending or search on-site.'
+              : verdictTeaser
+          }
+          deadLanding={deadLanding}
+        />
 
         {/* Side-by-side comparison */}
         <div className="grid md:grid-cols-2 gap-6 mb-10">
