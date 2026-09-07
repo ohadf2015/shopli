@@ -3,6 +3,7 @@
  * (paste Amazon / AliExpress / any URL → IL quote).
  * Provenance only — no live scraping. Quote math stays in lib/landed-cost.ts (#14/#18/#19/#20).
  * Kit paste (2–5 URLs) + single-SKU miss tipping: Moat after #21.
+ * ITA Shaar Olami calculator foil (#23): deep-link honesty strip — presentation only.
  */
 
 import {
@@ -239,4 +240,31 @@ export function customsStampCopyHe(): string {
     'פסים: פטור מתחת ל-$75 · $75–$500 מע״ם בלבד (ויתור מכס). ' +
     'יריבים (למשל iWishBag Amazon→IL) עדיין כותבים "17% VAT" בגוף העמוד בעוד שטבלת המכסים אצלם מציינת 18%.'
   );
+}
+
+/**
+ * Official Israel Tax Authority (רשות המיסים) Shaar Olami personal-import
+ * tax calculator — deep-link for /landed honesty foil. Presentation only;
+ * does not change estimator / kit / band math (#18–#22).
+ */
+export const ITA_SHAAR_OLAMI_CALC_URL =
+  'https://shaarolami-query.customs.mof.gov.il/CustomspilotWeb/he/PersonalImportTax/Home/Calc';
+
+/**
+ * Hebrew honesty strip: same $75 ptur + $75–$500 VAT-only bands as רשות המיסים
+ * (Shaar Olami). Foil for /landed — does not change customs math.
+ */
+export function itaShaarOlamiFoilStripHe(): string {
+  const ptur = DUTY_FREE_THRESHOLD_USD;
+  const ceiling = DUTY_WAIVER_CEILING_USD;
+  return (
+    `אותם פסי יבוא אישי כמו ברשות המיסים (שער עולמי): ` +
+    `פטור מתחת ל-$${ptur} · $${ptur}–$${ceiling} מע״ם בלבד (ויתור מכס). ` +
+    `אפשר לאמת במחשבון הרשמי של רשות המיסים.`
+  );
+}
+
+/** Short CTA label for the Shaar Olami deep-link. */
+export function itaShaarOlamiLinkLabelHe(): string {
+  return 'מחשבון שער עולמי · רשות המיסים';
 }

@@ -24,6 +24,9 @@ import {
   classifyDutyWaiverBand,
   kitTippingHint,
   kitTippingCopyHe,
+  ITA_SHAAR_OLAMI_CALC_URL,
+  itaShaarOlamiFoilStripHe,
+  itaShaarOlamiLinkLabelHe,
   type ParsedProductUrl,
 } from '../lib/landed-url';
 
@@ -47,9 +50,10 @@ function emptyKitPrices(n = KIT_MAX): string[] {
 
 /**
  * /landed — paste Amazon/product URL(s) → IL landed-cost quote.
- * Moat 10:31: multi-SKU kit rollup (2–5 URLs) vs $75 ptur + $75–$500 VAT-only
+ * Moat: multi-SKU kit rollup (2–5 URLs) vs $75 ptur + $75–$500 VAT-only
  * bands after #21; Skills IL v1.4.0 Sep 6 stamp; single-SKU miss kit tipping.
- * Estimator math unchanged from #18/#19/#20/#21.
+ * ITA Shaar Olami calculator foil: deep-link honesty strip (same bands as
+ * רשות המיסים) — presentation only. Estimator math unchanged (#18–#22).
  */
 export default function LandedPage() {
   const router = useRouter();
@@ -184,6 +188,8 @@ export default function LandedPage() {
 
   const stamp = customsStampCopyHe();
   const tipCopy = kitTippingCopyHe();
+  const itaFoil = itaShaarOlamiFoilStripHe();
+  const itaLinkLabel = itaShaarOlamiLinkLabelHe();
 
   const setKitPriceAt = (idx: number, value: string) => {
     setKitPrices((prev) => {
@@ -212,6 +218,7 @@ export default function LandedPage() {
         data-page="landed"
         data-skills-il={SKILLS_IL}
         data-duty-bands="ptur-vat-waiver"
+        data-ita-shaar-olami-foil="1"
         data-landed-mode={mode}
         {...(mode === 'kit'
           ? {
@@ -263,6 +270,41 @@ export default function LandedPage() {
             <p className="text-xs leading-relaxed" style={{ color: 'var(--shopli-warm-gray)' }}>
               {stamp}
             </p>
+          </aside>
+
+          {/* ITA Shaar Olami calculator foil — deep-link honesty strip */}
+          <aside
+            className="rounded-xl border p-3 sm:p-4 mb-6"
+            style={{
+              borderColor: 'rgba(15,23,42,0.14)',
+              background: 'rgba(15,23,42,0.03)',
+            }}
+            data-ita-shaar-olami-foil="1"
+            data-ita-calc-href={ITA_SHAAR_OLAMI_CALC_URL}
+            data-ptur-usd={String(DUTY_FREE_THRESHOLD_USD)}
+            data-duty-waiver-ceiling-usd={String(DUTY_WAIVER_CEILING_USD)}
+          >
+            <div
+              className="flex items-start gap-2 text-sm font-bold mb-1"
+              style={{ color: 'var(--shopli-navy)' }}
+            >
+              <Icon name="info" size={16} className="shrink-0 mt-0.5" />
+              <span>שקיפות · אותם פסים כמו רשות המיסים (שער עולמי)</span>
+            </div>
+            <p className="text-xs leading-relaxed mb-2" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {itaFoil}
+            </p>
+            <a
+              href={ITA_SHAAR_OLAMI_CALC_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold underline-offset-2 hover:underline"
+              style={{ color: 'var(--shopli-orange)' }}
+              data-ita-shaar-olami-link="1"
+            >
+              {itaLinkLabel}
+              <Icon name="external" size={12} className="shrink-0" />
+            </a>
           </aside>
 
           {/* Duty-waiver bands (ptur + VAT-only) */}
