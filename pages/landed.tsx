@@ -28,6 +28,12 @@ import {
   itaShaarOlamiFoilStripHe,
   itaShaarOlamiLinkLabelHe,
   israelVat18Not17FoilEn,
+  IWISHBAG_AMAZON_IL_URL,
+  IWISHBAG_PAGE_LAST_UPDATED,
+  IWISHBAG_BODY_STILL_WRONG_VERIFIED,
+  iwishbagSideBySideRows,
+  iwishbagBodyStillWrongHeadlineEn,
+  iwishbagSideBySideIntroHe,
   SKILLS_IL_CUSTOMS,
   SKILLS_IL_SHEKEL,
   SKILLS_IL_STAMP_DATE,
@@ -58,9 +64,10 @@ function emptyKitPrices(n = KIT_MAX): string[] {
  * /landed — paste Amazon/product URL(s) → IL landed-cost quote.
  * Moat: multi-SKU kit rollup (2–5 URLs) vs $75 ptur + $75–$500 VAT-only
  * bands after #21; Skills IL customs v1.4.0 + shekel v2.2.0 Sep 7 stamp;
- * explicit "Israel VAT is 18% not 17%" foil vs iWishBag Apr 29 body bug;
+ * explicit "Israel VAT is 18% not 17%" foil vs iWishBag Apr 29 body bug (#24);
+ * side-by-side iWishBag 「17% body still wrong」 foil (verified Sep 7 night);
  * ITA Shaar Olami calculator foil (#23) kept. Presentation only.
- * Estimator math unchanged (#18–#23).
+ * Estimator math unchanged (#18–#24).
  */
 export default function LandedPage() {
   const router = useRouter();
@@ -195,6 +202,9 @@ export default function LandedPage() {
 
   const stamp = customsStampCopyHe();
   const vatFoilEn = israelVat18Not17FoilEn();
+  const iwishbagRows = iwishbagSideBySideRows();
+  const iwishbagHeadline = iwishbagBodyStillWrongHeadlineEn();
+  const iwishbagIntro = iwishbagSideBySideIntroHe();
   const tipCopy = kitTippingCopyHe();
   const itaFoil = itaShaarOlamiFoilStripHe();
   const itaLinkLabel = itaShaarOlamiLinkLabelHe();
@@ -228,6 +238,8 @@ export default function LandedPage() {
         data-skills-shekel={SKILLS_SHEKEL}
         data-skills-stamp={SKILLS_STAMP}
         data-vat-honesty-foil="18-not-17"
+        data-iwishbag-side-by-side-foil="1"
+        data-iwishbag-body-still-wrong={IWISHBAG_BODY_STILL_WRONG_VERIFIED}
         data-duty-bands="ptur-vat-waiver"
         data-ita-shaar-olami-foil="1"
         data-landed-mode={mode}
@@ -294,6 +306,110 @@ export default function LandedPage() {
             </p>
             <p className="text-xs leading-relaxed" style={{ color: 'var(--shopli-warm-gray)' }}>
               {stamp}
+            </p>
+          </aside>
+
+          {/* Side-by-side iWishBag honesty foil — 17% body still wrong (Sep 7 night) */}
+          <aside
+            className="rounded-xl border p-3 sm:p-4 mb-6"
+            style={{
+              borderColor: 'rgba(220,38,38,0.28)',
+              background: 'rgba(254,242,242,0.65)',
+            }}
+            data-iwishbag-side-by-side-foil="1"
+            data-iwishbag-url={IWISHBAG_AMAZON_IL_URL}
+            data-iwishbag-last-updated={IWISHBAG_PAGE_LAST_UPDATED}
+            data-iwishbag-body-still-wrong={IWISHBAG_BODY_STILL_WRONG_VERIFIED}
+            data-vat-honesty-foil="18-not-17"
+          >
+            <div
+              className="flex items-start gap-2 text-sm font-bold mb-1"
+              style={{ color: 'var(--shopli-navy)' }}
+            >
+              <Icon name="shield" size={16} className="shrink-0 mt-0.5" />
+              <span>Side-by-side · iWishBag 「17% body still wrong」</span>
+            </div>
+            <p
+              className="text-xs font-bold mb-2"
+              style={{ color: '#b91c1c' }}
+              dir="ltr"
+              data-iwishbag-headline="body-still-wrong"
+            >
+              {iwishbagHeadline}
+            </p>
+            <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {iwishbagIntro}{' '}
+              <a
+                href={IWISHBAG_AMAZON_IL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline-offset-2 hover:underline"
+                style={{ color: 'var(--shopli-orange)' }}
+                data-iwishbag-foil-link="1"
+              >
+                iWishBag Amazon→IL
+                <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+              </a>
+            </p>
+            <div className="overflow-x-auto" dir="ltr">
+              <table
+                className="w-full text-left text-xs border-collapse"
+                data-iwishbag-side-by-side-table="1"
+              >
+                <thead>
+                  <tr style={{ color: 'var(--shopli-navy)' }}>
+                    <th className="py-1.5 pe-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Claim
+                    </th>
+                    <th className="py-1.5 px-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Shopli /landed
+                    </th>
+                    <th className="py-1.5 ps-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      iWishBag
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {iwishbagRows.map((row) => (
+                    <tr
+                      key={row.id}
+                      data-iwishbag-row={row.id}
+                      {...(row.iwishbagWrong ? { 'data-iwishbag-wrong': '1' } : {})}
+                    >
+                      <td
+                        className="py-1.5 pe-2 align-top font-semibold"
+                        style={{ color: 'var(--shopli-navy)' }}
+                      >
+                        {row.labelEn}
+                      </td>
+                      <td
+                        className="py-1.5 px-2 align-top"
+                        style={{ color: 'var(--shopli-warm-gray)' }}
+                        data-shopli-cell={row.id}
+                      >
+                        {row.shopliEn}
+                      </td>
+                      <td
+                        className="py-1.5 ps-2 align-top font-semibold"
+                        style={{
+                          color: row.iwishbagWrong ? '#b91c1c' : 'var(--shopli-warm-gray)',
+                        }}
+                        data-iwishbag-cell={row.id}
+                      >
+                        {row.iwishbagEn}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p
+              className="text-[11px] mt-2 font-semibold"
+              dir="ltr"
+              style={{ color: 'var(--shopli-navy)' }}
+              data-vat-foil-en="18-not-17"
+            >
+              {vatFoilEn} Keep #19 / #23 / #24.
             </p>
           </aside>
 

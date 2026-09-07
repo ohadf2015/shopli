@@ -4,6 +4,8 @@
  * Provenance only — no live scraping. Quote math stays in lib/landed-cost.ts (#14/#18/#19/#20).
  * Kit paste (2–5 URLs) + single-SKU miss tipping: Moat after #21.
  * ITA Shaar Olami calculator foil (#23): deep-link honesty strip — presentation only.
+ * #24: explicit 18% not 17% foil. Next: side-by-side iWishBag 「17% body still wrong」
+ * honesty foil (verified Sep 7 night) — presentation only; math unchanged.
  */
 
 import {
@@ -285,4 +287,89 @@ export function itaShaarOlamiFoilStripHe(): string {
 /** Short CTA label for the Shaar Olami deep-link. */
 export function itaShaarOlamiLinkLabelHe(): string {
   return 'מחשבון שער עולמי · רשות המיסים';
+}
+
+/** iWishBag Amazon US → Israel guide used as honesty foil target. */
+export const IWISHBAG_AMAZON_IL_URL =
+  'https://www.iwishbag.com/how-to-buy-from/amazon-us/israel';
+
+/** Rival page "Last updated" stamp (still Apr 29 on their live page). */
+export const IWISHBAG_PAGE_LAST_UPDATED = '2026-04-29';
+
+/**
+ * Re-check stamp: iWishBag body copy still says "17% VAT" while their duties
+ * table / reality is 18%. Verified Sep 7 night (after #24). Presentation only.
+ */
+export const IWISHBAG_BODY_STILL_WRONG_VERIFIED = 'Sep 7 night';
+
+export interface IwishbagSideBySideRow {
+  id: string;
+  labelEn: string;
+  shopliEn: string;
+  iwishbagEn: string;
+  /** When true, iWishBag cell is the honesty callout (body still wrong). */
+  iwishbagWrong?: boolean;
+}
+
+/**
+ * Side-by-side honesty rows: Shopli /landed vs iWishBag Amazon→IL.
+ * Foil: rival body still claims 17% VAT while table/reality is 18%
+ * (verified {@link IWISHBAG_BODY_STILL_WRONG_VERIFIED}). Does not change
+ * estimator / kit / band math (#18–#24).
+ */
+export function iwishbagSideBySideRows(): IwishbagSideBySideRow[] {
+  return [
+    {
+      id: 'body-vat',
+      labelEn: 'Body VAT claim',
+      shopliEn: '18% (correct)',
+      iwishbagEn: '17% — body still wrong',
+      iwishbagWrong: true,
+    },
+    {
+      id: 'table-vat',
+      labelEn: 'Duties table / reality',
+      shopliEn: '18%',
+      iwishbagEn: '18%',
+    },
+    {
+      id: 'paste-url',
+      labelEn: 'Paste Amazon/product URL → IL quote',
+      shopliEn: '/landed (free estimator)',
+      iwishbagEn: 'Buy & Ship quote form',
+    },
+    {
+      id: 'boi-fx',
+      labelEn: 'BoI representative +0.5% FX',
+      shopliEn: 'Labeled (rashimon)',
+      iwishbagEn: 'Not labeled',
+    },
+    {
+      id: 'last-updated',
+      labelEn: 'Last updated / verified',
+      shopliEn: `Skills IL · ${SKILLS_IL_STAMP_DATE}`,
+      iwishbagEn: `${IWISHBAG_PAGE_LAST_UPDATED} (page) · body still wrong as of ${IWISHBAG_BODY_STILL_WRONG_VERIFIED}`,
+      iwishbagWrong: true,
+    },
+  ];
+}
+
+/**
+ * English headline for the side-by-side foil — 「17% body still wrong」.
+ * Keeps #24 "Israel VAT is 18% not 17%." as a sibling string.
+ */
+export function iwishbagBodyStillWrongHeadlineEn(): string {
+  return (
+    `iWishBag body still wrong: "17% VAT" (table/reality 18%) · ` +
+    `verified ${IWISHBAG_BODY_STILL_WRONG_VERIFIED}`
+  );
+}
+
+/** Short Hebrew intro above the side-by-side panel. */
+export function iwishbagSideBySideIntroHe(): string {
+  return (
+    `השוואה ליריב (iWishBag Amazon→IL): בגוף העמוד שלהם עדיין כתוב "17% VAT" ` +
+    `בעוד שטבלת המכסים / המציאות הן 18% — אומת ${IWISHBAG_BODY_STILL_WRONG_VERIFIED} ` +
+    `(עדכון אחרון אצלם ${IWISHBAG_PAGE_LAST_UPDATED}). שופלי מציגה מע״ם 18% + BoI+0.5%.`
+  );
 }

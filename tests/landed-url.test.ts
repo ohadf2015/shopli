@@ -12,6 +12,12 @@ import {
   itaShaarOlamiFoilStripHe,
   itaShaarOlamiLinkLabelHe,
   israelVat18Not17FoilEn,
+  IWISHBAG_AMAZON_IL_URL,
+  IWISHBAG_PAGE_LAST_UPDATED,
+  IWISHBAG_BODY_STILL_WRONG_VERIFIED,
+  iwishbagSideBySideRows,
+  iwishbagBodyStillWrongHeadlineEn,
+  iwishbagSideBySideIntroHe,
   SKILLS_IL_CUSTOMS,
   SKILLS_IL_SHEKEL,
   SKILLS_IL_STAMP_DATE,
@@ -199,7 +205,7 @@ test('duty-waiver bands: $75 ptur + $75–$500 VAT-only + above-$500', () => {
   assert.doesNotMatch(rows.map((r) => r.detailHe).join('\n'), /מע״ם 17%/);
 });
 
-test('keep #18–#23 math: constants + tooltip + honesty strip + estimator untouched', () => {
+test('keep #18–#24 math: constants + tooltip + honesty strip + estimator untouched', () => {
   assert.equal(IL_VAT_RATE, 0.18);
   assert.equal(BOI_CUSTOMS_FX_UPLIFT, 0.005);
   assert.equal(USD_TO_ILS_RATE, 3.6);
@@ -223,6 +229,8 @@ test('keep #18–#23 math: constants + tooltip + honesty strip + estimator untou
   assert.ok(Math.abs(mid.totalIls - 200 * USD_TO_ILS_RATE * (1 + IL_VAT_RATE)) < 1e-9);
   // ITA foil from #23 still present
   assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
+  // #24 English foil still present
+  assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
 });
 
 test('ITA Shaar Olami foil: deep-link + same $75 / $75–$500 bands as רשות המיסים', () => {
@@ -251,5 +259,85 @@ test('ITA Shaar Olami foil is presentation-only: bands + estimator still match #
   const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
   assert.ok(mid);
   assert.equal(mid.dutyFree, false);
+  assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
+});
+
+
+test('iWishBag side-by-side foil: body still wrong as of Sep 7 night', () => {
+  assert.equal(
+    IWISHBAG_AMAZON_IL_URL,
+    'https://www.iwishbag.com/how-to-buy-from/amazon-us/israel',
+  );
+  assert.equal(IWISHBAG_PAGE_LAST_UPDATED, '2026-04-29');
+  assert.equal(IWISHBAG_BODY_STILL_WRONG_VERIFIED, 'Sep 7 night');
+
+  const headline = iwishbagBodyStillWrongHeadlineEn();
+  assert.match(headline, /body still wrong/i);
+  assert.match(headline, /"17% VAT"/);
+  assert.match(headline, /table\/reality 18%/);
+  assert.match(headline, /Sep 7 night/);
+  assert.doesNotMatch(headline, /מע״ם 17%/);
+
+  const intro = iwishbagSideBySideIntroHe();
+  assert.match(intro, /iWishBag/);
+  assert.match(intro, /"17% VAT"/);
+  assert.match(intro, /18%/);
+  assert.match(intro, /Sep 7 night/);
+  assert.match(intro, /2026-04-29/);
+  assert.match(intro, /BoI\+0\.5%/);
+  assert.doesNotMatch(intro, /מע״ם 17%/);
+
+  const rows = iwishbagSideBySideRows();
+  assert.ok(rows.length >= 4);
+  const body = rows.find((r) => r.id === 'body-vat');
+  assert.ok(body);
+  assert.equal(body.iwishbagWrong, true);
+  assert.match(body.shopliEn, /18%/);
+  assert.match(body.iwishbagEn, /17%/);
+  assert.match(body.iwishbagEn, /still wrong/i);
+
+  const table = rows.find((r) => r.id === 'table-vat');
+  assert.ok(table);
+  assert.match(table.shopliEn, /18%/);
+  assert.match(table.iwishbagEn, /18%/);
+  assert.equal(table.iwishbagWrong, undefined);
+
+  const paste = rows.find((r) => r.id === 'paste-url');
+  assert.ok(paste);
+  assert.match(paste.shopliEn, /\/landed/);
+  assert.match(paste.labelEn, /Amazon|URL/i);
+
+  const fx = rows.find((r) => r.id === 'boi-fx');
+  assert.ok(fx);
+  assert.match(fx.shopliEn, /Labeled|rashimon/i);
+
+  const updated = rows.find((r) => r.id === 'last-updated');
+  assert.ok(updated);
+  assert.equal(updated.iwishbagWrong, true);
+  assert.match(updated.iwishbagEn, /2026-04-29/);
+  assert.match(updated.iwishbagEn, /Sep 7 night/);
+});
+
+test('side-by-side foil is presentation-only: #18–#24 math + prior foils intact', () => {
+  assert.equal(IL_VAT_RATE, 0.18);
+  assert.equal(BOI_CUSTOMS_FX_UPLIFT, 0.005);
+  assert.equal(USD_TO_ILS_RATE, 3.6);
+  assert.equal(DUTY_FREE_THRESHOLD_USD, 75);
+  assert.equal(DUTY_WAIVER_CEILING_USD, 500);
+  assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
+  assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+
+  const strip = vatFxHonestyStripHe();
+  assert.match(strip, /מע״ם 18%/);
+  assert.match(strip, /לא 17%/);
+
+  assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
+  assert.match(itaShaarOlamiFoilStripHe(), /\$75/);
+
+  assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
+
+  const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
+  assert.ok(mid);
   assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
 });
