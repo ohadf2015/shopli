@@ -30,14 +30,15 @@ test('customs FX tooltip explains BoI representative rate + 0.5%', () => {
   assert.match(tip, /רשות המסים/);
 });
 
-test('VAT/FX honesty strip labels 18% VAT and BoI representative +0.5% (rashimon)', () => {
+test('VAT/FX honesty strip labels 18% VAT (not 17%) and BoI representative +0.5% (rashimon)', () => {
   const strip = vatFxHonestyStripHe();
   assert.match(strip, /מע״ם 18%/);
+  assert.match(strip, /לא 17%/); // explicit foil vs rivals' stale 17%
   assert.match(strip, /בנק ישראל/);
   assert.match(strip, /\+ 0\.5%/);
   assert.match(strip, /רשומון/);
-  // Foil: rivals still publish stale 17% in body — we never label 17%.
-  assert.doesNotMatch(strip, /17%/);
+  // Foil calls out "not 17%" but never claims מע״ם 17%.
+  assert.doesNotMatch(strip, /מע״ם 17%/);
   // Keep #18 tooltip math/wording independent of the strip.
   const tip = customsFxTooltipHe();
   assert.match(tip, /\+ 0\.5%/);

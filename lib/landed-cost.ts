@@ -39,17 +39,18 @@ export function customsFxTooltipHe(rate: number = USD_TO_ILS_RATE): string {
 }
 
 /**
- * Visible VAT/FX honesty strip for IL badges. Labels current 18% VAT and
- * BoI representative +0.5% customs FX (rashimon) explicitly — foil rivals
- * (e.g. iWishBag Amazon→IL, last-updated 2026-04-29) still saying "17% VAT"
- * in body copy while their duties table says 18%. Does not change estimator
- * math or #18 tooltip wording.
+ * Visible VAT/FX honesty strip for IL badges. Labels current 18% VAT
+ * (explicitly not 17%) and BoI representative +0.5% customs FX (rashimon) —
+ * foil rivals (e.g. iWishBag Amazon→IL, last-updated 2026-04-29) still saying
+ * "17% VAT" in body copy while their duties table says 18%. Does not change
+ * estimator math or #18 tooltip wording.
  */
 export function vatFxHonestyStripHe(): string {
   const vatPct = Math.round(IL_VAT_RATE * 100);
   const fxPct = (BOI_CUSTOMS_FX_UPLIFT * 100).toFixed(1);
+  // Explicit "not 17%" foil vs rivals (e.g. iWishBag Apr 29 body bug).
   return (
-    `מע״ם ${vatPct}% · שער יציג בנק ישראל + ${fxPct}% לרשומון`
+    `מע״ם ${vatPct}% (לא 17%) · שער יציג בנק ישראל + ${fxPct}% לרשומון`
   );
 }
 

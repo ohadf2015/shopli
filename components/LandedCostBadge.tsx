@@ -88,7 +88,7 @@ export default function LandedCostBadge({
         <span
           className="text-[0.55rem] sm:text-[0.6rem] font-medium px-2 leading-tight"
           style={{ color: 'var(--shopli-warm-gray)' }}
-          data-honesty-strip="vat-18-boi-0.5"
+          data-honesty-strip="vat-18-not-17-boi-0.5"
           data-vat-rate={String(vatPct)}
         >
           {honesty}
@@ -132,7 +132,7 @@ export default function LandedCostBadge({
           color: 'var(--shopli-navy)',
           background: 'rgba(15, 23, 42, 0.04)',
         }}
-        data-honesty-strip="vat-18-boi-0.5"
+        data-honesty-strip="vat-18-not-17-boi-0.5"
         data-vat-rate={String(vatPct)}
       >
         {honesty}
