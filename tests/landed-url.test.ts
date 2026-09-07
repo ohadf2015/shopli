@@ -18,6 +18,13 @@ import {
   iwishbagSideBySideRows,
   iwishbagBodyStillWrongHeadlineEn,
   iwishbagSideBySideIntroHe,
+  IWISHBAG_ETSY_IL_URL,
+  IWISHBAG_EBAY_IL_URL,
+  IWISHBAG_WALMART_IL_URL,
+  MARKETPLACE_HOW_TOS,
+  getMarketplaceHowTo,
+  iwishbagMarketplaceSideBySideRows,
+  iwishbagMarketplaceFoilIntroEn,
   SKILLS_IL_CUSTOMS,
   SKILLS_IL_SHEKEL,
   SKILLS_IL_STAMP_DATE,
@@ -337,6 +344,70 @@ test('side-by-side foil is presentation-only: #18–#24 math + prior foils intac
 
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
 
+  const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
+  assert.ok(mid);
+  assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
+});
+
+
+test('marketplace how-tos: Etsy/eBay/Walmart iWishBag URLs + paths', () => {
+  assert.equal(IWISHBAG_ETSY_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/etsy/israel');
+  assert.equal(IWISHBAG_EBAY_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/ebay/israel');
+  assert.equal(IWISHBAG_WALMART_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/walmart/israel');
+
+  assert.equal(MARKETPLACE_HOW_TOS.length, 3);
+  const ids = MARKETPLACE_HOW_TOS.map((m) => m.id);
+  assert.deepEqual(ids, ['etsy', 'ebay', 'walmart']);
+
+  for (const m of MARKETPLACE_HOW_TOS) {
+    assert.match(m.path, new RegExp(`^/how-to-${m.id}-israel$`));
+    assert.match(m.iwishbagUrl, /iwishbag\.com\/how-to-buy-from\//);
+    assert.equal(getMarketplaceHowTo(m.id).path, m.path);
+  }
+});
+
+test('marketplace foil copy: 18% not 17%, Skills Sep 7 stamp, body still wrong', () => {
+  for (const m of MARKETPLACE_HOW_TOS) {
+    const intro = iwishbagMarketplaceFoilIntroEn(m.id);
+    assert.match(intro, /"17% VAT"/);
+    assert.match(intro, /18%/);
+    assert.match(intro, /Sep 7 night/);
+    assert.match(intro, /\/landed/);
+    assert.match(intro, new RegExp(m.nameEn));
+    assert.match(intro, /Israel VAT is 18% not 17%/);
+    assert.doesNotMatch(intro, /מע״ם 17%/);
+
+    const rows = iwishbagMarketplaceSideBySideRows(m.id);
+    const body = rows.find((r) => r.id === 'body-vat');
+    assert.ok(body);
+    assert.equal(body.iwishbagWrong, true);
+    assert.match(body.iwishbagEn, /17%/);
+    assert.match(body.iwishbagEn, /still wrong/i);
+    assert.match(body.shopliEn, /18%/);
+
+    const paste = rows.find((r) => r.id === 'paste-url');
+    assert.ok(paste);
+    assert.match(paste.labelEn, new RegExp(m.nameEn));
+    assert.match(paste.shopliEn, /\/landed/);
+    assert.ok(paste.shopliEn.includes(m.path));
+  }
+
+  // Shared foils still present
+  assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
+  assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
+  assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+  const stamp = customsStampCopyHe();
+  assert.match(stamp, /Sep 7/);
+  assert.match(stamp, /לא 17%/);
+});
+
+test('marketplace foil is presentation-only: estimator math unchanged', () => {
+  assert.equal(IL_VAT_RATE, 0.18);
+  assert.equal(BOI_CUSTOMS_FX_UPLIFT, 0.005);
+  assert.equal(USD_TO_ILS_RATE, 3.6);
+  assert.equal(DUTY_FREE_THRESHOLD_USD, 75);
+  assert.equal(DUTY_WAIVER_CEILING_USD, 500);
   const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
   assert.ok(mid);
   assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);

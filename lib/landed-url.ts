@@ -4,8 +4,9 @@
  * Provenance only — no live scraping. Quote math stays in lib/landed-cost.ts (#14/#18/#19/#20).
  * Kit paste (2–5 URLs) + single-SKU miss tipping: Moat after #21.
  * ITA Shaar Olami calculator foil (#23): deep-link honesty strip — presentation only.
- * #24: explicit 18% not 17% foil. Next: side-by-side iWishBag 「17% body still wrong」
- * honesty foil (verified Sep 7 night) — presentation only; math unchanged.
+ * #24: explicit 18% not 17% foil. #25: side-by-side iWishBag 「17% body still wrong」
+ * (verified Sep 7 night). Next: extend foil onto Etsy/eBay/Walmart→IL how-tos —
+ * presentation only; math unchanged.
  */
 
 import {
@@ -371,5 +372,90 @@ export function iwishbagSideBySideIntroHe(): string {
     `השוואה ליריב (iWishBag Amazon→IL): בגוף העמוד שלהם עדיין כתוב "17% VAT" ` +
     `בעוד שטבלת המכסים / המציאות הן 18% — אומת ${IWISHBAG_BODY_STILL_WRONG_VERIFIED} ` +
     `(עדכון אחרון אצלם ${IWISHBAG_PAGE_LAST_UPDATED}). שופלי מציגה מע״ם 18% + BoI+0.5%.`
+  );
+}
+
+/** Marketplace how-to pages that reuse the iWishBag 「17% body still wrong」 foil. */
+export type MarketplaceHowToId = 'etsy' | 'ebay' | 'walmart';
+
+export interface MarketplaceHowToSpec {
+  id: MarketplaceHowToId;
+  nameEn: string;
+  /** Shopli path, e.g. /how-to-etsy-israel */
+  path: string;
+  /** Rival iWishBag how-to-buy-from guide (same Apr-29 body bug). */
+  iwishbagUrl: string;
+}
+
+/** iWishBag Etsy → Israel guide (same 17% body / 18% table foil as Amazon). */
+export const IWISHBAG_ETSY_IL_URL =
+  'https://www.iwishbag.com/how-to-buy-from/etsy/israel';
+
+/** iWishBag eBay → Israel guide. */
+export const IWISHBAG_EBAY_IL_URL =
+  'https://www.iwishbag.com/how-to-buy-from/ebay/israel';
+
+/** iWishBag Walmart → Israel guide. */
+export const IWISHBAG_WALMART_IL_URL =
+  'https://www.iwishbag.com/how-to-buy-from/walmart/israel';
+
+/**
+ * Lean marketplace→IL how-to catalog (Etsy / eBay / Walmart).
+ * Presentation / SEO foil only — estimator math unchanged (#18–#25).
+ */
+export const MARKETPLACE_HOW_TOS: readonly MarketplaceHowToSpec[] = [
+  {
+    id: 'etsy',
+    nameEn: 'Etsy',
+    path: '/how-to-etsy-israel',
+    iwishbagUrl: IWISHBAG_ETSY_IL_URL,
+  },
+  {
+    id: 'ebay',
+    nameEn: 'eBay',
+    path: '/how-to-ebay-israel',
+    iwishbagUrl: IWISHBAG_EBAY_IL_URL,
+  },
+  {
+    id: 'walmart',
+    nameEn: 'Walmart',
+    path: '/how-to-walmart-israel',
+    iwishbagUrl: IWISHBAG_WALMART_IL_URL,
+  },
+] as const;
+
+export function getMarketplaceHowTo(id: MarketplaceHowToId): MarketplaceHowToSpec {
+  const found = MARKETPLACE_HOW_TOS.find((m) => m.id === id);
+  if (!found) throw new Error(`unknown marketplace how-to: ${id}`);
+  return found;
+}
+
+/**
+ * Side-by-side rows for a marketplace how-to — same 「17% body still wrong」
+ * foil as {@link iwishbagSideBySideRows}, with paste-URL claim scoped to the
+ * marketplace. Presentation only.
+ */
+export function iwishbagMarketplaceSideBySideRows(
+  marketplace: MarketplaceHowToId,
+): IwishbagSideBySideRow[] {
+  const spec = getMarketplaceHowTo(marketplace);
+  return iwishbagSideBySideRows().map((row) => {
+    if (row.id !== 'paste-url') return row;
+    return {
+      ...row,
+      labelEn: `Paste ${spec.nameEn}/product URL → IL quote`,
+      shopliEn: `/landed (free estimator) · ${spec.path}`,
+      iwishbagEn: 'Buy & Ship quote form',
+    };
+  });
+}
+
+/** English intro line for marketplace how-to foil panels. */
+export function iwishbagMarketplaceFoilIntroEn(marketplace: MarketplaceHowToId): string {
+  const spec = getMarketplaceHowTo(marketplace);
+  return (
+    `Same Apr-29 iWishBag body bug on ${spec.nameEn}→IL: still says "17% VAT" ` +
+    `while duties table / reality is 18% (verified ${IWISHBAG_BODY_STILL_WRONG_VERIFIED}). ` +
+    `Shopli: ${israelVat18Not17FoilEn()} Paste URL → /landed.`
   );
 }
