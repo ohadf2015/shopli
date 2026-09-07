@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SeoHead from '../components/SeoHead';
@@ -34,6 +35,7 @@ import {
   iwishbagSideBySideRows,
   iwishbagBodyStillWrongHeadlineEn,
   iwishbagSideBySideIntroHe,
+  MARKETPLACE_HOW_TOS,
   SKILLS_IL_CUSTOMS,
   SKILLS_IL_SHEKEL,
   SKILLS_IL_STAMP_DATE,
@@ -67,7 +69,7 @@ function emptyKitPrices(n = KIT_MAX): string[] {
  * explicit "Israel VAT is 18% not 17%" foil vs iWishBag Apr 29 body bug (#24);
  * side-by-side iWishBag 「17% body still wrong」 foil (verified Sep 7 night);
  * ITA Shaar Olami calculator foil (#23) kept. Presentation only.
- * Estimator math unchanged (#18–#24).
+ * Marketplace Etsy/eBay/Walmart→IL how-tos reuse this foil. Estimator math unchanged (#18–#25).
  */
 export default function LandedPage() {
   const router = useRouter();
@@ -412,6 +414,42 @@ export default function LandedPage() {
               {vatFoilEn} Keep #19 / #23 / #24.
             </p>
           </aside>
+
+          {/* Marketplace→IL how-tos — same iWishBag 17% body foil */}
+          <nav
+            className="rounded-xl border p-3 sm:p-4 mb-6"
+            style={{
+              borderColor: 'rgba(15,23,42,0.12)',
+              background: 'rgba(15,23,42,0.02)',
+            }}
+            data-marketplace-how-to-nav="1"
+            aria-label="Marketplace to Israel how-tos"
+          >
+            <div className="text-sm font-bold mb-1" style={{ color: 'var(--shopli-navy)' }}>
+              How-tos · Etsy / eBay / Walmart → IL
+            </div>
+            <p className="text-xs mb-2" style={{ color: 'var(--shopli-warm-gray)' }}>
+              Same 「17% body still wrong」 foil on marketplace pages — paste URL back here on /landed.
+            </p>
+            <ul className="flex flex-wrap gap-2" dir="ltr">
+              {MARKETPLACE_HOW_TOS.map((m) => (
+                <li key={m.id}>
+                  <Link
+                    href={m.path}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold border"
+                    style={{
+                      borderColor: 'rgba(249,115,22,0.35)',
+                      color: 'var(--shopli-orange)',
+                      background: 'rgba(249,115,22,0.06)',
+                    }}
+                    data-marketplace-how-to-link={m.id}
+                  >
+                    {m.nameEn}→IL
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
           {/* ITA Shaar Olami calculator foil — deep-link honesty strip */}
           <aside

@@ -96,6 +96,26 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     lastmod: today,
   });
 
+  // /landed estimator + marketplace→IL how-tos (iWishBag 17% foil)
+  urls.push({
+    loc: `${SITE_URL}/landed`,
+    changefreq: 'weekly',
+    priority: 0.85,
+    lastmod: today,
+  });
+  for (const path of [
+    '/how-to-etsy-israel',
+    '/how-to-ebay-israel',
+    '/how-to-walmart-israel',
+  ]) {
+    urls.push({
+      loc: `${SITE_URL}${path}`,
+      changefreq: 'weekly',
+      priority: 0.7,
+      lastmod: today,
+    });
+  }
+
   // Regional homepages
   for (const region of regionCodes) {
     urls.push({
