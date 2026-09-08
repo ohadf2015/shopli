@@ -260,7 +260,7 @@ export default function MarketplaceIwishbagHowTo({
               style={{ color: 'var(--shopli-navy)' }}
               data-vat-foil-en="18-not-17"
             >
-              {vatFoilEn} Keep #19 / #23 / #24 / #25 / #26 / #27 / #28.
+              {vatFoilEn} Keep #19 / #23 / #24 / #25 / #26 / #27 / #28 / #29.
             </p>
           </aside>
 
@@ -293,7 +293,7 @@ export default function MarketplaceIwishbagHowTo({
           <p className="text-xs leading-relaxed" style={{ color: 'var(--shopli-warm-gray)' }}>
             Note: Shopli is not the Israel Tax Authority. Estimator reflects common personal-import
             bands and the Skills IL customs {SKILLS_IL_CUSTOMS} + shekel {SKILLS_IL_SHEKEL} ·{' '}
-            {SKILLS_IL_STAMP_DATE} stamp. {vatFoilEn} Math unchanged from /landed (#18–#28).
+            {SKILLS_IL_STAMP_DATE} stamp. {vatFoilEn} Math unchanged from /landed (#18–#29).
           </p>
         </section>
       </main>
