@@ -5,8 +5,10 @@
  * Kit paste (2–5 URLs) + single-SKU miss tipping: Moat after #21.
  * ITA Shaar Olami calculator foil (#23): deep-link honesty strip — presentation only.
  * #24: explicit 18% not 17% foil. #25: side-by-side iWishBag 「17% body still wrong」
- * (verified Sep 7 night). #26: Etsy/eBay/Walmart→IL how-tos. #27 layer: AliExpress +
- * Amazon JP→IL how-tos — presentation only; math unchanged.
+ * (verified Sep 7 night). #26: Etsy/eBay/Walmart→IL how-tos. #27: AliExpress +
+ * Amazon JP→IL how-tos. #28: compare above-fold (kept). Moat next-layer ~4:42am:
+ * Shein + Temu→IL how-tos — presentation only; math unchanged. Keep #19–#28;
+ * Amazon US Apr-29 body 17% vs table/de-minimis 18% honesty intact.
  */
 
 import {
@@ -376,7 +378,7 @@ export function iwishbagSideBySideIntroHe(): string {
 }
 
 /** Marketplace how-to pages that reuse the iWishBag 「17% body still wrong」 foil. */
-export type MarketplaceHowToId = 'etsy' | 'ebay' | 'walmart' | 'aliexpress' | 'amazonjp';
+export type MarketplaceHowToId = 'etsy' | 'ebay' | 'walmart' | 'aliexpress' | 'amazonjp' | 'shein' | 'temu';
 
 export interface MarketplaceHowToSpec {
   id: MarketplaceHowToId;
@@ -407,9 +409,18 @@ export const IWISHBAG_ALIEXPRESS_IL_URL =
 export const IWISHBAG_AMAZONJP_IL_URL =
   'https://www.iwishbag.com/how-to-buy-from/amazon-japan/israel';
 
+/** iWishBag Shein → Israel guide (same 17% body / 18% table foil template). */
+export const IWISHBAG_SHEIN_IL_URL =
+  'https://www.iwishbag.com/how-to-buy-from/shein/israel';
+
+/** iWishBag Temu → Israel guide (same 17% body / 18% table foil template). */
+export const IWISHBAG_TEMU_IL_URL =
+  'https://www.iwishbag.com/how-to-buy-from/temu/israel';
+
 /**
- * Lean marketplace→IL how-to catalog (Etsy / eBay / Walmart / AliExpress / Amazon JP).
- * Presentation / SEO foil only — estimator math unchanged (#18–#26).
+ * Lean marketplace→IL how-to catalog (Etsy / eBay / Walmart / AliExpress /
+ * Amazon JP / Shein / Temu). Presentation / SEO foil only — estimator math
+ * unchanged (#18–#28). Moat next-layer ~4:42am: Shein + Temu.
  */
 export const MARKETPLACE_HOW_TOS: readonly MarketplaceHowToSpec[] = [
   {
@@ -441,6 +452,18 @@ export const MARKETPLACE_HOW_TOS: readonly MarketplaceHowToSpec[] = [
     nameEn: 'Amazon JP',
     path: '/how-to-amazonjp-israel',
     iwishbagUrl: IWISHBAG_AMAZONJP_IL_URL,
+  },
+  {
+    id: 'shein',
+    nameEn: 'Shein',
+    path: '/how-to-shein-israel',
+    iwishbagUrl: IWISHBAG_SHEIN_IL_URL,
+  },
+  {
+    id: 'temu',
+    nameEn: 'Temu',
+    path: '/how-to-temu-israel',
+    iwishbagUrl: IWISHBAG_TEMU_IL_URL,
   },
 ] as const;
 
