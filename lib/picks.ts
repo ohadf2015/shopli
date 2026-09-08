@@ -80,7 +80,12 @@ export interface Pick extends PickMetrics {
 /** A product needs this many units/day before "surging" means anything. */
 const SURGE_MIN_PER_DAY = 3;
 const SURGE_RATIO = 2;
-const DROP_MIN_PCT = 10;
+/**
+ * A "price drop" has to be a real move, not rounding noise: under 10% off its
+ * own median the badge reads as a discount the shopper cannot actually see.
+ * Exported so the rail chips and the reason gate can never drift apart.
+ */
+export const DROP_MIN_PCT = 10;
 
 /**
  * A discount on something nobody buys is not a deal, it is a clearance shelf.

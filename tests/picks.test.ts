@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { aggregateSnapshots, buildPriceOptions, dedupePicks, diversifyPicks, pickReason, scorePick, type Pick, type PickReason, type PickSnapshot } from '../lib/picks';
+import { aggregateSnapshots, buildPriceOptions, dedupePicks, diversifyPicks, pickReason, scorePick, DROP_MIN_PCT, type Pick, type PickReason, type PickSnapshot } from '../lib/picks';
 
 function snaps(rows: Array<[string, number, number | null]>): PickSnapshot[] {
   return rows.map(([seenOn, volume, price]) => ({ productId: 'p1', seenOn, volume, price }));
@@ -178,6 +178,18 @@ test('a discount on a product nobody buys is not a deal', () => {
     ['2026-08-11', 500, 100], ['2026-08-12', 520, 100], ['2026-08-13', 540, 100], ['2026-08-14', 560, 70],
   ]))!;
   assert.equal(pickReason(alive), 'price_drop');
+});
+
+test('a single-digit wobble is not a price drop', () => {
+  // MoversRail badges DROP_MIN_PCT and up, matching ProductCard's showDiscount
+  // bar — a 1-9% move off the median gets no price_drop copy anywhere.
+  assert.equal(DROP_MIN_PCT, 10);
+  const wobble = aggregateSnapshots(snaps([
+    ['2026-08-11', 500, 100], ['2026-08-12', 520, 100], ['2026-08-13', 540, 100], ['2026-08-14', 560, 92],
+  ]))!;
+  assert.equal(wobble.dropPct, 8);
+  assert.ok(wobble.dropPct < DROP_MIN_PCT);
+  assert.notEqual(pickReason(wobble), 'price_drop');
 });
 
 test('a best seller has to actually sell', () => {
