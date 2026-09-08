@@ -6,9 +6,11 @@
  * ITA Shaar Olami calculator foil (#23): deep-link honesty strip — presentation only.
  * #24: explicit 18% not 17% foil. #25: side-by-side iWishBag 「17% body still wrong」
  * (verified Sep 7 night). #26: Etsy/eBay/Walmart→IL how-tos. #27: AliExpress +
- * Amazon JP→IL how-tos. #28: compare above-fold (kept). Moat next-layer ~4:42am:
- * Shein + Temu→IL how-tos — presentation only; math unchanged. Keep #19–#28;
- * Amazon US Apr-29 body 17% vs table/de-minimis 18% honesty intact.
+ * Amazon JP→IL how-tos. #28: compare above-fold (kept). #29: Shein + Temu→IL
+ * how-tos (kept). Moat ~6:28am: Flipkart→IL how-to — presentation only; math
+ * unchanged. Keep #19–#29; Amazon US Apr-29 body 17% vs table/de-minimis 18%
+ * honesty intact (Amazon page still cites Flipkart). Skills IL Sep 8 still
+ * v1.4.0 + BoI+0.5% (context only; stamp date unchanged).
  */
 
 import {
@@ -378,7 +380,7 @@ export function iwishbagSideBySideIntroHe(): string {
 }
 
 /** Marketplace how-to pages that reuse the iWishBag 「17% body still wrong」 foil. */
-export type MarketplaceHowToId = 'etsy' | 'ebay' | 'walmart' | 'aliexpress' | 'amazonjp' | 'shein' | 'temu';
+export type MarketplaceHowToId = 'etsy' | 'ebay' | 'walmart' | 'aliexpress' | 'amazonjp' | 'shein' | 'temu' | 'flipkart';
 
 export interface MarketplaceHowToSpec {
   id: MarketplaceHowToId;
@@ -417,10 +419,14 @@ export const IWISHBAG_SHEIN_IL_URL =
 export const IWISHBAG_TEMU_IL_URL =
   'https://www.iwishbag.com/how-to-buy-from/temu/israel';
 
+/** iWishBag Flipkart → Israel guide (same 17% body / 18% table foil template). */
+export const IWISHBAG_FLIPKART_IL_URL =
+  'https://www.iwishbag.com/how-to-buy-from/flipkart/israel';
+
 /**
  * Lean marketplace→IL how-to catalog (Etsy / eBay / Walmart / AliExpress /
- * Amazon JP / Shein / Temu). Presentation / SEO foil only — estimator math
- * unchanged (#18–#28). Moat next-layer ~4:42am: Shein + Temu.
+ * Amazon JP / Shein / Temu / Flipkart). Presentation / SEO foil only —
+ * estimator math unchanged (#18–#29). Moat ~6:28am: Flipkart.
  */
 export const MARKETPLACE_HOW_TOS: readonly MarketplaceHowToSpec[] = [
   {
@@ -464,6 +470,12 @@ export const MARKETPLACE_HOW_TOS: readonly MarketplaceHowToSpec[] = [
     nameEn: 'Temu',
     path: '/how-to-temu-israel',
     iwishbagUrl: IWISHBAG_TEMU_IL_URL,
+  },
+  {
+    id: 'flipkart',
+    nameEn: 'Flipkart',
+    path: '/how-to-flipkart-israel',
+    iwishbagUrl: IWISHBAG_FLIPKART_IL_URL,
   },
 ] as const;
 

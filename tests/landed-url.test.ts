@@ -25,6 +25,7 @@ import {
   IWISHBAG_AMAZONJP_IL_URL,
   IWISHBAG_SHEIN_IL_URL,
   IWISHBAG_TEMU_IL_URL,
+  IWISHBAG_FLIPKART_IL_URL,
   MARKETPLACE_HOW_TOS,
   getMarketplaceHowTo,
   iwishbagMarketplaceSideBySideRows,
@@ -354,7 +355,7 @@ test('side-by-side foil is presentation-only: #18–#24 math + prior foils intac
 });
 
 
-test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu iWishBag URLs + paths', () => {
+test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Flipkart iWishBag URLs + paths', () => {
   assert.equal(IWISHBAG_ETSY_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/etsy/israel');
   assert.equal(IWISHBAG_EBAY_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/ebay/israel');
   assert.equal(IWISHBAG_WALMART_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/walmart/israel');
@@ -362,10 +363,11 @@ test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu iWi
   assert.equal(IWISHBAG_AMAZONJP_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/amazon-japan/israel');
   assert.equal(IWISHBAG_SHEIN_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/shein/israel');
   assert.equal(IWISHBAG_TEMU_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/temu/israel');
+  assert.equal(IWISHBAG_FLIPKART_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/flipkart/israel');
 
-  assert.equal(MARKETPLACE_HOW_TOS.length, 7);
+  assert.equal(MARKETPLACE_HOW_TOS.length, 8);
   const ids = MARKETPLACE_HOW_TOS.map((m) => m.id);
-  assert.deepEqual(ids, ['etsy', 'ebay', 'walmart', 'aliexpress', 'amazonjp', 'shein', 'temu']);
+  assert.deepEqual(ids, ['etsy', 'ebay', 'walmart', 'aliexpress', 'amazonjp', 'shein', 'temu', 'flipkart']);
 
   for (const m of MARKETPLACE_HOW_TOS) {
     assert.match(m.path, new RegExp(`^/how-to-${m.id}-israel$`));
@@ -385,6 +387,9 @@ test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu iWi
   const temu = getMarketplaceHowTo('temu');
   assert.equal(temu.nameEn, 'Temu');
   assert.equal(temu.path, '/how-to-temu-israel');
+  const flipkart = getMarketplaceHowTo('flipkart');
+  assert.equal(flipkart.nameEn, 'Flipkart');
+  assert.equal(flipkart.path, '/how-to-flipkart-israel');
 });
 
 test('marketplace foil copy: 18% not 17%, Skills Sep 7 stamp, body still wrong', () => {
