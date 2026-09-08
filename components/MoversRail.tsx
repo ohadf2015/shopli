@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Icon from './icons';
 import { productImage } from '../lib/img';
-import type { Pick } from '../lib/picks';
+import { DROP_MIN_PCT, type Pick } from '../lib/picks';
 
 /**
  * "Moving right now" — the homepage rail built from our own history.
@@ -87,6 +87,11 @@ export default function MoversRail({
   asOf?: string;
 }) {
   if (!items.length) return null;
+  // Same bar as ProductCard's showDiscount: a 1-9% wobble off the median is
+  // not a "price drop" worth copy. The picks pipeline already gates the
+  // reason at DROP_MIN_PCT; this keeps the rail honest if that ever loosens.
+  const visible = items.filter((m) => m.reason !== 'price_drop' || m.dropPct >= DROP_MIN_PCT);
+  if (!visible.length) return null;
   const c = rtl ? COPY.he : COPY.en;
   const locale = lang === 'he' ? 'he-IL' : 'en-US';
   const num = (n: number) => Math.round(n).toLocaleString(locale);
@@ -134,7 +139,7 @@ export default function MoversRail({
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-          {items.slice(0, 8).map((m, i) => (
+          {visible.slice(0, 8).map((m, i) => (
             <Link
               key={m.productId}
               href={`/${region}/product/${m.productId}`}
@@ -156,7 +161,7 @@ export default function MoversRail({
                 >
                   {BADGE[m.reason].icon} {c[m.reason]}
                 </span>
-                {m.dropPct > 0 && (
+                {m.dropPct >= DROP_MIN_PCT && (
                   <span
                     className="absolute top-2 end-2 text-[11px] font-bold px-2 py-1 rounded-full bg-white/95 backdrop-blur-sm shadow-sm"
                     style={{ color: 'var(--shopli-orange)' }}
