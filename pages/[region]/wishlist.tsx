@@ -145,7 +145,14 @@ export default function WishlistPage() {
         const res = await fetch('/api/newsletter', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email.trim(), region, wishlist: true }),
+          // The ids are the point: price-drop alerts on YOUR saved items need
+          // to know which items those are (first-party data, kg 143).
+          body: JSON.stringify({
+            email: email.trim(),
+            region,
+            wishlist: true,
+            items: sorted.map((i) => i.id),
+          }),
         });
         const data = await res.json();
         setEmailStatus(data);
@@ -155,7 +162,7 @@ export default function WishlistPage() {
       }
       setSubmitting(false);
     },
-    [email, region, rtl],
+    [email, region, rtl, sorted],
   );
 
   return (
