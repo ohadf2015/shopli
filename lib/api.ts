@@ -60,7 +60,11 @@ function mapProducts(products: any[], region: RegionCode): Product[] {
     currencySymbol: regionConfig.currencySymbol,
     originalPrice: p.price?.amount,
     imageUrl: p.imageUrl || '',
-    affiliateLink: p.affiliateLink || generateAffiliateLink(p.productId, region),
+    // '#' is the fallback catalog's dead placeholder — treat it as missing so
+    // the buy button always lands on a tracked link.
+    affiliateLink: p.affiliateLink && p.affiliateLink !== '#'
+      ? p.affiliateLink
+      : generateAffiliateLink(p.productId, region),
     commissionRate: p.commissionRate || 0,
     rating: p.rating || 0,
     reviewCount: p.reviewCount || 0,

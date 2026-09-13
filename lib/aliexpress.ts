@@ -102,6 +102,26 @@ async function callApi(params: Record<string, string>, attempts = 2): Promise<an
   }
 }
 
+/**
+ * Guarantee every exit URL carries our affiliate tracking.
+ * A `promotion_link` (s.click...) already converts, but when the API returns
+ * none we fell back to a bare `product_detail_url`, and demo products built
+ * bare item links by hand — those exits earn ZERO commission (kg 88; demo PDPs
+ * sit in the sitemap, so they do get organic traffic). Appending `aff_fcid`
+ * to a bare item URL follows the same convention as lib/api.ts's
+ * generateAffiliateLink.
+ */
+export function ensureAffiliateTracking(url: string, productId?: string | number): string {
+  const id = String(productId ?? '').trim();
+  if (!url) {
+    return id ? `https://www.aliexpress.com/item/${id}.html?aff_fcid=${TRACKING_ID}` : url;
+  }
+  // Already tagged: s.click deep links or any aff_* param — leave untouched.
+  if (url.includes('s.click.aliexpress.com') || /[?&]aff[_%]/i.test(url)) return url;
+  if (!/(^|\.)aliexpress\.com/i.test(new URL(url, 'https://www.aliexpress.com').hostname)) return url;
+  return url + (url.includes('?') ? '&' : '?') + `aff_fcid=${TRACKING_ID}`;
+}
+
 export interface SearchProduct {
   id: string;
   sku: string;
@@ -166,7 +186,7 @@ export async function searchAliExpress(keywords: string, region: string, pageSiz
     currency: p.target_sale_price_currency || cfg.currency,
     imageUrl: p.product_main_image_url || '',
     images: p.product_small_image_urls?.string || [],
-    affiliateLink: p.promotion_link || p.product_detail_url || '',
+    affiliateLink: ensureAffiliateTracking(p.promotion_link || p.product_detail_url || '', p.product_id),
     rating: parseFloat(String(p.evaluate_rate || '0').replace('%', '')),
     reviewCount: 0, // see the field docs on SearchProduct
     volume: parseInt(p.lastest_volume || '0'),
@@ -258,7 +278,7 @@ function mapRawProduct(p: any, cfg: { language: string; currency: string; shipTo
     currency: p.target_sale_price_currency || p.sale_price_currency || cfg.currency,
     imageUrl: p.product_main_image_url || '',
     images: p.product_small_image_urls?.string || [],
-    affiliateLink: p.promotion_link || p.product_detail_url || '',
+    affiliateLink: ensureAffiliateTracking(p.promotion_link || p.product_detail_url || '', p.product_id),
     rating: parseFloat(String(p.evaluate_rate || '0').replace('%', '')),
     reviewCount: 0, // see the field docs on SearchProduct
     volume: parseInt(p.lastest_volume || '0', 10),
