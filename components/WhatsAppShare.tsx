@@ -13,6 +13,8 @@ interface WhatsAppShareProps {
   className?: string;
   /** Size variant */
   size?: 'sm' | 'md';
+  /** Visual weight: filled (green primary-weight) or text (secondary link) */
+  variant?: 'filled' | 'text';
 }
 
 const LABELS: Record<string, string> = {
@@ -32,6 +34,7 @@ export default function WhatsAppShare({
   locale = 'en',
   className = '',
   size = 'sm',
+  variant = 'filled',
 }: WhatsAppShareProps) {
   const text = description
     ? `${title} — ${description}\n\n${url}`
@@ -43,16 +46,21 @@ export default function WhatsAppShare({
     ? 'text-xs px-3 py-1.5 gap-1.5'
     : 'text-sm px-4 py-2 gap-2';
 
+  const isText = variant === 'text';
+  const baseClass = isText
+    ? `inline-flex items-center font-medium transition-colors ${className}`
+    : `inline-flex items-center rounded-full font-medium transition-all duration-200 hover:scale-105 active:scale-95 ${sizeClasses} ${className}`;
+  const filledStyle = isText
+    ? undefined
+    : { backgroundColor: '#25D366', color: '#fff' };
+
   return (
     <a
       href={waUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center rounded-full font-medium transition-all duration-200 hover:scale-105 active:scale-95 ${sizeClasses} ${className}`}
-      style={{
-        backgroundColor: '#25D366',
-        color: '#fff',
-      }}
+      className={baseClass}
+      style={filledStyle}
       onClick={(e) => {
         // Track share event
         try {

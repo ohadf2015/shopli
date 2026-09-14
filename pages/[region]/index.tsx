@@ -114,7 +114,7 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs, th
             <p className="text-base md:text-lg mb-6 leading-relaxed" style={{ color: 'var(--shopli-warm-gray)' }}>
               {heroDesc}
             </p>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <a href={`/${region}/trending`} className="btn-primary">
                 <Icon name="tag" size={16} />
                 {rtl ? 'כל המבצעים' : 'Browse All Deals'}
@@ -125,7 +125,7 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs, th
                   {rtl ? 'ערוץ טלגרם' : 'Telegram Channel'}
                 </a>
               )}
-              <a href={`/${region}/game`} className="btn-secondary">
+              <a href={`/${region}/game`} className="btn-text">
                 <Icon name="star" size={16} />
                 {rtl ? 'נחשו את המחיר' : 'Guess the Price'}
               </a>
@@ -135,7 +135,8 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs, th
                 description={heroDesc}
                 locale={config.lang}
                 size="md"
-                className="btn-secondary"
+                variant="text"
+                className="btn-text"
               />
             </div>
           </div>
