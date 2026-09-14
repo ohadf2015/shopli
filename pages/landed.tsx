@@ -70,10 +70,10 @@ function emptyKitPrices(n = KIT_MAX): string[] {
  * side-by-side iWishBag 「17% body still wrong」 foil (verified Sep 7 night);
  * ITA Shaar Olami calculator foil (#23) kept. Presentation only.
  * Marketplace Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Flipkart/
- * Amazon US→IL how-tos reuse this foil (#26–#30 + moat next-layer priority 2
- * Amazon US). Estimator math unchanged (#18–#30). Ship honest 18% VAT foil on
- * dedicated Amazon US path (JP was #27 only); do not reopen #19–#30. Skills IL
- * Sep 8 still v1.4.0 + BoI+0.5% (context only).
+ * Amazon US/Amazon India→IL how-tos reuse this foil (#26–#30 / #34 + Amazon
+ * India). Estimator math unchanged (#18–#34). Ship honest 18% VAT foil on
+ * dedicated Amazon India path (same Apr-29 body bug as #34); do not reopen
+ * #19–#34. Skills IL Sep 8 still v1.4.0 + BoI+0.5% (context only).
  */
 export default function LandedPage() {
   const router = useRouter();

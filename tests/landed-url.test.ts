@@ -26,6 +26,7 @@ import {
   IWISHBAG_SHEIN_IL_URL,
   IWISHBAG_TEMU_IL_URL,
   IWISHBAG_FLIPKART_IL_URL,
+  IWISHBAG_AMAZONINDIA_IL_URL,
   MARKETPLACE_HOW_TOS,
   getMarketplaceHowTo,
   iwishbagMarketplaceSideBySideRows,
@@ -355,7 +356,7 @@ test('side-by-side foil is presentation-only: #18–#24 math + prior foils intac
 });
 
 
-test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Flipkart/Amazon US iWishBag URLs + paths', () => {
+test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Flipkart/Amazon US/Amazon India iWishBag URLs + paths', () => {
   assert.equal(IWISHBAG_ETSY_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/etsy/israel');
   assert.equal(IWISHBAG_EBAY_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/ebay/israel');
   assert.equal(IWISHBAG_WALMART_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/walmart/israel');
@@ -365,10 +366,11 @@ test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Fli
   assert.equal(IWISHBAG_TEMU_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/temu/israel');
   assert.equal(IWISHBAG_FLIPKART_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/flipkart/israel');
   assert.equal(IWISHBAG_AMAZON_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/amazon-us/israel');
+  assert.equal(IWISHBAG_AMAZONINDIA_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/amazon-india/israel');
 
-  assert.equal(MARKETPLACE_HOW_TOS.length, 9);
+  assert.equal(MARKETPLACE_HOW_TOS.length, 10);
   const ids = MARKETPLACE_HOW_TOS.map((m) => m.id);
-  assert.deepEqual(ids, ['etsy', 'ebay', 'walmart', 'aliexpress', 'amazonjp', 'shein', 'temu', 'flipkart', 'amazonus']);
+  assert.deepEqual(ids, ['etsy', 'ebay', 'walmart', 'aliexpress', 'amazonjp', 'shein', 'temu', 'flipkart', 'amazonus', 'amazonindia']);
 
   for (const m of MARKETPLACE_HOW_TOS) {
     assert.match(m.path, new RegExp(`^/how-to-${m.id}-israel$`));
@@ -395,6 +397,10 @@ test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Fli
   assert.equal(amazonus.nameEn, 'Amazon US');
   assert.equal(amazonus.path, '/how-to-amazonus-israel');
   assert.equal(amazonus.iwishbagUrl, IWISHBAG_AMAZON_IL_URL);
+  const amazonindia = getMarketplaceHowTo('amazonindia');
+  assert.equal(amazonindia.nameEn, 'Amazon India');
+  assert.equal(amazonindia.path, '/how-to-amazonindia-israel');
+  assert.equal(amazonindia.iwishbagUrl, IWISHBAG_AMAZONINDIA_IL_URL);
 });
 
 test('marketplace foil copy: 18% not 17%, Skills Sep 7 stamp, body still wrong', () => {
