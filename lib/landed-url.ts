@@ -7,9 +7,9 @@
  * #24: explicit 18% not 17% foil. #25: side-by-side iWishBag 「17% body still wrong」
  * (verified Sep 7 night). #26: Etsy/eBay/Walmart→IL how-tos. #27: AliExpress +
  * Amazon JP→IL how-tos. #28: compare above-fold (kept). #29: Shein + Temu→IL
- * how-tos (kept). #30: Flipkart→IL (kept). Moat next-layer priority 2:
- * dedicated Amazon US→IL how-to (JP was #27 only) — presentation only; math
- * unchanged. Keep #19–#30; ship honest 18% VAT foil citing gov.il vs iWishBag
+ * how-tos (kept). #30: Flipkart→IL (kept). #34: Amazon US→IL (kept). Moat:
+ * dedicated Amazon India→IL how-to — presentation only; math unchanged.
+ * Keep #19–#34; ship honest 18% VAT foil citing gov.il vs iWishBag Amazon India
  * Apr-29 body 「17% VAT」 (table Standard VAT/GST 18%). Skills IL Sep 8 still
  * v1.4.0 + BoI+0.5% (context only; stamp date unchanged).
  */
@@ -381,7 +381,7 @@ export function iwishbagSideBySideIntroHe(): string {
 }
 
 /** Marketplace how-to pages that reuse the iWishBag 「17% body still wrong」 foil. */
-export type MarketplaceHowToId = 'etsy' | 'ebay' | 'walmart' | 'aliexpress' | 'amazonjp' | 'shein' | 'temu' | 'flipkart' | 'amazonus';
+export type MarketplaceHowToId = 'etsy' | 'ebay' | 'walmart' | 'aliexpress' | 'amazonjp' | 'shein' | 'temu' | 'flipkart' | 'amazonus' | 'amazonindia';
 
 export interface MarketplaceHowToSpec {
   id: MarketplaceHowToId;
@@ -424,11 +424,15 @@ export const IWISHBAG_TEMU_IL_URL =
 export const IWISHBAG_FLIPKART_IL_URL =
   'https://www.iwishbag.com/how-to-buy-from/flipkart/israel';
 
+/** iWishBag Amazon India → Israel guide (same 17% body / 18% table foil as Amazon US). */
+export const IWISHBAG_AMAZONINDIA_IL_URL =
+  'https://www.iwishbag.com/how-to-buy-from/amazon-india/israel';
+
 /**
  * Lean marketplace→IL how-to catalog (Etsy / eBay / Walmart / AliExpress /
- * Amazon JP / Shein / Temu / Flipkart / Amazon US). Presentation / SEO foil
- * only — estimator math unchanged (#18–#30). Moat next-layer priority 2:
- * dedicated Amazon US (flagship iWishBag Apr-29 body bug; JP was #27 only).
+ * Amazon JP / Shein / Temu / Flipkart / Amazon US / Amazon India). Presentation /
+ * SEO foil only — estimator math unchanged (#18–#34). Moat: dedicated Amazon
+ * India (same Apr-29 body bug as Amazon US #34; JP was #27 only).
  */
 export const MARKETPLACE_HOW_TOS: readonly MarketplaceHowToSpec[] = [
   {
@@ -484,6 +488,12 @@ export const MARKETPLACE_HOW_TOS: readonly MarketplaceHowToSpec[] = [
     nameEn: 'Amazon US',
     path: '/how-to-amazonus-israel',
     iwishbagUrl: IWISHBAG_AMAZON_IL_URL,
+  },
+  {
+    id: 'amazonindia',
+    nameEn: 'Amazon India',
+    path: '/how-to-amazonindia-israel',
+    iwishbagUrl: IWISHBAG_AMAZONINDIA_IL_URL,
   },
 ] as const;
 
