@@ -69,11 +69,11 @@ function emptyKitPrices(n = KIT_MAX): string[] {
  * explicit "Israel VAT is 18% not 17%" foil vs iWishBag Apr 29 body bug (#24);
  * side-by-side iWishBag 「17% body still wrong」 foil (verified Sep 7 night);
  * ITA Shaar Olami calculator foil (#23) kept. Presentation only.
- * Marketplace Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Flipkart→IL
- * how-tos reuse this foil (#26–#29 + moat ~6:28am Flipkart). Estimator math
- * unchanged (#18–#29). Amazon US Apr-29 body 17% vs table 18% honesty kept
- * (Amazon page still cites Flipkart); do not reopen #19–#29. Skills IL Sep 8
- * still v1.4.0 + BoI+0.5% (context only).
+ * Marketplace Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Flipkart/
+ * Amazon US→IL how-tos reuse this foil (#26–#30 + moat next-layer priority 2
+ * Amazon US). Estimator math unchanged (#18–#30). Ship honest 18% VAT foil on
+ * dedicated Amazon US path (JP was #27 only); do not reopen #19–#30. Skills IL
+ * Sep 8 still v1.4.0 + BoI+0.5% (context only).
  */
 export default function LandedPage() {
   const router = useRouter();
