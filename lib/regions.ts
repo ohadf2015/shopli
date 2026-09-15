@@ -47,8 +47,8 @@ export const REGIONS: Record<string, RegionConfig> = {
     defaultShipTo: 'FR',
     direction: 'ltr',
     meta: {
-      title: 'Shopli — Best AliExpress Deals Picked by AI',
-      description: 'AI-powered product recommendations from AliExpress. Curated deals, free shipping, quality guaranteed.',
+      title: 'Shopli — Live AliExpress Deals for Europe (€)',
+      description: 'Curated AliExpress deals priced in EUR. Free-shipping picks, quality-filtered, updated daily. Browse today\'s deals.',
     },
   },
   us: {

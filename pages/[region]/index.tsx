@@ -2,7 +2,7 @@ import { GetServerSideProps } from 'next';
 import Header from '../../components/Header';
 import Icon from '../../components/icons';
 import ProductCard, { ProductCardProduct } from '../../components/ProductCard';
-import WhatsAppShare from '../../components/WhatsAppShare';
+import HomeAboveFold from '../../components/HomeAboveFold';
 import SeoHead from '../../components/SeoHead';
 import TrendingRail, { TrendingItem } from '../../components/TrendingRail';
 import MoversRail, { MoverItem } from '../../components/MoversRail';
@@ -76,13 +76,6 @@ async function fetchCollectionProducts(region: string, keywords: string[], limit
 }
 
 export default function HomePage({ region, config, groups, rtl, orderedSlugs, themes, trending, movers, moversAsOf }: HomePageProps) {
-  const t = (text?: Record<string, string> | null) => text?.[config.lang] || text?.en || '';
-
-  const heroTitle = rtl ? 'מצאו את הדילים הכי שווים מאליאקספרס' : 'The Best AliExpress Deals, Curated for You';
-  const heroDesc = rtl
-    ? 'אנחנו בוחרים מוצרים לפי טרנדים, עונה ואיכות. אתם קונים במחירים הכי נמוכים דרך קישורי שותפים ישירים.'
-    : 'We pick products by trends, season & quality. You buy at the lowest price with direct affiliate links.';
-
   const pageUrl = `${SITE_URL}/${region}`;
   const structuredData = [
     breadcrumbJsonLd([{ name: rtl ? 'דף הבית' : 'Home', url: pageUrl }]),
@@ -102,45 +95,15 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs, th
 
       <main style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}>
 
-        {/* HERO */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-12 md:pt-32 md:pb-16">
-          <div className="max-w-3xl">
-            <div className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: 'var(--shopli-orange)' }}>
-              {rtl ? 'שופלי — המלצות חכמות' : 'SHOPLI — SMART PICKS'}
-            </div>
-            <h1 className="text-3xl md:text-5xl font-extrabold leading-tight mb-4" style={{ color: 'var(--shopli-navy)' }}>
-              {heroTitle}
-            </h1>
-            <p className="text-base md:text-lg mb-6 leading-relaxed" style={{ color: 'var(--shopli-warm-gray)' }}>
-              {heroDesc}
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
-              <a href={`/${region}/trending`} className="btn-primary">
-                <Icon name="tag" size={16} />
-                {rtl ? 'כל המבצעים' : 'Browse All Deals'}
-              </a>
-              {config.tgChannel && (
-                <a href={`https://t.me/${config.tgChannel}`} target="_blank" rel="noopener" className="btn-secondary">
-                  <Icon name="telegram" size={16} />
-                  {rtl ? 'ערוץ טלגרם' : 'Telegram Channel'}
-                </a>
-              )}
-              <a href={`/${region}/game`} className="btn-text">
-                <Icon name="star" size={16} />
-                {rtl ? 'נחשו את המחיר' : 'Guess the Price'}
-              </a>
-              <WhatsAppShare
-                title={rtl ? 'שופלי — הדילים הכי שווים מאליאקספרס' : 'Shopli — The Best AliExpress Deals'}
-                url={`${SITE_URL}/${region}`}
-                description={heroDesc}
-                locale={config.lang}
-                size="md"
-                variant="text"
-                className="btn-text"
-              />
-            </div>
-          </div>
-        </section>
+        {/* HERO — above-fold value + sole Browse CTA + deal preview (t_2ecfa746) */}
+        <HomeAboveFold
+          region={region}
+          lang={config.lang}
+          rtl={rtl}
+          currencySymbol={config.currencySymbol}
+          tgChannel={config.tgChannel}
+          trending={trending}
+        />
 
         {/* TRENDING RAIL — directly below hero */}
         {trending.length > 0 && (
