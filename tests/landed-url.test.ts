@@ -23,6 +23,12 @@ import {
   dutyDecoderSideBySideRows,
   dutyDecoderStale17HeadlineEn,
   dutyDecoderSideBySideIntroHe,
+  GATEWAYLINES_TARIFF_URL,
+  GATEWAYLINES_STALE_17_VERIFIED,
+  GATEWAYLINES_VAT_LABEL_QUOTE,
+  gatewayLinesSideBySideRows,
+  gatewayLinesStale17HeadlineEn,
+  gatewayLinesSideBySideIntroHe,
   IWISHBAG_ETSY_IL_URL,
   IWISHBAG_EBAY_IL_URL,
   IWISHBAG_WALMART_IL_URL,
@@ -525,6 +531,88 @@ test('DutyDecoder foil is presentation-only: #18–#36 math + prior foils intact
   assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
   assert.equal(IWISHBAG_BODY_STILL_WRONG_VERIFIED, 'Sep 7 night');
+
+  const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
+  assert.ok(mid);
+  assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
+});
+
+
+test('Gateway Lines side-by-side foil: still מע״מ(17%) as of Sep 15', () => {
+  assert.equal(
+    GATEWAYLINES_TARIFF_URL,
+    'https://tariff.gatewaylines.co.il/tariff-calculator',
+  );
+  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_VAT_LABEL_QUOTE, 'מע״מ(17%)');
+
+  const headline = gatewayLinesStale17HeadlineEn();
+  assert.match(headline, /Gateway Lines still wrong/i);
+  assert.match(headline, /מע״מ\(17%\)/);
+  assert.match(headline, /reality 18%/);
+  assert.match(headline, /BoI\+0\.5%/);
+  assert.match(headline, /Sep 15/);
+  assert.match(headline, /tariff\.gatewaylines\.co\.il/);
+
+  const intro = gatewayLinesSideBySideIntroHe();
+  assert.match(intro, /Gateway Lines/);
+  assert.match(intro, /מע״מ\(17%\)/);
+  assert.match(intro, /18%/);
+  assert.match(intro, /Sep 15/);
+  assert.match(intro, /BoI\+0\.5%/);
+
+  const rows = gatewayLinesSideBySideRows();
+  assert.ok(rows.length >= 4);
+
+  const breakdown = rows.find((r) => r.id === 'breakdown-vat');
+  assert.ok(breakdown);
+  assert.equal(breakdown.gatewayLinesWrong, true);
+  assert.match(breakdown.shopliEn, /18%/);
+  assert.match(breakdown.gatewayLinesEn, /מע״מ\(17%\)/);
+  assert.match(breakdown.gatewayLinesEn, /still wrong/i);
+
+  const methodology = rows.find((r) => r.id === 'methodology-vat');
+  assert.ok(methodology);
+  assert.equal(methodology.gatewayLinesWrong, true);
+  assert.match(methodology.shopliEn, /18%/);
+  assert.match(methodology.shopliEn, /BoI\+0\.5%/);
+  assert.match(methodology.gatewayLinesEn, /מע״מ 17%/);
+
+  const reality = rows.find((r) => r.id === 'reality');
+  assert.ok(reality);
+  assert.match(reality.shopliEn, /18%/);
+  assert.match(reality.gatewayLinesEn, /18%/);
+
+  const paste = rows.find((r) => r.id === 'paste-url');
+  assert.ok(paste);
+  assert.match(paste.shopliEn, /\/landed/);
+
+  const verified = rows.find((r) => r.id === 'last-verified');
+  assert.ok(verified);
+  assert.equal(verified.gatewayLinesWrong, true);
+  assert.match(verified.gatewayLinesEn, /Sep 15/);
+  assert.match(verified.gatewayLinesEn, /מע״מ\(17%\)/);
+});
+
+test('Gateway Lines foil is presentation-only: #18–#38 math + prior foils intact', () => {
+  assert.equal(IL_VAT_RATE, 0.18);
+  assert.equal(BOI_CUSTOMS_FX_UPLIFT, 0.005);
+  assert.equal(USD_TO_ILS_RATE, 3.6);
+  assert.equal(DUTY_FREE_THRESHOLD_USD, 75);
+  assert.equal(DUTY_WAIVER_CEILING_USD, 500);
+  assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
+  assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+
+  const strip = vatFxHonestyStripHe();
+  assert.match(strip, /מע״ם 18%/);
+  assert.match(strip, /לא 17%/);
+
+  assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
+  assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
+  assert.equal(IWISHBAG_BODY_STILL_WRONG_VERIFIED, 'Sep 7 night');
+  assert.equal(DUTYDECODER_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 15');
 
   const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
   assert.ok(mid);

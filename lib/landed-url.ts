@@ -8,10 +8,13 @@
  * (verified Sep 7 night). #26: Etsy/eBay/Walmart→IL how-tos. #27: AliExpress +
  * Amazon JP→IL how-tos. #28: compare above-fold (kept). #29: Shein + Temu→IL
  * how-tos (kept). #30: Flipkart→IL (kept). #34: Amazon US→IL (kept).
- * #36: Amazon India→IL how-to (kept). Moat 2026-09-15 #6: DutyDecoder
- * dutydecoder.com/israel still badges/body 「17%」 VAT vs real 18% — side-by-side
- * foil on /landed. Presentation only; estimator math unchanged.
- * Keep #19–#36; Skills IL Sep 7 still v1.4.0 + BoI+0.5% (context only).
+ * #36: Amazon India→IL how-to (kept). #38: DutyDecoder /israel stale 17%
+ * foil (kept). Moat 2026-09-15 10:25 #2: Gateway Lines tariff calculator
+ * tariff.gatewaylines.co.il still labels 「מע״מ(17%)」 + methodology
+ * 「מע״מ 17% על הערך הכולל」 vs real 18% — side-by-side foil on /landed.
+ * Presentation only; estimator math unchanged. iWishBag lanes already
+ * covered (#25–#36); this is Gateway Lines specifically.
+ * Keep #19–#38; Skills IL Sep 7 still v1.4.0 + BoI+0.5% (context only).
  */
 
 import {
@@ -614,5 +617,94 @@ export function dutyDecoderSideBySideIntroHe(): string {
     `השוואה ליריב (DutyDecoder /israel): עדיין מציגים "17% VAT" בתג ובגוף/FAQ ` +
     `בעוד שבמציאות / gov.il המע״ם הוא 18% — אומת ${DUTYDECODER_STALE_17_VERIFIED}. ` +
     `שופלי מציגה מע״ם 18% + BoI+0.5%.`
+  );
+}
+
+/** Gateway Lines Israel tariff calculator used as honesty foil (stale 17% VAT). */
+export const GATEWAYLINES_TARIFF_URL =
+  'https://tariff.gatewaylines.co.il/tariff-calculator';
+
+/**
+ * Re-check stamp: Gateway Lines tariff calculator still shows breakdown
+ * label 「מע״מ(17%)」 and methodology 「מע״מ 17% על הערך הכולל」 while Israel
+ * reality / gov.il is 18% (raised 2025-01-01). Live quote verified Sep 15
+ * (moat 2026-09-15 10:25 #2). Presentation only — does not change estimator math.
+ */
+export const GATEWAYLINES_STALE_17_VERIFIED = 'Sep 15';
+
+/** Exact live breakdown label quoted from the rival calculator. */
+export const GATEWAYLINES_VAT_LABEL_QUOTE = 'מע״מ(17%)';
+
+export interface GatewayLinesSideBySideRow {
+  id: string;
+  labelEn: string;
+  shopliEn: string;
+  gatewayLinesEn: string;
+  /** When true, Gateway Lines cell is the honesty callout (still 17%). */
+  gatewayLinesWrong?: boolean;
+}
+
+/**
+ * Side-by-side honesty rows: Shopli /landed vs Gateway Lines tariff calculator.
+ * Foil: rival still claims מע״מ(17%) on the live calculator + methodology
+ * while reality is 18% (verified {@link GATEWAYLINES_STALE_17_VERIFIED}).
+ * Does not change estimator / kit / band math (#18–#38). iWishBag lanes
+ * already covered — Gateway Lines specifically.
+ */
+export function gatewayLinesSideBySideRows(): GatewayLinesSideBySideRow[] {
+  return [
+    {
+      id: 'breakdown-vat',
+      labelEn: 'Calculator VAT breakdown label',
+      shopliEn: '18% (correct)',
+      gatewayLinesEn: 'מע״מ(17%) — still wrong',
+      gatewayLinesWrong: true,
+    },
+    {
+      id: 'methodology-vat',
+      labelEn: 'Methodology / how-we-calculate',
+      shopliEn: '18% + BoI+0.5%',
+      gatewayLinesEn: 'מע״מ 17% על הערך הכולל',
+      gatewayLinesWrong: true,
+    },
+    {
+      id: 'reality',
+      labelEn: 'Israel reality / gov.il',
+      shopliEn: '18% (since 2025-01-01)',
+      gatewayLinesEn: '18% (they still publish 17%)',
+    },
+    {
+      id: 'paste-url',
+      labelEn: 'Paste Amazon/product URL → IL quote',
+      shopliEn: '/landed (free estimator)',
+      gatewayLinesEn: 'HS / tariff calculator (stale VAT)',
+    },
+    {
+      id: 'last-verified',
+      labelEn: 'Last verified',
+      shopliEn: `Skills IL · ${SKILLS_IL_STAMP_DATE}`,
+      gatewayLinesEn: `Still מע״מ(17%) as of ${GATEWAYLINES_STALE_17_VERIFIED}`,
+      gatewayLinesWrong: true,
+    },
+  ];
+}
+
+/**
+ * English headline for the Gateway Lines foil — stale מע״מ(17%) vs real 18%.
+ * Keeps #24 "Israel VAT is 18% not 17%." as a sibling string.
+ */
+export function gatewayLinesStale17HeadlineEn(): string {
+  return (
+    `Gateway Lines still wrong: "מע״מ(17%)" on tariff.gatewaylines.co.il ` +
+    `(reality 18% · Shopli 18% + BoI+0.5%) · verified ${GATEWAYLINES_STALE_17_VERIFIED}`
+  );
+}
+
+/** Short Hebrew intro above the Gateway Lines side-by-side panel. */
+export function gatewayLinesSideBySideIntroHe(): string {
+  return (
+    `השוואה ליריב (Gateway Lines מחשבון תעריף): עדיין מציגים "מע״מ(17%)" בפירוט ` +
+    `ו־"מע״מ 17% על הערך הכולל" במתודולוגיה בעוד שבמציאות / gov.il המע״ם הוא 18% — ` +
+    `אומת ${GATEWAYLINES_STALE_17_VERIFIED}. שופלי מציגה מע״ם 18% + BoI+0.5%.`
   );
 }
