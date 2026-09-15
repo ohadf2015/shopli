@@ -37,6 +37,12 @@ import {
   vatTruthLastCheckedStampEn,
   vatTruthHeadlineEn,
   vatTruthIntroHe,
+  IWISHBAG_FLIPKART_ETSY_SELF_CONTRADICTION_VERIFIED,
+  IWISHBAG_BODY_17_VAT_QUOTE,
+  IWISHBAG_OWN_TABLE_18_VAT_QUOTE,
+  iwishbagFlipkartEtsySelfContradictionRows,
+  iwishbagFlipkartEtsySelfContradictionHeadlineEn,
+  iwishbagFlipkartEtsySelfContradictionIntroHe,
   IWISHBAG_ETSY_IL_URL,
   IWISHBAG_EBAY_IL_URL,
   IWISHBAG_WALMART_IL_URL,
@@ -705,6 +711,94 @@ test('VAT truth moat is presentation-only: #18–#39 math + prior foils intact',
   assert.equal(GATEWAYLINES_VAT_LABEL_QUOTE, 'מע״מ(17%)');
   assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-15 noon');
   assert.equal(TAX_AUTHORITY_VAT_RATE_PCT, 18);
+
+  const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
+  assert.ok(mid);
+  assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
+});
+
+test('iWishBag Flipkart+Etsy self-contradiction strip: body 17% vs own table 18%', () => {
+  assert.equal(IWISHBAG_PAGE_LAST_UPDATED, '2026-04-29');
+  assert.equal(IWISHBAG_FLIPKART_ETSY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 14:15');
+  assert.equal(IWISHBAG_FLIPKART_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/flipkart/israel');
+  assert.equal(IWISHBAG_ETSY_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/etsy/israel');
+  assert.match(IWISHBAG_BODY_17_VAT_QUOTE, /17% VAT/);
+  assert.match(IWISHBAG_OWN_TABLE_18_VAT_QUOTE, /Standard VAT\/GST 18%/);
+
+  const headline = iwishbagFlipkartEtsySelfContradictionHeadlineEn();
+  assert.match(headline, /Flipkart\+Etsy/i);
+  assert.match(headline, /self-contradiction/i);
+  assert.match(headline, /17% VAT/);
+  assert.match(headline, /Standard VAT\/GST 18%/);
+  assert.match(headline, /2026-04-29/);
+  assert.match(headline, /2026-09-15 14:15/);
+
+  const intro = iwishbagFlipkartEtsySelfContradictionIntroHe();
+  assert.match(intro, /Flipkart\+Etsy/);
+  assert.match(intro, /17% VAT/);
+  assert.match(intro, /18%/);
+  assert.match(intro, /2026-04-29/);
+  assert.match(intro, /2026-09-15 14:15/);
+  assert.match(intro, /BoI\+0\.5%/);
+
+  const rows = iwishbagFlipkartEtsySelfContradictionRows();
+  assert.ok(rows.length >= 6);
+
+  const body = rows.find((r) => r.id === 'body-vat');
+  assert.ok(body);
+  assert.equal(body.iwishbagWrong, true);
+  assert.match(body.iwishbagEn, /17% VAT/);
+  assert.match(body.shopliEn, /18%/);
+
+  const table = rows.find((r) => r.id === 'own-table-vat');
+  assert.ok(table);
+  assert.match(table.iwishbagEn, /Standard VAT\/GST 18%/);
+  assert.notEqual(table.iwishbagWrong, true);
+
+  const self = rows.find((r) => r.id === 'self-contradiction');
+  assert.ok(self);
+  assert.equal(self.iwishbagWrong, true);
+  assert.match(self.iwishbagEn, /Body 17% vs own table 18%/);
+
+  const flipkart = rows.find((r) => r.id === 'flipkart-lane');
+  assert.ok(flipkart);
+  assert.equal(flipkart.iwishbagWrong, true);
+  assert.equal(flipkart.liveUrl, IWISHBAG_FLIPKART_IL_URL);
+  assert.match(flipkart.iwishbagEn, /Apr 29/);
+
+  const etsy = rows.find((r) => r.id === 'etsy-lane');
+  assert.ok(etsy);
+  assert.equal(etsy.iwishbagWrong, true);
+  assert.equal(etsy.liveUrl, IWISHBAG_ETSY_IL_URL);
+  assert.match(etsy.iwishbagEn, /Apr 29/);
+
+  const last = rows.find((r) => r.id === 'last-updated');
+  assert.ok(last);
+  assert.equal(last.iwishbagWrong, true);
+  assert.match(last.iwishbagEn, /2026-04-29/);
+  assert.match(last.iwishbagEn, /2026-09-15 14:15/);
+});
+
+test('Flipkart+Etsy self-contradiction foil is presentation-only: #18–#40 math + prior foils intact', () => {
+  assert.equal(IL_VAT_RATE, 0.18);
+  assert.equal(BOI_CUSTOMS_FX_UPLIFT, 0.005);
+  assert.equal(USD_TO_ILS_RATE, 3.6);
+  assert.equal(DUTY_FREE_THRESHOLD_USD, 75);
+  assert.equal(DUTY_WAIVER_CEILING_USD, 500);
+  assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
+  assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+
+  assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
+  assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
+  assert.equal(IWISHBAG_BODY_STILL_WRONG_VERIFIED, 'Sep 7 night');
+  assert.equal(DUTYDECODER_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_VAT_LABEL_QUOTE, 'מע״מ(17%)');
+  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-15 noon');
+  assert.equal(TAX_AUTHORITY_VAT_RATE_PCT, 18);
+  assert.equal(IWISHBAG_FLIPKART_ETSY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 14:15');
+  assert.equal(IWISHBAG_PAGE_LAST_UPDATED, '2026-04-29');
 
   const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
   assert.ok(mid);
