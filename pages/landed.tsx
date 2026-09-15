@@ -53,6 +53,12 @@ import {
   vatTruthLastCheckedStampEn,
   vatTruthHeadlineEn,
   vatTruthIntroHe,
+  IWISHBAG_ETSY_IL_URL,
+  IWISHBAG_FLIPKART_IL_URL,
+  IWISHBAG_FLIPKART_ETSY_SELF_CONTRADICTION_VERIFIED,
+  iwishbagFlipkartEtsySelfContradictionRows,
+  iwishbagFlipkartEtsySelfContradictionHeadlineEn,
+  iwishbagFlipkartEtsySelfContradictionIntroHe,
   MARKETPLACE_HOW_TOS,
   SKILLS_IL_CUSTOMS,
   SKILLS_IL_SHEKEL,
@@ -89,12 +95,14 @@ function emptyKitPrices(n = KIT_MAX): string[] {
  * DutyDecoder /israel stale 17% foil (#38, verified Sep 15);
  * Gateway Lines tariff 「מע״מ(17%)」 foil (#39, kept);
  * durable VAT-truth moat: Tax Authority 18% cite + last-checked stamp +
- * live 「competitors still 17%」 proof row (Gateway Lines still wrong post-#39;
- * noon moat 2026-09-15 #2);
+ * live 「competitors still 17%」 proof row (#40, kept);
+ * iWishBag Flipkart+Etsy→IL body 「17% VAT」 vs own table 18% self-contradiction
+ * strip (moat 2026-09-15 14:15 #3; Last updated 2026-04-29 still live) —
+ * distinct from Tax Authority cite #40 / Gateway #39;
  * ITA Shaar Olami calculator foil (#23) kept. Presentation only.
  * Marketplace Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Flipkart/
  * Amazon US/Amazon India→IL how-tos reuse iWishBag foil (#26–#36).
- * Estimator math unchanged (#18–#39). Keep #19–#39; Skills IL Sep 7 still
+ * Estimator math unchanged (#18–#40). Keep #19–#40; Skills IL Sep 7 still
  * v1.4.0 + BoI+0.5% (context only).
  */
 export default function LandedPage() {
@@ -244,6 +252,9 @@ export default function LandedPage() {
   const vatTruthIntro = vatTruthIntroHe();
   const taxAuthCite = taxAuthorityVat18CiteEn();
   const vatTruthStamp = vatTruthLastCheckedStampEn();
+  const flipkartEtsyRows = iwishbagFlipkartEtsySelfContradictionRows();
+  const flipkartEtsyHeadline = iwishbagFlipkartEtsySelfContradictionHeadlineEn();
+  const flipkartEtsyIntro = iwishbagFlipkartEtsySelfContradictionIntroHe();
   const tipCopy = kitTippingCopyHe();
   const itaFoil = itaShaarOlamiFoilStripHe();
   const itaLinkLabel = itaShaarOlamiLinkLabelHe();
@@ -286,6 +297,8 @@ export default function LandedPage() {
         data-vat-truth-moat="1"
         data-tax-authority-vat-cite={String(TAX_AUTHORITY_VAT_RATE_PCT)}
         data-vat-truth-last-checked={VAT_TRUTH_LAST_CHECKED}
+        data-iwishbag-flipkart-etsy-self-contradiction="1"
+        data-iwishbag-flipkart-etsy-verified={IWISHBAG_FLIPKART_ETSY_SELF_CONTRADICTION_VERIFIED}
         data-duty-bands="ptur-vat-waiver"
         data-ita-shaar-olami-foil="1"
         data-landed-mode={mode}
@@ -788,6 +801,140 @@ export default function LandedPage() {
               data-vat-foil-en="18-not-17"
             >
               {vatFoilEn} Durable VAT-truth moat. Gateway Lines still wrong post-#39. Keep #19 / #23–#39.
+            </p>
+          </aside>
+
+          {/* iWishBag Flipkart+Etsy→IL self-contradiction strip — body 17% vs own table 18% (moat 14:15 #3) */}
+          <aside
+            className="rounded-xl border p-3 sm:p-4 mb-6"
+            style={{
+              borderColor: 'rgba(220,38,38,0.28)',
+              background: 'rgba(254,242,242,0.65)',
+            }}
+            data-iwishbag-flipkart-etsy-self-contradiction="1"
+            data-iwishbag-flipkart-url={IWISHBAG_FLIPKART_IL_URL}
+            data-iwishbag-etsy-url={IWISHBAG_ETSY_IL_URL}
+            data-iwishbag-last-updated={IWISHBAG_PAGE_LAST_UPDATED}
+            data-iwishbag-flipkart-etsy-verified={IWISHBAG_FLIPKART_ETSY_SELF_CONTRADICTION_VERIFIED}
+            data-vat-honesty-foil="18-not-17"
+          >
+            <div
+              className="flex items-start gap-2 text-sm font-bold mb-1"
+              style={{ color: 'var(--shopli-navy)' }}
+            >
+              <Icon name="shield" size={16} className="shrink-0 mt-0.5" />
+              <span>Self-contradiction · iWishBag Flipkart+Etsy→IL</span>
+            </div>
+            <p
+              className="text-xs font-bold mb-2"
+              style={{ color: '#b91c1c' }}
+              dir="ltr"
+              data-iwishbag-flipkart-etsy-headline="self-contradiction"
+            >
+              {flipkartEtsyHeadline}
+            </p>
+            <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {flipkartEtsyIntro}{' '}
+              <a
+                href={IWISHBAG_FLIPKART_IL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline-offset-2 hover:underline"
+                style={{ color: 'var(--shopli-orange)' }}
+                data-iwishbag-flipkart-foil-link="1"
+              >
+                Flipkart→IL
+                <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+              </a>
+              {' · '}
+              <a
+                href={IWISHBAG_ETSY_IL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline-offset-2 hover:underline"
+                style={{ color: 'var(--shopli-orange)' }}
+                data-iwishbag-etsy-foil-link="1"
+              >
+                Etsy→IL
+                <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+              </a>
+            </p>
+            <div className="overflow-x-auto" dir="ltr">
+              <table
+                className="w-full text-left text-xs border-collapse"
+                data-iwishbag-flipkart-etsy-self-contradiction-table="1"
+              >
+                <thead>
+                  <tr style={{ color: 'var(--shopli-navy)' }}>
+                    <th className="py-1.5 pe-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Claim
+                    </th>
+                    <th className="py-1.5 px-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Shopli /landed
+                    </th>
+                    <th className="py-1.5 ps-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      iWishBag Flipkart+Etsy
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {flipkartEtsyRows.map((row) => (
+                    <tr
+                      key={row.id}
+                      data-iwishbag-flipkart-etsy-row={row.id}
+                      {...(row.iwishbagWrong ? { 'data-iwishbag-wrong': '1' } : {})}
+                    >
+                      <td
+                        className="py-1.5 pe-2 align-top font-semibold"
+                        style={{ color: 'var(--shopli-navy)' }}
+                      >
+                        {row.labelEn}
+                      </td>
+                      <td
+                        className="py-1.5 px-2 align-top"
+                        style={{ color: 'var(--shopli-warm-gray)' }}
+                        data-shopli-cell={row.id}
+                      >
+                        {row.shopliEn}
+                      </td>
+                      <td
+                        className="py-1.5 ps-2 align-top font-semibold"
+                        style={{
+                          color: row.iwishbagWrong ? '#b91c1c' : 'var(--shopli-warm-gray)',
+                        }}
+                        data-iwishbag-cell={row.id}
+                      >
+                        {row.iwishbagEn}
+                        {row.liveUrl ? (
+                          <>
+                            {' '}
+                            <a
+                              href={row.liveUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="underline-offset-2 hover:underline"
+                              style={{ color: 'var(--shopli-orange)' }}
+                              data-iwishbag-lane-link={row.id}
+                            >
+                              live
+                              <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+                            </a>
+                          </>
+                        ) : null}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p
+              className="text-[11px] mt-2 font-semibold"
+              dir="ltr"
+              style={{ color: 'var(--shopli-navy)' }}
+              data-vat-foil-en="18-not-17"
+            >
+              {vatFoilEn} Flipkart+Etsy body 「17% VAT」 vs own table 18% · Last updated{' '}
+              {IWISHBAG_PAGE_LAST_UPDATED} still live. Distinct from #40 / #39. Keep #19 / #23–#40.
             </p>
           </aside>
 
