@@ -29,6 +29,14 @@ import {
   gatewayLinesSideBySideRows,
   gatewayLinesStale17HeadlineEn,
   gatewayLinesSideBySideIntroHe,
+  TAX_AUTHORITY_VAT_CITE_URL,
+  TAX_AUTHORITY_VAT_RATE_PCT,
+  VAT_TRUTH_LAST_CHECKED,
+  vatTruthCompetitorsStill17ProofRows,
+  taxAuthorityVat18CiteEn,
+  vatTruthLastCheckedStampEn,
+  vatTruthHeadlineEn,
+  vatTruthIntroHe,
   IWISHBAG_ETSY_IL_URL,
   IWISHBAG_EBAY_IL_URL,
   IWISHBAG_WALMART_IL_URL,
@@ -613,6 +621,90 @@ test('Gateway Lines foil is presentation-only: #18–#38 math + prior foils inta
   assert.equal(IWISHBAG_BODY_STILL_WRONG_VERIFIED, 'Sep 7 night');
   assert.equal(DUTYDECODER_STALE_17_VERIFIED, 'Sep 15');
   assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 15');
+
+  const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
+  assert.ok(mid);
+  assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
+});
+
+test('VAT truth moat: Tax Authority 18% cite + last-checked + competitors still 17%', () => {
+  assert.equal(
+    TAX_AUTHORITY_VAT_CITE_URL,
+    'https://www.gov.il/he/departments/topics/vat/govil-landing-page',
+  );
+  assert.equal(TAX_AUTHORITY_VAT_RATE_PCT, 18);
+  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-15 noon');
+  assert.equal(TAX_AUTHORITY_VAT_RATE_PCT, Math.round(IL_VAT_RATE * 100));
+
+  const cite = taxAuthorityVat18CiteEn();
+  assert.match(cite, /Tax Authority/);
+  assert.match(cite, /רשות המיסים/);
+  assert.match(cite, /18%/);
+  assert.match(cite, /2025-01-01/);
+
+  const stamp = vatTruthLastCheckedStampEn();
+  assert.match(stamp, /Last checked/);
+  assert.match(stamp, /2026-09-15 noon/);
+
+  const headline = vatTruthHeadlineEn();
+  assert.match(headline, /VAT truth/i);
+  assert.match(headline, /Tax Authority 18%/);
+  assert.match(headline, /competitors still 17%/i);
+  assert.match(headline, /Gateway Lines still wrong post-#39/);
+  assert.match(headline, /2026-09-15 noon/);
+
+  const intro = vatTruthIntroHe();
+  assert.match(intro, /רשות המיסים/);
+  assert.match(intro, /18%/);
+  assert.match(intro, /Gateway Lines/);
+  assert.match(intro, /#39/);
+  assert.match(intro, /2026-09-15 noon/);
+  assert.match(intro, /BoI\+0\.5%/);
+
+  const rows = vatTruthCompetitorsStill17ProofRows();
+  assert.ok(rows.length >= 3);
+
+  const gateway = rows.find((r) => r.id === 'gatewaylines');
+  assert.ok(gateway);
+  assert.equal(gateway.stillWrong, true);
+  assert.equal(gateway.liveUrl, GATEWAYLINES_TARIFF_URL);
+  assert.match(gateway.claimEn, /מע״מ\(17%\)/);
+  assert.match(gateway.claimEn, /post-#39/);
+
+  const duty = rows.find((r) => r.id === 'dutydecoder');
+  assert.ok(duty);
+  assert.equal(duty.stillWrong, true);
+  assert.equal(duty.liveUrl, DUTYDECODER_IL_URL);
+  assert.match(duty.claimEn, /17%/);
+
+  const iwish = rows.find((r) => r.id === 'iwishbag');
+  assert.ok(iwish);
+  assert.equal(iwish.stillWrong, true);
+  assert.equal(iwish.liveUrl, IWISHBAG_AMAZON_IL_URL);
+  assert.match(iwish.claimEn, /17%/);
+
+  // Every proof row is a live still-wrong competitor
+  assert.ok(rows.every((r) => r.stillWrong && /17%/.test(r.claimEn)));
+});
+
+test('VAT truth moat is presentation-only: #18–#39 math + prior foils intact', () => {
+  assert.equal(IL_VAT_RATE, 0.18);
+  assert.equal(BOI_CUSTOMS_FX_UPLIFT, 0.005);
+  assert.equal(USD_TO_ILS_RATE, 3.6);
+  assert.equal(DUTY_FREE_THRESHOLD_USD, 75);
+  assert.equal(DUTY_WAIVER_CEILING_USD, 500);
+  assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
+  assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+
+  assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
+  assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
+  assert.equal(IWISHBAG_BODY_STILL_WRONG_VERIFIED, 'Sep 7 night');
+  assert.equal(DUTYDECODER_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_VAT_LABEL_QUOTE, 'מע״מ(17%)');
+  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-15 noon');
+  assert.equal(TAX_AUTHORITY_VAT_RATE_PCT, 18);
 
   const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
   assert.ok(mid);

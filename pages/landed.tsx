@@ -45,6 +45,14 @@ import {
   gatewayLinesSideBySideRows,
   gatewayLinesStale17HeadlineEn,
   gatewayLinesSideBySideIntroHe,
+  TAX_AUTHORITY_VAT_CITE_URL,
+  TAX_AUTHORITY_VAT_RATE_PCT,
+  VAT_TRUTH_LAST_CHECKED,
+  vatTruthCompetitorsStill17ProofRows,
+  taxAuthorityVat18CiteEn,
+  vatTruthLastCheckedStampEn,
+  vatTruthHeadlineEn,
+  vatTruthIntroHe,
   MARKETPLACE_HOW_TOS,
   SKILLS_IL_CUSTOMS,
   SKILLS_IL_SHEKEL,
@@ -79,11 +87,14 @@ function emptyKitPrices(n = KIT_MAX): string[] {
  * explicit "Israel VAT is 18% not 17%" foil vs iWishBag Apr 29 body bug (#24);
  * side-by-side iWishBag 「17% body still wrong」 foil (verified Sep 7 night);
  * DutyDecoder /israel stale 17% foil (#38, verified Sep 15);
- * Gateway Lines tariff 「מע״מ(17%)」 foil (moat 2026-09-15 10:25 #2);
+ * Gateway Lines tariff 「מע״מ(17%)」 foil (#39, kept);
+ * durable VAT-truth moat: Tax Authority 18% cite + last-checked stamp +
+ * live 「competitors still 17%」 proof row (Gateway Lines still wrong post-#39;
+ * noon moat 2026-09-15 #2);
  * ITA Shaar Olami calculator foil (#23) kept. Presentation only.
  * Marketplace Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Flipkart/
  * Amazon US/Amazon India→IL how-tos reuse iWishBag foil (#26–#36).
- * Estimator math unchanged (#18–#38). Keep #19–#38; Skills IL Sep 7 still
+ * Estimator math unchanged (#18–#39). Keep #19–#39; Skills IL Sep 7 still
  * v1.4.0 + BoI+0.5% (context only).
  */
 export default function LandedPage() {
@@ -228,6 +239,11 @@ export default function LandedPage() {
   const gatewayLinesRows = gatewayLinesSideBySideRows();
   const gatewayLinesHeadline = gatewayLinesStale17HeadlineEn();
   const gatewayLinesIntro = gatewayLinesSideBySideIntroHe();
+  const vatTruthRows = vatTruthCompetitorsStill17ProofRows();
+  const vatTruthHeadline = vatTruthHeadlineEn();
+  const vatTruthIntro = vatTruthIntroHe();
+  const taxAuthCite = taxAuthorityVat18CiteEn();
+  const vatTruthStamp = vatTruthLastCheckedStampEn();
   const tipCopy = kitTippingCopyHe();
   const itaFoil = itaShaarOlamiFoilStripHe();
   const itaLinkLabel = itaShaarOlamiLinkLabelHe();
@@ -267,6 +283,9 @@ export default function LandedPage() {
         data-dutydecoder-stale-17={DUTYDECODER_STALE_17_VERIFIED}
         data-gatewaylines-side-by-side-foil="1"
         data-gatewaylines-stale-17={GATEWAYLINES_STALE_17_VERIFIED}
+        data-vat-truth-moat="1"
+        data-tax-authority-vat-cite={String(TAX_AUTHORITY_VAT_RATE_PCT)}
+        data-vat-truth-last-checked={VAT_TRUTH_LAST_CHECKED}
         data-duty-bands="ptur-vat-waiver"
         data-ita-shaar-olami-foil="1"
         data-landed-mode={mode}
@@ -643,6 +662,132 @@ export default function LandedPage() {
               data-vat-foil-en="18-not-17"
             >
               {vatFoilEn} Foil tariff.gatewaylines.co.il 「מע״מ(17%)」. Keep #19 / #23–#25 / #36 / #38.
+            </p>
+          </aside>
+
+          {/* Durable VAT-truth moat — Tax Authority 18% cite + last-checked + competitors still 17% */}
+          <aside
+            className="rounded-xl border p-3 sm:p-4 mb-6"
+            style={{
+              borderColor: 'rgba(22,163,74,0.35)',
+              background: 'rgba(240,253,244,0.75)',
+            }}
+            data-vat-truth-moat="1"
+            data-tax-authority-vat-cite-url={TAX_AUTHORITY_VAT_CITE_URL}
+            data-tax-authority-vat-rate={String(TAX_AUTHORITY_VAT_RATE_PCT)}
+            data-vat-truth-last-checked={VAT_TRUTH_LAST_CHECKED}
+            data-vat-honesty-foil="18-not-17"
+          >
+            <div
+              className="flex items-start gap-2 text-sm font-bold mb-1"
+              style={{ color: 'var(--shopli-navy)' }}
+            >
+              <Icon name="shield" size={16} className="shrink-0 mt-0.5" />
+              <span>VAT truth · Tax Authority {TAX_AUTHORITY_VAT_RATE_PCT}% cite</span>
+            </div>
+            <p
+              className="text-xs font-bold mb-2"
+              style={{ color: 'var(--shopli-navy)' }}
+              dir="ltr"
+              data-vat-truth-headline="1"
+            >
+              {vatTruthHeadline}
+            </p>
+            <p className="text-xs leading-relaxed mb-2" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {vatTruthIntro}
+            </p>
+            <p
+              className="text-xs font-semibold mb-1"
+              dir="ltr"
+              style={{ color: 'var(--shopli-navy)' }}
+              data-tax-authority-vat-cite="1"
+            >
+              {taxAuthCite}{' '}
+              <a
+                href={TAX_AUTHORITY_VAT_CITE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline-offset-2 hover:underline"
+                style={{ color: 'var(--shopli-orange)' }}
+                data-tax-authority-cite-link="1"
+              >
+                gov.il · מע״מ
+                <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+              </a>
+            </p>
+            <p
+              className="text-[11px] font-semibold mb-3"
+              dir="ltr"
+              style={{ color: 'var(--shopli-warm-gray)' }}
+              data-vat-truth-last-checked-stamp="1"
+            >
+              {vatTruthStamp}
+            </p>
+            <div className="overflow-x-auto" dir="ltr">
+              <table
+                className="w-full text-left text-xs border-collapse"
+                data-vat-truth-competitors-still-17-table="1"
+              >
+                <thead>
+                  <tr style={{ color: 'var(--shopli-navy)' }}>
+                    <th className="py-1.5 pe-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Competitor
+                    </th>
+                    <th className="py-1.5 px-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Live claim
+                    </th>
+                    <th className="py-1.5 ps-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Proof
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {vatTruthRows.map((row) => (
+                    <tr
+                      key={row.id}
+                      data-vat-truth-proof-row={row.id}
+                      {...(row.stillWrong ? { 'data-competitors-still-17': '1' } : {})}
+                    >
+                      <td
+                        className="py-1.5 pe-2 align-top font-semibold"
+                        style={{ color: 'var(--shopli-navy)' }}
+                      >
+                        {row.competitorEn}
+                      </td>
+                      <td
+                        className="py-1.5 px-2 align-top font-semibold"
+                        style={{
+                          color: row.stillWrong ? '#b91c1c' : 'var(--shopli-warm-gray)',
+                        }}
+                        data-vat-truth-claim={row.id}
+                      >
+                        {row.claimEn}
+                      </td>
+                      <td className="py-1.5 ps-2 align-top">
+                        <a
+                          href={row.liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-semibold underline-offset-2 hover:underline"
+                          style={{ color: 'var(--shopli-orange)' }}
+                          data-vat-truth-proof-link={row.id}
+                        >
+                          live
+                          <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p
+              className="text-[11px] mt-2 font-semibold"
+              dir="ltr"
+              style={{ color: 'var(--shopli-navy)' }}
+              data-vat-foil-en="18-not-17"
+            >
+              {vatFoilEn} Durable VAT-truth moat. Gateway Lines still wrong post-#39. Keep #19 / #23–#39.
             </p>
           </aside>
 
