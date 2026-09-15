@@ -7,11 +7,11 @@
  * #24: explicit 18% not 17% foil. #25: side-by-side iWishBag 「17% body still wrong」
  * (verified Sep 7 night). #26: Etsy/eBay/Walmart→IL how-tos. #27: AliExpress +
  * Amazon JP→IL how-tos. #28: compare above-fold (kept). #29: Shein + Temu→IL
- * how-tos (kept). #30: Flipkart→IL (kept). #34: Amazon US→IL (kept). Moat:
- * dedicated Amazon India→IL how-to — presentation only; math unchanged.
- * Keep #19–#34; ship honest 18% VAT foil citing gov.il vs iWishBag Amazon India
- * Apr-29 body 「17% VAT」 (table Standard VAT/GST 18%). Skills IL Sep 8 still
- * v1.4.0 + BoI+0.5% (context only; stamp date unchanged).
+ * how-tos (kept). #30: Flipkart→IL (kept). #34: Amazon US→IL (kept).
+ * #36: Amazon India→IL how-to (kept). Moat 2026-09-15 #6: DutyDecoder
+ * dutydecoder.com/israel still badges/body 「17%」 VAT vs real 18% — side-by-side
+ * foil on /landed. Presentation only; estimator math unchanged.
+ * Keep #19–#36; Skills IL Sep 7 still v1.4.0 + BoI+0.5% (context only).
  */
 
 import {
@@ -530,5 +530,89 @@ export function iwishbagMarketplaceFoilIntroEn(marketplace: MarketplaceHowToId):
     `Same Apr-29 iWishBag body bug on ${spec.nameEn}→IL: still says "17% VAT" ` +
     `while duties table / reality is 18% (verified ${IWISHBAG_BODY_STILL_WRONG_VERIFIED}). ` +
     `Shopli: ${israelVat18Not17FoilEn()} Paste URL → /landed.`
+  );
+}
+
+/** DutyDecoder Israel guide used as honesty foil target (stale 17% VAT). */
+export const DUTYDECODER_IL_URL = 'https://dutydecoder.com/israel';
+
+/**
+ * Re-check stamp: DutyDecoder /israel still shows VAT Rate 17% in the hero
+ * badge + body/FAQ ("standard VAT rate is 17%") while Israel reality /
+ * gov.il is 18% (raised 2025-01-01). Verified Sep 15 (moat 2026-09-15 #6).
+ * Presentation only — does not change estimator math.
+ */
+export const DUTYDECODER_STALE_17_VERIFIED = 'Sep 15';
+
+export interface DutyDecoderSideBySideRow {
+  id: string;
+  labelEn: string;
+  shopliEn: string;
+  dutyDecoderEn: string;
+  /** When true, DutyDecoder cell is the honesty callout (still 17%). */
+  dutyDecoderWrong?: boolean;
+}
+
+/**
+ * Side-by-side honesty rows: Shopli /landed vs DutyDecoder /israel.
+ * Foil: rival still claims 17% VAT everywhere (badge + body + FAQ) while
+ * reality is 18% (verified {@link DUTYDECODER_STALE_17_VERIFIED}). Does not
+ * change estimator / kit / band math (#18–#36).
+ */
+export function dutyDecoderSideBySideRows(): DutyDecoderSideBySideRow[] {
+  return [
+    {
+      id: 'badge-vat',
+      labelEn: 'VAT Rate badge / claim',
+      shopliEn: '18% (correct)',
+      dutyDecoderEn: '17% — still wrong',
+      dutyDecoderWrong: true,
+    },
+    {
+      id: 'body-vat',
+      labelEn: 'Body / FAQ VAT',
+      shopliEn: '18%',
+      dutyDecoderEn: '17% — "standard VAT rate is 17%"',
+      dutyDecoderWrong: true,
+    },
+    {
+      id: 'reality',
+      labelEn: 'Israel reality / gov.il',
+      shopliEn: '18% (since 2025-01-01)',
+      dutyDecoderEn: '18% (they still publish 17%)',
+    },
+    {
+      id: 'paste-url',
+      labelEn: 'Paste Amazon/product URL → IL quote',
+      shopliEn: '/landed (free estimator)',
+      dutyDecoderEn: 'HS / duty calculator (stale VAT)',
+    },
+    {
+      id: 'last-verified',
+      labelEn: 'Last verified',
+      shopliEn: `Skills IL · ${SKILLS_IL_STAMP_DATE}`,
+      dutyDecoderEn: `Still 17% as of ${DUTYDECODER_STALE_17_VERIFIED}`,
+      dutyDecoderWrong: true,
+    },
+  ];
+}
+
+/**
+ * English headline for the DutyDecoder foil — stale 17% vs real 18%.
+ * Keeps #24 "Israel VAT is 18% not 17%." as a sibling string.
+ */
+export function dutyDecoderStale17HeadlineEn(): string {
+  return (
+    `DutyDecoder still wrong: "17% VAT" on dutydecoder.com/israel ` +
+    `(reality 18%) · verified ${DUTYDECODER_STALE_17_VERIFIED}`
+  );
+}
+
+/** Short Hebrew intro above the DutyDecoder side-by-side panel. */
+export function dutyDecoderSideBySideIntroHe(): string {
+  return (
+    `השוואה ליריב (DutyDecoder /israel): עדיין מציגים "17% VAT" בתג ובגוף/FAQ ` +
+    `בעוד שבמציאות / gov.il המע״ם הוא 18% — אומת ${DUTYDECODER_STALE_17_VERIFIED}. ` +
+    `שופלי מציגה מע״ם 18% + BoI+0.5%.`
   );
 }

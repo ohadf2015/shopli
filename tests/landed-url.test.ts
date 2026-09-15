@@ -18,6 +18,11 @@ import {
   iwishbagSideBySideRows,
   iwishbagBodyStillWrongHeadlineEn,
   iwishbagSideBySideIntroHe,
+  DUTYDECODER_IL_URL,
+  DUTYDECODER_STALE_17_VERIFIED,
+  dutyDecoderSideBySideRows,
+  dutyDecoderStale17HeadlineEn,
+  dutyDecoderSideBySideIntroHe,
   IWISHBAG_ETSY_IL_URL,
   IWISHBAG_EBAY_IL_URL,
   IWISHBAG_WALMART_IL_URL,
@@ -445,6 +450,82 @@ test('marketplace foil is presentation-only: estimator math unchanged', () => {
   assert.equal(USD_TO_ILS_RATE, 3.6);
   assert.equal(DUTY_FREE_THRESHOLD_USD, 75);
   assert.equal(DUTY_WAIVER_CEILING_USD, 500);
+  const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
+  assert.ok(mid);
+  assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
+});
+
+
+test('DutyDecoder side-by-side foil: still 17% as of Sep 15', () => {
+  assert.equal(DUTYDECODER_IL_URL, 'https://dutydecoder.com/israel');
+  assert.equal(DUTYDECODER_STALE_17_VERIFIED, 'Sep 15');
+
+  const headline = dutyDecoderStale17HeadlineEn();
+  assert.match(headline, /DutyDecoder still wrong/i);
+  assert.match(headline, /"17% VAT"/);
+  assert.match(headline, /reality 18%/);
+  assert.match(headline, /Sep 15/);
+  assert.match(headline, /dutydecoder\.com\/israel/);
+  assert.doesNotMatch(headline, /מע״ם 17%/);
+
+  const intro = dutyDecoderSideBySideIntroHe();
+  assert.match(intro, /DutyDecoder/);
+  assert.match(intro, /"17% VAT"/);
+  assert.match(intro, /18%/);
+  assert.match(intro, /Sep 15/);
+  assert.match(intro, /BoI\+0\.5%/);
+  assert.doesNotMatch(intro, /מע״ם 17%/);
+
+  const rows = dutyDecoderSideBySideRows();
+  assert.ok(rows.length >= 4);
+
+  const badge = rows.find((r) => r.id === 'badge-vat');
+  assert.ok(badge);
+  assert.equal(badge.dutyDecoderWrong, true);
+  assert.match(badge.shopliEn, /18%/);
+  assert.match(badge.dutyDecoderEn, /17%/);
+  assert.match(badge.dutyDecoderEn, /still wrong/i);
+
+  const body = rows.find((r) => r.id === 'body-vat');
+  assert.ok(body);
+  assert.equal(body.dutyDecoderWrong, true);
+  assert.match(body.shopliEn, /18%/);
+  assert.match(body.dutyDecoderEn, /17%/);
+
+  const reality = rows.find((r) => r.id === 'reality');
+  assert.ok(reality);
+  assert.match(reality.shopliEn, /18%/);
+  assert.match(reality.dutyDecoderEn, /18%/);
+
+  const paste = rows.find((r) => r.id === 'paste-url');
+  assert.ok(paste);
+  assert.match(paste.shopliEn, /\/landed/);
+
+  const verified = rows.find((r) => r.id === 'last-verified');
+  assert.ok(verified);
+  assert.equal(verified.dutyDecoderWrong, true);
+  assert.match(verified.dutyDecoderEn, /Sep 15/);
+  assert.match(verified.dutyDecoderEn, /17%/);
+});
+
+test('DutyDecoder foil is presentation-only: #18–#36 math + prior foils intact', () => {
+  assert.equal(IL_VAT_RATE, 0.18);
+  assert.equal(BOI_CUSTOMS_FX_UPLIFT, 0.005);
+  assert.equal(USD_TO_ILS_RATE, 3.6);
+  assert.equal(DUTY_FREE_THRESHOLD_USD, 75);
+  assert.equal(DUTY_WAIVER_CEILING_USD, 500);
+  assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
+  assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+
+  const strip = vatFxHonestyStripHe();
+  assert.match(strip, /מע״ם 18%/);
+  assert.match(strip, /לא 17%/);
+
+  assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
+  assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
+  assert.equal(IWISHBAG_BODY_STILL_WRONG_VERIFIED, 'Sep 7 night');
+
   const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
   assert.ok(mid);
   assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
