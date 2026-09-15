@@ -40,6 +40,11 @@ import {
   dutyDecoderSideBySideRows,
   dutyDecoderStale17HeadlineEn,
   dutyDecoderSideBySideIntroHe,
+  GATEWAYLINES_TARIFF_URL,
+  GATEWAYLINES_STALE_17_VERIFIED,
+  gatewayLinesSideBySideRows,
+  gatewayLinesStale17HeadlineEn,
+  gatewayLinesSideBySideIntroHe,
   MARKETPLACE_HOW_TOS,
   SKILLS_IL_CUSTOMS,
   SKILLS_IL_SHEKEL,
@@ -73,11 +78,12 @@ function emptyKitPrices(n = KIT_MAX): string[] {
  * bands after #21; Skills IL customs v1.4.0 + shekel v2.2.0 Sep 7 stamp;
  * explicit "Israel VAT is 18% not 17%" foil vs iWishBag Apr 29 body bug (#24);
  * side-by-side iWishBag 「17% body still wrong」 foil (verified Sep 7 night);
- * DutyDecoder /israel stale 17% foil (moat 2026-09-15 #6, verified Sep 15);
+ * DutyDecoder /israel stale 17% foil (#38, verified Sep 15);
+ * Gateway Lines tariff 「מע״מ(17%)」 foil (moat 2026-09-15 10:25 #2);
  * ITA Shaar Olami calculator foil (#23) kept. Presentation only.
  * Marketplace Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Flipkart/
  * Amazon US/Amazon India→IL how-tos reuse iWishBag foil (#26–#36).
- * Estimator math unchanged (#18–#36). Keep #19–#36; Skills IL Sep 7 still
+ * Estimator math unchanged (#18–#38). Keep #19–#38; Skills IL Sep 7 still
  * v1.4.0 + BoI+0.5% (context only).
  */
 export default function LandedPage() {
@@ -219,6 +225,9 @@ export default function LandedPage() {
   const dutyDecoderRows = dutyDecoderSideBySideRows();
   const dutyDecoderHeadline = dutyDecoderStale17HeadlineEn();
   const dutyDecoderIntro = dutyDecoderSideBySideIntroHe();
+  const gatewayLinesRows = gatewayLinesSideBySideRows();
+  const gatewayLinesHeadline = gatewayLinesStale17HeadlineEn();
+  const gatewayLinesIntro = gatewayLinesSideBySideIntroHe();
   const tipCopy = kitTippingCopyHe();
   const itaFoil = itaShaarOlamiFoilStripHe();
   const itaLinkLabel = itaShaarOlamiLinkLabelHe();
@@ -256,6 +265,8 @@ export default function LandedPage() {
         data-iwishbag-body-still-wrong={IWISHBAG_BODY_STILL_WRONG_VERIFIED}
         data-dutydecoder-side-by-side-foil="1"
         data-dutydecoder-stale-17={DUTYDECODER_STALE_17_VERIFIED}
+        data-gatewaylines-side-by-side-foil="1"
+        data-gatewaylines-stale-17={GATEWAYLINES_STALE_17_VERIFIED}
         data-duty-bands="ptur-vat-waiver"
         data-ita-shaar-olami-foil="1"
         data-landed-mode={mode}
@@ -529,6 +540,109 @@ export default function LandedPage() {
               data-vat-foil-en="18-not-17"
             >
               {vatFoilEn} Foil dutydecoder.com/israel stale 17%. Keep #19 / #23–#25 / #36.
+            </p>
+          </aside>
+
+          {/* Side-by-side Gateway Lines honesty foil — מע״מ(17%) vs real 18% (Sep 15) */}
+          <aside
+            className="rounded-xl border p-3 sm:p-4 mb-6"
+            style={{
+              borderColor: 'rgba(220,38,38,0.28)',
+              background: 'rgba(254,242,242,0.65)',
+            }}
+            data-gatewaylines-side-by-side-foil="1"
+            data-gatewaylines-url={GATEWAYLINES_TARIFF_URL}
+            data-gatewaylines-stale-17={GATEWAYLINES_STALE_17_VERIFIED}
+            data-vat-honesty-foil="18-not-17"
+          >
+            <div
+              className="flex items-start gap-2 text-sm font-bold mb-1"
+              style={{ color: 'var(--shopli-navy)' }}
+            >
+              <Icon name="shield" size={16} className="shrink-0 mt-0.5" />
+              <span>Side-by-side · Gateway Lines 「מע״מ(17%)」</span>
+            </div>
+            <p
+              className="text-xs font-bold mb-2"
+              style={{ color: '#b91c1c' }}
+              dir="ltr"
+              data-gatewaylines-headline="stale-17"
+            >
+              {gatewayLinesHeadline}
+            </p>
+            <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {gatewayLinesIntro}{' '}
+              <a
+                href={GATEWAYLINES_TARIFF_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline-offset-2 hover:underline"
+                style={{ color: 'var(--shopli-orange)' }}
+                data-gatewaylines-foil-link="1"
+              >
+                tariff.gatewaylines.co.il
+                <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+              </a>
+            </p>
+            <div className="overflow-x-auto" dir="ltr">
+              <table
+                className="w-full text-left text-xs border-collapse"
+                data-gatewaylines-side-by-side-table="1"
+              >
+                <thead>
+                  <tr style={{ color: 'var(--shopli-navy)' }}>
+                    <th className="py-1.5 pe-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Claim
+                    </th>
+                    <th className="py-1.5 px-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Shopli /landed
+                    </th>
+                    <th className="py-1.5 ps-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Gateway Lines
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {gatewayLinesRows.map((row) => (
+                    <tr
+                      key={row.id}
+                      data-gatewaylines-row={row.id}
+                      {...(row.gatewayLinesWrong ? { 'data-gatewaylines-wrong': '1' } : {})}
+                    >
+                      <td
+                        className="py-1.5 pe-2 align-top font-semibold"
+                        style={{ color: 'var(--shopli-navy)' }}
+                      >
+                        {row.labelEn}
+                      </td>
+                      <td
+                        className="py-1.5 px-2 align-top"
+                        style={{ color: 'var(--shopli-warm-gray)' }}
+                        data-shopli-cell={row.id}
+                      >
+                        {row.shopliEn}
+                      </td>
+                      <td
+                        className="py-1.5 ps-2 align-top font-semibold"
+                        style={{
+                          color: row.gatewayLinesWrong ? '#b91c1c' : 'var(--shopli-warm-gray)',
+                        }}
+                        data-gatewaylines-cell={row.id}
+                      >
+                        {row.gatewayLinesEn}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p
+              className="text-[11px] mt-2 font-semibold"
+              dir="ltr"
+              style={{ color: 'var(--shopli-navy)' }}
+              data-vat-foil-en="18-not-17"
+            >
+              {vatFoilEn} Foil tariff.gatewaylines.co.il 「מע״מ(17%)」. Keep #19 / #23–#25 / #36 / #38.
             </p>
           </aside>
 
