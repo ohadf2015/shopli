@@ -9,12 +9,11 @@
  * Amazon JP→IL how-tos. #28: compare above-fold (kept). #29: Shein + Temu→IL
  * how-tos (kept). #30: Flipkart→IL (kept). #34: Amazon US→IL (kept).
  * #36: Amazon India→IL how-to (kept). #38: DutyDecoder /israel stale 17%
- * foil (kept). Moat 2026-09-15 10:25 #2: Gateway Lines tariff calculator
- * tariff.gatewaylines.co.il still labels 「מע״מ(17%)」 + methodology
- * 「מע״מ 17% על הערך הכולל」 vs real 18% — side-by-side foil on /landed.
- * Presentation only; estimator math unchanged. iWishBag lanes already
- * covered (#25–#36); this is Gateway Lines specifically.
- * Keep #19–#38; Skills IL Sep 7 still v1.4.0 + BoI+0.5% (context only).
+ * foil (kept). #39: Gateway Lines tariff 「מע״מ(17%)」 foil (kept).
+ * Noon moat 2026-09-15 #2: durable VAT-truth moat — Tax Authority 18% cite
+ * + last-checked stamp + live 「competitors still 17%」 proof row
+ * (Gateway Lines still wrong post-#39). Presentation only; estimator math
+ * unchanged. Keep #19–#39; Skills IL Sep 7 still v1.4.0 + BoI+0.5% (context only).
  */
 
 import {
@@ -706,5 +705,97 @@ export function gatewayLinesSideBySideIntroHe(): string {
     `השוואה ליריב (Gateway Lines מחשבון תעריף): עדיין מציגים "מע״מ(17%)" בפירוט ` +
     `ו־"מע״מ 17% על הערך הכולל" במתודולוגיה בעוד שבמציאות / gov.il המע״ם הוא 18% — ` +
     `אומת ${GATEWAYLINES_STALE_17_VERIFIED}. שופלי מציגה מע״ם 18% + BoI+0.5%.`
+  );
+}
+
+/**
+ * Official Israel Tax Authority (רשות המיסים) VAT topic on gov.il —
+ * durable cite that standard VAT is 18% (since 2025-01-01). Presentation
+ * only; does not change estimator / kit / band math (#18–#39).
+ */
+export const TAX_AUTHORITY_VAT_CITE_URL =
+  'https://www.gov.il/he/departments/topics/vat/govil-landing-page';
+
+/** Standard VAT rate percent per Tax Authority / law (raised 2025-01-01). */
+export const TAX_AUTHORITY_VAT_RATE_PCT = 18;
+
+/**
+ * Durable VAT-truth last-checked stamp (noon moat 2026-09-15 #2, after #39
+ * Gateway Lines foil). Live re-check: rivals still publish 17%.
+ */
+export const VAT_TRUTH_LAST_CHECKED = '2026-09-15 noon';
+
+export interface VatTruthCompetitorProofRow {
+  id: string;
+  competitorEn: string;
+  /** Live stale claim (still 17%). */
+  claimEn: string;
+  liveUrl: string;
+  /** When true, competitor cell is the honesty callout. */
+  stillWrong: boolean;
+}
+
+/**
+ * Live 「competitors still 17%」 proof rows for the durable VAT-truth moat.
+ * Gateway Lines re-checked post-#39 still wrong; DutyDecoder + iWishBag
+ * kept. Does not change estimator math.
+ */
+export function vatTruthCompetitorsStill17ProofRows(): VatTruthCompetitorProofRow[] {
+  return [
+    {
+      id: 'gatewaylines',
+      competitorEn: 'Gateway Lines tariff calculator',
+      claimEn: 'מע״מ(17%) — still wrong post-#39',
+      liveUrl: GATEWAYLINES_TARIFF_URL,
+      stillWrong: true,
+    },
+    {
+      id: 'dutydecoder',
+      competitorEn: 'DutyDecoder /israel',
+      claimEn: '17% VAT — still wrong',
+      liveUrl: DUTYDECODER_IL_URL,
+      stillWrong: true,
+    },
+    {
+      id: 'iwishbag',
+      competitorEn: 'iWishBag Amazon→IL body',
+      claimEn: '17% VAT body — still wrong',
+      liveUrl: IWISHBAG_AMAZON_IL_URL,
+      stillWrong: true,
+    },
+  ];
+}
+
+/** English Tax Authority 18% cite line for /landed VAT-truth panel. */
+export function taxAuthorityVat18CiteEn(): string {
+  return (
+    `Tax Authority (רשות המיסים) cite: standard VAT is ${TAX_AUTHORITY_VAT_RATE_PCT}% ` +
+    `since 2025-01-01.`
+  );
+}
+
+/** English last-checked stamp for the durable VAT-truth moat. */
+export function vatTruthLastCheckedStampEn(): string {
+  return `Last checked: ${VAT_TRUTH_LAST_CHECKED}`;
+}
+
+/**
+ * English headline for the durable VAT-truth moat — Tax Authority 18% cite
+ * + competitors still 17% (Gateway Lines still wrong post-#39).
+ */
+export function vatTruthHeadlineEn(): string {
+  return (
+    `VAT truth: Tax Authority ${TAX_AUTHORITY_VAT_RATE_PCT}% cite · ` +
+    `competitors still 17% (Gateway Lines still wrong post-#39) · ` +
+    `last checked ${VAT_TRUTH_LAST_CHECKED}`
+  );
+}
+
+/** Short Hebrew intro above the VAT-truth proof panel. */
+export function vatTruthIntroHe(): string {
+  return (
+    `אמת מע״ם: רשות המיסים / gov.il — ${TAX_AUTHORITY_VAT_RATE_PCT}% מאז 2025-01-01. ` +
+    `יריבים עדיין מפרסמים 17% (Gateway Lines עדיין שגוי אחרי #39). ` +
+    `נבדק לאחרונה ${VAT_TRUTH_LAST_CHECKED}. שופלי: מע״ם 18% + BoI+0.5%.`
   );
 }
