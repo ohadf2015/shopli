@@ -66,6 +66,17 @@ import {
   iwishbagAliexpressWalmartEbaySelfContradictionRows,
   iwishbagAliexpressWalmartEbaySelfContradictionHeadlineEn,
   iwishbagAliexpressWalmartEbaySelfContradictionIntroHe,
+  PTUR_THRESHOLD_CHURN_LAST_CHECKED,
+  PTUR_OFFICIAL_USD,
+  PTUR_CHURN_130_USD,
+  SKILLS_IL_CUSTOMS_CALC_URL,
+  OPENACCOUNTANTS_IL_CUSTOMS_URL,
+  GOV_IL_PERSONAL_IMPORT_CALC_URL,
+  pturThresholdChurnRows,
+  pturThresholdChurnHeadlineEn,
+  pturThresholdChurnLastCheckedStampEn,
+  pturOfficial75CiteEn,
+  pturThresholdChurnIntroHe,
   MARKETPLACE_HOW_TOS,
   SKILLS_IL_CUSTOMS,
   SKILLS_IL_SHEKEL,
@@ -106,13 +117,15 @@ function emptyKitPrices(n = KIT_MAX): string[] {
  * iWishBag Flipkart+Etsy→IL body 「17% VAT」 vs own table 18% self-contradiction
  * strip (#41, kept; moat 2026-09-15 14:15 #3; Last updated 2026-04-29 still live);
  * iWishBag AliExpress+Walmart+eBay→IL body 「17% VAT」 vs own table 18%
- * self-contradiction strip (moat 2026-09-15 16:35 #2; Last updated 2026-04-29
- * still live) — distinct from Flipkart+Etsy #41 / Tax Authority #40 / Gateway #39 /
- * Amazon US/India;
+ * self-contradiction strip (#42, kept; moat 2026-09-15 16:35 #2);
+ * personal-import threshold-churn honesty strip — official $75 ptur +
+ * documented 2026 $75↔$130 flip-flops (Skills IL / OpenAccountants) +
+ * last-checked stamp (moat 2026-09-21 16:30 #7); 「17% body still wrong」
+ * secondary cite only — do not redo #41/#42 as primary;
  * ITA Shaar Olami calculator foil (#23) kept. Presentation only.
  * Marketplace Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Flipkart/
  * Amazon US/Amazon India→IL how-tos reuse iWishBag foil (#26–#36).
- * Estimator math unchanged (#18–#41). Keep #19–#41; Skills IL Sep 7 still
+ * Estimator math unchanged (#18–#42). Keep #19–#42; Skills IL Sep 7 still
  * v1.4.0 + BoI+0.5% (context only).
  */
 export default function LandedPage() {
@@ -268,6 +281,11 @@ export default function LandedPage() {
   const aliexpressWalmartEbayRows = iwishbagAliexpressWalmartEbaySelfContradictionRows();
   const aliexpressWalmartEbayHeadline = iwishbagAliexpressWalmartEbaySelfContradictionHeadlineEn();
   const aliexpressWalmartEbayIntro = iwishbagAliexpressWalmartEbaySelfContradictionIntroHe();
+  const pturChurnRows = pturThresholdChurnRows();
+  const pturChurnHeadline = pturThresholdChurnHeadlineEn();
+  const pturChurnIntro = pturThresholdChurnIntroHe();
+  const pturOfficialCite = pturOfficial75CiteEn();
+  const pturChurnStamp = pturThresholdChurnLastCheckedStampEn();
   const tipCopy = kitTippingCopyHe();
   const itaFoil = itaShaarOlamiFoilStripHe();
   const itaLinkLabel = itaShaarOlamiLinkLabelHe();
@@ -314,6 +332,9 @@ export default function LandedPage() {
         data-iwishbag-flipkart-etsy-verified={IWISHBAG_FLIPKART_ETSY_SELF_CONTRADICTION_VERIFIED}
         data-iwishbag-aliexpress-walmart-ebay-self-contradiction="1"
         data-iwishbag-aliexpress-walmart-ebay-verified={IWISHBAG_ALIEXPRESS_WALMART_EBAY_SELF_CONTRADICTION_VERIFIED}
+        data-ptur-threshold-churn="1"
+        data-ptur-official-usd={String(PTUR_OFFICIAL_USD)}
+        data-ptur-threshold-churn-last-checked={PTUR_THRESHOLD_CHURN_LAST_CHECKED}
         data-duty-bands="ptur-vat-waiver"
         data-ita-shaar-olami-foil="1"
         data-landed-mode={mode}
@@ -1097,6 +1118,171 @@ export default function LandedPage() {
             >
               {vatFoilEn} AliExpress+Walmart+eBay body 「17% VAT」 vs own table 18% · Last updated{' '}
               {IWISHBAG_PAGE_LAST_UPDATED} still live. Distinct from #41 / #40 / #39. Keep #19 / #23–#41.
+            </p>
+          </aside>
+
+          {/* Personal-import threshold-churn honesty strip — official $75 + $75↔$130 flip-flops (moat 2026-09-21 16:30 #7) */}
+          <aside
+            className="rounded-xl border p-3 sm:p-4 mb-6"
+            style={{
+              borderColor: 'rgba(22,163,74,0.35)',
+              background: 'rgba(240,253,244,0.75)',
+            }}
+            data-ptur-threshold-churn="1"
+            data-ptur-official-usd={String(PTUR_OFFICIAL_USD)}
+            data-ptur-churn-130-usd={String(PTUR_CHURN_130_USD)}
+            data-ptur-threshold-churn-last-checked={PTUR_THRESHOLD_CHURN_LAST_CHECKED}
+            data-skills-il-customs-calc-url={SKILLS_IL_CUSTOMS_CALC_URL}
+            data-openaccountants-il-customs-url={OPENACCOUNTANTS_IL_CUSTOMS_URL}
+            data-gov-il-personal-import-calc-url={GOV_IL_PERSONAL_IMPORT_CALC_URL}
+            data-body-still-17-secondary="1"
+          >
+            <div
+              className="flex items-start gap-2 text-sm font-bold mb-1"
+              style={{ color: 'var(--shopli-navy)' }}
+            >
+              <Icon name="shield" size={16} className="shrink-0 mt-0.5" />
+              <span>Threshold churn · official ${PTUR_OFFICIAL_USD} ptur</span>
+            </div>
+            <p
+              className="text-xs font-bold mb-2"
+              style={{ color: 'var(--shopli-navy)' }}
+              dir="ltr"
+              data-ptur-threshold-churn-headline="1"
+            >
+              {pturChurnHeadline}
+            </p>
+            <p className="text-xs leading-relaxed mb-2" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {pturChurnIntro}
+            </p>
+            <p
+              className="text-xs font-semibold mb-1"
+              dir="ltr"
+              style={{ color: 'var(--shopli-navy)' }}
+              data-ptur-official-cite="1"
+            >
+              {pturOfficialCite}{' '}
+              <a
+                href={GOV_IL_PERSONAL_IMPORT_CALC_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline-offset-2 hover:underline"
+                style={{ color: 'var(--shopli-orange)' }}
+                data-gov-il-ptur-cite-link="1"
+              >
+                gov.il · personal import calc
+                <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+              </a>
+            </p>
+            <p
+              className="text-[11px] font-semibold mb-3"
+              dir="ltr"
+              style={{ color: 'var(--shopli-warm-gray)' }}
+              data-ptur-threshold-churn-last-checked-stamp="1"
+            >
+              {pturChurnStamp}
+            </p>
+            <div className="overflow-x-auto" dir="ltr">
+              <table
+                className="w-full text-left text-xs border-collapse"
+                data-ptur-threshold-churn-table="1"
+              >
+                <thead>
+                  <tr style={{ color: 'var(--shopli-navy)' }}>
+                    <th className="py-1.5 pe-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Fact
+                    </th>
+                    <th className="py-1.5 px-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Detail
+                    </th>
+                    <th className="py-1.5 ps-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Source
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pturChurnRows.map((row) => (
+                    <tr
+                      key={row.id}
+                      data-ptur-threshold-churn-row={row.id}
+                      {...(row.churnCallout ? { 'data-ptur-churn-callout': '1' } : {})}
+                      {...(row.id === 'body-still-17-secondary'
+                        ? { 'data-body-still-17-secondary': '1' }
+                        : {})}
+                    >
+                      <td
+                        className="py-1.5 pe-2 align-top font-semibold"
+                        style={{ color: 'var(--shopli-navy)' }}
+                      >
+                        {row.labelEn}
+                      </td>
+                      <td
+                        className="py-1.5 px-2 align-top font-semibold"
+                        style={{
+                          color: row.churnCallout ? '#b91c1c' : 'var(--shopli-warm-gray)',
+                        }}
+                        data-ptur-churn-detail={row.id}
+                      >
+                        {row.detailEn}
+                      </td>
+                      <td className="py-1.5 ps-2 align-top">
+                        {row.liveUrl ? (
+                          <a
+                            href={row.liveUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-semibold underline-offset-2 hover:underline"
+                            style={{ color: 'var(--shopli-orange)' }}
+                            data-ptur-churn-proof-link={row.id}
+                          >
+                            live
+                            <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+                          </a>
+                        ) : (
+                          <span style={{ color: 'var(--shopli-warm-gray)' }}>—</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-[11px] mt-2" dir="ltr" style={{ color: 'var(--shopli-warm-gray)' }}>
+              Documented churn:{' '}
+              <a
+                href={SKILLS_IL_CUSTOMS_CALC_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline-offset-2 hover:underline"
+                style={{ color: 'var(--shopli-orange)' }}
+                data-skills-il-churn-link="1"
+              >
+                Skills IL
+                <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+              </a>
+              {' · '}
+              <a
+                href={OPENACCOUNTANTS_IL_CUSTOMS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline-offset-2 hover:underline"
+                style={{ color: 'var(--shopli-orange)' }}
+                data-openaccountants-churn-link="1"
+              >
+                OpenAccountants
+                <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+              </a>
+              . Body-still-17% (#24/#41/#42) secondary only.
+            </p>
+            <p
+              className="text-[11px] mt-1 font-semibold"
+              dir="ltr"
+              style={{ color: 'var(--shopli-navy)' }}
+              data-vat-foil-en="18-not-17"
+            >
+              {vatFoilEn} Official ${PTUR_OFFICIAL_USD} ptur · ${PTUR_OFFICIAL_USD}↔$
+              {PTUR_CHURN_130_USD} churn documented · last checked{' '}
+              {PTUR_THRESHOLD_CHURN_LAST_CHECKED}. Distinct from #42 / #41 / #40. Keep #19 / #23–#42.
             </p>
           </aside>
 

@@ -47,6 +47,17 @@ import {
   iwishbagAliexpressWalmartEbaySelfContradictionRows,
   iwishbagAliexpressWalmartEbaySelfContradictionHeadlineEn,
   iwishbagAliexpressWalmartEbaySelfContradictionIntroHe,
+  PTUR_THRESHOLD_CHURN_LAST_CHECKED,
+  PTUR_OFFICIAL_USD,
+  PTUR_CHURN_130_USD,
+  SKILLS_IL_CUSTOMS_CALC_URL,
+  OPENACCOUNTANTS_IL_CUSTOMS_URL,
+  GOV_IL_PERSONAL_IMPORT_CALC_URL,
+  pturThresholdChurnRows,
+  pturThresholdChurnHeadlineEn,
+  pturThresholdChurnLastCheckedStampEn,
+  pturOfficial75CiteEn,
+  pturThresholdChurnIntroHe,
   IWISHBAG_ETSY_IL_URL,
   IWISHBAG_EBAY_IL_URL,
   IWISHBAG_WALMART_IL_URL,
@@ -899,6 +910,109 @@ test('AliExpress+Walmart+eBay self-contradiction foil is presentation-only: #18�
   assert.equal(IWISHBAG_FLIPKART_ETSY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 14:15');
   assert.equal(IWISHBAG_ALIEXPRESS_WALMART_EBAY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 16:35');
   assert.equal(IWISHBAG_PAGE_LAST_UPDATED, '2026-04-29');
+
+  const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
+  assert.ok(mid);
+  assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
+});
+
+
+test('ptur threshold-churn honesty strip: official $75 + $75↔$130 flip-flops + last-checked', () => {
+  assert.equal(PTUR_OFFICIAL_USD, 75);
+  assert.equal(PTUR_OFFICIAL_USD, DUTY_FREE_THRESHOLD_USD);
+  assert.equal(PTUR_CHURN_130_USD, 130);
+  assert.equal(PTUR_THRESHOLD_CHURN_LAST_CHECKED, '2026-09-21 16:30');
+  assert.match(SKILLS_IL_CUSTOMS_CALC_URL, /agentskills\.co\.il/);
+  assert.match(SKILLS_IL_CUSTOMS_CALC_URL, /israeli-customs-duty-calculator/);
+  assert.match(OPENACCOUNTANTS_IL_CUSTOMS_URL, /openaccountants\.com\/skills\/il-customs-duty/);
+  assert.match(GOV_IL_PERSONAL_IMPORT_CALC_URL, /gov\.il/);
+  assert.match(GOV_IL_PERSONAL_IMPORT_CALC_URL, /customs-tax-calculation-import-by-israelis/);
+
+  const cite = pturOfficial75CiteEn();
+  assert.match(cite, /Official personal-import ptur/);
+  assert.match(cite, /\$75/);
+  assert.match(cite, /goods value alone/i);
+
+  const stamp = pturThresholdChurnLastCheckedStampEn();
+  assert.match(stamp, /Last checked/);
+  assert.match(stamp, /2026-09-21 16:30/);
+
+  const headline = pturThresholdChurnHeadlineEn();
+  assert.match(headline, /threshold churn/i);
+  assert.match(headline, /\$75/);
+  assert.match(headline, /\$130/);
+  assert.match(headline, /Skills IL/);
+  assert.match(headline, /OpenAccountants/);
+  assert.match(headline, /2026-09-21 16:30/);
+
+  const intro = pturThresholdChurnIntroHe();
+  assert.match(intro, /\$75/);
+  assert.match(intro, /\$130/);
+  assert.match(intro, /Skills IL/);
+  assert.match(intro, /OpenAccountants/);
+  assert.match(intro, /2026-09-21 16:30/);
+
+  const rows = pturThresholdChurnRows();
+  assert.ok(rows.length >= 6);
+
+  const official = rows.find((r) => r.id === 'official-ptur');
+  assert.ok(official);
+  assert.match(official.detailEn, /\$75/);
+  assert.notEqual(official.churnCallout, true);
+
+  const skills = rows.find((r) => r.id === 'skills-il-churn');
+  assert.ok(skills);
+  assert.equal(skills.churnCallout, true);
+  assert.equal(skills.liveUrl, SKILLS_IL_CUSTOMS_CALC_URL);
+  assert.match(skills.detailEn, /\$130/);
+  assert.match(skills.detailEn, /1 Jun 2026/i);
+
+  const oa = rows.find((r) => r.id === 'openaccountants-churn');
+  assert.ok(oa);
+  assert.equal(oa.churnCallout, true);
+  assert.equal(oa.liveUrl, OPENACCOUNTANTS_IL_CUSTOMS_URL);
+  assert.match(oa.detailEn, /\$150/);
+  assert.match(oa.detailEn, /24 Feb 2026/);
+
+  const secondary = rows.find((r) => r.id === 'body-still-17-secondary');
+  assert.ok(secondary);
+  assert.match(secondary.detailEn, /secondary/i);
+  assert.match(secondary.detailEn, /17% body still wrong/);
+  assert.match(secondary.detailEn, /#41/);
+  assert.match(secondary.detailEn, /#42/);
+  assert.notEqual(secondary.churnCallout, true);
+
+  const last = rows.find((r) => r.id === 'last-checked');
+  assert.ok(last);
+  assert.equal(last.churnCallout, true);
+  assert.equal(last.detailEn, PTUR_THRESHOLD_CHURN_LAST_CHECKED);
+  assert.equal(last.liveUrl, GOV_IL_PERSONAL_IMPORT_CALC_URL);
+});
+
+test('ptur threshold-churn foil is presentation-only: #18–#42 math + prior foils intact', () => {
+  assert.equal(IL_VAT_RATE, 0.18);
+  assert.equal(BOI_CUSTOMS_FX_UPLIFT, 0.005);
+  assert.equal(USD_TO_ILS_RATE, 3.6);
+  assert.equal(DUTY_FREE_THRESHOLD_USD, 75);
+  assert.equal(DUTY_WAIVER_CEILING_USD, 500);
+  assert.equal(PTUR_OFFICIAL_USD, 75);
+  assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
+  assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+
+  assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
+  assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
+  assert.equal(IWISHBAG_BODY_STILL_WRONG_VERIFIED, 'Sep 7 night');
+  assert.equal(DUTYDECODER_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_VAT_LABEL_QUOTE, 'מע״מ(17%)');
+  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-15 noon');
+  assert.equal(TAX_AUTHORITY_VAT_RATE_PCT, 18);
+  assert.equal(IWISHBAG_FLIPKART_ETSY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 14:15');
+  assert.equal(IWISHBAG_ALIEXPRESS_WALMART_EBAY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 16:35');
+  assert.equal(IWISHBAG_PAGE_LAST_UPDATED, '2026-04-29');
+  assert.equal(PTUR_THRESHOLD_CHURN_LAST_CHECKED, '2026-09-21 16:30');
+  assert.equal(PTUR_CHURN_130_USD, 130);
 
   const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
   assert.ok(mid);

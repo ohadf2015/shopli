@@ -19,7 +19,11 @@
  * AliExpress+Walmart+eBay→IL body 「17% VAT」 vs own duties table Standard
  * VAT/GST 18% self-contradiction strip on /landed (Last updated 2026-04-29
  * still live). Distinct from Flipkart+Etsy #41 / Tax Authority #40 / Gateway #39 /
- * Amazon US/India. Presentation only; estimator math unchanged. Keep #19–#41;
+ * Amazon US/India (kept as #42). Moat 2026-09-21 16:30 #7: personal-import
+ * threshold-churn honesty strip — official $75 ptur + documented 2026
+ * $75↔$130 flip-flops (Skills IL / OpenAccountants) + last-checked stamp.
+ * 「17% body still wrong」 is secondary cite only — do not redo #41/#42 as primary.
+ * Presentation only; estimator math unchanged. Keep #19–#42;
  * Skills IL Sep 7 still v1.4.0 + BoI+0.5% (context only).
  */
 
@@ -1015,5 +1019,129 @@ export function iwishbagAliexpressWalmartEbaySelfContradictionIntroHe(): string 
     `"17% VAT" בעוד שטבלת המכסים באותו עמוד מציינת Standard VAT/GST 18% — ` +
     `עדכון אחרון אצלם ${IWISHBAG_PAGE_LAST_UPDATED} עדיין חי. ` +
     `אומת ${IWISHBAG_ALIEXPRESS_WALMART_EBAY_SELF_CONTRADICTION_VERIFIED}. שופלי: מע״ם 18% + BoI+0.5%.`
+  );
+}
+
+
+/**
+ * Moat 2026-09-21 16:30 #7: personal-import threshold-churn honesty strip.
+ * Official ptur is USD $75 (goods-only). Skills IL + OpenAccountants document
+ * the 2026 $75↔$130 flip-flops (Skills IL: four moves in seven months — Dec 2025
+ * $75→$150, Knesset revoke 24 Feb 2026 →$75, next-day order →$130, window ran
+ * to 1 Jun 2026 →$75 again; OpenAccountants: Smotrich $150 Nov 2025, Knesset
+ * revoke 24 Feb 2026 →$75, verify-before-use). Presentation only — estimator
+ * still uses {@link DUTY_FREE_THRESHOLD_USD} = 75. Do NOT redo Flipkart+Etsy #41 /
+ * AliExpress+Walmart+eBay #42 as primary; 「17% body still wrong」 is a secondary
+ * cite only.
+ */
+export const PTUR_THRESHOLD_CHURN_LAST_CHECKED = '2026-09-21 16:30';
+
+/** Official personal-import full-exemption threshold (USD) — current law / estimator. */
+export const PTUR_OFFICIAL_USD = DUTY_FREE_THRESHOLD_USD;
+
+/** Documented temporary $130 window (Skills IL: expired 1 June 2026). */
+export const PTUR_CHURN_130_USD = 130;
+
+/** Skills IL israeli-customs-duty-calculator (documents $75↔$130 churn). */
+export const SKILLS_IL_CUSTOMS_CALC_URL =
+  'https://agentskills.co.il/en/skills/tax-and-finance/israeli-customs-duty-calculator';
+
+/** OpenAccountants IL Customs Duty skill (documents $150↔$75 + verify-before-use). */
+export const OPENACCOUNTANTS_IL_CUSTOMS_URL =
+  'https://www.openaccountants.com/skills/il-customs-duty';
+
+/** Official gov.il personal-import tax calculator (verify live threshold). */
+export const GOV_IL_PERSONAL_IMPORT_CALC_URL =
+  'https://www.gov.il/en/service/customs-tax-calculation-import-by-israelis';
+
+export interface PturThresholdChurnRow {
+  id: string;
+  labelEn: string;
+  detailEn: string;
+  /** Optional live proof URL. */
+  liveUrl?: string;
+  /** When true, row is a churn / verify callout. */
+  churnCallout?: boolean;
+}
+
+/**
+ * Honesty rows for the personal-import threshold-churn strip: official $75
+ * ptur + documented 2026 $75↔$130 flip-flops (Skills IL / OpenAccountants) +
+ * last-checked stamp. Secondary: body-still-17% cite only (not Flipkart/Etsy
+ * #41 or AliExpress/Walmart/eBay #42 as primary).
+ */
+export function pturThresholdChurnRows(): PturThresholdChurnRow[] {
+  return [
+    {
+      id: 'official-ptur',
+      labelEn: 'Official ptur (current)',
+      detailEn: `USD $${PTUR_OFFICIAL_USD} goods-only · Shopli estimator + gov.il`,
+    },
+    {
+      id: 'skills-il-churn',
+      labelEn: 'Skills IL documented churn',
+      detailEn:
+        `$75→$150 (Dec 2025) →$75 (Knesset 24 Feb 2026) →$130 (next-day order) →$75 (window ended 1 Jun 2026)`,
+      liveUrl: SKILLS_IL_CUSTOMS_CALC_URL,
+      churnCallout: true,
+    },
+    {
+      id: 'openaccountants-churn',
+      labelEn: 'OpenAccountants documented churn',
+      detailEn:
+        `Smotrich $150 (Nov 2025) revoked 24 Feb 2026 →$75 · "verify before use" (as of May 2026)`,
+      liveUrl: OPENACCOUNTANTS_IL_CUSTOMS_URL,
+      churnCallout: true,
+    },
+    {
+      id: 'shopli-stance',
+      labelEn: 'Shopli /landed stance',
+      detailEn: `Honest $${PTUR_OFFICIAL_USD} ptur · $${PTUR_OFFICIAL_USD}–$${DUTY_WAIVER_CEILING_USD} VAT-only · last-checked stamp`,
+    },
+    {
+      id: 'body-still-17-secondary',
+      labelEn: 'Secondary cite only',
+      detailEn: `「17% body still wrong」 (#24 / #41 / #42) — secondary; this strip is ptur threshold churn, not VAT body foil`,
+      churnCallout: false,
+    },
+    {
+      id: 'last-checked',
+      labelEn: 'Last checked',
+      detailEn: PTUR_THRESHOLD_CHURN_LAST_CHECKED,
+      liveUrl: GOV_IL_PERSONAL_IMPORT_CALC_URL,
+      churnCallout: true,
+    },
+  ];
+}
+
+/** English headline for the ptur threshold-churn honesty strip. */
+export function pturThresholdChurnHeadlineEn(): string {
+  return (
+    `Personal-import threshold churn: official $${PTUR_OFFICIAL_USD} ptur · ` +
+    `documented 2026 $${PTUR_OFFICIAL_USD}↔$${PTUR_CHURN_130_USD} flip-flops ` +
+    `(Skills IL / OpenAccountants) · last checked ${PTUR_THRESHOLD_CHURN_LAST_CHECKED}`
+  );
+}
+
+/** English last-checked stamp for the ptur threshold-churn moat. */
+export function pturThresholdChurnLastCheckedStampEn(): string {
+  return `Last checked: ${PTUR_THRESHOLD_CHURN_LAST_CHECKED}`;
+}
+
+/** Official $75 ptur cite line. */
+export function pturOfficial75CiteEn(): string {
+  return (
+    `Official personal-import ptur: USD $${PTUR_OFFICIAL_USD} (goods value alone; ` +
+    `shipping excluded from the threshold test).`
+  );
+}
+
+/** Short Hebrew intro above the ptur threshold-churn panel. */
+export function pturThresholdChurnIntroHe(): string {
+  return (
+    `יושרת סף יבוא אישי: הפטור הרשמי $${PTUR_OFFICIAL_USD} (על ערך הסחורה בלבד). ` +
+    `Skills IL ו־OpenAccountants מתעדים את התנודות $${PTUR_OFFICIAL_USD}↔$${PTUR_CHURN_130_USD} ב־2026 ` +
+    `(חלון $130 עד 1 ביוני 2026; חזרה ל-$${PTUR_OFFICIAL_USD}). ` +
+    `נבדק לאחרונה ${PTUR_THRESHOLD_CHURN_LAST_CHECKED}. שופלי: פטור $${PTUR_OFFICIAL_USD} קבוע במחשבון.`
   );
 }
