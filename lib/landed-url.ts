@@ -22,9 +22,13 @@
  * Amazon US/India (kept as #42). Moat 2026-09-21 16:30 #7: personal-import
  * threshold-churn honesty strip — official $75 ptur + documented 2026
  * $75↔$130 flip-flops (Skills IL / OpenAccountants) + last-checked stamp.
- * 「17% body still wrong」 is secondary cite only — do not redo #41/#42 as primary.
- * Presentation only; estimator math unchanged. Keep #19–#42;
- * Skills IL Sep 7 still v1.4.0 + BoI+0.5% (context only).
+ * 「17% body still wrong」 is secondary cite only — do not redo #41/#42 as primary
+ * (kept as #43). Moat 2026-09-21 18:45 #2: iWishBag Target→IL body 「17% VAT」 vs
+ * own duties table Standard VAT/GST 18% self-contradiction strip on /landed
+ * (Last updated 2026-04-29 still live). Distinct from threshold #43 /
+ * AliExpress+Walmart+eBay #42 / Flipkart+Etsy #41 / Tax Authority #40 /
+ * Gateway #39 / Amazon US/India / JP. Presentation only; estimator math
+ * unchanged. Keep #19–#43; Skills IL Sep 7 still v1.4.0 + BoI+0.5% (context only).
  */
 
 import {
@@ -440,6 +444,10 @@ export const IWISHBAG_FLIPKART_IL_URL =
 /** iWishBag Amazon India → Israel guide (same 17% body / 18% table foil as Amazon US). */
 export const IWISHBAG_AMAZONINDIA_IL_URL =
   'https://www.iwishbag.com/how-to-buy-from/amazon-india/israel';
+
+/** iWishBag Target → Israel guide (same 17% body / 18% table self-contradiction). */
+export const IWISHBAG_TARGET_IL_URL =
+  'https://www.iwishbag.com/how-to-buy-from/target/israel';
 
 /**
  * Lean marketplace→IL how-to catalog (Etsy / eBay / Walmart / AliExpress /
@@ -1145,3 +1153,95 @@ export function pturThresholdChurnIntroHe(): string {
     `נבדק לאחרונה ${PTUR_THRESHOLD_CHURN_LAST_CHECKED}. שופלי: פטור $${PTUR_OFFICIAL_USD} קבוע במחשבון.`
   );
 }
+
+/**
+ * Moat 2026-09-21 18:45 #2: iWishBag Target→IL still self-contradict — body
+ * 「17% VAT」 (customs blurb + FAQ citing gov.il) vs own duties table
+ * 「Standard VAT/GST 18%」, Last updated 2026-04-29 still live. Distinct from
+ * threshold-churn #43 / AliExpress+Walmart+eBay #42 / Flipkart+Etsy #41 /
+ * Tax Authority cite #40 / Gateway Lines #39 / Amazon US side-by-side #25 /
+ * Amazon India #36 / JP #27.
+ * Presentation only — does not change estimator / kit / band math (#18–#43).
+ */
+export const IWISHBAG_TARGET_SELF_CONTRADICTION_VERIFIED = '2026-09-21 18:45';
+
+export interface IwishbagTargetSelfContradictionRow {
+  id: string;
+  labelEn: string;
+  shopliEn: string;
+  iwishbagEn: string;
+  /** When true, iWishBag cell is the honesty callout (self-contradiction). */
+  iwishbagWrong?: boolean;
+  /** Optional live proof URL (Target lane). */
+  liveUrl?: string;
+}
+
+/**
+ * Side-by-side honesty rows: Shopli /landed vs iWishBag Target→IL.
+ * Foil: same page claims body 「17% VAT」 and table 「Standard VAT/GST 18%」
+ * while Last updated {@link IWISHBAG_PAGE_LAST_UPDATED} is still live
+ * (verified {@link IWISHBAG_TARGET_SELF_CONTRADICTION_VERIFIED}).
+ * Does not change estimator math. Distinct from #41 / #42 / #43.
+ */
+export function iwishbagTargetSelfContradictionRows(): IwishbagTargetSelfContradictionRow[] {
+  return [
+    {
+      id: 'body-vat',
+      labelEn: 'Body / customs blurb + FAQ',
+      shopliEn: '18% (correct)',
+      iwishbagEn: `${IWISHBAG_BODY_17_VAT_QUOTE} — still wrong`,
+      iwishbagWrong: true,
+    },
+    {
+      id: 'own-table-vat',
+      labelEn: 'Own duties table (same page)',
+      shopliEn: '18%',
+      iwishbagEn: IWISHBAG_OWN_TABLE_18_VAT_QUOTE,
+    },
+    {
+      id: 'self-contradiction',
+      labelEn: 'Self-contradiction',
+      shopliEn: 'None — single 18% story',
+      iwishbagEn: 'Body 17% vs own table 18%',
+      iwishbagWrong: true,
+    },
+    {
+      id: 'target-lane',
+      labelEn: 'Target→IL how-to',
+      shopliEn: 'paste Target URL → /landed',
+      iwishbagEn: 'Body 17% + table 18% · Last updated still Apr 29',
+      iwishbagWrong: true,
+      liveUrl: IWISHBAG_TARGET_IL_URL,
+    },
+    {
+      id: 'last-updated',
+      labelEn: 'Last updated / verified',
+      shopliEn: `Skills IL · ${SKILLS_IL_STAMP_DATE}`,
+      iwishbagEn: `${IWISHBAG_PAGE_LAST_UPDATED} (page) · self-contradiction live as of ${IWISHBAG_TARGET_SELF_CONTRADICTION_VERIFIED}`,
+      iwishbagWrong: true,
+    },
+  ];
+}
+
+/**
+ * English headline for the Target→IL self-contradiction strip —
+ * body 「17% VAT」 vs own table 18% (Last updated 2026-04-29 still live).
+ */
+export function iwishbagTargetSelfContradictionHeadlineEn(): string {
+  return (
+    `iWishBag Target→IL self-contradiction: body 「17% VAT」 vs own ` +
+    `table 「${IWISHBAG_OWN_TABLE_18_VAT_QUOTE}」 · Last updated ${IWISHBAG_PAGE_LAST_UPDATED} ` +
+    `still live · verified ${IWISHBAG_TARGET_SELF_CONTRADICTION_VERIFIED}`
+  );
+}
+
+/** Short Hebrew intro above the Target→IL self-contradiction strip. */
+export function iwishbagTargetSelfContradictionIntroHe(): string {
+  return (
+    `סתירה פנימית אצל iWishBag (Target→IL): בגוף העמוד/מכס/FAQ עדיין ` +
+    `"17% VAT" בעוד שטבלת המכסים באותו עמוד מציינת Standard VAT/GST 18% — ` +
+    `עדכון אחרון אצלם ${IWISHBAG_PAGE_LAST_UPDATED} עדיין חי. ` +
+    `אומת ${IWISHBAG_TARGET_SELF_CONTRADICTION_VERIFIED}. שופלי: מע״ם 18% + BoI+0.5%.`
+  );
+}
+
