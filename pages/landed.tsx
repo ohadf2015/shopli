@@ -66,6 +66,11 @@ import {
   iwishbagAliexpressWalmartEbaySelfContradictionRows,
   iwishbagAliexpressWalmartEbaySelfContradictionHeadlineEn,
   iwishbagAliexpressWalmartEbaySelfContradictionIntroHe,
+  IWISHBAG_TARGET_IL_URL,
+  IWISHBAG_TARGET_SELF_CONTRADICTION_VERIFIED,
+  iwishbagTargetSelfContradictionRows,
+  iwishbagTargetSelfContradictionHeadlineEn,
+  iwishbagTargetSelfContradictionIntroHe,
   PTUR_THRESHOLD_CHURN_LAST_CHECKED,
   PTUR_OFFICIAL_USD,
   PTUR_CHURN_130_USD,
@@ -120,12 +125,14 @@ function emptyKitPrices(n = KIT_MAX): string[] {
  * self-contradiction strip (#42, kept; moat 2026-09-15 16:35 #2);
  * personal-import threshold-churn honesty strip — official $75 ptur +
  * documented 2026 $75↔$130 flip-flops (Skills IL / OpenAccountants) +
- * last-checked stamp (moat 2026-09-21 16:30 #7); 「17% body still wrong」
+ * last-checked stamp (#43, kept; moat 2026-09-21 16:30 #7); 「17% body still wrong」
  * secondary cite only — do not redo #41/#42 as primary;
+ * iWishBag Target→IL body 「17% VAT」 vs own table 18% self-contradiction
+ * strip (moat 2026-09-21 18:45 #2; Last updated 2026-04-29 still live);
  * ITA Shaar Olami calculator foil (#23) kept. Presentation only.
  * Marketplace Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Flipkart/
  * Amazon US/Amazon India→IL how-tos reuse iWishBag foil (#26–#36).
- * Estimator math unchanged (#18–#42). Keep #19–#42; Skills IL Sep 7 still
+ * Estimator math unchanged (#18–#43). Keep #19–#43; Skills IL Sep 7 still
  * v1.4.0 + BoI+0.5% (context only).
  */
 export default function LandedPage() {
@@ -281,6 +288,9 @@ export default function LandedPage() {
   const aliexpressWalmartEbayRows = iwishbagAliexpressWalmartEbaySelfContradictionRows();
   const aliexpressWalmartEbayHeadline = iwishbagAliexpressWalmartEbaySelfContradictionHeadlineEn();
   const aliexpressWalmartEbayIntro = iwishbagAliexpressWalmartEbaySelfContradictionIntroHe();
+  const targetRows = iwishbagTargetSelfContradictionRows();
+  const targetHeadline = iwishbagTargetSelfContradictionHeadlineEn();
+  const targetIntro = iwishbagTargetSelfContradictionIntroHe();
   const pturChurnRows = pturThresholdChurnRows();
   const pturChurnHeadline = pturThresholdChurnHeadlineEn();
   const pturChurnIntro = pturThresholdChurnIntroHe();
@@ -332,6 +342,8 @@ export default function LandedPage() {
         data-iwishbag-flipkart-etsy-verified={IWISHBAG_FLIPKART_ETSY_SELF_CONTRADICTION_VERIFIED}
         data-iwishbag-aliexpress-walmart-ebay-self-contradiction="1"
         data-iwishbag-aliexpress-walmart-ebay-verified={IWISHBAG_ALIEXPRESS_WALMART_EBAY_SELF_CONTRADICTION_VERIFIED}
+        data-iwishbag-target-self-contradiction="1"
+        data-iwishbag-target-verified={IWISHBAG_TARGET_SELF_CONTRADICTION_VERIFIED}
         data-ptur-threshold-churn="1"
         data-ptur-official-usd={String(PTUR_OFFICIAL_USD)}
         data-ptur-threshold-churn-last-checked={PTUR_THRESHOLD_CHURN_LAST_CHECKED}
@@ -1283,6 +1295,127 @@ export default function LandedPage() {
               {vatFoilEn} Official ${PTUR_OFFICIAL_USD} ptur · ${PTUR_OFFICIAL_USD}↔$
               {PTUR_CHURN_130_USD} churn documented · last checked{' '}
               {PTUR_THRESHOLD_CHURN_LAST_CHECKED}. Distinct from #42 / #41 / #40. Keep #19 / #23–#42.
+            </p>
+          </aside>
+
+          {/* iWishBag Target→IL self-contradiction strip — body 17% vs own table 18% (moat 2026-09-21 18:45 #2) */}
+          <aside
+            className="rounded-xl border p-3 sm:p-4 mb-6"
+            style={{
+              borderColor: 'rgba(220,38,38,0.28)',
+              background: 'rgba(254,242,242,0.65)',
+            }}
+            data-iwishbag-target-self-contradiction="1"
+            data-iwishbag-target-url={IWISHBAG_TARGET_IL_URL}
+            data-iwishbag-last-updated={IWISHBAG_PAGE_LAST_UPDATED}
+            data-iwishbag-target-verified={IWISHBAG_TARGET_SELF_CONTRADICTION_VERIFIED}
+            data-vat-honesty-foil="18-not-17"
+          >
+            <div
+              className="flex items-start gap-2 text-sm font-bold mb-1"
+              style={{ color: 'var(--shopli-navy)' }}
+            >
+              <Icon name="shield" size={16} className="shrink-0 mt-0.5" />
+              <span>Self-contradiction · iWishBag Target→IL</span>
+            </div>
+            <p
+              className="text-xs font-bold mb-2"
+              style={{ color: '#b91c1c' }}
+              dir="ltr"
+              data-iwishbag-target-headline="self-contradiction"
+            >
+              {targetHeadline}
+            </p>
+            <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {targetIntro}{' '}
+              <a
+                href={IWISHBAG_TARGET_IL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline-offset-2 hover:underline"
+                style={{ color: 'var(--shopli-orange)' }}
+                data-iwishbag-target-foil-link="1"
+              >
+                Target→IL
+                <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+              </a>
+            </p>
+            <div className="overflow-x-auto" dir="ltr">
+              <table
+                className="w-full text-left text-xs border-collapse"
+                data-iwishbag-target-self-contradiction-table="1"
+              >
+                <thead>
+                  <tr style={{ color: 'var(--shopli-navy)' }}>
+                    <th className="py-1.5 pe-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Claim
+                    </th>
+                    <th className="py-1.5 px-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Shopli /landed
+                    </th>
+                    <th className="py-1.5 ps-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      iWishBag Target→IL
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {targetRows.map((row) => (
+                    <tr
+                      key={row.id}
+                      data-iwishbag-target-row={row.id}
+                      {...(row.iwishbagWrong ? { 'data-iwishbag-wrong': '1' } : {})}
+                    >
+                      <td
+                        className="py-1.5 pe-2 align-top font-semibold"
+                        style={{ color: 'var(--shopli-navy)' }}
+                      >
+                        {row.labelEn}
+                      </td>
+                      <td
+                        className="py-1.5 px-2 align-top"
+                        style={{ color: 'var(--shopli-warm-gray)' }}
+                        data-shopli-cell={row.id}
+                      >
+                        {row.shopliEn}
+                      </td>
+                      <td
+                        className="py-1.5 ps-2 align-top font-semibold"
+                        style={{
+                          color: row.iwishbagWrong ? '#b91c1c' : 'var(--shopli-warm-gray)',
+                        }}
+                        data-iwishbag-cell={row.id}
+                      >
+                        {row.iwishbagEn}
+                        {row.liveUrl ? (
+                          <>
+                            {' '}
+                            <a
+                              href={row.liveUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="underline-offset-2 hover:underline"
+                              style={{ color: 'var(--shopli-orange)' }}
+                              data-iwishbag-lane-link={row.id}
+                            >
+                              live
+                              <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+                            </a>
+                          </>
+                        ) : null}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p
+              className="text-[11px] mt-2 font-semibold"
+              dir="ltr"
+              style={{ color: 'var(--shopli-navy)' }}
+              data-vat-foil-en="18-not-17"
+            >
+              {vatFoilEn} Target→IL body 「17% VAT」 vs own table 18% · Last updated{' '}
+              {IWISHBAG_PAGE_LAST_UPDATED} still live. Distinct from #43 / #42 / #41 / #40. Keep #19 / #23–#43.
             </p>
           </aside>
 
