@@ -578,12 +578,12 @@ test('DutyDecoder foil is presentation-only: #18–#36 math + prior foils intact
 });
 
 
-test('Gateway Lines side-by-side foil: still מע״מ(17%) as of Sep 15', () => {
+test('Gateway Lines side-by-side foil: still מע״מ(17%) as of Sep 22', () => {
   assert.equal(
     GATEWAYLINES_TARIFF_URL,
     'https://tariff.gatewaylines.co.il/tariff-calculator',
   );
-  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 22');
   assert.equal(GATEWAYLINES_VAT_LABEL_QUOTE, 'מע״מ(17%)');
 
   const headline = gatewayLinesStale17HeadlineEn();
@@ -591,14 +591,14 @@ test('Gateway Lines side-by-side foil: still מע״מ(17%) as of Sep 15', () => 
   assert.match(headline, /מע״מ\(17%\)/);
   assert.match(headline, /reality 18%/);
   assert.match(headline, /BoI\+0\.5%/);
-  assert.match(headline, /Sep 15/);
+  assert.match(headline, /Sep 22/);
   assert.match(headline, /tariff\.gatewaylines\.co\.il/);
 
   const intro = gatewayLinesSideBySideIntroHe();
   assert.match(intro, /Gateway Lines/);
   assert.match(intro, /מע״מ\(17%\)/);
   assert.match(intro, /18%/);
-  assert.match(intro, /Sep 15/);
+  assert.match(intro, /Sep 22/);
   assert.match(intro, /BoI\+0\.5%/);
 
   const rows = gatewayLinesSideBySideRows();
@@ -630,7 +630,7 @@ test('Gateway Lines side-by-side foil: still מע״מ(17%) as of Sep 15', () => 
   const verified = rows.find((r) => r.id === 'last-verified');
   assert.ok(verified);
   assert.equal(verified.gatewayLinesWrong, true);
-  assert.match(verified.gatewayLinesEn, /Sep 15/);
+  assert.match(verified.gatewayLinesEn, /Sep 22/);
   assert.match(verified.gatewayLinesEn, /מע״מ\(17%\)/);
 });
 
@@ -652,7 +652,7 @@ test('Gateway Lines foil is presentation-only: #18–#38 math + prior foils inta
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
   assert.equal(IWISHBAG_BODY_STILL_WRONG_VERIFIED, 'Sep 7 night');
   assert.equal(DUTYDECODER_STALE_17_VERIFIED, 'Sep 15');
-  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 22');
 
   const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
   assert.ok(mid);
@@ -665,7 +665,7 @@ test('VAT truth moat: Tax Authority 18% cite + last-checked + competitors still 
     'https://www.gov.il/he/departments/topics/vat/govil-landing-page',
   );
   assert.equal(TAX_AUTHORITY_VAT_RATE_PCT, 18);
-  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-15 noon');
+  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-22 18:45');
   assert.equal(TAX_AUTHORITY_VAT_RATE_PCT, Math.round(IL_VAT_RATE * 100));
 
   const cite = taxAuthorityVat18CiteEn();
@@ -676,21 +676,21 @@ test('VAT truth moat: Tax Authority 18% cite + last-checked + competitors still 
 
   const stamp = vatTruthLastCheckedStampEn();
   assert.match(stamp, /Last checked/);
-  assert.match(stamp, /2026-09-15 noon/);
+  assert.match(stamp, /2026-09-22 18:45/);
 
   const headline = vatTruthHeadlineEn();
   assert.match(headline, /VAT truth/i);
   assert.match(headline, /Tax Authority 18%/);
   assert.match(headline, /competitors still 17%/i);
   assert.match(headline, /Gateway Lines still wrong post-#39/);
-  assert.match(headline, /2026-09-15 noon/);
+  assert.match(headline, /2026-09-22 18:45/);
 
   const intro = vatTruthIntroHe();
   assert.match(intro, /רשות המיסים/);
   assert.match(intro, /18%/);
   assert.match(intro, /Gateway Lines/);
   assert.match(intro, /#39/);
-  assert.match(intro, /2026-09-15 noon/);
+  assert.match(intro, /2026-09-22 18:45/);
   assert.match(intro, /BoI\+0\.5%/);
 
   const rows = vatTruthCompetitorsStill17ProofRows();
@@ -733,9 +733,9 @@ test('VAT truth moat is presentation-only: #18–#39 math + prior foils intact',
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
   assert.equal(IWISHBAG_BODY_STILL_WRONG_VERIFIED, 'Sep 7 night');
   assert.equal(DUTYDECODER_STALE_17_VERIFIED, 'Sep 15');
-  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 22');
   assert.equal(GATEWAYLINES_VAT_LABEL_QUOTE, 'מע״מ(17%)');
-  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-15 noon');
+  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-22 18:45');
   assert.equal(TAX_AUTHORITY_VAT_RATE_PCT, 18);
 
   const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
@@ -819,9 +819,9 @@ test('Flipkart+Etsy self-contradiction foil is presentation-only: #18–#41 math
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
   assert.equal(IWISHBAG_BODY_STILL_WRONG_VERIFIED, 'Sep 7 night');
   assert.equal(DUTYDECODER_STALE_17_VERIFIED, 'Sep 15');
-  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 22');
   assert.equal(GATEWAYLINES_VAT_LABEL_QUOTE, 'מע״מ(17%)');
-  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-15 noon');
+  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-22 18:45');
   assert.equal(TAX_AUTHORITY_VAT_RATE_PCT, 18);
   assert.equal(IWISHBAG_FLIPKART_ETSY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 14:15');
   assert.equal(IWISHBAG_PAGE_LAST_UPDATED, '2026-04-29');
@@ -914,9 +914,9 @@ test('AliExpress+Walmart+eBay self-contradiction foil is presentation-only: #18�
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
   assert.equal(IWISHBAG_BODY_STILL_WRONG_VERIFIED, 'Sep 7 night');
   assert.equal(DUTYDECODER_STALE_17_VERIFIED, 'Sep 15');
-  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 22');
   assert.equal(GATEWAYLINES_VAT_LABEL_QUOTE, 'מע״מ(17%)');
-  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-15 noon');
+  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-22 18:45');
   assert.equal(TAX_AUTHORITY_VAT_RATE_PCT, 18);
   assert.equal(IWISHBAG_FLIPKART_ETSY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 14:15');
   assert.equal(IWISHBAG_ALIEXPRESS_WALMART_EBAY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 16:35');
@@ -1015,9 +1015,9 @@ test('ptur threshold-churn foil is presentation-only: #18–#42 math + prior foi
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
   assert.equal(IWISHBAG_BODY_STILL_WRONG_VERIFIED, 'Sep 7 night');
   assert.equal(DUTYDECODER_STALE_17_VERIFIED, 'Sep 15');
-  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 22');
   assert.equal(GATEWAYLINES_VAT_LABEL_QUOTE, 'מע״מ(17%)');
-  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-15 noon');
+  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-22 18:45');
   assert.equal(TAX_AUTHORITY_VAT_RATE_PCT, 18);
   assert.equal(IWISHBAG_FLIPKART_ETSY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 14:15');
   assert.equal(IWISHBAG_ALIEXPRESS_WALMART_EBAY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 16:35');
@@ -1100,9 +1100,9 @@ test('Target→IL self-contradiction foil is presentation-only: #18–#43 math +
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
   assert.equal(IWISHBAG_BODY_STILL_WRONG_VERIFIED, 'Sep 7 night');
   assert.equal(DUTYDECODER_STALE_17_VERIFIED, 'Sep 15');
-  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 22');
   assert.equal(GATEWAYLINES_VAT_LABEL_QUOTE, 'מע״מ(17%)');
-  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-15 noon');
+  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-22 18:45');
   assert.equal(TAX_AUTHORITY_VAT_RATE_PCT, 18);
   assert.equal(IWISHBAG_FLIPKART_ETSY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 14:15');
   assert.equal(IWISHBAG_ALIEXPRESS_WALMART_EBAY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 16:35');
@@ -1196,9 +1196,9 @@ test('RateShips foil is presentation-only: estimator math unchanged (18%) + prio
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
   assert.equal(IWISHBAG_BODY_STILL_WRONG_VERIFIED, 'Sep 7 night');
   assert.equal(DUTYDECODER_STALE_17_VERIFIED, 'Sep 15');
-  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 22');
   assert.equal(GATEWAYLINES_VAT_LABEL_QUOTE, 'מע״מ(17%)');
-  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-15 noon');
+  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-22 18:45');
   assert.equal(TAX_AUTHORITY_VAT_RATE_PCT, 18);
   assert.equal(IWISHBAG_FLIPKART_ETSY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 14:15');
   assert.equal(IWISHBAG_ALIEXPRESS_WALMART_EBAY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 16:35');

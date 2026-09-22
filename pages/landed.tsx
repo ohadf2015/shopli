@@ -636,7 +636,7 @@ export default function LandedPage() {
             </p>
           </aside>
 
-          {/* Side-by-side Gateway Lines honesty foil — מע״מ(17%) vs real 18% (Sep 15) */}
+          {/* Side-by-side Gateway Lines honesty foil — מע״מ(17%) vs real 18% (Sep 22 lastChecked) */}
           <aside
             className="rounded-xl border p-3 sm:p-4 mb-6"
             style={{
