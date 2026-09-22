@@ -34,6 +34,9 @@
  * / marketplace how-tos. Presentation only; estimator math unchanged
  * (still 18%). Keep #19–#44; Skills IL Sep 22 still v1.4.0 + BoI+0.5%
  * (context only — agentskills.co.il customs calc Updated Sep 22, 2026).
+ * Sep 22 ~18:45 IDT: Gateway Lines #39 still-stuck lastChecked bump +
+ * VAT-truth #40 stamp refresh only — do NOT invent a second Gateway foil;
+ * keep #39/#40; do not redo RateShips #46 or iWishBag Target #44.
  */
 
 import {
@@ -650,10 +653,12 @@ export const GATEWAYLINES_TARIFF_URL =
 /**
  * Re-check stamp: Gateway Lines tariff calculator still shows breakdown
  * label 「מע״מ(17%)」 and methodology 「מע״מ 17% על הערך הכולל」 while Israel
- * reality / gov.il is 18% (raised 2025-01-01). Live quote verified Sep 15
- * (moat 2026-09-15 10:25 #2). Presentation only — does not change estimator math.
+ * reality / gov.il is 18% (raised 2025-01-01). Live quote re-verified Sep 22
+ * ~18:45 IDT (still-stuck lastChecked bump; keeps #39 foil — do not invent a
+ * second Gateway foil). Original foil moat 2026-09-15 10:25 #2. Presentation
+ * only — does not change estimator math.
  */
-export const GATEWAYLINES_STALE_17_VERIFIED = 'Sep 15';
+export const GATEWAYLINES_STALE_17_VERIFIED = 'Sep 22';
 
 /** Exact live breakdown label quoted from the rival calculator. */
 export const GATEWAYLINES_VAT_LABEL_QUOTE = 'מע״מ(17%)';
@@ -745,9 +750,10 @@ export const TAX_AUTHORITY_VAT_RATE_PCT = 18;
 
 /**
  * Durable VAT-truth last-checked stamp (noon moat 2026-09-15 #2, after #39
- * Gateway Lines foil). Live re-check: rivals still publish 17%.
+ * Gateway Lines foil; Moti-style still-stuck lastChecked bump Sep 22 ~18:45 IDT).
+ * Live re-check: rivals still publish 17% (Gateway Lines מע״מ(17%) still live).
  */
-export const VAT_TRUTH_LAST_CHECKED = '2026-09-15 noon';
+export const VAT_TRUTH_LAST_CHECKED = '2026-09-22 18:45';
 
 export interface VatTruthCompetitorProofRow {
   id: string;
