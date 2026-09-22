@@ -52,6 +52,12 @@ import {
   iwishbagTargetSelfContradictionRows,
   iwishbagTargetSelfContradictionHeadlineEn,
   iwishbagTargetSelfContradictionIntroHe,
+  RATESHIPS_IL_URL,
+  RATESHIPS_STALE_17_VERIFIED,
+  RATESHIPS_FAQ_VAT_17_QUOTE,
+  rateShipsSideBySideRows,
+  rateShipsStale17HeadlineEn,
+  rateShipsSideBySideIntroHe,
   PTUR_THRESHOLD_CHURN_LAST_CHECKED,
   PTUR_OFFICIAL_USD,
   PTUR_CHURN_130_USD,
@@ -204,15 +210,15 @@ test('kit tipping copy mentions $75 threshold and never 17% VAT', () => {
   assert.doesNotMatch(c, /מע״ם 17%/);
 });
 
-test('customs stamp copy: Skills IL customs v1.4.0 + shekel v2.2.0 · Sep 7, 18% not 17%, BoI+0.5%', () => {
+test('customs stamp copy: Skills IL customs v1.4.0 + shekel v2.2.0 · Sep 22, 18% not 17%, BoI+0.5%', () => {
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
 
   const stamp = customsStampCopyHe();
   assert.match(stamp, /Skills IL customs v1\.4\.0/);
   assert.match(stamp, /shekel v2\.2\.0/);
-  assert.match(stamp, /Sep 7/);
+  assert.match(stamp, /Sep 22/);
   assert.doesNotMatch(stamp, /Sep 6/);
   assert.match(stamp, /מע״ם בישראל 18%/);
   assert.match(stamp, /לא 17%/);
@@ -384,7 +390,7 @@ test('side-by-side foil is presentation-only: #18–#24 math + prior foils intac
   assert.equal(DUTY_WAIVER_CEILING_USD, 500);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
 
   const strip = vatFxHonestyStripHe();
   assert.match(strip, /מע״ם 18%/);
@@ -448,7 +454,7 @@ test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Fli
   assert.equal(amazonindia.iwishbagUrl, IWISHBAG_AMAZONINDIA_IL_URL);
 });
 
-test('marketplace foil copy: 18% not 17%, Skills Sep 7 stamp, body still wrong', () => {
+test('marketplace foil copy: 18% not 17%, Skills Sep 22 stamp, body still wrong', () => {
   for (const m of MARKETPLACE_HOW_TOS) {
     const intro = iwishbagMarketplaceFoilIntroEn(m.id);
     assert.match(intro, /"17% VAT"/);
@@ -478,9 +484,9 @@ test('marketplace foil copy: 18% not 17%, Skills Sep 7 stamp, body still wrong',
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
   const stamp = customsStampCopyHe();
-  assert.match(stamp, /Sep 7/);
+  assert.match(stamp, /Sep 22/);
   assert.match(stamp, /לא 17%/);
 });
 
@@ -556,7 +562,7 @@ test('DutyDecoder foil is presentation-only: #18–#36 math + prior foils intact
   assert.equal(DUTY_WAIVER_CEILING_USD, 500);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
 
   const strip = vatFxHonestyStripHe();
   assert.match(strip, /מע״ם 18%/);
@@ -636,7 +642,7 @@ test('Gateway Lines foil is presentation-only: #18–#38 math + prior foils inta
   assert.equal(DUTY_WAIVER_CEILING_USD, 500);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
 
   const strip = vatFxHonestyStripHe();
   assert.match(strip, /מע״ם 18%/);
@@ -721,7 +727,7 @@ test('VAT truth moat is presentation-only: #18–#39 math + prior foils intact',
   assert.equal(DUTY_WAIVER_CEILING_USD, 500);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
 
   assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
@@ -807,7 +813,7 @@ test('Flipkart+Etsy self-contradiction foil is presentation-only: #18–#41 math
   assert.equal(DUTY_WAIVER_CEILING_USD, 500);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
 
   assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
@@ -902,7 +908,7 @@ test('AliExpress+Walmart+eBay self-contradiction foil is presentation-only: #18�
   assert.equal(DUTY_WAIVER_CEILING_USD, 500);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
 
   assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
@@ -1003,7 +1009,7 @@ test('ptur threshold-churn foil is presentation-only: #18–#42 math + prior foi
   assert.equal(PTUR_OFFICIAL_USD, 75);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
 
   assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
@@ -1088,7 +1094,7 @@ test('Target→IL self-contradiction foil is presentation-only: #18–#43 math +
   assert.equal(PTUR_OFFICIAL_USD, 75);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 7');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
 
   assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
@@ -1110,3 +1116,104 @@ test('Target→IL self-contradiction foil is presentation-only: #18–#43 math +
   assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
 });
 
+test('RateShips side-by-side foil: whole-page VAT 17% as of Sep 22', () => {
+  assert.equal(RATESHIPS_IL_URL, 'https://rateships.com/en/customs/israel');
+  assert.equal(RATESHIPS_STALE_17_VERIFIED, 'Sep 22');
+  assert.match(RATESHIPS_FAQ_VAT_17_QUOTE, /VAT\/tax rate on imports to Israel is 17%/);
+
+  const headline = rateShipsStale17HeadlineEn();
+  assert.match(headline, /RateShips still wrong/i);
+  assert.match(headline, /"VAT 17%"/);
+  assert.match(headline, /reality 18%/);
+  assert.match(headline, /Sep 22/);
+  assert.match(headline, /rateships\.com\/en\/customs\/israel/);
+  assert.match(headline, /Quick Facts/);
+  assert.match(headline, /FAQ/);
+  assert.match(headline, /estimate table/);
+  assert.doesNotMatch(headline, /מע״ם 17%/);
+
+  const intro = rateShipsSideBySideIntroHe();
+  assert.match(intro, /RateShips/);
+  assert.match(intro, /"VAT 17%"/);
+  assert.match(intro, /18%/);
+  assert.match(intro, /Sep 22/);
+  assert.match(intro, /BoI\+0\.5%/);
+  assert.doesNotMatch(intro, /מע״ם 17%/);
+
+  const rows = rateShipsSideBySideRows();
+  assert.ok(rows.length >= 5);
+
+  const title = rows.find((r) => r.id === 'title-quick-facts');
+  assert.ok(title);
+  assert.equal(title.rateshipsWrong, true);
+  assert.match(title.shopliEn, /18%/);
+  assert.match(title.rateshipsEn, /17%/);
+  assert.match(title.rateshipsEn, /Quick Facts/);
+
+  const faq = rows.find((r) => r.id === 'faq-vat');
+  assert.ok(faq);
+  assert.equal(faq.rateshipsWrong, true);
+  assert.match(faq.shopliEn, /18%/);
+  assert.match(faq.rateshipsEn, /17%/);
+  assert.match(faq.rateshipsEn, /VAT\/tax rate on imports to Israel is 17%/);
+
+  const estimate = rows.find((r) => r.id === 'estimate-table');
+  assert.ok(estimate);
+  assert.equal(estimate.rateshipsWrong, true);
+  assert.match(estimate.rateshipsEn, /17% math/);
+  assert.match(estimate.rateshipsEn, /\$100/);
+
+  const reality = rows.find((r) => r.id === 'reality');
+  assert.ok(reality);
+  assert.match(reality.shopliEn, /18%/);
+  assert.match(reality.rateshipsEn, /18%/);
+  assert.notEqual(reality.rateshipsWrong, true);
+
+  const paste = rows.find((r) => r.id === 'paste-url');
+  assert.ok(paste);
+  assert.match(paste.shopliEn, /\/landed/);
+
+  const verified = rows.find((r) => r.id === 'last-verified');
+  assert.ok(verified);
+  assert.equal(verified.rateshipsWrong, true);
+  assert.match(verified.rateshipsEn, /Sep 22/);
+  assert.match(verified.rateshipsEn, /17%/);
+  assert.match(verified.shopliEn, /Sep 22/);
+});
+
+test('RateShips foil is presentation-only: estimator math unchanged (18%) + prior foils intact', () => {
+  assert.equal(IL_VAT_RATE, 0.18);
+  assert.equal(BOI_CUSTOMS_FX_UPLIFT, 0.005);
+  assert.equal(USD_TO_ILS_RATE, 3.6);
+  assert.equal(DUTY_FREE_THRESHOLD_USD, 75);
+  assert.equal(DUTY_WAIVER_CEILING_USD, 500);
+  assert.equal(PTUR_OFFICIAL_USD, 75);
+  assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
+  assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
+
+  assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
+  assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
+  assert.equal(IWISHBAG_BODY_STILL_WRONG_VERIFIED, 'Sep 7 night');
+  assert.equal(DUTYDECODER_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_VAT_LABEL_QUOTE, 'מע״מ(17%)');
+  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-15 noon');
+  assert.equal(TAX_AUTHORITY_VAT_RATE_PCT, 18);
+  assert.equal(IWISHBAG_FLIPKART_ETSY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 14:15');
+  assert.equal(IWISHBAG_ALIEXPRESS_WALMART_EBAY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 16:35');
+  assert.equal(IWISHBAG_TARGET_SELF_CONTRADICTION_VERIFIED, '2026-09-21 18:45');
+  assert.equal(IWISHBAG_PAGE_LAST_UPDATED, '2026-04-29');
+  assert.equal(PTUR_THRESHOLD_CHURN_LAST_CHECKED, '2026-09-21 16:30');
+  assert.equal(PTUR_CHURN_130_USD, 130);
+  assert.equal(RATESHIPS_STALE_17_VERIFIED, 'Sep 22');
+  assert.equal(RATESHIPS_IL_URL, 'https://rateships.com/en/customs/israel');
+
+  // Distinct from DutyDecoder #38 and Target #44
+  assert.notEqual(RATESHIPS_IL_URL, DUTYDECODER_IL_URL);
+  assert.notEqual(RATESHIPS_IL_URL, IWISHBAG_TARGET_IL_URL);
+
+  const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
+  assert.ok(mid);
+  assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
+});

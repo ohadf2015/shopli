@@ -71,6 +71,11 @@ import {
   iwishbagTargetSelfContradictionRows,
   iwishbagTargetSelfContradictionHeadlineEn,
   iwishbagTargetSelfContradictionIntroHe,
+  RATESHIPS_IL_URL,
+  RATESHIPS_STALE_17_VERIFIED,
+  rateShipsSideBySideRows,
+  rateShipsStale17HeadlineEn,
+  rateShipsSideBySideIntroHe,
   PTUR_THRESHOLD_CHURN_LAST_CHECKED,
   PTUR_OFFICIAL_USD,
   PTUR_CHURN_130_USD,
@@ -112,7 +117,7 @@ function emptyKitPrices(n = KIT_MAX): string[] {
 /**
  * /landed — paste Amazon/product URL(s) → IL landed-cost quote.
  * Moat: multi-SKU kit rollup (2–5 URLs) vs $75 ptur + $75–$500 VAT-only
- * bands after #21; Skills IL customs v1.4.0 + shekel v2.2.0 Sep 7 stamp;
+ * bands after #21; Skills IL customs v1.4.0 + shekel v2.2.0 Sep 22 stamp;
  * explicit "Israel VAT is 18% not 17%" foil vs iWishBag Apr 29 body bug (#24);
  * side-by-side iWishBag 「17% body still wrong」 foil (verified Sep 7 night);
  * DutyDecoder /israel stale 17% foil (#38, verified Sep 15);
@@ -128,12 +133,15 @@ function emptyKitPrices(n = KIT_MAX): string[] {
  * last-checked stamp (#43, kept; moat 2026-09-21 16:30 #7); 「17% body still wrong」
  * secondary cite only — do not redo #41/#42 as primary;
  * iWishBag Target→IL body 「17% VAT」 vs own table 18% self-contradiction
- * strip (moat 2026-09-21 18:45 #2; Last updated 2026-04-29 still live);
+ * strip (#44, kept; moat 2026-09-21 18:45 #2; Last updated 2026-04-29 still live);
+ * RateShips /en/customs/israel whole-page 「VAT 17%」 foil (title + Quick Facts +
+ * FAQ + estimate-table 17% math; moat 2026-09-22) — distinct from DutyDecoder
+ * #38 / Gateway #39 / Target #44 / marketplace how-tos;
  * ITA Shaar Olami calculator foil (#23) kept. Presentation only.
  * Marketplace Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Flipkart/
  * Amazon US/Amazon India→IL how-tos reuse iWishBag foil (#26–#36).
- * Estimator math unchanged (#18–#43). Keep #19–#43; Skills IL Sep 7 still
- * v1.4.0 + BoI+0.5% (context only).
+ * Estimator math unchanged (#18–#44, still 18%). Keep #19–#44; Skills IL
+ * Sep 22 still v1.4.0 + BoI+0.5% (context only).
  */
 export default function LandedPage() {
   const router = useRouter();
@@ -291,6 +299,9 @@ export default function LandedPage() {
   const targetRows = iwishbagTargetSelfContradictionRows();
   const targetHeadline = iwishbagTargetSelfContradictionHeadlineEn();
   const targetIntro = iwishbagTargetSelfContradictionIntroHe();
+  const rateShipsRows = rateShipsSideBySideRows();
+  const rateShipsHeadline = rateShipsStale17HeadlineEn();
+  const rateShipsIntro = rateShipsSideBySideIntroHe();
   const pturChurnRows = pturThresholdChurnRows();
   const pturChurnHeadline = pturThresholdChurnHeadlineEn();
   const pturChurnIntro = pturThresholdChurnIntroHe();
@@ -344,6 +355,8 @@ export default function LandedPage() {
         data-iwishbag-aliexpress-walmart-ebay-verified={IWISHBAG_ALIEXPRESS_WALMART_EBAY_SELF_CONTRADICTION_VERIFIED}
         data-iwishbag-target-self-contradiction="1"
         data-iwishbag-target-verified={IWISHBAG_TARGET_SELF_CONTRADICTION_VERIFIED}
+        data-rateships-side-by-side-foil="1"
+        data-rateships-stale-17={RATESHIPS_STALE_17_VERIFIED}
         data-ptur-threshold-churn="1"
         data-ptur-official-usd={String(PTUR_OFFICIAL_USD)}
         data-ptur-threshold-churn-last-checked={PTUR_THRESHOLD_CHURN_LAST_CHECKED}
@@ -378,7 +391,7 @@ export default function LandedPage() {
             תקרה (פריט בודד יכול להיראות פטור).
           </p>
 
-          {/* Customs stamp callout — 18% not 17% + BoI+0.5% · Sep 7 restamp */}
+          {/* Customs stamp callout — 18% not 17% + BoI+0.5% · Sep 22 restamp */}
           <aside
             className="rounded-xl border p-3 sm:p-4 mb-6"
             style={{
@@ -1415,7 +1428,112 @@ export default function LandedPage() {
               data-vat-foil-en="18-not-17"
             >
               {vatFoilEn} Target→IL body 「17% VAT」 vs own table 18% · Last updated{' '}
-              {IWISHBAG_PAGE_LAST_UPDATED} still live. Distinct from #43 / #42 / #41 / #40. Keep #19 / #23–#43.
+              {IWISHBAG_PAGE_LAST_UPDATED} still live. Distinct from #43 / #42 / #41 / #40. Keep #19 / #23–#44.
+            </p>
+          </aside>
+
+          {/* Side-by-side RateShips honesty foil — whole-page VAT 17% vs real 18% (Sep 22) */}
+          <aside
+            className="rounded-xl border p-3 sm:p-4 mb-6"
+            style={{
+              borderColor: 'rgba(220,38,38,0.28)',
+              background: 'rgba(254,242,242,0.65)',
+            }}
+            data-rateships-side-by-side-foil="1"
+            data-rateships-url={RATESHIPS_IL_URL}
+            data-rateships-stale-17={RATESHIPS_STALE_17_VERIFIED}
+            data-vat-honesty-foil="18-not-17"
+          >
+            <div
+              className="flex items-start gap-2 text-sm font-bold mb-1"
+              style={{ color: 'var(--shopli-navy)' }}
+            >
+              <Icon name="shield" size={16} className="shrink-0 mt-0.5" />
+              <span>Side-by-side · RateShips 「VAT 17%」 whole page</span>
+            </div>
+            <p
+              className="text-xs font-bold mb-2"
+              style={{ color: '#b91c1c' }}
+              dir="ltr"
+              data-rateships-headline="stale-17"
+            >
+              {rateShipsHeadline}
+            </p>
+            <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {rateShipsIntro}{' '}
+              <a
+                href={RATESHIPS_IL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline-offset-2 hover:underline"
+                style={{ color: 'var(--shopli-orange)' }}
+                data-rateships-foil-link="1"
+              >
+                rateships.com/en/customs/israel
+                <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+              </a>
+            </p>
+            <div className="overflow-x-auto" dir="ltr">
+              <table
+                className="w-full text-left text-xs border-collapse"
+                data-rateships-side-by-side-table="1"
+              >
+                <thead>
+                  <tr style={{ color: 'var(--shopli-navy)' }}>
+                    <th className="py-1.5 pe-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Claim
+                    </th>
+                    <th className="py-1.5 px-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Shopli /landed
+                    </th>
+                    <th className="py-1.5 ps-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      RateShips
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rateShipsRows.map((row) => (
+                    <tr
+                      key={row.id}
+                      data-rateships-row={row.id}
+                      {...(row.rateshipsWrong ? { 'data-rateships-wrong': '1' } : {})}
+                    >
+                      <td
+                        className="py-1.5 pe-2 align-top font-semibold"
+                        style={{ color: 'var(--shopli-navy)' }}
+                      >
+                        {row.labelEn}
+                      </td>
+                      <td
+                        className="py-1.5 px-2 align-top"
+                        style={{ color: 'var(--shopli-warm-gray)' }}
+                        data-shopli-cell={row.id}
+                      >
+                        {row.shopliEn}
+                      </td>
+                      <td
+                        className="py-1.5 ps-2 align-top font-semibold"
+                        style={{
+                          color: row.rateshipsWrong ? '#b91c1c' : 'var(--shopli-warm-gray)',
+                        }}
+                        data-rateships-cell={row.id}
+                      >
+                        {row.rateshipsEn}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p
+              className="text-[11px] mt-2 font-semibold"
+              dir="ltr"
+              style={{ color: 'var(--shopli-navy)' }}
+              data-vat-foil-en="18-not-17"
+            >
+              {vatFoilEn} Foil rateships.com/en/customs/israel whole-page 17%. Distinct from
+              DutyDecoder #38 / Target #44 / marketplace how-tos. Keep #19 / #23–#44.
+              Estimator math unchanged (18%).
             </p>
           </aside>
 

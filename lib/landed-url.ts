@@ -27,8 +27,13 @@
  * own duties table Standard VAT/GST 18% self-contradiction strip on /landed
  * (Last updated 2026-04-29 still live). Distinct from threshold #43 /
  * AliExpress+Walmart+eBay #42 / Flipkart+Etsy #41 / Tax Authority #40 /
- * Gateway #39 / Amazon US/India / JP. Presentation only; estimator math
- * unchanged. Keep #19–#43; Skills IL Sep 7 still v1.4.0 + BoI+0.5% (context only).
+ * Gateway #39 / Amazon US/India / JP (kept as #44). Moat 2026-09-22: RateShips
+ * /en/customs/israel whole-page 「VAT 17%」 foil (title + Quick Facts +
+ * FAQ + estimate-table 17% math) vs Israel Tax Authority / Skills IL 18%
+ * truth. Distinct from DutyDecoder #38 / Gateway #39 / iWishBag Target #44
+ * / marketplace how-tos. Presentation only; estimator math unchanged
+ * (still 18%). Keep #19–#44; Skills IL Sep 22 still v1.4.0 + BoI+0.5%
+ * (context only — agentskills.co.il customs calc Updated Sep 22, 2026).
  */
 
 import {
@@ -259,11 +264,11 @@ export const SKILLS_IL_CUSTOMS = 'v1.4.0';
 /** Skills IL shekel-currency-converter foil version. Still v2.2.0. */
 export const SKILLS_IL_SHEKEL = 'v2.2.0';
 /** Re-stamp date for customs + shekel honesty foil on /landed. */
-export const SKILLS_IL_STAMP_DATE = 'Sep 7';
+export const SKILLS_IL_STAMP_DATE = 'Sep 22';
 
 /**
  * Hebrew customs-stamp copy for /landed
- * (Skills IL customs v1.4.0 + shekel v2.2.0 · Sep 7 foil).
+ * (Skills IL customs v1.4.0 + shekel v2.2.0 · Sep 22 foil).
  * Labels 18% VAT + BoI representative +0.5% — explicit "not 17%".
  * Does not change estimator math (#18–#23).
  */
@@ -1245,3 +1250,102 @@ export function iwishbagTargetSelfContradictionIntroHe(): string {
   );
 }
 
+/** RateShips Israel customs guide used as honesty foil (whole-page stale 17% VAT). */
+export const RATESHIPS_IL_URL = 'https://rateships.com/en/customs/israel';
+
+/**
+ * Re-check stamp: RateShips /en/customs/israel still shows whole-page 「VAT 17%」
+ * — title "VAT 17%", Quick Facts VAT/Sales Tax 17%, FAQ "The VAT/tax rate on
+ * imports to Israel is 17%", and Duty & Tax Estimate table 17% math — while
+ * Israel Tax Authority / Skills IL truth is 18% (raised 2025-01-01). Live
+ * verified Sep 22 (moat 2026-09-22). Presentation only — does not change
+ * estimator math. Distinct from DutyDecoder #38 / Gateway #39 / iWishBag
+ * Target #44 / marketplace how-tos.
+ */
+export const RATESHIPS_STALE_17_VERIFIED = 'Sep 22';
+
+/** Exact live FAQ quote from RateShips Israel customs page. */
+export const RATESHIPS_FAQ_VAT_17_QUOTE =
+  'The VAT/tax rate on imports to Israel is 17%';
+
+export interface RateShipsSideBySideRow {
+  id: string;
+  labelEn: string;
+  shopliEn: string;
+  rateshipsEn: string;
+  /** When true, RateShips cell is the honesty callout (still 17%). */
+  rateshipsWrong?: boolean;
+}
+
+/**
+ * Side-by-side honesty rows: Shopli /landed vs RateShips /en/customs/israel.
+ * Foil: rival still claims 17% VAT across title / Quick Facts / FAQ / estimate
+ * table while reality is 18% (verified {@link RATESHIPS_STALE_17_VERIFIED}).
+ * Does not change estimator / kit / band math (#18–#44). Distinct from
+ * DutyDecoder #38 and iWishBag Target #44.
+ */
+export function rateShipsSideBySideRows(): RateShipsSideBySideRow[] {
+  return [
+    {
+      id: 'title-quick-facts',
+      labelEn: 'Title / Quick Facts VAT',
+      shopliEn: '18% (correct)',
+      rateshipsEn: '17% — title "VAT 17%" + Quick Facts VAT/Sales Tax 17%',
+      rateshipsWrong: true,
+    },
+    {
+      id: 'faq-vat',
+      labelEn: 'FAQ VAT claim',
+      shopliEn: '18%',
+      rateshipsEn: `"${RATESHIPS_FAQ_VAT_17_QUOTE}" — still wrong`,
+      rateshipsWrong: true,
+    },
+    {
+      id: 'estimate-table',
+      labelEn: 'Duty & Tax Estimate table',
+      shopliEn: '18% math',
+      rateshipsEn: '17% math (e.g. $100 → VAT $17)',
+      rateshipsWrong: true,
+    },
+    {
+      id: 'reality',
+      labelEn: 'Israel reality / Tax Authority / Skills IL',
+      shopliEn: '18% (since 2025-01-01)',
+      rateshipsEn: '18% (they still publish 17%)',
+    },
+    {
+      id: 'paste-url',
+      labelEn: 'Paste Amazon/product URL → IL quote',
+      shopliEn: '/landed (free estimator)',
+      rateshipsEn: 'Customs guide (stale VAT, no paste-URL quote)',
+    },
+    {
+      id: 'last-verified',
+      labelEn: 'Last verified',
+      shopliEn: `Skills IL · ${SKILLS_IL_STAMP_DATE}`,
+      rateshipsEn: `Still 17% as of ${RATESHIPS_STALE_17_VERIFIED}`,
+      rateshipsWrong: true,
+    },
+  ];
+}
+
+/**
+ * English headline for the RateShips foil — whole-page stale 17% vs real 18%.
+ * Keeps #24 "Israel VAT is 18% not 17%." as a sibling string.
+ */
+export function rateShipsStale17HeadlineEn(): string {
+  return (
+    `RateShips still wrong: whole-page "VAT 17%" on rateships.com/en/customs/israel ` +
+    `(title + Quick Facts + FAQ + estimate table; reality 18%) · verified ${RATESHIPS_STALE_17_VERIFIED}`
+  );
+}
+
+/** Short Hebrew intro above the RateShips side-by-side panel. */
+export function rateShipsSideBySideIntroHe(): string {
+  return (
+    `השוואה ליריב (RateShips /en/customs/israel): עמוד שלם עדיין מציג "VAT 17%" ` +
+    `בכותרת, Quick Facts, FAQ וטבלת הערכה — בעוד שבמציאות / רשות המיסים / Skills IL ` +
+    `המע״ם הוא 18% — אומת ${RATESHIPS_STALE_17_VERIFIED}. ` +
+    `שופלי מציגה מע״ם 18% + BoI+0.5%.`
+  );
+}
