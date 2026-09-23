@@ -416,7 +416,7 @@ export function iwishbagSideBySideIntroHe(): string {
 }
 
 /** Marketplace how-to pages that reuse the iWishBag 「17% body still wrong」 foil. */
-export type MarketplaceHowToId = 'etsy' | 'ebay' | 'walmart' | 'aliexpress' | 'amazonjp' | 'shein' | 'temu' | 'flipkart' | 'amazonus' | 'amazonindia';
+export type MarketplaceHowToId = 'etsy' | 'ebay' | 'walmart' | 'aliexpress' | 'amazonjp' | 'shein' | 'temu' | 'flipkart' | 'amazonus' | 'amazonindia' | 'myntra';
 
 /** When false, iWishBag URL 404s — do not link / do not invent VAT foil. */
 
@@ -485,13 +485,17 @@ export const IWISHBAG_FLIPKART_IL_URL =
 export const IWISHBAG_AMAZONINDIA_IL_URL =
   'https://www.iwishbag.com/how-to-buy-from/amazon-india/israel';
 
+/** iWishBag Myntra → Israel guide (same 17% body / 18% table self-contradiction). */
+export const IWISHBAG_MYNTRA_IL_URL =
+  'https://www.iwishbag.com/how-to-buy-from/myntra/israel';
+
 /** iWishBag Target → Israel guide (same 17% body / 18% table self-contradiction). */
 export const IWISHBAG_TARGET_IL_URL =
   'https://www.iwishbag.com/how-to-buy-from/target/israel';
 
 /**
  * Lean marketplace→IL how-to catalog (Etsy / eBay / Walmart / AliExpress /
- * Amazon JP / Shein / Temu / Flipkart / Amazon US / Amazon India). Presentation /
+ * Amazon JP / Shein / Temu / Flipkart / Amazon US / Amazon India / Myntra). Presentation /
  * SEO foil only — estimator math unchanged (#18–#34). Moat: dedicated Amazon
  * India (same Apr-29 body bug as Amazon US #34; JP was #27 only).
  */
@@ -557,6 +561,12 @@ export const MARKETPLACE_HOW_TOS: readonly MarketplaceHowToSpec[] = [
     nameEn: 'Amazon India',
     path: '/how-to-amazonindia-israel',
     iwishbagUrl: IWISHBAG_AMAZONINDIA_IL_URL,
+  },
+  {
+    id: 'myntra',
+    nameEn: 'Myntra',
+    path: '/how-to-myntra-israel',
+    iwishbagUrl: IWISHBAG_MYNTRA_IL_URL,
   },
 ] as const;
 
@@ -1681,5 +1691,97 @@ export function iwishbagAmazonJpSelfContradictionIntroHe(): string {
     `עדכון אחרון אצלם ${IWISHBAG_PAGE_LAST_UPDATED} עדיין חי. ` +
     `אומת ${IWISHBAG_AMAZONJP_SELF_CONTRADICTION_VERIFIED}. שופלי: מע״ם 18% + BoI+0.5%. ` +
     `הערה: Yahoo Shopping JP→IL אותה סתירה; Shein/Temu אצלם 404.`
+  );
+}
+
+
+/**
+ * Moat 2026-09-23 ~14:35: iWishBag Myntra→IL still self-contradict — body
+ * 「17% VAT」 (customs blurb + FAQ) vs own duties table 「Standard VAT/GST 18%」,
+ * Last updated 2026-04-29 still live. Distinct from Amazon US #48 / India #49 /
+ * Japan #50 / Target #44 / Flipkart+Etsy #41 / AliExpress+Walmart+eBay #42.
+ * Do NOT use Shein/Temu iWishBag URLs (404). Presentation only — estimator math
+ * unchanged (`IL_VAT_RATE` 0.18). Skills IL still v1.4.0 (VAT 18%).
+ * hermes-filed for moat merge.
+ */
+export const IWISHBAG_MYNTRA_SELF_CONTRADICTION_VERIFIED = '2026-09-23 14:35';
+
+export interface IwishbagMyntraSelfContradictionRow {
+  id: string;
+  labelEn: string;
+  shopliEn: string;
+  iwishbagEn: string;
+  /** When true, iWishBag cell is the honesty callout (self-contradiction). */
+  iwishbagWrong?: boolean;
+  /** Optional live proof URL (Myntra lane). */
+  liveUrl?: string;
+}
+
+/**
+ * Side-by-side honesty rows: Shopli /landed vs iWishBag Myntra→IL.
+ * Foil: same page claims body 「17% VAT」 and table 「Standard VAT/GST 18%」
+ * while Last updated {@link IWISHBAG_PAGE_LAST_UPDATED} is still live
+ * (verified {@link IWISHBAG_MYNTRA_SELF_CONTRADICTION_VERIFIED}).
+ * Does not change estimator math. Distinct from #48 / #49 / #50 / #44 / #41 / #42.
+ */
+export function iwishbagMyntraSelfContradictionRows(): IwishbagMyntraSelfContradictionRow[] {
+  return [
+    {
+      id: 'body-vat',
+      labelEn: 'Body / customs blurb + FAQ',
+      shopliEn: '18% (correct)',
+      iwishbagEn: `${IWISHBAG_BODY_17_VAT_QUOTE} — still wrong`,
+      iwishbagWrong: true,
+    },
+    {
+      id: 'own-table-vat',
+      labelEn: 'Own duties table (same page)',
+      shopliEn: '18%',
+      iwishbagEn: IWISHBAG_OWN_TABLE_18_VAT_QUOTE,
+    },
+    {
+      id: 'self-contradiction',
+      labelEn: 'Self-contradiction',
+      shopliEn: 'None — single 18% story',
+      iwishbagEn: 'Body 17% vs own table 18%',
+      iwishbagWrong: true,
+    },
+    {
+      id: 'myntra-lane',
+      labelEn: 'Myntra→IL how-to',
+      shopliEn: 'paste Myntra URL → /landed',
+      iwishbagEn: 'Body 17% + table 18% · Last updated still Apr 29',
+      iwishbagWrong: true,
+      liveUrl: IWISHBAG_MYNTRA_IL_URL,
+    },
+    {
+      id: 'last-updated',
+      labelEn: 'Last updated / verified',
+      shopliEn: `Skills IL · ${SKILLS_IL_STAMP_DATE}`,
+      iwishbagEn: `${IWISHBAG_PAGE_LAST_UPDATED} (page) · self-contradiction live as of ${IWISHBAG_MYNTRA_SELF_CONTRADICTION_VERIFIED}`,
+      iwishbagWrong: true,
+    },
+  ];
+}
+
+/**
+ * English headline for the Myntra→IL self-contradiction strip —
+ * body 「17% VAT」 vs own table 18% (Last updated 2026-04-29 still live).
+ */
+export function iwishbagMyntraSelfContradictionHeadlineEn(): string {
+  return (
+    `iWishBag Myntra→IL self-contradiction: body 「17% VAT」 vs own ` +
+    `table 「${IWISHBAG_OWN_TABLE_18_VAT_QUOTE}」 · Last updated ${IWISHBAG_PAGE_LAST_UPDATED} ` +
+    `still live · verified ${IWISHBAG_MYNTRA_SELF_CONTRADICTION_VERIFIED}`
+  );
+}
+
+/** Short Hebrew intro above the Myntra→IL self-contradiction strip. */
+export function iwishbagMyntraSelfContradictionIntroHe(): string {
+  return (
+    `סתירה פנימית אצל iWishBag (Myntra→IL): בגוף העמוד/מכס/FAQ עדיין ` +
+    `"17% VAT" בעוד שטבלת המכסים באותו עמוד מציינת Standard VAT/GST 18% — ` +
+    `עדכון אחרון אצלם ${IWISHBAG_PAGE_LAST_UPDATED} עדיין חי. ` +
+    `אומת ${IWISHBAG_MYNTRA_SELF_CONTRADICTION_VERIFIED}. שופלי: מע״ם 18% + BoI+0.5%.`
   );
 }

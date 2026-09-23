@@ -65,6 +65,11 @@ import {
   iwishbagAmazonJpSelfContradictionRows,
   iwishbagAmazonJpSelfContradictionHeadlineEn,
   iwishbagAmazonJpSelfContradictionIntroHe,
+  IWISHBAG_MYNTRA_IL_URL,
+  IWISHBAG_MYNTRA_SELF_CONTRADICTION_VERIFIED,
+  iwishbagMyntraSelfContradictionRows,
+  iwishbagMyntraSelfContradictionHeadlineEn,
+  iwishbagMyntraSelfContradictionIntroHe,
   IWISHBAG_YAHOO_SHOPPING_JP_IL_URL,
   IWISHBAG_SHEIN_TEMU_404_VERIFIED,
   IWISHBAG_SHEIN_IL_URL_LIVE,
@@ -423,7 +428,7 @@ test('side-by-side foil is presentation-only: #18–#24 math + prior foils intac
 });
 
 
-test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Flipkart/Amazon US/Amazon India iWishBag URLs + paths', () => {
+test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Flipkart/Amazon US/Amazon India/Myntra iWishBag URLs + paths', () => {
   assert.equal(IWISHBAG_ETSY_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/etsy/israel');
   assert.equal(IWISHBAG_EBAY_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/ebay/israel');
   assert.equal(IWISHBAG_WALMART_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/walmart/israel');
@@ -440,9 +445,9 @@ test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Fli
   assert.equal(IWISHBAG_AMAZON_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/amazon-us/israel');
   assert.equal(IWISHBAG_AMAZONINDIA_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/amazon-india/israel');
 
-  assert.equal(MARKETPLACE_HOW_TOS.length, 10);
+  assert.equal(MARKETPLACE_HOW_TOS.length, 11);
   const ids = MARKETPLACE_HOW_TOS.map((m) => m.id);
-  assert.deepEqual(ids, ['etsy', 'ebay', 'walmart', 'aliexpress', 'amazonjp', 'shein', 'temu', 'flipkart', 'amazonus', 'amazonindia']);
+  assert.deepEqual(ids, ['etsy', 'ebay', 'walmart', 'aliexpress', 'amazonjp', 'shein', 'temu', 'flipkart', 'amazonus', 'amazonindia', 'myntra']);
 
   for (const m of MARKETPLACE_HOW_TOS) {
     assert.match(m.path, new RegExp(`^/how-to-${m.id}-israel$`));
@@ -473,6 +478,11 @@ test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Fli
   assert.equal(amazonindia.nameEn, 'Amazon India');
   assert.equal(amazonindia.path, '/how-to-amazonindia-israel');
   assert.equal(amazonindia.iwishbagUrl, IWISHBAG_AMAZONINDIA_IL_URL);
+  assert.equal(IWISHBAG_MYNTRA_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/myntra/israel');
+  const myntra = getMarketplaceHowTo('myntra');
+  assert.equal(myntra.nameEn, 'Myntra');
+  assert.equal(myntra.path, '/how-to-myntra-israel');
+  assert.equal(myntra.iwishbagUrl, IWISHBAG_MYNTRA_IL_URL);
 });
 
 test('marketplace foil copy: 18% not 17%, Skills Sep 23 stamp, body still wrong', () => {
@@ -1513,3 +1523,85 @@ test('Amazon Japan→IL self-contradiction foil is presentation-only: distinct f
   assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
 });
 
+
+
+test('iWishBag Myntra→IL self-contradiction strip: body 17% vs own table 18%', () => {
+  assert.equal(IWISHBAG_PAGE_LAST_UPDATED, '2026-04-29');
+  assert.equal(IWISHBAG_MYNTRA_SELF_CONTRADICTION_VERIFIED, '2026-09-23 14:35');
+  assert.equal(IWISHBAG_MYNTRA_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/myntra/israel');
+  assert.match(IWISHBAG_BODY_17_VAT_QUOTE, /17% VAT/);
+  assert.match(IWISHBAG_OWN_TABLE_18_VAT_QUOTE, /Standard VAT\/GST 18%/);
+  assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 23');
+
+  const headline = iwishbagMyntraSelfContradictionHeadlineEn();
+  assert.match(headline, /Myntra→IL/i);
+  assert.match(headline, /self-contradiction/i);
+  assert.match(headline, /17% VAT/);
+  assert.match(headline, /Standard VAT\/GST 18%/);
+  assert.match(headline, /2026-04-29/);
+  assert.match(headline, /2026-09-23 14:35/);
+
+  const intro = iwishbagMyntraSelfContradictionIntroHe();
+  assert.match(intro, /Myntra→IL/);
+  assert.match(intro, /17% VAT/);
+  assert.match(intro, /18%/);
+  assert.match(intro, /2026-04-29/);
+  assert.match(intro, /2026-09-23 14:35/);
+  assert.match(intro, /BoI\+0\.5%/);
+
+  const rows = iwishbagMyntraSelfContradictionRows();
+  assert.ok(rows.length >= 5);
+
+  const body = rows.find((r) => r.id === 'body-vat');
+  assert.ok(body);
+  assert.equal(body.iwishbagWrong, true);
+  assert.match(body.iwishbagEn, /17% VAT/);
+  assert.match(body.shopliEn, /18%/);
+
+  const table = rows.find((r) => r.id === 'own-table-vat');
+  assert.ok(table);
+  assert.match(table.iwishbagEn, /Standard VAT\/GST 18%/);
+  assert.notEqual(table.iwishbagWrong, true);
+
+  const self = rows.find((r) => r.id === 'self-contradiction');
+  assert.ok(self);
+  assert.equal(self.iwishbagWrong, true);
+  assert.match(self.iwishbagEn, /Body 17% vs own table 18%/);
+
+  const myntra = rows.find((r) => r.id === 'myntra-lane');
+  assert.ok(myntra);
+  assert.equal(myntra.iwishbagWrong, true);
+  assert.equal(myntra.liveUrl, IWISHBAG_MYNTRA_IL_URL);
+  assert.match(myntra.iwishbagEn, /Apr 29/);
+
+  const last = rows.find((r) => r.id === 'last-updated');
+  assert.ok(last);
+  assert.equal(last.iwishbagWrong, true);
+  assert.match(last.iwishbagEn, /2026-04-29/);
+  assert.match(last.iwishbagEn, /2026-09-23 14:35/);
+  assert.match(last.shopliEn, /Sep 23/);
+});
+
+test('Myntra→IL self-contradiction foil is presentation-only: distinct from #50/#49/#48 + math intact', () => {
+  assert.equal(IL_VAT_RATE, 0.18);
+  assert.equal(BOI_CUSTOMS_FX_UPLIFT, 0.005);
+  assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 23');
+  assert.equal(IWISHBAG_MYNTRA_SELF_CONTRADICTION_VERIFIED, '2026-09-23 14:35');
+  assert.equal(IWISHBAG_AMAZONJP_SELF_CONTRADICTION_VERIFIED, '2026-09-23 12:40');
+  assert.equal(IWISHBAG_AMAZONINDIA_SELF_CONTRADICTION_VERIFIED, '2026-09-23 10:40');
+  assert.equal(IWISHBAG_AMAZONUS_SELF_CONTRADICTION_VERIFIED, '2026-09-23 08:15');
+  assert.notEqual(IWISHBAG_MYNTRA_IL_URL, IWISHBAG_AMAZON_IL_URL);
+  assert.notEqual(IWISHBAG_MYNTRA_IL_URL, IWISHBAG_AMAZONINDIA_IL_URL);
+  assert.notEqual(IWISHBAG_MYNTRA_IL_URL, IWISHBAG_AMAZONJP_IL_URL);
+  assert.notEqual(
+    IWISHBAG_MYNTRA_SELF_CONTRADICTION_VERIFIED,
+    IWISHBAG_AMAZONJP_SELF_CONTRADICTION_VERIFIED,
+  );
+  assert.equal(IWISHBAG_PAGE_LAST_UPDATED, '2026-04-29');
+
+  const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
+  assert.ok(mid);
+  assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
+});
