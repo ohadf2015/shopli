@@ -71,6 +71,10 @@ import {
   iwishbagTargetSelfContradictionRows,
   iwishbagTargetSelfContradictionHeadlineEn,
   iwishbagTargetSelfContradictionIntroHe,
+  IWISHBAG_AMAZONUS_SELF_CONTRADICTION_VERIFIED,
+  iwishbagAmazonUsSelfContradictionRows,
+  iwishbagAmazonUsSelfContradictionHeadlineEn,
+  iwishbagAmazonUsSelfContradictionIntroHe,
   RATESHIPS_IL_URL,
   RATESHIPS_STALE_17_VERIFIED,
   rateShipsSideBySideRows,
@@ -135,12 +139,15 @@ function emptyKitPrices(n = KIT_MAX): string[] {
  * iWishBag Target→IL body 「17% VAT」 vs own table 18% self-contradiction
  * strip (#44, kept; moat 2026-09-21 18:45 #2; Last updated 2026-04-29 still live);
  * RateShips /en/customs/israel whole-page 「VAT 17%」 foil (title + Quick Facts +
- * FAQ + estimate-table 17% math; moat 2026-09-22) — distinct from DutyDecoder
+ * FAQ + estimate-table 17% math; #46, kept; moat 2026-09-22) — distinct from DutyDecoder
  * #38 / Gateway #39 / Target #44 / marketplace how-tos;
+ * iWishBag Amazon US→IL body 「17% VAT」 vs own table 18% self-contradiction
+ * strip (moat 2026-09-23 08:15 #2; Last updated 2026-04-29 still live) — distinct
+ * from Target #44 / RateShips #46 / Gateway #47 bump / Amazon US how-to #34;
  * ITA Shaar Olami calculator foil (#23) kept. Presentation only.
  * Marketplace Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Flipkart/
  * Amazon US/Amazon India→IL how-tos reuse iWishBag foil (#26–#36).
- * Estimator math unchanged (#18–#44, still 18%). Keep #19–#44; Skills IL
+ * Estimator math unchanged (#18–#47, still 18%). Keep #19–#47; Skills IL
  * Sep 22 still v1.4.0 + BoI+0.5% (context only).
  */
 export default function LandedPage() {
@@ -299,6 +306,9 @@ export default function LandedPage() {
   const targetRows = iwishbagTargetSelfContradictionRows();
   const targetHeadline = iwishbagTargetSelfContradictionHeadlineEn();
   const targetIntro = iwishbagTargetSelfContradictionIntroHe();
+  const amazonUsRows = iwishbagAmazonUsSelfContradictionRows();
+  const amazonUsHeadline = iwishbagAmazonUsSelfContradictionHeadlineEn();
+  const amazonUsIntro = iwishbagAmazonUsSelfContradictionIntroHe();
   const rateShipsRows = rateShipsSideBySideRows();
   const rateShipsHeadline = rateShipsStale17HeadlineEn();
   const rateShipsIntro = rateShipsSideBySideIntroHe();
@@ -355,6 +365,8 @@ export default function LandedPage() {
         data-iwishbag-aliexpress-walmart-ebay-verified={IWISHBAG_ALIEXPRESS_WALMART_EBAY_SELF_CONTRADICTION_VERIFIED}
         data-iwishbag-target-self-contradiction="1"
         data-iwishbag-target-verified={IWISHBAG_TARGET_SELF_CONTRADICTION_VERIFIED}
+        data-iwishbag-amazonus-self-contradiction="1"
+        data-iwishbag-amazonus-verified={IWISHBAG_AMAZONUS_SELF_CONTRADICTION_VERIFIED}
         data-rateships-side-by-side-foil="1"
         data-rateships-stale-17={RATESHIPS_STALE_17_VERIFIED}
         data-ptur-threshold-churn="1"
@@ -1534,6 +1546,128 @@ export default function LandedPage() {
               {vatFoilEn} Foil rateships.com/en/customs/israel whole-page 17%. Distinct from
               DutyDecoder #38 / Target #44 / marketplace how-tos. Keep #19 / #23–#44.
               Estimator math unchanged (18%).
+            </p>
+          </aside>
+
+          {/* iWishBag Amazon US→IL self-contradiction strip — body 17% vs own table 18% (moat 2026-09-23 08:15 #2) */}
+          <aside
+            className="rounded-xl border p-3 sm:p-4 mb-6"
+            style={{
+              borderColor: 'rgba(220,38,38,0.28)',
+              background: 'rgba(254,242,242,0.65)',
+            }}
+            data-iwishbag-amazonus-self-contradiction="1"
+            data-iwishbag-amazonus-url={IWISHBAG_AMAZON_IL_URL}
+            data-iwishbag-last-updated={IWISHBAG_PAGE_LAST_UPDATED}
+            data-iwishbag-amazonus-verified={IWISHBAG_AMAZONUS_SELF_CONTRADICTION_VERIFIED}
+            data-vat-honesty-foil="18-not-17"
+          >
+            <div
+              className="flex items-start gap-2 text-sm font-bold mb-1"
+              style={{ color: 'var(--shopli-navy)' }}
+            >
+              <Icon name="shield" size={16} className="shrink-0 mt-0.5" />
+              <span>Self-contradiction · iWishBag Amazon US→IL</span>
+            </div>
+            <p
+              className="text-xs font-bold mb-2"
+              style={{ color: '#b91c1c' }}
+              dir="ltr"
+              data-iwishbag-amazonus-headline="self-contradiction"
+            >
+              {amazonUsHeadline}
+            </p>
+            <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {amazonUsIntro}{' '}
+              <a
+                href={IWISHBAG_AMAZON_IL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline-offset-2 hover:underline"
+                style={{ color: 'var(--shopli-orange)' }}
+                data-iwishbag-amazonus-foil-link="1"
+              >
+                Amazon US→IL
+                <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+              </a>
+            </p>
+            <div className="overflow-x-auto" dir="ltr">
+              <table
+                className="w-full text-left text-xs border-collapse"
+                data-iwishbag-amazonus-self-contradiction-table="1"
+              >
+                <thead>
+                  <tr style={{ color: 'var(--shopli-navy)' }}>
+                    <th className="py-1.5 pe-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Claim
+                    </th>
+                    <th className="py-1.5 px-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Shopli /landed
+                    </th>
+                    <th className="py-1.5 ps-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      iWishBag Amazon US→IL
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {amazonUsRows.map((row) => (
+                    <tr
+                      key={row.id}
+                      data-iwishbag-amazonus-row={row.id}
+                      {...(row.iwishbagWrong ? { 'data-iwishbag-wrong': '1' } : {})}
+                    >
+                      <td
+                        className="py-1.5 pe-2 align-top font-semibold"
+                        style={{ color: 'var(--shopli-navy)' }}
+                      >
+                        {row.labelEn}
+                      </td>
+                      <td
+                        className="py-1.5 px-2 align-top"
+                        style={{ color: 'var(--shopli-warm-gray)' }}
+                        data-shopli-cell={row.id}
+                      >
+                        {row.shopliEn}
+                      </td>
+                      <td
+                        className="py-1.5 ps-2 align-top font-semibold"
+                        style={{
+                          color: row.iwishbagWrong ? '#b91c1c' : 'var(--shopli-warm-gray)',
+                        }}
+                        data-iwishbag-cell={row.id}
+                      >
+                        {row.iwishbagEn}
+                        {row.liveUrl ? (
+                          <>
+                            {' '}
+                            <a
+                              href={row.liveUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="underline-offset-2 hover:underline"
+                              style={{ color: 'var(--shopli-orange)' }}
+                              data-iwishbag-lane-link={row.id}
+                            >
+                              live
+                              <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+                            </a>
+                          </>
+                        ) : null}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p
+              className="text-[11px] mt-2 font-semibold"
+              dir="ltr"
+              style={{ color: 'var(--shopli-navy)' }}
+              data-vat-foil-en="18-not-17"
+            >
+              {vatFoilEn} Amazon US→IL body 「17% VAT」 vs own table 18% · Last updated{' '}
+              {IWISHBAG_PAGE_LAST_UPDATED} still live. Distinct from #46 / #44 / #43 / #42 / #34.
+              Keep #19 / #23–#47.
             </p>
           </aside>
 

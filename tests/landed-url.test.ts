@@ -52,6 +52,10 @@ import {
   iwishbagTargetSelfContradictionRows,
   iwishbagTargetSelfContradictionHeadlineEn,
   iwishbagTargetSelfContradictionIntroHe,
+  IWISHBAG_AMAZONUS_SELF_CONTRADICTION_VERIFIED,
+  iwishbagAmazonUsSelfContradictionRows,
+  iwishbagAmazonUsSelfContradictionHeadlineEn,
+  iwishbagAmazonUsSelfContradictionIntroHe,
   RATESHIPS_IL_URL,
   RATESHIPS_STALE_17_VERIFIED,
   RATESHIPS_FAQ_VAT_17_QUOTE,
@@ -1217,3 +1221,98 @@ test('RateShips foil is presentation-only: estimator math unchanged (18%) + prio
   assert.ok(mid);
   assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
 });
+
+test('iWishBag Amazon US→IL self-contradiction strip: body 17% vs own table 18%', () => {
+  assert.equal(IWISHBAG_PAGE_LAST_UPDATED, '2026-04-29');
+  assert.equal(IWISHBAG_AMAZONUS_SELF_CONTRADICTION_VERIFIED, '2026-09-23 08:15');
+  assert.equal(IWISHBAG_AMAZON_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/amazon-us/israel');
+  assert.match(IWISHBAG_BODY_17_VAT_QUOTE, /17% VAT/);
+  assert.match(IWISHBAG_OWN_TABLE_18_VAT_QUOTE, /Standard VAT\/GST 18%/);
+
+  const headline = iwishbagAmazonUsSelfContradictionHeadlineEn();
+  assert.match(headline, /Amazon US→IL/i);
+  assert.match(headline, /self-contradiction/i);
+  assert.match(headline, /17% VAT/);
+  assert.match(headline, /Standard VAT\/GST 18%/);
+  assert.match(headline, /2026-04-29/);
+  assert.match(headline, /2026-09-23 08:15/);
+
+  const intro = iwishbagAmazonUsSelfContradictionIntroHe();
+  assert.match(intro, /Amazon US→IL/);
+  assert.match(intro, /17% VAT/);
+  assert.match(intro, /18%/);
+  assert.match(intro, /2026-04-29/);
+  assert.match(intro, /2026-09-23 08:15/);
+  assert.match(intro, /BoI\+0\.5%/);
+
+  const rows = iwishbagAmazonUsSelfContradictionRows();
+  assert.ok(rows.length >= 5);
+
+  const body = rows.find((r) => r.id === 'body-vat');
+  assert.ok(body);
+  assert.equal(body.iwishbagWrong, true);
+  assert.match(body.iwishbagEn, /17% VAT/);
+  assert.match(body.shopliEn, /18%/);
+
+  const table = rows.find((r) => r.id === 'own-table-vat');
+  assert.ok(table);
+  assert.match(table.iwishbagEn, /Standard VAT\/GST 18%/);
+  assert.notEqual(table.iwishbagWrong, true);
+
+  const self = rows.find((r) => r.id === 'self-contradiction');
+  assert.ok(self);
+  assert.equal(self.iwishbagWrong, true);
+  assert.match(self.iwishbagEn, /Body 17% vs own table 18%/);
+
+  const amazonus = rows.find((r) => r.id === 'amazonus-lane');
+  assert.ok(amazonus);
+  assert.equal(amazonus.iwishbagWrong, true);
+  assert.equal(amazonus.liveUrl, IWISHBAG_AMAZON_IL_URL);
+  assert.match(amazonus.iwishbagEn, /Apr 29/);
+
+  const last = rows.find((r) => r.id === 'last-updated');
+  assert.ok(last);
+  assert.equal(last.iwishbagWrong, true);
+  assert.match(last.iwishbagEn, /2026-04-29/);
+  assert.match(last.iwishbagEn, /2026-09-23 08:15/);
+});
+
+test('Amazon US→IL self-contradiction foil is presentation-only: #18–#47 math + prior foils intact', () => {
+  assert.equal(IL_VAT_RATE, 0.18);
+  assert.equal(BOI_CUSTOMS_FX_UPLIFT, 0.005);
+  assert.equal(USD_TO_ILS_RATE, 3.6);
+  assert.equal(DUTY_FREE_THRESHOLD_USD, 75);
+  assert.equal(DUTY_WAIVER_CEILING_USD, 500);
+  assert.equal(PTUR_OFFICIAL_USD, 75);
+  assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
+  assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
+
+  assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
+  assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
+  assert.equal(IWISHBAG_BODY_STILL_WRONG_VERIFIED, 'Sep 7 night');
+  assert.equal(DUTYDECODER_STALE_17_VERIFIED, 'Sep 15');
+  assert.equal(GATEWAYLINES_STALE_17_VERIFIED, 'Sep 22');
+  assert.equal(GATEWAYLINES_VAT_LABEL_QUOTE, 'מע״מ(17%)');
+  assert.equal(VAT_TRUTH_LAST_CHECKED, '2026-09-22 18:45');
+  assert.equal(TAX_AUTHORITY_VAT_RATE_PCT, 18);
+  assert.equal(IWISHBAG_FLIPKART_ETSY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 14:15');
+  assert.equal(IWISHBAG_ALIEXPRESS_WALMART_EBAY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 16:35');
+  assert.equal(IWISHBAG_TARGET_SELF_CONTRADICTION_VERIFIED, '2026-09-21 18:45');
+  assert.equal(IWISHBAG_AMAZONUS_SELF_CONTRADICTION_VERIFIED, '2026-09-23 08:15');
+  assert.equal(IWISHBAG_PAGE_LAST_UPDATED, '2026-04-29');
+  assert.equal(PTUR_THRESHOLD_CHURN_LAST_CHECKED, '2026-09-21 16:30');
+  assert.equal(PTUR_CHURN_130_USD, 130);
+  assert.equal(RATESHIPS_STALE_17_VERIFIED, 'Sep 22');
+  assert.equal(RATESHIPS_IL_URL, 'https://rateships.com/en/customs/israel');
+
+  // Distinct from Target #44 / RateShips #46 / Amazon US URL is the known foil lane
+  assert.notEqual(IWISHBAG_AMAZON_IL_URL, IWISHBAG_TARGET_IL_URL);
+  assert.notEqual(IWISHBAG_AMAZON_IL_URL, RATESHIPS_IL_URL);
+  assert.notEqual(IWISHBAG_AMAZONUS_SELF_CONTRADICTION_VERIFIED, IWISHBAG_TARGET_SELF_CONTRADICTION_VERIFIED);
+
+  const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
+  assert.ok(mid);
+  assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
+});
+
