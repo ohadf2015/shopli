@@ -418,6 +418,9 @@ export function iwishbagSideBySideIntroHe(): string {
 /** Marketplace how-to pages that reuse the iWishBag 「17% body still wrong」 foil. */
 export type MarketplaceHowToId = 'etsy' | 'ebay' | 'walmart' | 'aliexpress' | 'amazonjp' | 'shein' | 'temu' | 'flipkart' | 'amazonus' | 'amazonindia';
 
+/** When false, iWishBag URL 404s — do not link / do not invent VAT foil. */
+
+
 export interface MarketplaceHowToSpec {
   id: MarketplaceHowToId;
   nameEn: string;
@@ -425,6 +428,8 @@ export interface MarketplaceHowToSpec {
   path: string;
   /** Rival iWishBag how-to-buy-from guide (same Apr-29 body bug). */
   iwishbagUrl: string;
+  /** false when iWishBag URL 404s live — drop external foil link. */
+  iwishbagUrlLive?: boolean;
 }
 
 /** iWishBag Etsy → Israel guide (same 17% body / 18% table foil as Amazon). */
@@ -447,13 +452,30 @@ export const IWISHBAG_ALIEXPRESS_IL_URL =
 export const IWISHBAG_AMAZONJP_IL_URL =
   'https://www.iwishbag.com/how-to-buy-from/amazon-japan/israel';
 
-/** iWishBag Shein → Israel guide (same 17% body / 18% table foil template). */
+/**
+ * iWishBag Shein → Israel guide URL — **404 live** as of
+ * {@link IWISHBAG_SHEIN_TEMU_404_VERIFIED}. Do not invent a VAT foil for a dead
+ * page; Shopli /how-to-shein-israel still serves our own how-to.
+ */
 export const IWISHBAG_SHEIN_IL_URL =
   'https://www.iwishbag.com/how-to-buy-from/shein/israel';
 
-/** iWishBag Temu → Israel guide (same 17% body / 18% table foil template). */
+/**
+ * iWishBag Temu → Israel guide URL — **404 live** as of
+ * {@link IWISHBAG_SHEIN_TEMU_404_VERIFIED}. Do not invent a VAT foil for a dead
+ * page; Shopli /how-to-temu-israel still serves our own how-to.
+ */
 export const IWISHBAG_TEMU_IL_URL =
   'https://www.iwishbag.com/how-to-buy-from/temu/israel';
+
+/** Live HTTP status check: Shein + Temu iWishBag how-tos 404 (Sep 23 ~12:40). */
+export const IWISHBAG_SHEIN_TEMU_404_VERIFIED = '2026-09-23 12:40';
+export const IWISHBAG_SHEIN_IL_URL_LIVE = false;
+export const IWISHBAG_TEMU_IL_URL_LIVE = false;
+
+/** iWishBag Yahoo Shopping JP → Israel guide (same Apr-29 17% body / 18% table bug). */
+export const IWISHBAG_YAHOO_SHOPPING_JP_IL_URL =
+  'https://www.iwishbag.com/how-to-buy-from/yahoo-shopping-jp/israel';
 
 /** iWishBag Flipkart → Israel guide (same 17% body / 18% table foil template). */
 export const IWISHBAG_FLIPKART_IL_URL =
@@ -509,12 +531,14 @@ export const MARKETPLACE_HOW_TOS: readonly MarketplaceHowToSpec[] = [
     nameEn: 'Shein',
     path: '/how-to-shein-israel',
     iwishbagUrl: IWISHBAG_SHEIN_IL_URL,
+    iwishbagUrlLive: false,
   },
   {
     id: 'temu',
     nameEn: 'Temu',
     path: '/how-to-temu-israel',
     iwishbagUrl: IWISHBAG_TEMU_IL_URL,
+    iwishbagUrlLive: false,
   },
   {
     id: 'flipkart',
@@ -1550,3 +1574,112 @@ export function iwishbagAmazonIndiaSelfContradictionIntroHe(): string {
   );
 }
 
+
+/**
+ * Moat 2026-09-23 ~12:40: iWishBag Amazon Japan→IL still self-contradict — body
+ * 「17% VAT」 (customs blurb + FAQ) vs own duties table 「Standard VAT/GST 18%」,
+ * Last updated 2026-04-29 still live. Distinct from Amazon India #49 / Amazon US #48 /
+ * Target #44 / RateShips #46 / Gateway #47 bump / AliExpress+Walmart+eBay #42 /
+ * Flipkart+Etsy #41 / Amazon US how-to #34 / Amazon India how-to #36 / JP how-to #27.
+ * Presentation only — does not change estimator / kit / band math (#18–#49).
+ * Skills IL israeli-customs-duty-calculator Updated Sep 23, 2026 still v1.4.0 (VAT 18%).
+ * Bonus: Shein/Temu iWishBag URLs 404 live (drop foil links; no invented foil).
+ * Optional note: Yahoo Shopping JP→IL same 17vs18 Apr-29 bug (live, not a second strip).
+ */
+export const IWISHBAG_AMAZONJP_SELF_CONTRADICTION_VERIFIED = '2026-09-23 12:40';
+
+export interface IwishbagAmazonJpSelfContradictionRow {
+  id: string;
+  labelEn: string;
+  shopliEn: string;
+  iwishbagEn: string;
+  /** When true, iWishBag cell is the honesty callout (self-contradiction). */
+  iwishbagWrong?: boolean;
+  /** Optional live proof URL (Amazon JP / Yahoo JP lanes). */
+  liveUrl?: string;
+}
+
+/**
+ * Side-by-side honesty rows: Shopli /landed vs iWishBag Amazon Japan→IL.
+ * Foil: same page claims body 「17% VAT」 and table 「Standard VAT/GST 18%」
+ * while Last updated {@link IWISHBAG_PAGE_LAST_UPDATED} is still live
+ * (verified {@link IWISHBAG_AMAZONJP_SELF_CONTRADICTION_VERIFIED}).
+ * Does not change estimator math. Distinct from #49 / #48 / #27.
+ */
+export function iwishbagAmazonJpSelfContradictionRows(): IwishbagAmazonJpSelfContradictionRow[] {
+  return [
+    {
+      id: 'body-vat',
+      labelEn: 'Body / customs blurb + FAQ',
+      shopliEn: '18% (correct)',
+      iwishbagEn: `${IWISHBAG_BODY_17_VAT_QUOTE} — still wrong`,
+      iwishbagWrong: true,
+    },
+    {
+      id: 'own-table-vat',
+      labelEn: 'Own duties table (same page)',
+      shopliEn: '18%',
+      iwishbagEn: IWISHBAG_OWN_TABLE_18_VAT_QUOTE,
+    },
+    {
+      id: 'self-contradiction',
+      labelEn: 'Self-contradiction',
+      shopliEn: 'None — single 18% story',
+      iwishbagEn: 'Body 17% vs own table 18%',
+      iwishbagWrong: true,
+    },
+    {
+      id: 'amazonjp-lane',
+      labelEn: 'Amazon Japan→IL how-to',
+      shopliEn: 'paste Amazon JP URL → /landed',
+      iwishbagEn: 'Body 17% + table 18% · Last updated still Apr 29',
+      iwishbagWrong: true,
+      liveUrl: IWISHBAG_AMAZONJP_IL_URL,
+    },
+    {
+      id: 'yahoo-jp-note',
+      labelEn: 'Yahoo Shopping JP→IL (same bug)',
+      shopliEn: 'same /landed 18% path',
+      iwishbagEn: 'Same body 17% vs table 18% · Last updated Apr 29 (note only)',
+      iwishbagWrong: true,
+      liveUrl: IWISHBAG_YAHOO_SHOPPING_JP_IL_URL,
+    },
+    {
+      id: 'shein-temu-404',
+      labelEn: 'Shein / Temu iWishBag URLs',
+      shopliEn: 'Shopli /how-to-shein-israel + /how-to-temu-israel live',
+      iwishbagEn: `404 live · verified ${IWISHBAG_SHEIN_TEMU_404_VERIFIED} — foil links dropped`,
+      iwishbagWrong: true,
+    },
+    {
+      id: 'last-updated',
+      labelEn: 'Last updated / verified',
+      shopliEn: `Skills IL · ${SKILLS_IL_STAMP_DATE}`,
+      iwishbagEn: `${IWISHBAG_PAGE_LAST_UPDATED} (page) · self-contradiction live as of ${IWISHBAG_AMAZONJP_SELF_CONTRADICTION_VERIFIED}`,
+      iwishbagWrong: true,
+    },
+  ];
+}
+
+/**
+ * English headline for the Amazon Japan→IL self-contradiction strip —
+ * body 「17% VAT」 vs own table 18% (Last updated 2026-04-29 still live).
+ */
+export function iwishbagAmazonJpSelfContradictionHeadlineEn(): string {
+  return (
+    `iWishBag Amazon Japan→IL self-contradiction: body 「17% VAT」 vs own ` +
+    `table 「${IWISHBAG_OWN_TABLE_18_VAT_QUOTE}」 · Last updated ${IWISHBAG_PAGE_LAST_UPDATED} ` +
+    `still live · verified ${IWISHBAG_AMAZONJP_SELF_CONTRADICTION_VERIFIED}`
+  );
+}
+
+/** Short Hebrew intro above the Amazon Japan→IL self-contradiction strip. */
+export function iwishbagAmazonJpSelfContradictionIntroHe(): string {
+  return (
+    `סתירה פנימית אצל iWishBag (Amazon Japan→IL): בגוף העמוד/מכס/FAQ עדיין ` +
+    `"17% VAT" בעוד שטבלת המכסים באותו עמוד מציינת Standard VAT/GST 18% — ` +
+    `עדכון אחרון אצלם ${IWISHBAG_PAGE_LAST_UPDATED} עדיין חי. ` +
+    `אומת ${IWISHBAG_AMAZONJP_SELF_CONTRADICTION_VERIFIED}. שופלי: מע״ם 18% + BoI+0.5%. ` +
+    `הערה: Yahoo Shopping JP→IL אותה סתירה; Shein/Temu אצלם 404.`
+  );
+}

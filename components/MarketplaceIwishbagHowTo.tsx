@@ -67,6 +67,7 @@ export default function MarketplaceIwishbagHowTo({
         data-iwishbag-side-by-side-foil="1"
         data-iwishbag-body-still-wrong={IWISHBAG_BODY_STILL_WRONG_VERIFIED}
         data-iwishbag-url={spec.iwishbagUrl}
+        {...(spec.iwishbagUrlLive === false ? { 'data-iwishbag-url-404': '1' } : {})}
       >
         <section className="max-w-3xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-10">
           <div
@@ -168,6 +169,7 @@ export default function MarketplaceIwishbagHowTo({
             }}
             data-iwishbag-side-by-side-foil="1"
             data-iwishbag-url={spec.iwishbagUrl}
+        {...(spec.iwishbagUrlLive === false ? { 'data-iwishbag-url-404': '1' } : {})}
             data-iwishbag-last-updated={IWISHBAG_PAGE_LAST_UPDATED}
             data-iwishbag-body-still-wrong={IWISHBAG_BODY_STILL_WRONG_VERIFIED}
             data-vat-honesty-foil="18-not-17"
@@ -191,17 +193,28 @@ export default function MarketplaceIwishbagHowTo({
             </p>
             <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--shopli-warm-gray)' }}>
               {introEn}{' '}
-              <a
-                href={spec.iwishbagUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold underline-offset-2 hover:underline"
-                style={{ color: 'var(--shopli-orange)' }}
-                data-iwishbag-foil-link="1"
-              >
-                iWishBag {spec.nameEn}→IL
-                <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
-              </a>
+              {spec.iwishbagUrlLive === false ? (
+                <span
+                  className="font-semibold"
+                  style={{ color: '#b91c1c' }}
+                  data-iwishbag-foil-link="404"
+                  data-iwishbag-url-404="1"
+                >
+                  iWishBag {spec.nameEn}→IL 404 (foil link dropped)
+                </span>
+              ) : (
+                <a
+                  href={spec.iwishbagUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold underline-offset-2 hover:underline"
+                  style={{ color: 'var(--shopli-orange)' }}
+                  data-iwishbag-foil-link="1"
+                >
+                  iWishBag {spec.nameEn}→IL
+                  <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+                </a>
+              )}
             </p>
             <div className="overflow-x-auto">
               <table
