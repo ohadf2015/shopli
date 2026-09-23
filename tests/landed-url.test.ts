@@ -56,6 +56,10 @@ import {
   iwishbagAmazonUsSelfContradictionRows,
   iwishbagAmazonUsSelfContradictionHeadlineEn,
   iwishbagAmazonUsSelfContradictionIntroHe,
+  IWISHBAG_AMAZONINDIA_SELF_CONTRADICTION_VERIFIED,
+  iwishbagAmazonIndiaSelfContradictionRows,
+  iwishbagAmazonIndiaSelfContradictionHeadlineEn,
+  iwishbagAmazonIndiaSelfContradictionIntroHe,
   RATESHIPS_IL_URL,
   RATESHIPS_STALE_17_VERIFIED,
   RATESHIPS_FAQ_VAT_17_QUOTE,
@@ -214,15 +218,15 @@ test('kit tipping copy mentions $75 threshold and never 17% VAT', () => {
   assert.doesNotMatch(c, /מע״ם 17%/);
 });
 
-test('customs stamp copy: Skills IL customs v1.4.0 + shekel v2.2.0 · Sep 22, 18% not 17%, BoI+0.5%', () => {
+test('customs stamp copy: Skills IL customs v1.4.0 + shekel v2.2.0 · Sep 23, 18% not 17%, BoI+0.5%', () => {
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 23');
 
   const stamp = customsStampCopyHe();
   assert.match(stamp, /Skills IL customs v1\.4\.0/);
   assert.match(stamp, /shekel v2\.2\.0/);
-  assert.match(stamp, /Sep 22/);
+  assert.match(stamp, /Sep 23/);
   assert.doesNotMatch(stamp, /Sep 6/);
   assert.match(stamp, /מע״ם בישראל 18%/);
   assert.match(stamp, /לא 17%/);
@@ -394,7 +398,7 @@ test('side-by-side foil is presentation-only: #18–#24 math + prior foils intac
   assert.equal(DUTY_WAIVER_CEILING_USD, 500);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 23');
 
   const strip = vatFxHonestyStripHe();
   assert.match(strip, /מע״ם 18%/);
@@ -458,7 +462,7 @@ test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Fli
   assert.equal(amazonindia.iwishbagUrl, IWISHBAG_AMAZONINDIA_IL_URL);
 });
 
-test('marketplace foil copy: 18% not 17%, Skills Sep 22 stamp, body still wrong', () => {
+test('marketplace foil copy: 18% not 17%, Skills Sep 23 stamp, body still wrong', () => {
   for (const m of MARKETPLACE_HOW_TOS) {
     const intro = iwishbagMarketplaceFoilIntroEn(m.id);
     assert.match(intro, /"17% VAT"/);
@@ -488,9 +492,9 @@ test('marketplace foil copy: 18% not 17%, Skills Sep 22 stamp, body still wrong'
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 23');
   const stamp = customsStampCopyHe();
-  assert.match(stamp, /Sep 22/);
+  assert.match(stamp, /Sep 23/);
   assert.match(stamp, /לא 17%/);
 });
 
@@ -566,7 +570,7 @@ test('DutyDecoder foil is presentation-only: #18–#36 math + prior foils intact
   assert.equal(DUTY_WAIVER_CEILING_USD, 500);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 23');
 
   const strip = vatFxHonestyStripHe();
   assert.match(strip, /מע״ם 18%/);
@@ -646,7 +650,7 @@ test('Gateway Lines foil is presentation-only: #18–#38 math + prior foils inta
   assert.equal(DUTY_WAIVER_CEILING_USD, 500);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 23');
 
   const strip = vatFxHonestyStripHe();
   assert.match(strip, /מע״ם 18%/);
@@ -731,7 +735,7 @@ test('VAT truth moat is presentation-only: #18–#39 math + prior foils intact',
   assert.equal(DUTY_WAIVER_CEILING_USD, 500);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 23');
 
   assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
@@ -817,7 +821,7 @@ test('Flipkart+Etsy self-contradiction foil is presentation-only: #18–#41 math
   assert.equal(DUTY_WAIVER_CEILING_USD, 500);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 23');
 
   assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
@@ -912,7 +916,7 @@ test('AliExpress+Walmart+eBay self-contradiction foil is presentation-only: #18�
   assert.equal(DUTY_WAIVER_CEILING_USD, 500);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 23');
 
   assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
@@ -1013,7 +1017,7 @@ test('ptur threshold-churn foil is presentation-only: #18–#42 math + prior foi
   assert.equal(PTUR_OFFICIAL_USD, 75);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 23');
 
   assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
@@ -1098,7 +1102,7 @@ test('Target→IL self-contradiction foil is presentation-only: #18–#43 math +
   assert.equal(PTUR_OFFICIAL_USD, 75);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 23');
 
   assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
@@ -1182,7 +1186,7 @@ test('RateShips side-by-side foil: whole-page VAT 17% as of Sep 22', () => {
   assert.equal(verified.rateshipsWrong, true);
   assert.match(verified.rateshipsEn, /Sep 22/);
   assert.match(verified.rateshipsEn, /17%/);
-  assert.match(verified.shopliEn, /Sep 22/);
+  assert.match(verified.shopliEn, /Sep 23/);
 });
 
 test('RateShips foil is presentation-only: estimator math unchanged (18%) + prior foils intact', () => {
@@ -1194,7 +1198,7 @@ test('RateShips foil is presentation-only: estimator math unchanged (18%) + prio
   assert.equal(PTUR_OFFICIAL_USD, 75);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 23');
 
   assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
@@ -1277,7 +1281,7 @@ test('iWishBag Amazon US→IL self-contradiction strip: body 17% vs own table 18
   assert.match(last.iwishbagEn, /2026-09-23 08:15/);
 });
 
-test('Amazon US→IL self-contradiction foil is presentation-only: #18–#47 math + prior foils intact', () => {
+test('Amazon US→IL self-contradiction foil is presentation-only: #18–#48 math + prior foils intact', () => {
   assert.equal(IL_VAT_RATE, 0.18);
   assert.equal(BOI_CUSTOMS_FX_UPLIFT, 0.005);
   assert.equal(USD_TO_ILS_RATE, 3.6);
@@ -1286,7 +1290,7 @@ test('Amazon US→IL self-contradiction foil is presentation-only: #18–#47 mat
   assert.equal(PTUR_OFFICIAL_USD, 75);
   assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
   assert.equal(SKILLS_IL_SHEKEL, 'v2.2.0');
-  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 22');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 23');
 
   assert.match(ITA_SHAAR_OLAMI_CALC_URL, /shaarolami-query\.customs\.mof\.gov\.il/);
   assert.equal(israelVat18Not17FoilEn(), 'Israel VAT is 18% not 17%.');
@@ -1300,6 +1304,7 @@ test('Amazon US→IL self-contradiction foil is presentation-only: #18–#47 mat
   assert.equal(IWISHBAG_ALIEXPRESS_WALMART_EBAY_SELF_CONTRADICTION_VERIFIED, '2026-09-15 16:35');
   assert.equal(IWISHBAG_TARGET_SELF_CONTRADICTION_VERIFIED, '2026-09-21 18:45');
   assert.equal(IWISHBAG_AMAZONUS_SELF_CONTRADICTION_VERIFIED, '2026-09-23 08:15');
+  assert.equal(IWISHBAG_AMAZONINDIA_SELF_CONTRADICTION_VERIFIED, '2026-09-23 10:40');
   assert.equal(IWISHBAG_PAGE_LAST_UPDATED, '2026-04-29');
   assert.equal(PTUR_THRESHOLD_CHURN_LAST_CHECKED, '2026-09-21 16:30');
   assert.equal(PTUR_CHURN_130_USD, 130);
@@ -1310,6 +1315,84 @@ test('Amazon US→IL self-contradiction foil is presentation-only: #18–#47 mat
   assert.notEqual(IWISHBAG_AMAZON_IL_URL, IWISHBAG_TARGET_IL_URL);
   assert.notEqual(IWISHBAG_AMAZON_IL_URL, RATESHIPS_IL_URL);
   assert.notEqual(IWISHBAG_AMAZONUS_SELF_CONTRADICTION_VERIFIED, IWISHBAG_TARGET_SELF_CONTRADICTION_VERIFIED);
+
+  const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
+  assert.ok(mid);
+  assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
+});
+
+
+test('iWishBag Amazon India→IL self-contradiction strip: body 17% vs own table 18%', () => {
+  assert.equal(IWISHBAG_PAGE_LAST_UPDATED, '2026-04-29');
+  assert.equal(IWISHBAG_AMAZONINDIA_SELF_CONTRADICTION_VERIFIED, '2026-09-23 10:40');
+  assert.equal(IWISHBAG_AMAZONINDIA_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/amazon-india/israel');
+  assert.match(IWISHBAG_BODY_17_VAT_QUOTE, /17% VAT/);
+  assert.match(IWISHBAG_OWN_TABLE_18_VAT_QUOTE, /Standard VAT\/GST 18%/);
+  assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 23');
+
+  const headline = iwishbagAmazonIndiaSelfContradictionHeadlineEn();
+  assert.match(headline, /Amazon India→IL/i);
+  assert.match(headline, /self-contradiction/i);
+  assert.match(headline, /17% VAT/);
+  assert.match(headline, /Standard VAT\/GST 18%/);
+  assert.match(headline, /2026-04-29/);
+  assert.match(headline, /2026-09-23 10:40/);
+
+  const intro = iwishbagAmazonIndiaSelfContradictionIntroHe();
+  assert.match(intro, /Amazon India→IL/);
+  assert.match(intro, /17% VAT/);
+  assert.match(intro, /18%/);
+  assert.match(intro, /2026-04-29/);
+  assert.match(intro, /2026-09-23 10:40/);
+  assert.match(intro, /BoI\+0\.5%/);
+
+  const rows = iwishbagAmazonIndiaSelfContradictionRows();
+  assert.ok(rows.length >= 5);
+
+  const body = rows.find((r) => r.id === 'body-vat');
+  assert.ok(body);
+  assert.equal(body.iwishbagWrong, true);
+  assert.match(body.iwishbagEn, /17% VAT/);
+  assert.match(body.shopliEn, /18%/);
+
+  const table = rows.find((r) => r.id === 'own-table-vat');
+  assert.ok(table);
+  assert.match(table.iwishbagEn, /Standard VAT\/GST 18%/);
+  assert.notEqual(table.iwishbagWrong, true);
+
+  const self = rows.find((r) => r.id === 'self-contradiction');
+  assert.ok(self);
+  assert.equal(self.iwishbagWrong, true);
+  assert.match(self.iwishbagEn, /Body 17% vs own table 18%/);
+
+  const amazonindia = rows.find((r) => r.id === 'amazonindia-lane');
+  assert.ok(amazonindia);
+  assert.equal(amazonindia.iwishbagWrong, true);
+  assert.equal(amazonindia.liveUrl, IWISHBAG_AMAZONINDIA_IL_URL);
+  assert.match(amazonindia.iwishbagEn, /Apr 29/);
+
+  const last = rows.find((r) => r.id === 'last-updated');
+  assert.ok(last);
+  assert.equal(last.iwishbagWrong, true);
+  assert.match(last.iwishbagEn, /2026-04-29/);
+  assert.match(last.iwishbagEn, /2026-09-23 10:40/);
+  assert.match(last.shopliEn, /Sep 23/);
+});
+
+test('Amazon India→IL self-contradiction foil is presentation-only: distinct from #48/#36 + math intact', () => {
+  assert.equal(IL_VAT_RATE, 0.18);
+  assert.equal(BOI_CUSTOMS_FX_UPLIFT, 0.005);
+  assert.equal(SKILLS_IL_CUSTOMS, 'v1.4.0');
+  assert.equal(SKILLS_IL_STAMP_DATE, 'Sep 23');
+  assert.equal(IWISHBAG_AMAZONINDIA_SELF_CONTRADICTION_VERIFIED, '2026-09-23 10:40');
+  assert.equal(IWISHBAG_AMAZONUS_SELF_CONTRADICTION_VERIFIED, '2026-09-23 08:15');
+  assert.notEqual(IWISHBAG_AMAZONINDIA_IL_URL, IWISHBAG_AMAZON_IL_URL);
+  assert.notEqual(
+    IWISHBAG_AMAZONINDIA_SELF_CONTRADICTION_VERIFIED,
+    IWISHBAG_AMAZONUS_SELF_CONTRADICTION_VERIFIED,
+  );
+  assert.equal(IWISHBAG_PAGE_LAST_UPDATED, '2026-04-29');
 
   const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
   assert.ok(mid);
