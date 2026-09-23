@@ -85,6 +85,11 @@ import {
   iwishbagAmazonJpSelfContradictionRows,
   iwishbagAmazonJpSelfContradictionHeadlineEn,
   iwishbagAmazonJpSelfContradictionIntroHe,
+  IWISHBAG_MYNTRA_IL_URL,
+  IWISHBAG_MYNTRA_SELF_CONTRADICTION_VERIFIED,
+  iwishbagMyntraSelfContradictionRows,
+  iwishbagMyntraSelfContradictionHeadlineEn,
+  iwishbagMyntraSelfContradictionIntroHe,
   IWISHBAG_YAHOO_SHOPPING_JP_IL_URL,
   IWISHBAG_SHEIN_TEMU_404_VERIFIED,
   RATESHIPS_IL_URL,
@@ -161,7 +166,7 @@ function emptyKitPrices(n = KIT_MAX): string[] {
  * Amazon India how-to #36;
  * ITA Shaar Olami calculator foil (#23) kept. Presentation only.
  * Marketplace Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Flipkart/
- * Amazon US/Amazon India→IL how-tos reuse iWishBag foil (#26–#36).
+ * Amazon US/Amazon India/Myntra→IL how-tos reuse iWishBag foil (#26–#36 + Myntra).
  * Estimator math unchanged (#18–#48, still 18%). Keep #19–#48; Skills IL
  * Sep 23 still v1.4.0 + BoI+0.5% (context only).
  */
@@ -330,6 +335,9 @@ export default function LandedPage() {
   const amazonJpRows = iwishbagAmazonJpSelfContradictionRows();
   const amazonJpHeadline = iwishbagAmazonJpSelfContradictionHeadlineEn();
   const amazonJpIntro = iwishbagAmazonJpSelfContradictionIntroHe();
+  const myntraRows = iwishbagMyntraSelfContradictionRows();
+  const myntraHeadline = iwishbagMyntraSelfContradictionHeadlineEn();
+  const myntraIntro = iwishbagMyntraSelfContradictionIntroHe();
   const rateShipsRows = rateShipsSideBySideRows();
   const rateShipsHeadline = rateShipsStale17HeadlineEn();
   const rateShipsIntro = rateShipsSideBySideIntroHe();
@@ -392,6 +400,8 @@ export default function LandedPage() {
         data-iwishbag-amazonindia-verified={IWISHBAG_AMAZONINDIA_SELF_CONTRADICTION_VERIFIED}
         data-iwishbag-amazonjp-self-contradiction="1"
         data-iwishbag-amazonjp-verified={IWISHBAG_AMAZONJP_SELF_CONTRADICTION_VERIFIED}
+        data-iwishbag-myntra-self-contradiction="1"
+        data-iwishbag-myntra-verified={IWISHBAG_MYNTRA_SELF_CONTRADICTION_VERIFIED}
         data-iwishbag-shein-temu-404={IWISHBAG_SHEIN_TEMU_404_VERIFIED}
         data-rateships-side-by-side-foil="1"
         data-rateships-stale-17={RATESHIPS_STALE_17_VERIFIED}
@@ -1944,6 +1954,131 @@ export default function LandedPage() {
               Keep #19 / #23–#49. Skills IL Sep 23 still v1.4.0 (VAT 18%).
             </p>
           </aside>
+
+{/* iWishBag Myntra→IL self-contradiction strip — body 17% vs own table 18% (moat 2026-09-23 ~14:35; hermes-filed) */}
+          <aside
+            className="rounded-xl border p-3 sm:p-4 mb-6"
+            style={{
+              borderColor: 'rgba(220,38,38,0.28)',
+              background: 'rgba(254,242,242,0.65)',
+            }}
+            data-iwishbag-myntra-self-contradiction="1"
+            data-iwishbag-myntra-url={IWISHBAG_MYNTRA_IL_URL}
+            data-iwishbag-last-updated={IWISHBAG_PAGE_LAST_UPDATED}
+            data-iwishbag-myntra-verified={IWISHBAG_MYNTRA_SELF_CONTRADICTION_VERIFIED}
+            data-vat-honesty-foil="18-not-17"
+          >
+            <div
+              className="flex items-start gap-2 text-sm font-bold mb-1"
+              style={{ color: 'var(--shopli-navy)' }}
+            >
+              <Icon name="shield" size={16} className="shrink-0 mt-0.5" />
+              <span>Self-contradiction · iWishBag Myntra→IL</span>
+            </div>
+            <p
+              className="text-xs font-bold mb-2"
+              style={{ color: '#b91c1c' }}
+              dir="ltr"
+              data-iwishbag-myntra-headline="self-contradiction"
+            >
+              {myntraHeadline}
+            </p>
+            <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {myntraIntro}{' '}
+              <a
+                href={IWISHBAG_MYNTRA_IL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline-offset-2 hover:underline"
+                style={{ color: 'var(--shopli-orange)' }}
+                data-iwishbag-myntra-foil-link="1"
+              >
+                Myntra→IL
+                <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+              </a>
+            </p>
+            <div className="overflow-x-auto" dir="ltr">
+              <table
+                className="w-full text-left text-xs border-collapse"
+                data-iwishbag-myntra-self-contradiction-table="1"
+              >
+                <thead>
+                  <tr style={{ color: 'var(--shopli-navy)' }}>
+                    <th className="py-1.5 pe-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Claim
+                    </th>
+                    <th className="py-1.5 px-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Shopli /landed
+                    </th>
+                    <th className="py-1.5 ps-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      iWishBag Myntra→IL
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {myntraRows.map((row) => (
+                    <tr
+                      key={row.id}
+                      data-iwishbag-myntra-row={row.id}
+                      {...(row.iwishbagWrong ? { 'data-iwishbag-wrong': '1' } : {})}
+                    >
+                      <td
+                        className="py-1.5 pe-2 align-top font-semibold"
+                        style={{ color: 'var(--shopli-navy)' }}
+                      >
+                        {row.labelEn}
+                      </td>
+                      <td
+                        className="py-1.5 px-2 align-top"
+                        style={{ color: 'var(--shopli-warm-gray)' }}
+                        data-shopli-cell={row.id}
+                      >
+                        {row.shopliEn}
+                      </td>
+                      <td
+                        className="py-1.5 ps-2 align-top font-semibold"
+                        style={{
+                          color: row.iwishbagWrong ? '#b91c1c' : 'var(--shopli-warm-gray)',
+                        }}
+                        data-iwishbag-cell={row.id}
+                      >
+                        {row.iwishbagEn}
+                        {row.liveUrl ? (
+                          <>
+                            {' '}
+                            <a
+                              href={row.liveUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="underline-offset-2 hover:underline"
+                              style={{ color: 'var(--shopli-orange)' }}
+                              data-iwishbag-lane-link={row.id}
+                            >
+                              live
+                              <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+                            </a>
+                          </>
+                        ) : null}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p
+              className="text-[11px] mt-2 font-semibold"
+              dir="ltr"
+              style={{ color: 'var(--shopli-navy)' }}
+              data-vat-foil-en="18-not-17"
+            >
+              {vatFoilEn} Myntra→IL body 「17% VAT」 vs own table 18% · Last updated{' '}
+              {IWISHBAG_PAGE_LAST_UPDATED} still live. Distinct from #50 / #49 / #48 / #44 / #42 / #41.
+              Keep #19 / #23–#50. hermes-filed for moat merge. Skills IL Sep 23 still v1.4.0 (VAT 18%).
+            </p>
+          </aside>
+
+
+          
 
           {/* Marketplace→IL how-tos — same iWishBag 17% body foil */}
           <nav
