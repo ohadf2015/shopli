@@ -75,6 +75,11 @@ import {
   iwishbagCostcoSelfContradictionIntroHe,
   IWISHBAG_COSTCO_SELF_CONTRADICTION_VERIFIED,
   IWISHBAG_COSTCO_IL_URL,
+  iwishbagMacysSelfContradictionRows,
+  iwishbagMacysSelfContradictionHeadlineEn,
+  iwishbagMacysSelfContradictionIntroHe,
+  IWISHBAG_MACYS_SELF_CONTRADICTION_VERIFIED,
+  IWISHBAG_MACYS_IL_URL,
   IWISHBAG_YAHOO_SHOPPING_JP_IL_URL,
   IWISHBAG_SHEIN_TEMU_404_VERIFIED,
   IWISHBAG_SHEIN_IL_URL_LIVE,
@@ -450,9 +455,9 @@ test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Fli
   assert.equal(IWISHBAG_AMAZON_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/amazon-us/israel');
   assert.equal(IWISHBAG_AMAZONINDIA_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/amazon-india/israel');
 
-  assert.equal(MARKETPLACE_HOW_TOS.length, 12);
+  assert.equal(MARKETPLACE_HOW_TOS.length, 13);
   const ids = MARKETPLACE_HOW_TOS.map((m) => m.id);
-  assert.deepEqual(ids, ['etsy', 'ebay', 'walmart', 'aliexpress', 'amazonjp', 'shein', 'temu', 'flipkart', 'amazonus', 'amazonindia', 'myntra', 'costco']);
+  assert.deepEqual(ids, ['etsy', 'ebay', 'walmart', 'aliexpress', 'amazonjp', 'shein', 'temu', 'flipkart', 'amazonus', 'amazonindia', 'myntra', 'costco', 'macys']);
 
   for (const m of MARKETPLACE_HOW_TOS) {
     assert.match(m.path, new RegExp(`^/how-to-${m.id}-israel$`));
@@ -493,6 +498,11 @@ test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Fli
   assert.equal(costco.nameEn, 'Costco');
   assert.equal(costco.path, '/how-to-costco-israel');
   assert.equal(costco.iwishbagUrl, IWISHBAG_COSTCO_IL_URL);
+  assert.equal(IWISHBAG_MACYS_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/macys/israel');
+  const macys = getMarketplaceHowTo('macys');
+  assert.equal(macys.nameEn, "Macy's");
+  assert.equal(macys.path, '/how-to-macys-israel');
+  assert.equal(macys.iwishbagUrl, IWISHBAG_MACYS_IL_URL);
 });
 
 test('marketplace foil copy: 18% not 17%, Skills Sep 23 stamp, body still wrong', () => {
@@ -1623,7 +1633,19 @@ test('iwishbagCostcoSelfContradiction: body 17 vs own table 18 · Sep28 verified
   assert.ok(rows.some((r) => r.id === 'costco-lane' && r.liveUrl?.includes('costco')));
   assert.match(iwishbagCostcoSelfContradictionHeadlineEn(), /Costco→IL/);
   assert.match(iwishbagCostcoSelfContradictionIntroHe(), /Costco→IL|מע״ם 18%/);
-  assert.equal(IWISHBAG_COSTCO_SELF_CONTRADICTION_VERIFIED,
-  IWISHBAG_COSTCO_IL_URL, '2026-09-28 16:40');
+  assert.equal(IWISHBAG_COSTCO_SELF_CONTRADICTION_VERIFIED, '2026-09-28 16:40');
+  assert.equal(IWISHBAG_COSTCO_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/costco/israel');
   assert.equal(getMarketplaceHowTo('costco').path, '/how-to-costco-israel');
+});
+
+test("iwishbagMacysSelfContradiction: body 17 vs own table 18 · Sep28 verified", () => {
+  const rows = iwishbagMacysSelfContradictionRows();
+  assert.ok(rows.some((r) => r.id === 'body-vat' && r.iwishbagWrong));
+  assert.ok(rows.some((r) => r.id === 'own-table-vat' && r.iwishbagEn.includes('18%')));
+  assert.ok(rows.some((r) => r.id === 'macys-lane' && r.liveUrl?.includes('macys')));
+  assert.match(iwishbagMacysSelfContradictionHeadlineEn(), /Macy's→IL/);
+  assert.match(iwishbagMacysSelfContradictionIntroHe(), /Macy's→IL|מע״ם 18%/);
+  assert.equal(IWISHBAG_MACYS_SELF_CONTRADICTION_VERIFIED, '2026-09-28 19:20');
+  assert.equal(IWISHBAG_MACYS_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/macys/israel');
+  assert.equal(getMarketplaceHowTo('macys').path, '/how-to-macys-israel');
 });
