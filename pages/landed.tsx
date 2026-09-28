@@ -90,6 +90,11 @@ import {
   iwishbagMyntraSelfContradictionRows,
   iwishbagMyntraSelfContradictionHeadlineEn,
   iwishbagMyntraSelfContradictionIntroHe,
+  IWISHBAG_COSTCO_IL_URL,
+  IWISHBAG_COSTCO_SELF_CONTRADICTION_VERIFIED,
+  iwishbagCostcoSelfContradictionRows,
+  iwishbagCostcoSelfContradictionHeadlineEn,
+  iwishbagCostcoSelfContradictionIntroHe,
   IWISHBAG_YAHOO_SHOPPING_JP_IL_URL,
   IWISHBAG_SHEIN_TEMU_404_VERIFIED,
   RATESHIPS_IL_URL,
@@ -338,6 +343,9 @@ export default function LandedPage() {
   const myntraRows = iwishbagMyntraSelfContradictionRows();
   const myntraHeadline = iwishbagMyntraSelfContradictionHeadlineEn();
   const myntraIntro = iwishbagMyntraSelfContradictionIntroHe();
+  const costcoRows = iwishbagCostcoSelfContradictionRows();
+  const costcoHeadline = iwishbagCostcoSelfContradictionHeadlineEn();
+  const costcoIntro = iwishbagCostcoSelfContradictionIntroHe();
   const rateShipsRows = rateShipsSideBySideRows();
   const rateShipsHeadline = rateShipsStale17HeadlineEn();
   const rateShipsIntro = rateShipsSideBySideIntroHe();
@@ -402,6 +410,8 @@ export default function LandedPage() {
         data-iwishbag-amazonjp-verified={IWISHBAG_AMAZONJP_SELF_CONTRADICTION_VERIFIED}
         data-iwishbag-myntra-self-contradiction="1"
         data-iwishbag-myntra-verified={IWISHBAG_MYNTRA_SELF_CONTRADICTION_VERIFIED}
+        data-iwishbag-costco-self-contradiction="1"
+        data-iwishbag-costco-verified={IWISHBAG_COSTCO_SELF_CONTRADICTION_VERIFIED}
         data-iwishbag-shein-temu-404={IWISHBAG_SHEIN_TEMU_404_VERIFIED}
         data-rateships-side-by-side-foil="1"
         data-rateships-stale-17={RATESHIPS_STALE_17_VERIFIED}
@@ -2076,6 +2086,129 @@ export default function LandedPage() {
               Keep #19 / #23–#50. hermes-filed for moat merge. Skills IL Sep 23 still v1.4.0 (VAT 18%).
             </p>
           </aside>
+
+{/* iWishBag Costco→IL self-contradiction strip — body 17% vs own table 18% (moat 2026-09-28 ~16:40; hermes-filed) */}
+          <aside
+            className="rounded-xl border p-3 sm:p-4 mb-6"
+            style={{
+              borderColor: 'rgba(220,38,38,0.28)',
+              background: 'rgba(254,242,242,0.65)',
+            }}
+            data-iwishbag-costco-self-contradiction="1"
+            data-iwishbag-costco-url={IWISHBAG_COSTCO_IL_URL}
+            data-iwishbag-last-updated={IWISHBAG_PAGE_LAST_UPDATED}
+            data-iwishbag-costco-verified={IWISHBAG_COSTCO_SELF_CONTRADICTION_VERIFIED}
+            data-vat-honesty-foil="18-not-17"
+          >
+            <div
+              className="flex items-start gap-2 text-sm font-bold mb-1"
+              style={{ color: 'var(--shopli-navy)' }}
+            >
+              <Icon name="shield" size={16} className="shrink-0 mt-0.5" />
+              <span>Self-contradiction · iWishBag Costco→IL</span>
+            </div>
+            <p
+              className="text-xs font-bold mb-2"
+              style={{ color: '#b91c1c' }}
+              dir="ltr"
+              data-iwishbag-costco-headline="self-contradiction"
+            >
+              {costcoHeadline}
+            </p>
+            <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {costcoIntro}{' '}
+              <a
+                href={IWISHBAG_COSTCO_IL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline-offset-2 hover:underline"
+                style={{ color: 'var(--shopli-orange)' }}
+                data-iwishbag-costco-foil-link="1"
+              >
+                Costco→IL
+                <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+              </a>
+            </p>
+            <div className="overflow-x-auto" dir="ltr">
+              <table
+                className="w-full text-left text-xs border-collapse"
+                data-iwishbag-costco-self-contradiction-table="1"
+              >
+                <thead>
+                  <tr style={{ color: 'var(--shopli-navy)' }}>
+                    <th className="py-1.5 pe-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Claim
+                    </th>
+                    <th className="py-1.5 px-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      Shopli /landed
+                    </th>
+                    <th className="py-1.5 ps-2 font-bold border-b" style={{ borderColor: 'rgba(15,23,42,0.12)' }}>
+                      iWishBag Costco→IL
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {costcoRows.map((row) => (
+                    <tr
+                      key={row.id}
+                      data-iwishbag-costco-row={row.id}
+                      {...(row.iwishbagWrong ? { 'data-iwishbag-wrong': '1' } : {})}
+                    >
+                      <td
+                        className="py-1.5 pe-2 align-top font-semibold"
+                        style={{ color: 'var(--shopli-navy)' }}
+                      >
+                        {row.labelEn}
+                      </td>
+                      <td
+                        className="py-1.5 px-2 align-top"
+                        style={{ color: 'var(--shopli-warm-gray)' }}
+                        data-shopli-cell={row.id}
+                      >
+                        {row.shopliEn}
+                      </td>
+                      <td
+                        className="py-1.5 ps-2 align-top font-semibold"
+                        style={{
+                          color: row.iwishbagWrong ? '#b91c1c' : 'var(--shopli-warm-gray)',
+                        }}
+                        data-iwishbag-cell={row.id}
+                      >
+                        {row.iwishbagEn}
+                        {row.liveUrl ? (
+                          <>
+                            {' '}
+                            <a
+                              href={row.liveUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="underline-offset-2 hover:underline"
+                              style={{ color: 'var(--shopli-orange)' }}
+                              data-iwishbag-lane-link={row.id}
+                            >
+                              live
+                              <Icon name="external" size={11} className="inline-block ms-1 align-middle" />
+                            </a>
+                          </>
+                        ) : null}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p
+              className="text-[11px] mt-2 font-semibold"
+              dir="ltr"
+              style={{ color: 'var(--shopli-navy)' }}
+              data-vat-foil-en="18-not-17"
+            >
+              {vatFoilEn} Costco→IL body 「17% VAT」 vs own table 18% · Last updated{' '}
+              {IWISHBAG_PAGE_LAST_UPDATED} still live. Distinct from #51 / #50 / #49 / #48 / #44 / #42 / #41.
+              Keep #19 / #23–#51. Cite gov.il 18% + Skills IL. hermes-filed for moat merge.
+            </p>
+          </aside>
+
 
 
           
