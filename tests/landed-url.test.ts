@@ -70,6 +70,10 @@ import {
   iwishbagMyntraSelfContradictionRows,
   iwishbagMyntraSelfContradictionHeadlineEn,
   iwishbagMyntraSelfContradictionIntroHe,
+  iwishbagCostcoSelfContradictionRows,
+  iwishbagCostcoSelfContradictionHeadlineEn,
+  iwishbagCostcoSelfContradictionIntroHe,
+  IWISHBAG_COSTCO_SELF_CONTRADICTION_VERIFIED,
   IWISHBAG_YAHOO_SHOPPING_JP_IL_URL,
   IWISHBAG_SHEIN_TEMU_404_VERIFIED,
   IWISHBAG_SHEIN_IL_URL_LIVE,
@@ -1604,4 +1608,15 @@ test('Myntra→IL self-contradiction foil is presentation-only: distinct from #5
   const mid = estimateLandedCost({ price: 200, currency: 'USD', freeShipping: true });
   assert.ok(mid);
   assert.ok(Math.abs(mid.vatIls - IL_VAT_RATE * 200 * USD_TO_ILS_RATE) < 1e-9);
+});
+
+test('iwishbagCostcoSelfContradiction: body 17 vs own table 18 · Sep28 verified', () => {
+  const rows = iwishbagCostcoSelfContradictionRows();
+  assert.ok(rows.some((r) => r.id === 'body-vat' && r.iwishbagWrong));
+  assert.ok(rows.some((r) => r.id === 'own-table-vat' && r.iwishbagEn.includes('18%')));
+  assert.ok(rows.some((r) => r.id === 'costco-lane' && r.liveUrl?.includes('costco')));
+  assert.match(iwishbagCostcoSelfContradictionHeadlineEn(), /Costco→IL/);
+  assert.match(iwishbagCostcoSelfContradictionIntroHe(), /Costco→IL|מע״ם 18%/);
+  assert.equal(IWISHBAG_COSTCO_SELF_CONTRADICTION_VERIFIED, '2026-09-28 16:40');
+  assert.equal(getMarketplaceHowTo('costco').path, '/how-to-costco-israel');
 });
