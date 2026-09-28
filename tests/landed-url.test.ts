@@ -74,6 +74,7 @@ import {
   iwishbagCostcoSelfContradictionHeadlineEn,
   iwishbagCostcoSelfContradictionIntroHe,
   IWISHBAG_COSTCO_SELF_CONTRADICTION_VERIFIED,
+  IWISHBAG_COSTCO_IL_URL,
   IWISHBAG_YAHOO_SHOPPING_JP_IL_URL,
   IWISHBAG_SHEIN_TEMU_404_VERIFIED,
   IWISHBAG_SHEIN_IL_URL_LIVE,
@@ -449,9 +450,9 @@ test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Fli
   assert.equal(IWISHBAG_AMAZON_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/amazon-us/israel');
   assert.equal(IWISHBAG_AMAZONINDIA_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/amazon-india/israel');
 
-  assert.equal(MARKETPLACE_HOW_TOS.length, 11);
+  assert.equal(MARKETPLACE_HOW_TOS.length, 12);
   const ids = MARKETPLACE_HOW_TOS.map((m) => m.id);
-  assert.deepEqual(ids, ['etsy', 'ebay', 'walmart', 'aliexpress', 'amazonjp', 'shein', 'temu', 'flipkart', 'amazonus', 'amazonindia', 'myntra']);
+  assert.deepEqual(ids, ['etsy', 'ebay', 'walmart', 'aliexpress', 'amazonjp', 'shein', 'temu', 'flipkart', 'amazonus', 'amazonindia', 'myntra', 'costco']);
 
   for (const m of MARKETPLACE_HOW_TOS) {
     assert.match(m.path, new RegExp(`^/how-to-${m.id}-israel$`));
@@ -487,6 +488,11 @@ test('marketplace how-tos: Etsy/eBay/Walmart/AliExpress/Amazon JP/Shein/Temu/Fli
   assert.equal(myntra.nameEn, 'Myntra');
   assert.equal(myntra.path, '/how-to-myntra-israel');
   assert.equal(myntra.iwishbagUrl, IWISHBAG_MYNTRA_IL_URL);
+  assert.equal(IWISHBAG_COSTCO_IL_URL, 'https://www.iwishbag.com/how-to-buy-from/costco/israel');
+  const costco = getMarketplaceHowTo('costco');
+  assert.equal(costco.nameEn, 'Costco');
+  assert.equal(costco.path, '/how-to-costco-israel');
+  assert.equal(costco.iwishbagUrl, IWISHBAG_COSTCO_IL_URL);
 });
 
 test('marketplace foil copy: 18% not 17%, Skills Sep 23 stamp, body still wrong', () => {
@@ -1617,6 +1623,7 @@ test('iwishbagCostcoSelfContradiction: body 17 vs own table 18 · Sep28 verified
   assert.ok(rows.some((r) => r.id === 'costco-lane' && r.liveUrl?.includes('costco')));
   assert.match(iwishbagCostcoSelfContradictionHeadlineEn(), /Costco→IL/);
   assert.match(iwishbagCostcoSelfContradictionIntroHe(), /Costco→IL|מע״ם 18%/);
-  assert.equal(IWISHBAG_COSTCO_SELF_CONTRADICTION_VERIFIED, '2026-09-28 16:40');
+  assert.equal(IWISHBAG_COSTCO_SELF_CONTRADICTION_VERIFIED,
+  IWISHBAG_COSTCO_IL_URL, '2026-09-28 16:40');
   assert.equal(getMarketplaceHowTo('costco').path, '/how-to-costco-israel');
 });
