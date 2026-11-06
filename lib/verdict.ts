@@ -94,23 +94,45 @@ export function computeVerdict(input: {
 }
 
 /**
- * Sparkline points for a fixed-size SVG, oldest left. Gaps in the record stay
- * gaps in time (x is by day, not by reading), so a month without data is not
- * drawn as a cliff in a single step.
+ * Sparkline for a fixed-size SVG, oldest left, spaced by day. Readings more
+ * than `maxGapDays` apart are NOT joined by a solid line: a month without data
+ * would otherwise draw as a smooth slide that never happened. Each run of
+ * consecutive readings is one solid segment; the jumps between runs come back
+ * separately so the chart can draw them dashed.
  */
-export function sparklinePoints(history: PricePoint[], priceNow: number, w: number, h: number, pad = 4): string {
+export function sparklineSegments(
+  history: PricePoint[],
+  priceNow: number,
+  w: number,
+  h: number,
+  pad = 4,
+  maxGapDays = 3
+): { solid: string[]; gaps: string[] } {
   const pts = [...history].filter((p) => p.price > 0).sort((a, b) => a.day.localeCompare(b.day));
-  if (pts.length < 2) return '';
+  if (pts.length < 2) return { solid: [], gaps: [] };
   const first = Date.parse(pts[0].day);
-  const lastDay = Date.parse(pts[pts.length - 1].day);
-  const span = Math.max(1, lastDay - first);
+  const span = Math.max(1, Date.parse(pts[pts.length - 1].day) - first);
   const all = [...pts.map((p) => p.price), priceNow];
   const lo = Math.min(...all);
-  const hi = Math.max(...all);
-  const range = hi - lo || 1;
-  const x = (t: number) => pad + ((t - first) / span) * (w - pad * 2);
-  const y = (p: number) => pad + (1 - (p - lo) / range) * (h - pad * 2);
-  return pts.map((p) => `${x(Date.parse(p.day)).toFixed(1)},${y(p.price).toFixed(1)}`).join(' ');
+  const range = Math.max(...all) - lo || 1;
+  const xy = (p: PricePoint) =>
+    `${(pad + ((Date.parse(p.day) - first) / span) * (w - pad * 2)).toFixed(1)},${(pad + (1 - (p.price - lo) / range) * (h - pad * 2)).toFixed(1)}`;
+
+  const solid: string[] = [];
+  const gaps: string[] = [];
+  let run: string[] = [xy(pts[0])];
+  for (let i = 1; i < pts.length; i++) {
+    const cur = xy(pts[i]);
+    if (daysBetween(pts[i - 1].day, pts[i].day) > maxGapDays) {
+      solid.push(run.join(' '));
+      gaps.push(`${run[run.length - 1]} ${cur}`);
+      run = [cur];
+    } else {
+      run.push(cur);
+    }
+  }
+  solid.push(run.join(' '));
+  return { solid, gaps };
 }
 
 type Lang = 'en' | 'he';

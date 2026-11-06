@@ -29,7 +29,7 @@ function WishlistItemCard({
     item.originalPrice != null && item.originalPrice > price ? item.originalPrice : null;
 
   return (
-    <article className="product-card group bg-white rounded-xl border border-gray-100 overflow-hidden flex flex-col h-full relative">
+    <article className="product-card group overflow-hidden flex flex-col h-full relative">
       {/* Link to product page */}
       <a
         href={productUrl}

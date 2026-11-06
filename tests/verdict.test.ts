@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { computeVerdict, sparklinePoints, verdictReason, type PricePoint } from '../lib/verdict';
+import { computeVerdict, sparklineSegments, verdictReason, type PricePoint } from '../lib/verdict';
 
 function series(prices: number[], start = '2026-09-01', vol0 = 1000, perDay = 10): PricePoint[] {
   const t0 = Date.parse(start);
@@ -62,14 +62,16 @@ test('reason text names the usual price', () => {
   assert.match(s, /€12\.00/);
 });
 
-test('sparkline spaces points by day, so a gap stays a gap', () => {
+test('sparkline breaks at a gap in the record instead of drawing a slide', () => {
   const h: PricePoint[] = [
     { day: '2026-09-01', price: 10, volume: 0 },
     { day: '2026-09-02', price: 10, volume: 0 },
     { day: '2026-10-01', price: 5, volume: 0 },
+    { day: '2026-10-02', price: 5, volume: 0 },
   ];
-  const pts = sparklinePoints(h, 5, 104, 50, 2).split(' ').map((p) => Number(p.split(',')[0]));
-  assert.equal(pts.length, 3);
-  assert.ok(pts[1] - pts[0] < 5, 'consecutive days sit close together');
-  assert.ok(pts[2] - pts[1] > 90, 'the month gap spans most of the width');
+  const { solid, gaps } = sparklineSegments(h, 5, 104, 50, 2);
+  assert.equal(solid.length, 2);
+  assert.equal(gaps.length, 1);
+  const xs = solid[0].split(' ').map((p) => Number(p.split(',')[0]));
+  assert.ok(xs[1] - xs[0] < 5, 'consecutive days sit close together');
 });

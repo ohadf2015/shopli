@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Script from 'next/script';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { Assistant } from 'next/font/google';
+import { Assistant, Space_Grotesk } from 'next/font/google';
 import '../styles/globals.css';
 import { organizationJsonLd } from '../lib/seo';
 import { installClickTracking } from '../lib/analytics';
@@ -18,6 +18,15 @@ const assistant = Assistant({
   subsets: ['hebrew', 'latin'],
   weight: ['400', '600', '700', '800'],
   variable: '--font-assistant',
+  display: 'swap',
+});
+
+// Display face for headings in the neo-brutalist look (Latin regions only;
+// Hebrew keeps Assistant, which Space Grotesk has no glyphs for).
+const display = Space_Grotesk({
+  subsets: ['latin'],
+  weight: ['500', '700'],
+  variable: '--font-display',
   display: 'swap',
 });
 
@@ -67,6 +76,7 @@ export default function ShopliApp({ Component, pageProps }: AppProps) {
       <style jsx global>{`
         :root {
           --font-assistant: ${assistant.style.fontFamily};
+          --font-display: ${display.style.fontFamily};
         }
       `}</style>
       <Component {...pageProps} />
