@@ -264,8 +264,14 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
     const { searchCollection: sc } = await import('../../../lib/aliexpress');
     const itemGroups: ItemGroup[] = [];
 
-    for (const item of board.items) {
-      const products = await sc(region, item.keywords, 4);
+    // Run every item's search at once; one slow or failed search no longer
+    // holds up (or breaks) the whole board.
+    const results = await Promise.all(
+      board.items.map((item) => sc(region, item.keywords, 4).catch(() => []))
+    );
+
+    board.items.forEach((item, i) => {
+      const products = results[i];
       itemGroups.push({
         caption: item.caption?.[config.lang] || item.caption?.en || '',
         note: item.note?.[config.lang] || item.note?.en || '',
@@ -276,7 +282,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
           shopName: p.shopName, discount: p.discount,
         })),
       });
-    }
+    });
 
     const tag = board.tags[0];
     const relatedBoards = tag ? getMoodBoardsByTag(tag) : [];

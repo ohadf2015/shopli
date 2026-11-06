@@ -284,15 +284,21 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
     const sections: any[] = [];
 
     if (content) {
-      for (const section of content.sections) {
-        const { searchCollection: sc } = await import('../../../lib/aliexpress');
-        const products = await sc(region, section.keywords, 4);
+      // Sections are independent searches: run them together (lib/aliexpress
+      // caps real concurrency at 4). Awaiting them one by one made an editorial
+      // collection's render time the SUM of 4-6 API calls, the slowest pages
+      // on the site at ~8s to first paint for real visitors.
+      const { searchCollection: sc } = await import('../../../lib/aliexpress');
+      const results = await Promise.all(
+        content.sections.map((section) => sc(region, section.keywords, 4).catch(() => []))
+      );
+      content.sections.forEach((section, i) => {
         sections.push({
           heading: get(section.heading),
           body: get(section.body),
-          products,
+          products: results[i],
         });
-      }
+      });
     } else if (coll.keywords?.length) {
       // Collections without editorial content still show products
       const { searchCollection: sc } = await import('../../../lib/aliexpress');
