@@ -12,6 +12,8 @@
  * so scores are deterministic for a given pool.
  */
 
+import { passesFeaturedGate } from './quality';
+
 export const TREND_SCORE_VERSION = 'weighted-v1';
 
 export interface TrendCandidate {
@@ -325,11 +327,40 @@ export function toTrendCandidate(p: any): TrendCandidate {
   };
 }
 
-/** Serializable ranked list for passing from getServerSideProps to components. */
-export function buildTrending(products: any[], limit: number) {
-  const pool = products.map(toTrendCandidate);
-  return rankTrending(pool, { limit }).map((r) => ({
-    rank: r.rank,
+/**
+ * Serializable ranked list for passing from getServerSideProps to components.
+ *
+ * Two changes from plain rankTrending, both because this feeds the homepage
+ * hero and rail:
+ *  - Only products that clear the featured bar (lib/quality.ts) are eligible,
+ *    falling back to the whole pool if none do. Cold-start scoring is half
+ *    discount, and AliExpress discounts are list-price theatre, so without
+ *    this a 91%-rated phone pad and a 0-order storage rack led the hero.
+ *  - When `soldPerDay` has measured readings (our own daily volume snapshots,
+ *    lib/trend-velocity.ts), products are ordered by units sold per day, the
+ *    signal that actually means "trending". Products without a reading follow
+ *    in their usual order.
+ */
+export function buildTrending(
+  products: any[],
+  limit: number,
+  soldPerDay: Record<string, number | undefined> = {},
+) {
+  const all = products.map(toTrendCandidate);
+  const featured = all.filter(passesFeaturedGate);
+  const pool = featured.length > 0 ? featured : all;
+  const ranked = rankTrending(pool, { limit: pool.length });
+
+  const rate = (id: string) => soldPerDay[id] ?? -1;
+  const measured = ranked.filter((r) => rate(r.product.id) >= 1);
+  measured.sort((a, b) => rate(b.product.id) - rate(a.product.id) || (a.product.id < b.product.id ? -1 : 1));
+  const rest = ranked.filter((r) => rate(r.product.id) < 1);
+
+  return [
+    ...measured.map((r) => ({ ...r, reason: 'order_momentum' as TrendReason })),
+    ...rest,
+  ].slice(0, Math.max(0, limit)).map((r, i) => ({
+    rank: i + 1,
     score: r.score,
     reason: r.reason,
     product: r.product,

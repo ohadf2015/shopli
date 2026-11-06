@@ -96,3 +96,37 @@ export function filterQuality<T extends QualityInput>(items: T[]): T[] {
   const out = kept.length > 0 ? kept : items.slice();
   return out.sort((a, b) => qualityScore(b) - qualityScore(a));
 }
+
+/**
+ * The bar for the surfaces people see first: the homepage rails, the hero and
+ * the trending rail. The floor above passes ~97% of the catalogue (measured
+ * 2026-11-06 over 2,805 feed_products rows), so on its own it does not decide
+ * what gets featured; it only removes the worst.
+ *
+ * Measured the same day, 94% positive and 1,000+ orders keeps 56% of `il` and
+ * 66-74% of every other region, so every collection still has plenty to show.
+ *
+ * Unlike the floor, an unknown signal does NOT pass here. A product the API
+ * returned with no rating and no orders is fine to list on a long category
+ * page, but it was sitting in the homepage hero (a storage rack with 0 / 0).
+ */
+export const FEATURED_MIN_RATE = 94;
+export const FEATURED_MIN_VOLUME = 1000;
+
+export function passesFeaturedGate(p: QualityInput): boolean {
+  return (p.rating ?? 0) >= FEATURED_MIN_RATE && (p.volume ?? 0) >= FEATURED_MIN_VOLUME;
+}
+
+/**
+ * Featured products first, best first, then the rest of the floor-passing
+ * products to top the list up. Fails open like filterQuality: a section is
+ * never emptied by this, it is only reordered and trimmed of the tail.
+ */
+export function rankForFeature<T extends QualityInput & { commissionRate?: number }>(items: T[]): T[] {
+  const kept = items.filter(passesQualityGate);
+  const pool = kept.length > 0 ? kept : items.slice();
+  return pool.sort((a, b) =>
+    Number(passesFeaturedGate(b)) - Number(passesFeaturedGate(a))
+    || qualityScore(b) - qualityScore(a)
+    || (b.commissionRate ?? 0) - (a.commissionRate ?? 0));
+}

@@ -204,3 +204,31 @@ test('dedupeAcrossSections keeps genuinely distinct titles and handles empty inp
   assert.deepEqual(outA.map((p) => p.id), ['s1']);
   assert.deepEqual(outB, []);
 });
+
+import { buildTrending as buildHomeTrending } from '../lib/trending';
+
+const homePool = [
+  { id: 'case', title: 'Glitter phone case', price: 5, originalPrice: 20, discount: '75%', rating: 98, volume: 8940 },
+  { id: 'pad', title: 'Suction phone pad', price: 4, originalPrice: 30, discount: '87%', rating: 91.7, volume: 9025 },
+  { id: 'rack', title: 'Wall storage rack', price: 9, originalPrice: 40, discount: '78%', rating: 0, volume: 0 },
+  { id: 'earbuds', title: 'Clip-on earbuds', price: 106, originalPrice: 120, discount: '12%', rating: 96.4, volume: 14628 },
+  { id: 'cable', title: 'USB-C 240W cable', price: 4, originalPrice: 5, discount: '10%', rating: 98, volume: 165330 },
+];
+
+test('home trending only features products that clear the featured bar', () => {
+  const ids = buildHomeTrending(homePool, 8).map((t) => t.product.id);
+  assert.ok(!ids.includes('pad'), 'a 91.7% product should not be featured');
+  assert.ok(!ids.includes('rack'), 'a product with no rating or orders should not be featured');
+});
+
+test('home trending orders by measured sales per day when we have them', () => {
+  const out = buildHomeTrending(homePool, 3, { case: 41 / 5, earbuds: 1006, cable: 941 });
+  assert.deepEqual(out.map((t) => t.product.id), ['earbuds', 'cable', 'case']);
+  assert.equal(out[0].reason, 'order_momentum');
+  assert.deepEqual(out.map((t) => t.rank), [1, 2, 3]);
+});
+
+test('home trending falls back to the whole pool when nothing clears the bar', () => {
+  const weak = [{ id: 'x', title: 'Thing', price: 1, rating: 80, volume: 50 }];
+  assert.equal(buildHomeTrending(weak, 4).length, 1);
+});
