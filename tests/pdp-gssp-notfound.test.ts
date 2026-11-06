@@ -97,3 +97,34 @@ test('AE hit: live product used without requiring demo', async () => {
   assert.equal(product, live);
   assert.equal(demoCalled, false, 'demo must not be consulted when AE succeeds');
 });
+
+test('store fallback: AE empty but the daily sweep has it → serves the stored product', async () => {
+  const product = await resolvePdpProduct('1005012466633371', 'uk', 'GBP', {
+    getProductsByIds: async () => [],
+    getStoredProduct: async (id) => ({ ...fakeProduct(id), currency: 'GBP' }),
+    getDemoProductById,
+  });
+  assert.ok(product, 'stored product must be returned');
+  assert.equal(product!.id, '1005012466633371');
+  assert.equal(product!.currency, 'GBP');
+});
+
+test('store fallback: live product wins over the stored copy', async () => {
+  const product = await resolvePdpProduct('42', 'eu', 'EUR', {
+    getProductsByIds: async () => [{ ...fakeProduct('42'), title: 'live' }],
+    getStoredProduct: async (id) => ({ ...fakeProduct(id), title: 'stored' }),
+    getDemoProductById,
+  });
+  assert.equal(product!.title, 'live');
+});
+
+test('store fallback: store throws + unknown demo id → still a hard 404 (null)', async () => {
+  const product = await resolvePdpProduct('invalid-stale-id-999', 'eu', 'EUR', {
+    getProductsByIds: async () => [],
+    getStoredProduct: async () => {
+      throw new Error('db down');
+    },
+    getDemoProductById,
+  });
+  assert.equal(product, null);
+});

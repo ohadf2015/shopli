@@ -162,6 +162,54 @@ export async function getFeedProducts(region: string, limit = 500): Promise<GmcF
 }
 
 /**
+ * One stored product for one region, or null. The PDP's second source: when
+ * the live by-id call flakes (~10% of calls, see lib/aliexpress.ts), a product
+ * the daily sweep saw in the last two weeks still renders instead of a bare
+ * 404. Only rows refreshed within `maxAgeDays` count, so a product that left
+ * AliExpress stops resolving here about as soon as the feed prunes it.
+ */
+export async function getFeedProduct(
+  productId: string,
+  region: string,
+  maxAgeDays = 14
+): Promise<(GmcFeedItem & { rating: number }) | null> {
+  const sql = db();
+  if (!sql || !productId) return null;
+  if (!(await ensureTable(sql))) return null;
+  try {
+    const rows: Array<Record<string, any>> = await sql`
+      SELECT product_id, title, price, currency, image_url, brand, product_type, google_category, volume, rating
+      FROM feed_products
+      WHERE product_id = ${productId}
+        AND region = ${region}
+        AND updated_at > now() - make_interval(days => ${maxAgeDays})
+      LIMIT 1`;
+    const r = rows[0];
+    if (!r) return null;
+    let title = String(r.title);
+    if (region === 'il') {
+      const overrides = await getHebrewTitles([String(r.product_id)]);
+      title = overrides.get(String(r.product_id)) || title;
+    }
+    return {
+      id: String(r.product_id),
+      title,
+      description: title,
+      price: Number(r.price),
+      currency: r.currency,
+      imageUrl: r.image_url,
+      brand: r.brand,
+      productType: r.product_type,
+      googleCategory: r.google_category,
+      volume: Number(r.volume || 0),
+      rating: Number(r.rating || 0),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Drop rows no sweep has re-seen recently. A product that disappears from
  * AliExpress would otherwise stay in the feed forever, and GMC disapproves
  * items whose landing page 404s.
