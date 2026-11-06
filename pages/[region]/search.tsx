@@ -1,4 +1,5 @@
 import { GetServerSideProps } from 'next';
+import { aliexpressIdFromInput } from '../../lib/ae-link';
 import { useRouter } from 'next/router';
 import { FormEvent, useState } from 'react';
 import Header from '../../components/Header';
@@ -216,6 +217,13 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
   const config = getRegion(region);
   const rtl = config.direction === 'rtl';
   const q = typeof query?.q === 'string' ? query.q.trim() : '';
+
+  // A pasted AliExpress link or product id goes straight to our page for it,
+  // where the verdict answers "is this a good deal?".
+  const pastedId = aliexpressIdFromInput(q);
+  if (pastedId) {
+    return { redirect: { destination: `/${region}/product/${pastedId}`, permanent: false } };
+  }
 
   let products: SearchProduct[] = [];
   let error: string | null = null;

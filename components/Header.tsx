@@ -109,7 +109,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={rtl ? 'חיפוש מוצרים...' : 'Search products...'}
+              placeholder={rtl ? 'חפשו או הדביקו קישור מאליאקספרס' : 'Search or paste an AliExpress link'}
               className="w-full ps-9 pe-3 py-2 text-sm rounded-xl border border-gray-200 bg-gray-50/80 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-300 transition-colors"
               style={{ color: 'var(--shopli-navy)' }}
               aria-label={rtl ? 'חיפוש מוצרים' : 'Search products'}
@@ -311,7 +311,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={rtl ? 'חיפוש מוצרים...' : 'Search products...'}
+              placeholder={rtl ? 'חפשו או הדביקו קישור מאליאקספרס' : 'Search or paste an AliExpress link'}
               className="flex-1 min-w-0 px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
               style={{ color: 'var(--shopli-navy)' }}
               enterKeyHint="search"
