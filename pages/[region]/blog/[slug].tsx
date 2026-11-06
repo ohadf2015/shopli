@@ -175,7 +175,7 @@ export default function BlogPostPage({ region, config, post, rtl, regionOnly, pi
 
           <div className="prose prose-gray max-w-none" style={{ color: 'var(--shopli-navy)' }}>
             {p.sections.map((section: any, i: number) => (
-              <section key={i} className={`py-8 ${i % 2 === 1 ? 'bg-gray-50/50' : 'bg-white'} -mx-4 sm:-mx-6 px-4 sm:px-6`}>
+              <section key={i} className={`py-8 ${i % 2 === 1 ? 'bg-[#FFF4E4]/50' : 'bg-white'} -mx-4 sm:-mx-6 px-4 sm:px-6`}>
                 <div className="max-w-3xl mx-auto">
                   <h2 className="text-xl font-bold mb-3" style={{ color: 'var(--shopli-navy)' }}>
                     {t(section.heading)}

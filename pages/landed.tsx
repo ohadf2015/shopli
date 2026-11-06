@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Header from '../components/Header';
-import Footer from '../components/Footer';
 import SeoHead from '../components/SeoHead';
 import LandedCostBadge from '../components/LandedCostBadge';
 import Icon from '../components/icons';
@@ -2793,7 +2792,6 @@ export default function LandedPage() {
         </section>
       </main>
 
-      <Footer currentRegion="il" />
     </>
   );
 }

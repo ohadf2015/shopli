@@ -46,7 +46,7 @@ export default function BrowseNext({ region, rtl, surface }: BrowseNextProps) {
 
   return (
     <section
-      className="mt-10 rounded-xl border border-gray-100 bg-white shadow-sm p-5 sm:p-6"
+      className="mt-10 rounded-xl border border-[#141414] bg-white  p-5 sm:p-6"
       aria-label={rtl ? 'המשך גלילה' : 'Keep browsing'}
     >
       <h2
@@ -68,7 +68,7 @@ export default function BrowseNext({ region, rtl, surface }: BrowseNextProps) {
             onClick={() =>
               trackCompareNextAction({ region, surface, target: l.target })
             }
-            className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-orange-200 hover:shadow-sm transition-all group"
+            className="flex items-center gap-3 p-3 rounded-lg border border-[#141414] hover:border-orange-200 hover:shadow-sm transition-all group"
           >
             <span
               className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"

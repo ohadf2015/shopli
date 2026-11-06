@@ -147,7 +147,7 @@ export default function GamePage({ region, config, rtl, rounds }: GamePageProps)
         <p className="text-sm mb-6" style={{ color: 'var(--shopli-warm-gray)' }}>{c.lead}</p>
 
         {finished ? (
-          <div className="rounded-3xl border border-gray-100 p-8 text-center">
+          <div className="rounded-3xl border border-[#141414] p-8 text-center">
             <div className="text-5xl font-extrabold mb-1" style={{ color: 'var(--shopli-orange)' }}>
               {score}
             </div>
@@ -168,7 +168,7 @@ export default function GamePage({ region, config, rtl, rounds }: GamePageProps)
             </div>
           </div>
         ) : (
-          <div className="rounded-3xl border border-gray-100 overflow-hidden">
+          <div className="rounded-3xl border border-[#141414] overflow-hidden">
             <div className="px-4 py-2 text-xs flex items-center justify-between" style={{ background: 'oklch(96% 0.01 60)', color: 'var(--shopli-warm-gray)' }}>
               <span>{c.round(index + 1, total)}</span>
               <span className="font-semibold" style={{ color: 'var(--shopli-orange)' }}>{score}</span>
@@ -178,7 +178,7 @@ export default function GamePage({ region, config, rtl, rounds }: GamePageProps)
             <img
               {...productImage(round.imageUrl, 640, '(max-width: 672px) 100vw, 640px')}
               alt={round.title}
-              className="w-full aspect-square object-cover bg-gray-50"
+              className="w-full aspect-square object-cover bg-[#FFF4E4]"
               // The first round is the LCP element; later ones are behind a tap.
               // Lowercase: React 18 silently drops the camelCase fetchPriority.
               loading={index === 0 ? 'eager' : 'lazy'}
@@ -220,7 +220,7 @@ export default function GamePage({ region, config, rtl, rounds }: GamePageProps)
               </div>
 
               {picked != null && verdict && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
+                <div className="mt-4 pt-4 border-t border-[#141414]">
                   <div className="font-bold text-sm mb-1" style={{ color: 'var(--shopli-orange)' }}>
                     {c[verdict.key]} · {c.actual}: {sym}{round.price.toFixed(2)}
                   </div>

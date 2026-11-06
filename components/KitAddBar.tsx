@@ -59,7 +59,7 @@ export default function KitAddBar({ region, rtl, currency, skus }: KitAddBarProp
 
   return (
     <div
-      className="mt-6 rounded-xl border border-gray-100 bg-white p-4 sm:p-5"
+      className="mt-6 rounded-xl border border-[#141414] bg-white p-4 sm:p-5"
       data-kit-add-bar=""
     >
       {region === 'il' && (

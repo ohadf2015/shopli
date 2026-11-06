@@ -62,7 +62,7 @@ export default function CollectionsPage({ region, config, rtl, themes }: Collect
             <a
               key={t.key}
               href={`#${t.key}`}
-              className="px-3 py-1.5 rounded-full text-sm font-medium border border-gray-200 hover:border-orange-300 hover:bg-orange-50/50 transition-colors"
+              className="px-3 py-1.5 rounded-full text-sm font-medium border border-[#141414] hover:border-orange-300 hover:bg-orange-50/50 transition-colors"
               style={{ color: 'var(--shopli-navy)' }}
             >
               {t.name[lang] || t.name.en}
@@ -91,7 +91,7 @@ export default function CollectionsPage({ region, config, rtl, themes }: Collect
                 <Link
                   key={coll.slug}
                   href={`/${region}/collection/${coll.slug}`}
-                  className="flex items-center gap-2 p-3 rounded-xl border border-gray-100 hover:border-orange-200 hover:bg-orange-50/30 transition-all"
+                  className="flex items-center gap-2 p-3 rounded-xl border border-[#141414] hover:border-orange-200 hover:bg-orange-50/30 transition-all"
                 >
                   <Icon name={(coll.icon || 'package') as any} size={16} />
                   <span className="text-sm font-medium" style={{ color: 'var(--shopli-navy)' }}>

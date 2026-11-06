@@ -155,7 +155,7 @@ export default function NotFound() {
                   className="group block rounded-2xl overflow-hidden bg-white border transition hover:shadow-md"
                   style={{ borderColor: 'oklch(92% 0.01 80)' }}
                 >
-                  <div className="aspect-square bg-gray-50 overflow-hidden">
+                  <div className="aspect-square bg-[#FFF4E4] overflow-hidden">
                     {p.imageUrl && (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -175,7 +175,7 @@ export default function NotFound() {
                   </div>
                 </a>
               ) : (
-                <div key={i} className="rounded-2xl bg-gray-100 animate-pulse aspect-[3/4]" aria-hidden />
+                <div key={i} className="rounded-2xl bg-[#FFF4E4] animate-pulse aspect-[3/4]" aria-hidden />
               )
             )}
           </div>

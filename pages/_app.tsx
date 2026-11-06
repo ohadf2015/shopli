@@ -34,7 +34,11 @@ const display = Space_Grotesk({
 function regionFromPath(asPath?: string, query?: unknown): string {
   const q = Array.isArray(query) ? query[0] : query;
   if (typeof q === 'string' && q) return q;
-  return asPath?.match(/^\/([a-z]{2})(?:\/|$)/)?.[1] || 'eu';
+  const m = asPath?.match(/^\/([a-z]{2})(?:\/|$)/)?.[1];
+  if (m) return m;
+  // Israel-only tools and guides live outside the /il prefix.
+  if (/^\/(landed|how-to-)/.test(asPath || '')) return 'il';
+  return 'eu';
 }
 
 export default function ShopliApp({ Component, pageProps }: AppProps) {

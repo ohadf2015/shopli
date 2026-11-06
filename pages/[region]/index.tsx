@@ -56,6 +56,9 @@ const COPY = {
     dropsSub: "Cheaper than the product's own price over recent weeks, not a list price the seller made up.",
     sellers: 'Selling fast, rated well',
     sellersSub: 'What buyers are actually ordering right now, from well-rated sellers.',
+    finds: "Today's best finds",
+    findsSub: "Real price drops first, then what's selling fastest from well-rated sellers. All from our own daily records.",
+    preview: 'Example verdict',
     browse: 'Browse',
     seeAll: 'See all',
     howTitle: 'How we judge a deal',
@@ -73,6 +76,9 @@ const COPY = {
     dropsSub: 'זול יותר מהמחיר של אותו מוצר בשבועות האחרונים, לא ממחיר מחירון שהמוכר המציא.',
     sellers: 'נמכרים מהר, עם דירוג טוב',
     sellersSub: 'מה שקונים מזמינים עכשיו, ממוכרים עם דירוג גבוה.',
+    finds: 'המציאות של היום',
+    findsSub: 'קודם ירידות מחיר אמיתיות, אחר כך מה שנמכר הכי מהר ממוכרים עם דירוג גבוה. הכול מהתיעוד היומי שלנו.',
+    preview: 'דוגמה לבדיקה',
     browse: 'קטגוריות',
     seeAll: 'לכל המוצרים',
     howTitle: 'איך אנחנו שופטים דיל',
@@ -170,6 +176,7 @@ export default function HomePage({ region, config, rtl, drops, sellers, chips, a
         className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-10 flex flex-col gap-10 sm:gap-14"
         style={{ fontFamily: rtl ? 'var(--font-assistant), system-ui, sans-serif' : undefined }}
       >
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] items-center">
         <section className="flex flex-col gap-4 max-w-2xl">
           <h1 className="text-4xl sm:text-6xl font-bold leading-[1.03] m-0">{t.h1}</h1>
           <p className="text-base sm:text-lg leading-relaxed m-0" style={{ color: '#4A443C' }}>
@@ -193,14 +200,50 @@ export default function HomePage({ region, config, rtl, drops, sellers, chips, a
             </div>
           </form>
         </section>
+        {(drops[0] || sellers[0]) && (() => {
+          const ex = drops[0] || sellers[0];
+          return (
+            <a
+              href={`/${region}/product/${ex.productId}`}
+              className="hidden lg:flex flex-col gap-3 rounded-2xl bg-white p-5"
+              style={{ border: '2.5px solid var(--shopli-ink)', boxShadow: '8px 8px 0 var(--shopli-ink)', color: 'var(--shopli-ink)', textDecoration: 'none' }}
+            >
+              <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#5C554C' }}>{t.preview}</span>
+              <div className="flex gap-4 items-center">
+                {ex.imageUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img {...productImage(ex.imageUrl, 120)} alt="" className="w-24 h-24 rounded-xl object-cover" style={{ border: '2px solid var(--shopli-ink)' }} />
+                )}
+                <div className="flex flex-col gap-1.5 min-w-0">
+                  <span className="text-sm leading-snug line-clamp-2">{ex.title}</span>
+                  <span
+                    className="self-start px-2.5 py-1 rounded-lg font-bold text-sm"
+                    style={{ background: ex.tone === 'drop' ? '#B8F2C9' : '#FFE08A', border: '2px solid var(--shopli-ink)' }}
+                  >
+                    {ex.tone === 'drop' ? (rtl ? 'זמן טוב לקנות' : 'Good time to buy') : ex.badge} · {sym}{ex.price.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+              <span className="text-sm" style={{ color: '#4A443C' }}>{ex.why}</span>
+            </a>
+          );
+        })()}
+        </div>
 
         {drops.length === 0 && sellers.length === 0 && (
           <p className="m-0" style={{ color: '#5C554C' }}>
             {t.empty}
           </p>
         )}
-        {section('drops', t.drops, t.dropsSub, drops)}
-        {section('sellers', t.sellers, t.sellersSub, sellers)}
+        {drops.length >= 3 ? (
+          <>
+            {section('drops', t.drops, t.dropsSub, drops)}
+            {section('sellers', t.sellers, t.sellersSub, sellers)}
+          </>
+        ) : (
+          // One or two drops make a lonely row: show them first in a single grid.
+          section('finds', t.finds, t.findsSub, [...drops, ...sellers].slice(0, 8))
+        )}
         {asOf && (
           <p className="text-xs -mt-6 m-0" style={{ color: '#5C554C' }}>
             {t.asOf} {asOf}

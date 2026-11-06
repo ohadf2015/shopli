@@ -134,7 +134,7 @@ export default function DealsPage({ region, config, lang, groups, updatedIso, up
           </section>
         )}
         {groups.map((group, gi) => (
-          <section key={group.slug} className={`py-10 md:py-14 ${gi % 2 === 1 ? 'bg-white' : 'bg-gray-50/50'}`}>
+          <section key={group.slug} className={`py-10 md:py-14 ${gi % 2 === 1 ? 'bg-white' : 'bg-[#FFF4E4]/50'}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
               <div className="flex items-center justify-between mb-6">
                 <div>

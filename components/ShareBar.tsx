@@ -116,7 +116,7 @@ export default function ShareBar({
         <button
           type="button"
           aria-label={labels.native}
-          className={`${base} ${sizeClasses} border border-gray-200 bg-white`}
+          className={`${base} ${sizeClasses} border border-[#141414] bg-white`}
           style={{ color: 'var(--shopli-navy)' }}
           onClick={onNativeShare}
         >

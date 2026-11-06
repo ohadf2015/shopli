@@ -183,11 +183,11 @@ export default function HomeAboveFold({
                 <a
                   key={p.id}
                   href={href}
-                  className="group rounded-lg bg-white border border-gray-100 overflow-hidden hover:border-orange-200 hover:shadow-sm transition-all"
+                  className="group rounded-lg bg-white border border-[#141414] overflow-hidden hover:border-orange-200 hover:shadow-sm transition-all"
                   aria-label={p.title}
                   data-home-preview-product={p.id}
                 >
-                  <div className="aspect-square overflow-hidden bg-gray-50">
+                  <div className="aspect-square overflow-hidden bg-[#FFF4E4]">
                     {p.imageUrl ? (
                       <img
                         {...productImage(

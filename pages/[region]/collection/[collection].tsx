@@ -171,7 +171,7 @@ export default function CollectionPage({ region, config, collection, content, se
         {sections.map((section: any, i: number) => (
           <section
             key={i}
-            className={`py-8 ${i % 2 === 1 ? 'bg-white' : 'bg-gray-50/50'} -mx-4 sm:-mx-6 px-4 sm:px-6`}
+            className={`py-8 ${i % 2 === 1 ? 'bg-white' : 'bg-[#FFF4E4]/50'} -mx-4 sm:-mx-6 px-4 sm:px-6`}
           >
             <div className="max-w-7xl mx-auto">
               <div className="grid md:grid-cols-2 gap-6 items-start">
@@ -219,7 +219,7 @@ export default function CollectionPage({ region, config, collection, content, se
             {content.faq.map((item: any, i: number) => (
               <details
                 key={i}
-                className="border border-gray-200 rounded-lg mb-2 overflow-hidden"
+                className="border border-[#141414] rounded-lg mb-2 overflow-hidden"
               >
                 <summary
                   className="p-3 cursor-pointer font-semibold text-sm"
@@ -235,7 +235,7 @@ export default function CollectionPage({ region, config, collection, content, se
           </section>
         )}
 
-        <section className="py-6 border-t border-gray-100">
+        <section className="py-6 border-t border-[#141414]">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-sm font-medium" style={{ color: 'var(--shopli-warm-gray)' }}>
               {rtl ? 'אהבתם את האוסף? שתפו עם חברים' : 'Like this collection? Share it with friends'}

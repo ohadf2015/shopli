@@ -160,14 +160,14 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {group.products.slice(0, 4).map((p: Product) => (
                   <a key={p.id} href={p.affiliateLink} target="_blank" rel="noopener noreferrer sponsored"
-                    className="bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all"
+                    className="bg-white rounded-lg border border-[#141414] overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all"
                     data-product-id={p.id}
                     data-product-title={p.title}
                     data-price={p.price.toFixed(2)}
                     data-currency={config?.currencySymbol || p.currency || ''}
                     data-category={p.category || ''}
                   >
-                    <div className="aspect-square bg-gray-100 overflow-hidden relative">
+                    <div className="aspect-square bg-[#FFF4E4] overflow-hidden relative">
                       {p.imageUrl ? (
                         <img {...productImage(p.imageUrl, 400, '(max-width: 640px) 50vw, 400px')} alt={p.title} className="w-full h-full object-cover hover:scale-105 transition-transform" />
                       ) : (
@@ -211,12 +211,12 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
 
         {/* FAQ */}
         {board.faq?.length > 0 && (
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 border-t border-gray-100">
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 border-t border-[#141414]">
             <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--shopli-navy)' }}>
               {rtl ? 'שאלות נפוצות' : 'FAQ'}
             </h2>
             {board.faq.map((item: any, i: number) => (
-              <details key={i} className="mb-2 border border-gray-200 rounded-lg overflow-hidden">
+              <details key={i} className="mb-2 border border-[#141414] rounded-lg overflow-hidden">
                 <summary className="p-3 cursor-pointer font-semibold text-sm" style={{ color: 'var(--shopli-navy)' }}>{get(item.q)}</summary>
                 <p className="p-3 pt-0 text-sm" style={{ color: 'var(--shopli-warm-gray)' }}>{get(item.a)}</p>
               </details>
@@ -226,7 +226,7 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
 
         {/* RELATED BOARDS */}
         {relatedBoards.length > 0 && (
-          <section className="border-t border-gray-100 py-8">
+          <section className="border-t border-[#141414] py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
               <h3 className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--shopli-orange)' }}>
                 {rtl ? 'ערכות דומות' : 'More Looks'}
@@ -234,7 +234,7 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {relatedBoards.map((b: any) => (
                   <a key={b.slug} href={`/${region}/mood/${b.slug}`}
-                    className="p-3 rounded-lg border border-gray-100 hover:border-orange-200 transition-all">
+                    className="p-3 rounded-lg border border-[#141414] hover:border-orange-200 transition-all">
                     <div className="font-semibold text-sm mb-1" style={{ color: 'var(--shopli-navy)' }}>{get(b.h1)}</div>
                     <p className="text-[0.6rem] leading-snug" style={{ color: 'var(--shopli-warm-gray)' }}>{get(b.metaDesc)}</p>
                   </a>

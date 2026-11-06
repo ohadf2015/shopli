@@ -121,7 +121,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
         <nav className="hidden md:flex items-center gap-0.5 shrink-0">
           <Link
             href={`/${currentRegion}`}
-            className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors"
+            className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-[#FFF4E4] transition-colors"
             style={{ color: 'var(--shopli-navy)' }}
           >
             {rtl ? 'בית' : 'Home'}
@@ -129,7 +129,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
 
           <Link
             href={`/${currentRegion}/trending`}
-            className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors"
+            className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-[#FFF4E4] transition-colors"
             style={{ color: 'var(--shopli-navy)' }}
           >
             {rtl ? 'טרנדים' : 'Trending'}
@@ -140,7 +140,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             <button
               type="button"
               onClick={() => setCatOpen(!catOpen)}
-              className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors inline-flex items-center gap-1"
+              className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-[#FFF4E4] transition-colors inline-flex items-center gap-1"
               style={{ color: 'var(--shopli-navy)' }}
               aria-expanded={catOpen}
               aria-haspopup="true"
@@ -149,13 +149,13 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
               <Icon name="chevron-down" size={14} />
             </button>
             {catOpen && (
-              <div className="absolute top-full mt-1 start-0 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden min-w-[260px] max-h-[70vh] overflow-y-auto z-50">
+              <div className="absolute top-full mt-1 start-0 bg-white border border-[#141414] rounded-xl shadow-lg overflow-hidden min-w-[260px] max-h-[70vh] overflow-y-auto z-50">
                 {themes.map((th) => (
                   <Link
                     key={th.key}
                     href={`/${currentRegion}/collections#${th.key}`}
                     onClick={() => setCatOpen(false)}
-                    className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+                    className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm hover:bg-[#FFF4E4] transition-colors"
                     style={{ color: 'var(--shopli-navy)' }}
                   >
                     <span className="font-medium">{th.name[lang] || th.name.en}</span>
@@ -178,7 +178,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
 
           <Link
             href={`/${currentRegion}/game`}
-            className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors"
+            className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-[#FFF4E4] transition-colors"
             style={{ color: 'var(--shopli-navy)' }}
           >
             {rtl ? 'משחק' : 'Game'}
@@ -186,14 +186,14 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
 
           <Link
             href={`/${currentRegion}/compare`}
-            className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors"
+            className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-[#FFF4E4] transition-colors"
             style={{ color: 'var(--shopli-navy)' }}
           >
             {rtl ? 'השוואה' : 'Compare'}
           </Link>
           <Link
             href={`/${currentRegion}/wishlist`}
-            className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors inline-flex items-center gap-1.5 relative"
+            className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-[#FFF4E4] transition-colors inline-flex items-center gap-1.5 relative"
             style={{ color: 'var(--shopli-navy)' }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -213,7 +213,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
               href={`https://t.me/${region.tgChannel}`}
               target="_blank"
               rel="noopener"
-              className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-1.5"
+              className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-[#FFF4E4] transition-colors flex items-center gap-1.5"
               style={{ color: 'var(--shopli-navy)' }}
             >
               <Icon name="telegram" size={14} />
@@ -226,7 +226,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <button
             type="button"
-            className="md:hidden p-2.5 rounded-lg hover:bg-gray-100 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="md:hidden p-2.5 rounded-lg hover:bg-[#FFF4E4] min-w-[44px] min-h-[44px] flex items-center justify-center"
             onClick={() => setSearchOpen(!searchOpen)}
             style={{ color: 'var(--shopli-navy)' }}
             aria-label={rtl ? 'חיפוש' : 'Search'}
@@ -239,7 +239,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             <button
               type="button"
               onClick={() => setRegionOpen(!regionOpen)}
-              className="flex items-center gap-1.5 px-2 sm:px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors min-h-[44px]"
+              className="flex items-center gap-1.5 px-2 sm:px-3 py-2 text-sm font-medium rounded-lg hover:bg-[#FFF4E4] transition-colors min-h-[44px]"
               style={{ color: 'var(--shopli-navy)' }}
               aria-label={rtl ? 'בחירת אזור' : 'Select region'}
             >
@@ -256,7 +256,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
                  hung 52px off the viewport, clipping the flags. Direction now
                  applies to the contents; the anchoring stays with the page. */
               <div
-                className="absolute top-full mt-1 end-0 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden min-w-[200px] z-50"
+                className="absolute top-full mt-1 end-0 bg-white border border-[#141414] rounded-xl shadow-lg overflow-hidden min-w-[200px] z-50"
               >
                 <div style={{ direction: 'ltr' }}>
                 {ALL_REGIONS.map((r) => (
@@ -267,7 +267,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
                     className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
                       r.code === currentRegion
                         ? 'bg-orange-50 font-semibold'
-                        : 'hover:bg-gray-50'
+                        : 'hover:bg-[#FFF4E4]'
                     }`}
                   >
                     <Icon name={`${r.code}-flag` as any} size={18} />
@@ -291,7 +291,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
 
           <button
             type="button"
-            className="md:hidden p-2.5 rounded-lg hover:bg-gray-100 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="md:hidden p-2.5 rounded-lg hover:bg-[#FFF4E4] min-w-[44px] min-h-[44px] flex items-center justify-center"
             onClick={() => setMenuOpen(!menuOpen)}
             style={{ color: 'var(--shopli-navy)' }}
             aria-label={menuOpen ? (rtl ? 'סגור תפריט' : 'Close menu') : (rtl ? 'תפריט' : 'Menu')}
@@ -304,7 +304,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
 
       {/* Mobile search bar */}
       {searchOpen && (
-        <div className="md:hidden border-t border-gray-100 bg-white px-3 py-3">
+        <div className="md:hidden border-t border-[#141414] bg-white px-3 py-3">
           <form onSubmit={onSearch} className="flex gap-2" role="search">
             <input
               ref={searchInputRef}
@@ -312,7 +312,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={rtl ? 'חפשו או הדביקו קישור מאליאקספרס' : 'Search or paste an AliExpress link'}
-              className="flex-1 min-w-0 px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
+              className="flex-1 min-w-0 px-3 py-2.5 text-sm rounded-xl border border-[#141414] focus:outline-none focus:ring-2 focus:ring-orange-200"
               style={{ color: 'var(--shopli-navy)' }}
               enterKeyHint="search"
             />
@@ -329,38 +329,38 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
 
       {/* Mobile nav */}
       {menuOpen && (
-        <div className="md:hidden border-t border-gray-100 bg-white px-3 pb-4 pt-2 space-y-0.5 max-h-[80vh] overflow-y-auto">
+        <div className="md:hidden border-t border-[#141414] bg-white px-3 pb-4 pt-2 space-y-0.5 max-h-[80vh] overflow-y-auto">
           <Link
             href={`/${currentRegion}`}
-            className="block px-3 py-3 rounded-lg font-medium text-sm hover:bg-gray-100 min-h-[44px]"
+            className="block px-3 py-3 rounded-lg font-medium text-sm hover:bg-[#FFF4E4] min-h-[44px]"
             onClick={() => setMenuOpen(false)}
           >
             {rtl ? 'בית' : 'Home'}
           </Link>
           <Link
             href={`/${currentRegion}/trending`}
-            className="block px-3 py-3 rounded-lg font-medium text-sm hover:bg-gray-100 min-h-[44px]"
+            className="block px-3 py-3 rounded-lg font-medium text-sm hover:bg-[#FFF4E4] min-h-[44px]"
             onClick={() => setMenuOpen(false)}
           >
             {rtl ? 'טרנדים' : 'Trending'}
           </Link>
           <Link
             href={`/${currentRegion}/game`}
-            className="block px-3 py-3 rounded-lg font-medium text-sm hover:bg-gray-100 min-h-[44px]"
+            className="block px-3 py-3 rounded-lg font-medium text-sm hover:bg-[#FFF4E4] min-h-[44px]"
             onClick={() => setMenuOpen(false)}
           >
             {rtl ? 'משחק' : 'Game'}
           </Link>
           <Link
             href={`/${currentRegion}/compare`}
-            className="block px-3 py-3 rounded-lg font-medium text-sm hover:bg-gray-100 min-h-[44px]"
+            className="block px-3 py-3 rounded-lg font-medium text-sm hover:bg-[#FFF4E4] min-h-[44px]"
             onClick={() => setMenuOpen(false)}
           >
             {rtl ? 'השוואה' : 'Compare'}
           </Link>
           <Link
             href={`/${currentRegion}/wishlist`}
-            className="flex items-center gap-2 px-3 py-3 rounded-lg font-medium text-sm hover:bg-gray-100 min-h-[44px]"
+            className="flex items-center gap-2 px-3 py-3 rounded-lg font-medium text-sm hover:bg-[#FFF4E4] min-h-[44px]"
             style={{ color: 'var(--shopli-navy)' }}
             onClick={() => setMenuOpen(false)}
           >
@@ -381,7 +381,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
               href={`https://t.me/${region.tgChannel}`}
               target="_blank"
               rel="noopener"
-              className="flex items-center gap-2 px-3 py-3 rounded-lg font-medium text-sm hover:bg-gray-100 min-h-[44px]"
+              className="flex items-center gap-2 px-3 py-3 rounded-lg font-medium text-sm hover:bg-[#FFF4E4] min-h-[44px]"
               onClick={() => setMenuOpen(false)}
             >
               <Icon name="telegram" size={16} />
@@ -389,7 +389,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             </a>
           )}
 
-          <div className="pt-2 mt-1 border-t border-gray-100">
+          <div className="pt-2 mt-1 border-t border-[#141414]">
             <p
               className="px-3 py-2 text-xs font-semibold uppercase tracking-wider"
               style={{ color: 'var(--shopli-warm-gray)' }}
@@ -400,7 +400,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
               <Link
                 key={th.key}
                 href={`/${currentRegion}/collections#${th.key}`}
-                className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm hover:bg-gray-50 min-h-[44px]"
+                className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm hover:bg-[#FFF4E4] min-h-[44px]"
                 style={{ color: 'var(--shopli-navy)' }}
                 onClick={() => setMenuOpen(false)}
               >

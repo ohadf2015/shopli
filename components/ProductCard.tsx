@@ -159,7 +159,7 @@ export default function ProductCard({
         aria-label={product.title}
       />
 
-      <div className={`aspect-square bg-gray-50 overflow-hidden relative ${compact ? '' : ''}`}>
+      <div className={`aspect-square bg-[#FFF4E4] overflow-hidden relative ${compact ? '' : ''}`}>
         {product.imageUrl ? (
           <img
             {...productImage(product.imageUrl, compact ? 200 : 400, '(max-width: 640px) 50vw, 400px')}
@@ -180,7 +180,7 @@ export default function ProductCard({
 
         {showDiscount && (
           <span
-            className="absolute top-2 end-2 text-[0.6rem] sm:text-[0.65rem] font-bold px-2 py-0.5 rounded-full bg-white/95 backdrop-blur-sm shadow-sm"
+            className="absolute top-2 end-2 text-[0.6rem] sm:text-[0.65rem] font-bold px-2 py-0.5 rounded-full bg-white/95 backdrop-blur-sm "
             style={{ color: 'var(--shopli-orange)' }}
           >
             -{product.discount}
@@ -299,7 +299,7 @@ export default function ProductCard({
           {showCompareLink && region && product.id && (
             <a
               href={`/${region}/compare?ids=${encodeURIComponent(product.id)}`}
-              className="text-[0.65rem] font-semibold px-2 py-1 rounded-lg border border-gray-100 hover:border-orange-200 hover:bg-orange-50/40 transition-colors bg-white"
+              className="text-[0.65rem] font-semibold px-2 py-1 rounded-lg border border-[#141414] hover:border-orange-200 hover:bg-orange-50/40 transition-colors bg-white"
               style={{ color: 'var(--shopli-navy)' }}
             >
               {rtl ? 'השווה' : 'Compare'}

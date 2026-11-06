@@ -129,7 +129,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
           {[c.product1, c.product2].map((prod: any, pi: number) => {
             const items = pi === 0 ? prod1Items : prod2Items;
             return (
-              <div key={pi} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <div key={pi} className="bg-white rounded-xl  border border-[#141414] p-6">
                 <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--shopli-navy)' }}>{prod.name}</h2>
 
                 <div className="mb-4">
@@ -166,7 +166,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
                     </h3>
                     <div className="grid grid-cols-2 gap-2">
                       {items.slice(0, 4).map((item: any, i: number) => (
-                        <div key={i} className="bg-gray-50 rounded-lg p-2 hover:shadow transition">
+                        <div key={i} className="bg-[#FFF4E4] rounded-lg p-2 hover:shadow transition">
                           <a href={item.affiliateLink} target="_blank" rel="nofollow sponsored noopener noreferrer"
                             className="block"
                             data-product-id={item.id}
@@ -222,7 +222,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
         </div>
 
         {/* Next step — route the reader into a real browse path instead of bouncing */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-10">
+        <div className="bg-white rounded-xl  border border-[#141414] p-6 mb-10">
           <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--shopli-navy)' }}>
             {rtl ? 'מוכנים להחליט? הצעד הבא' : 'Ready to decide? Your next step'}
           </h2>
@@ -250,7 +250,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
 
         {/* FAQ */}
         {c.faq?.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-xl  border border-[#141414] p-6">
             <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--shopli-navy)' }}>
               {rtl ? 'שאלות נפוצות' : 'FAQ'}
             </h2>

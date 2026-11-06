@@ -82,12 +82,12 @@ const AdminImportPage: NextPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div className="min-h-screen bg-[#FFF4E4]" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       {/* robots.txt only asks crawlers not to fetch; this keeps it out of the index. */}
       <Head>
         <meta name="robots" content="noindex, nofollow" />
       </Head>
-      <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-gray-200 px-6 py-3">
+      <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-[#141414] px-6 py-3">
         <div className="max-w-5xl mx-auto flex items-center gap-3">
           <a href="/" className="text-xl font-bold" style={{ color: '#1e293b' }}>Shopli</a>
           <span className="text-gray-400">/</span>
@@ -101,7 +101,7 @@ const AdminImportPage: NextPage = () => {
           Upload a CSV of collections. Each valid collection adds 5-10 products to the Google Shopping feed.
         </p>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="bg-white rounded-xl  border border-[#141414] p-6 mb-6">
           <div className="flex items-center gap-3 mb-4">
             <input
               ref={fileRef}
@@ -151,7 +151,7 @@ const AdminImportPage: NextPage = () => {
         {result && (
           <div className="space-y-4">
             {/* Summary */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex gap-6 text-sm">
+            <div className="bg-white rounded-xl  border border-[#141414] p-4 flex gap-6 text-sm">
               <span><strong>{result.summary.total}</strong> rows</span>
               <span className="text-green-700"><strong>{result.summary.ok}</strong> valid</span>
               {result.summary.failed > 0 && <span className="text-red-700"><strong>{result.summary.failed}</strong> failed</span>}
@@ -175,10 +175,10 @@ const AdminImportPage: NextPage = () => {
 
             {/* Row results */}
             {result.rows.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
+              <div className="bg-white rounded-xl  border border-[#141414] overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-gray-200 bg-gray-50">
+                    <tr className="border-b border-[#141414] bg-[#FFF4E4]">
                       <th className="text-left px-4 py-2 font-semibold text-gray-600">Row</th>
                       <th className="text-left px-4 py-2 font-semibold text-gray-600">Slug</th>
                       <th className="text-left px-4 py-2 font-semibold text-gray-600">Name</th>
@@ -188,7 +188,7 @@ const AdminImportPage: NextPage = () => {
                   </thead>
                   <tbody>
                     {result.rows.map((r) => (
-                      <tr key={r.row} className="border-b border-gray-100">
+                      <tr key={r.row} className="border-b border-[#141414]">
                         <td className="px-4 py-2 text-gray-500">{r.row}</td>
                         <td className="px-4 py-2 font-mono text-xs">{r.slug}</td>
                         <td className="px-4 py-2">{r.name_en}</td>

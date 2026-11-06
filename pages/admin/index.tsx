@@ -19,9 +19,9 @@ const LINKS = [
 
 const AdminPage: NextPage = () => {
   return (
-    <div className="min-h-screen bg-gray-50" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div className="min-h-screen bg-[#FFF4E4]" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <NoIndex />
-      <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-gray-200 px-6 py-3">
+      <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-[#141414] px-6 py-3">
         <div className="max-w-3xl mx-auto flex items-center gap-3">
           <a href="/" className="text-xl font-bold" style={{ color: '#1e293b' }}>Shopli</a>
           <span className="text-gray-400">/</span>
@@ -40,7 +40,7 @@ const AdminPage: NextPage = () => {
             <a
               key={link.href}
               href={link.href}
-              className="block bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-blue-300 transition-all"
+              className="block bg-white rounded-xl  border border-[#141414] p-5 hover:shadow-md hover:border-blue-300 transition-all"
             >
               <div className="flex items-start gap-4">
                 <span className="text-2xl mt-0.5">{link.icon}</span>

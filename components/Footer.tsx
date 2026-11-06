@@ -154,8 +154,8 @@ export default function Footer({ currentRegion }: { currentRegion: RegionCode | 
 
   return (
     <footer
-      className="mt-16 border-t border-gray-100"
-      style={{ background: 'var(--shopli-warm-card)' }}
+      className="mt-16"
+      style={{ background: 'var(--shopli-warm-card)', borderTop: '2.5px solid var(--shopli-ink)' }}
       dir={rtl ? 'rtl' : 'ltr'}
     >
       <div className="max-w-6xl mx-auto px-4 py-10">
@@ -194,7 +194,7 @@ export default function Footer({ currentRegion }: { currentRegion: RegionCode | 
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-gray-100">
+        <div className="mt-8 pt-6 border-t border-[#141414]">
           <h2 className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: 'var(--shopli-navy)' }}>
             {lang === 'en' ? 'Shopli earns commission on qualifying purchases' : t.disclosure}
           </h2>

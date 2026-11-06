@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import Header from './Header';
-import Footer from './Footer';
 import SeoHead from './SeoHead';
 import Icon from './icons';
 import { SITE_URL } from '../lib/seo';
@@ -311,7 +310,6 @@ export default function MarketplaceIwishbagHowTo({
         </section>
       </main>
 
-      <Footer currentRegion="il" />
     </>
   );
 }
