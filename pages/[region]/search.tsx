@@ -149,7 +149,7 @@ export default function SearchPage({
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={rtl ? 'מה אתם מחפשים?' : 'What are you looking for?'}
-            className="flex-1 min-w-0 px-4 py-3 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-200"
+            className="flex-1 min-w-0 px-4 py-3 text-sm rounded-xl border border-[#141414] focus:outline-none focus:ring-2 focus:ring-orange-200"
             style={{ color: 'var(--shopli-navy)' }}
             autoFocus
           />
@@ -189,7 +189,7 @@ export default function SearchPage({
             ))}
           </div>
         ) : initialQuery ? (
-          <div className="text-center py-16 rounded-xl border border-dashed border-gray-200 bg-gray-50/50">
+          <div className="text-center py-16 rounded-xl border border-dashed border-[#141414] bg-[#FFF4E4]/50">
             <Icon name="search" size={32} className="mx-auto mb-3 opacity-40" />
             <p className="font-semibold mb-1" style={{ color: 'var(--shopli-navy)' }}>
               {rtl ? 'לא נמצאו מוצרים' : 'No products found'}

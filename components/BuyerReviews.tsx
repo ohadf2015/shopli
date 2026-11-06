@@ -83,7 +83,7 @@ export default function BuyerReviews({ reviews, rtl, lang }: Props) {
         </span>
       </div>
 
-      <div className="rounded-2xl border border-gray-100 p-4 sm:p-5">
+      <div className="rounded-2xl border border-[#141414] p-4 sm:p-5">
         <div className="flex flex-col sm:flex-row gap-5">
           {/* Score + the two counts, each labelled with what it counts */}
           <div className="sm:w-44 shrink-0">
@@ -155,7 +155,7 @@ export default function BuyerReviews({ reviews, rtl, lang }: Props) {
                 decoding="async"
                 width={96}
                 height={96}
-                className="w-24 h-24 object-cover rounded-xl shrink-0 border border-gray-100"
+                className="w-24 h-24 object-cover rounded-xl shrink-0 border border-[#141414]"
               />
             ))}
           </div>
@@ -164,7 +164,7 @@ export default function BuyerReviews({ reviews, rtl, lang }: Props) {
 
       <ul className="mt-4 space-y-3">
         {shown.map((r) => (
-          <li key={r.id} className="rounded-2xl border border-gray-100 p-4">
+          <li key={r.id} className="rounded-2xl border border-[#141414] p-4">
             <div className="flex items-center gap-2 text-xs mb-1.5" style={{ color: 'var(--shopli-warm-gray)' }}>
               <Stars n={r.stars} />
               {r.country && <span>{FLAGS[r.country] || ''} {r.country}</span>}
@@ -190,7 +190,7 @@ export default function BuyerReviews({ reviews, rtl, lang }: Props) {
                     decoding="async"
                     width={64}
                     height={64}
-                    className="w-16 h-16 object-cover rounded-lg border border-gray-100"
+                    className="w-16 h-16 object-cover rounded-lg border border-[#141414]"
                   />
                 ))}
               </div>

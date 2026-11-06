@@ -38,7 +38,7 @@ function WishlistItemCard({
       />
 
       {/* Image */}
-      <div className="aspect-square bg-gray-50 overflow-hidden relative">
+      <div className="aspect-square bg-[#FFF4E4] overflow-hidden relative">
         {item.imageUrl ? (
           <img
             {...productImage(item.imageUrl, 400, '(max-width: 640px) 50vw, 400px')}
@@ -55,7 +55,7 @@ function WishlistItemCard({
         )}
 
         {item.discount && (
-          <span className="absolute top-2 end-2 text-[0.6rem] sm:text-[0.65rem] font-bold px-2 py-0.5 rounded-full bg-white/95 backdrop-blur-sm shadow-sm" style={{ color: 'var(--shopli-orange)' }}>
+          <span className="absolute top-2 end-2 text-[0.6rem] sm:text-[0.65rem] font-bold px-2 py-0.5 rounded-full bg-white/95 backdrop-blur-sm " style={{ color: 'var(--shopli-orange)' }}>
             -{item.discount}
           </span>
         )}
@@ -64,7 +64,7 @@ function WishlistItemCard({
         <button
           type="button"
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); onRemove(item.id); }}
-          className="absolute top-2 start-2 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center z-10 shadow-sm transition-all hover:scale-110"
+          className="absolute top-2 start-2 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center z-10  transition-all hover:scale-110"
           aria-label={rtl ? 'הסר מהמועדפים' : 'Remove from wishlist'}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--shopli-warm-gray)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -74,7 +74,7 @@ function WishlistItemCard({
         </button>
 
         {item.freeShipping && (
-          <span className="absolute bottom-2 start-2 flex items-center gap-0.5 text-[0.55rem] font-semibold px-1.5 py-0.5 rounded-full bg-white/90 backdrop-blur-sm shadow-sm" style={{ color: 'var(--shopli-teal)' }}>
+          <span className="absolute bottom-2 start-2 flex items-center gap-0.5 text-[0.55rem] font-semibold px-1.5 py-0.5 rounded-full bg-white/90 backdrop-blur-sm " style={{ color: 'var(--shopli-teal)' }}>
             <Icon name="truck" size={10} />
             {rtl ? 'משלוח חינם' : 'Free ship'}
           </span>

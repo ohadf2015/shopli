@@ -315,7 +315,7 @@ export default function TrendingPage({ region, config, products, rtl, generatedA
             {products.map((p) => (
               <div key={p.id} className="relative">
                 <div
-                  className="absolute -top-2 start-2 z-10 text-[0.65rem] font-bold px-2.5 py-1 rounded-full shadow-sm"
+                  className="absolute -top-2 start-2 z-10 text-[0.65rem] font-bold px-2.5 py-1 rounded-full "
                   style={{ background: 'var(--shopli-orange)', color: 'white' }}
                 >
                   {p.trendReason}
@@ -338,7 +338,7 @@ export default function TrendingPage({ region, config, products, rtl, generatedA
           </section>
         )}
 
-        <section className="mt-12 py-8 border-t border-gray-100">
+        <section className="mt-12 py-8 border-t border-[#141414]">
           <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--shopli-navy)' }}>
             {rtl ? 'מה זה מוצרים טרנדיים?' : 'What makes these products trending?'}
           </h2>

@@ -43,7 +43,7 @@ export default function BlogIndexPage({ region, config, posts, rtl }: any) {
 
         <div className="grid gap-6">
           {posts.map((post: any) => (
-            <article key={post.slug} className="bg-white rounded-2xl border border-gray-100 hover:shadow-lg hover:border-orange-200 transition-all p-6 md:p-8">
+            <article key={post.slug} className="bg-white rounded-2xl border border-[#141414] hover:shadow-lg hover:border-orange-200 transition-all p-6 md:p-8">
               <div className="flex flex-col md:flex-row md:items-start gap-6">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-3">

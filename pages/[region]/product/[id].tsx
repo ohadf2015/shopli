@@ -188,8 +188,8 @@ export default function ProductPage({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 fade-in">
           {/* Image */}
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="aspect-square bg-gray-50 flex items-center justify-center relative">
+          <div className="bg-white rounded-xl border border-[#141414]  overflow-hidden">
+            <div className="aspect-square bg-[#FFF4E4] flex items-center justify-center relative">
               {product.imageUrl ? (
                 <img
                   {...productImage(product.imageUrl, 800, '(max-width: 768px) 100vw, 640px')}
@@ -206,7 +206,7 @@ export default function ProductPage({
               )}
               {product.discount && (
                 <span
-                  className="absolute top-3 end-3 text-xs font-bold px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-sm shadow-sm"
+                  className="absolute top-3 end-3 text-xs font-bold px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-sm "
                   style={{ color: 'var(--shopli-orange)' }}
                 >
                   -{product.discount}
@@ -247,7 +247,7 @@ export default function ProductPage({
                 </a>
               )}
               {product.shopName && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100" style={{ color: 'var(--shopli-warm-gray)' }}>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-[#FFF4E4]" style={{ color: 'var(--shopli-warm-gray)' }}>
                   {rtl ? 'מוכר: ' : 'Seller: '}{product.shopName}
                 </span>
               )}
@@ -306,7 +306,7 @@ export default function ProductPage({
               )}
               {product.category && (
                 <span
-                  className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-gray-100"
+                  className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-[#FFF4E4]"
                   style={{ color: 'var(--shopli-warm-gray)' }}
                 >
                   <Icon name="tag" size={10} />
@@ -373,7 +373,7 @@ export default function ProductPage({
           <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--shopli-navy)' }}>
             {rtl ? 'מפרט' : 'Specifications'}
           </h2>
-          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-6">
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 bg-white rounded-xl border border-[#141414]  p-4 sm:p-6">
             {specs.map((row) => (
               <div key={row.label} className="flex items-baseline justify-between gap-4 text-sm border-b border-gray-50 pb-2">
                 <dt style={{ color: 'var(--shopli-warm-gray)' }}>{row.label}</dt>
@@ -387,7 +387,7 @@ export default function ProductPage({
 
         {/* Pros / Cons */}
         <section className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 fade-in">
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-6">
+          <div className="bg-white rounded-xl border border-[#141414]  p-4 sm:p-6">
             <h2 className="text-base font-bold mb-3" style={{ color: 'var(--shopli-teal)' }}>
               {rtl ? 'יתרונות' : 'Pros'}
             </h2>
@@ -400,7 +400,7 @@ export default function ProductPage({
               ))}
             </ul>
           </div>
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-6">
+          <div className="bg-white rounded-xl border border-[#141414]  p-4 sm:p-6">
             <h2 className="text-base font-bold mb-3" style={{ color: 'var(--shopli-orange)' }}>
               {rtl ? 'חסרונות' : 'Cons'}
             </h2>
@@ -424,7 +424,7 @@ export default function ProductPage({
             {faq.map((item) => (
               <details
                 key={item.q}
-                className="bg-white rounded-xl border border-gray-100 shadow-sm p-4"
+                className="bg-white rounded-xl border border-[#141414]  p-4"
               >
                 <summary className="text-sm font-semibold cursor-pointer" style={{ color: 'var(--shopli-navy)' }}>
                   {item.q}
@@ -448,7 +448,7 @@ export default function ProductPage({
                 <a
                   key={c.slug}
                   href={`/${region}/collection/${c.slug}`}
-                  className="text-sm px-3 py-1.5 rounded-full bg-white border border-gray-100 shadow-sm hover:shadow transition-shadow"
+                  className="text-sm px-3 py-1.5 rounded-full bg-white border border-[#141414]  hover:shadow transition-shadow"
                   style={{ color: 'var(--shopli-navy)' }}
                 >
                   {c.name}

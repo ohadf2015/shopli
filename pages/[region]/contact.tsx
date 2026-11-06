@@ -184,7 +184,7 @@ export default function ContactPage({ region, config, rtl }: ContactPageProps) {
           {content.methods.map((method, idx) => (
             <div
               key={idx}
-              className="p-6 rounded-lg border border-gray-200"
+              className="p-6 rounded-lg border border-[#141414]"
               style={{ backgroundColor: 'var(--shopli-warm-card)' }}
             >
               <h2

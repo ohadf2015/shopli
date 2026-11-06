@@ -247,7 +247,7 @@ export default function ProductComparePage({
               <button
                 type="button"
                 onClick={copyShareLink}
-                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium px-3 py-2 rounded-lg border border-[#141414] bg-white hover:bg-[#FFF4E4] transition-colors"
                 style={{ color: 'var(--shopli-navy)' }}
               >
                 <Icon name="share" size={14} />
@@ -271,7 +271,7 @@ export default function ProductComparePage({
         </div>
 
         {/* ID input + keyword search shortcut */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-5 mb-8">
+        <div className="bg-white rounded-xl border border-[#141414]  p-4 sm:p-5 mb-8">
           <label
             htmlFor="compare-ids"
             className="block text-xs font-semibold uppercase tracking-wider mb-2"
@@ -289,7 +289,7 @@ export default function ProductComparePage({
               onChange={(e) => setIdInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && applyIds()}
               placeholder="1005007001, 1005007002, 1005007003"
-              className="flex-1 min-w-0 px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-300"
+              className="flex-1 min-w-0 px-3 py-2.5 text-sm rounded-lg border border-[#141414] focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-300"
               style={{ color: 'var(--shopli-navy)' }}
               dir="ltr"
             />
@@ -409,7 +409,7 @@ export default function ProductComparePage({
         )}
 
         {emptyState ? (
-          <div className="text-center py-12 sm:py-16 px-4 rounded-xl border border-dashed border-gray-200 bg-gray-50/50">
+          <div className="text-center py-12 sm:py-16 px-4 rounded-xl border border-dashed border-[#141414] bg-[#FFF4E4]/50">
             <div
               className="w-14 h-14 mx-auto mb-4 rounded-2xl flex items-center justify-center"
               style={{ background: 'oklch(90% 0.06 45)', color: 'var(--shopli-orange)' }}
@@ -466,11 +466,11 @@ export default function ProductComparePage({
                 {products.map((p) => (
                   <div
                     key={p.id}
-                    className={`snap-start shrink-0 w-[70vw] max-w-[220px] sm:w-auto sm:max-w-none bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col ${
+                    className={`snap-start shrink-0 w-[70vw] max-w-[220px] sm:w-auto sm:max-w-none bg-white rounded-xl border border-[#141414]  overflow-hidden flex flex-col ${
                       removing === p.id ? 'opacity-50' : ''
                     }`}
                   >
-                    <div className="aspect-square bg-gray-50 relative">
+                    <div className="aspect-square bg-[#FFF4E4] relative">
                       {p.imageUrl ? (
                         <img
                           {...productImage(p.imageUrl, 400, '(max-width: 640px) 70vw, 220px')}
@@ -487,7 +487,7 @@ export default function ProductComparePage({
                       )}
                       {p.discount && (
                         <span
-                          className="absolute top-2 end-2 text-[0.65rem] font-bold px-2 py-0.5 rounded-full bg-white/95 shadow-sm"
+                          className="absolute top-2 end-2 text-[0.65rem] font-bold px-2 py-0.5 rounded-full bg-white/95 "
                           style={{ color: 'var(--shopli-orange)' }}
                         >
                           -{p.discount}
@@ -496,7 +496,7 @@ export default function ProductComparePage({
                       <button
                         type="button"
                         onClick={() => removeProduct(p.id)}
-                        className="absolute top-2 start-2 w-7 h-7 rounded-full bg-white/95 shadow-sm flex items-center justify-center hover:bg-red-50 transition-colors"
+                        className="absolute top-2 start-2 w-7 h-7 rounded-full bg-white/95  flex items-center justify-center hover:bg-red-50 transition-colors"
                         style={{ color: 'var(--shopli-warm-gray)' }}
                         aria-label={rtl ? 'הסר מהשוואה' : 'Remove from comparison'}
                       >
@@ -553,7 +553,7 @@ export default function ProductComparePage({
                               product_id: p.id,
                             })
                           }
-                          className="mt-1.5 block text-center text-xs font-medium py-1.5 rounded-lg border border-gray-200 hover:border-orange-200 hover:bg-orange-50/50 transition-colors"
+                          className="mt-1.5 block text-center text-xs font-medium py-1.5 rounded-lg border border-[#141414] hover:border-orange-200 hover:bg-orange-50/50 transition-colors"
                           style={{ color: 'var(--shopli-navy)' }}
                         >
                           {rtl ? 'פרטים ומוצרים דומים' : 'Details & similar'}
@@ -567,15 +567,15 @@ export default function ProductComparePage({
 
             {/* Comparison table */}
             <section
-              className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden"
+              className="bg-white rounded-xl border border-[#141414]  overflow-hidden"
               aria-label={rtl ? 'טבלת השוואה' : 'Comparison table'}
             >
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[480px] border-collapse text-sm">
                   <thead>
-                    <tr className="border-b border-gray-100">
+                    <tr className="border-b border-[#141414]">
                       <th
-                        className="sticky start-0 z-10 bg-gray-50 text-start text-xs font-semibold uppercase tracking-wider px-3 sm:px-4 py-3 min-w-[7rem] sm:min-w-[10rem]"
+                        className="sticky start-0 z-10 bg-[#FFF4E4] text-start text-xs font-semibold uppercase tracking-wider px-3 sm:px-4 py-3 min-w-[7rem] sm:min-w-[10rem]"
                         style={{ color: 'var(--shopli-warm-gray)' }}
                       >
                         {rtl ? 'מפרט' : 'Spec'}
@@ -583,7 +583,7 @@ export default function ProductComparePage({
                       {products.map((p) => (
                         <th
                           key={p.id}
-                          className="bg-gray-50 text-start px-3 sm:px-4 py-3 font-semibold text-xs line-clamp-2 max-w-[10rem]"
+                          className="bg-[#FFF4E4] text-start px-3 sm:px-4 py-3 font-semibold text-xs line-clamp-2 max-w-[10rem]"
                           style={{ color: 'var(--shopli-navy)' }}
                         >
                           <span className="line-clamp-2">
@@ -659,7 +659,7 @@ export default function ProductComparePage({
                 </table>
               </div>
               <div
-                className="px-4 py-3 border-t border-gray-100 text-xs flex flex-wrap items-center gap-3"
+                className="px-4 py-3 border-t border-[#141414] text-xs flex flex-wrap items-center gap-3"
                 style={{ color: 'var(--shopli-warm-gray)' }}
               >
                 <span className="inline-flex items-center gap-1.5">
@@ -684,7 +684,7 @@ export default function ProductComparePage({
                   href={p.affiliateLink || '#'}
                   target="_blank"
                   rel="nofollow sponsored noopener noreferrer"
-                  className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-white hover:border-orange-200 hover:shadow-sm transition-all"
+                  className="flex items-center gap-3 p-3 rounded-xl border border-[#141414] bg-white hover:border-orange-200 hover:shadow-sm transition-all"
                   data-product-id={p.id}
                   data-product-title={p.title}
                   data-price={p.price.toFixed(2)}
@@ -695,7 +695,7 @@ export default function ProductComparePage({
                     <img
                       {...productImage(p.imageUrl, 120)}
                       alt=""
-                      className="w-12 h-12 object-contain rounded-lg bg-gray-50 shrink-0"
+                      className="w-12 h-12 object-contain rounded-lg bg-[#FFF4E4] shrink-0"
                     />
                   )}
                   <div className="min-w-0 flex-1">

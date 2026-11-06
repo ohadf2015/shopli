@@ -143,14 +143,14 @@ export default function MoversRail({
             <Link
               key={m.productId}
               href={`/${region}/product/${m.productId}`}
-              className="group rounded-2xl border border-gray-100 overflow-hidden hover:border-orange-200 hover:shadow-sm transition-all"
+              className="group rounded-2xl border border-[#141414] overflow-hidden hover:border-orange-200 hover:shadow-sm transition-all"
             >
               <div className="relative">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   {...productImage(m.imageUrl, 300, '(max-width: 768px) 50vw, 300px')}
                   alt={m.title}
-                  className="w-full aspect-square object-cover bg-gray-50"
+                  className="w-full aspect-square object-cover bg-[#FFF4E4]"
                   // Lowercase: React 18 drops the camelCase fetchPriority prop.
                   loading={i < 2 ? 'eager' : 'lazy'}
                   fetchpriority={i === 0 ? 'high' : undefined}
@@ -163,7 +163,7 @@ export default function MoversRail({
                 </span>
                 {m.dropPct >= DROP_MIN_PCT && (
                   <span
-                    className="absolute top-2 end-2 text-[11px] font-bold px-2 py-1 rounded-full bg-white/95 backdrop-blur-sm shadow-sm"
+                    className="absolute top-2 end-2 text-[11px] font-bold px-2 py-1 rounded-full bg-white/95 backdrop-blur-sm "
                     style={{ color: 'var(--shopli-orange)' }}
                   >
                     -{m.dropPct}%
