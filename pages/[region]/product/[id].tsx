@@ -6,6 +6,9 @@ import ShareBar from '../../../components/ShareBar';
 import FindSimilar from '../../../components/FindSimilar';
 import BuyerReviews from '../../../components/BuyerReviews';
 import LandedCostBadge from '../../../components/LandedCostBadge';
+import VerdictCard from '../../../components/VerdictCard';
+import { computeVerdict, sparklinePoints, type Verdict } from '../../../lib/verdict';
+import { getPriceHistory } from '../../../lib/trend-velocity';
 import { cacheIfNotEmpty } from '../../../lib/cache';
 import { trendingEnabled } from '../../../lib/flags';
 import { productImage } from '../../../lib/img';
@@ -43,6 +46,8 @@ interface ProductPageProps {
   related: Array<{ slug: string; name: string }>;
   similarEnabled: boolean;
   reviews: ProductReviews | null;
+  verdict: Verdict;
+  sparkline: string;
 }
 
 function ratingStars(rating: number): number {
@@ -69,6 +74,8 @@ export default function ProductPage({
   related,
   similarEnabled,
   reviews,
+  verdict,
+  sparkline,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const lang = config.lang || 'en';
   const pageUrl = `${SITE_URL}/${region}/product/${productId}`;
@@ -161,7 +168,7 @@ export default function ProductPage({
       <Header currentRegion={region} dir={config.direction} />
 
       <main
-        className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16"
+        className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-32 md:pb-16"
         style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}
       >
         {/* Breadcrumb */}
@@ -276,6 +283,15 @@ export default function ProductPage({
                 freeShipping={product.freeShipping}
               />
             )}
+
+            <VerdictCard
+              verdict={verdict}
+              points={sparkline}
+              rating={product.rating}
+              ratingCount={reviews && reviews.ratingCount > 0 ? reviews.ratingCount : null}
+              currencySymbol={config.currencySymbol}
+              rtl={rtl}
+            />
 
             <p className="text-sm sm:text-base leading-relaxed mb-6" style={{ color: 'var(--shopli-warm-gray)' }}>
               {description}
@@ -441,6 +457,42 @@ export default function ProductPage({
             </div>
           </section>
         )}
+        {/* Phone: the buy button stays in reach while reading the verdict and reviews. */}
+        {/* Keep the footer's last lines clear of the fixed bar on phones. */}
+        <style>{'@media (max-width: 767px) { footer { padding-bottom: 96px; } }'}</style>
+        <div
+          className="md:hidden fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 px-4 pt-3"
+          style={{
+            background: '#FFF4E4',
+            borderTop: '2.5px solid #141414',
+            paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+          }}
+        >
+          <div className="flex flex-col leading-tight">
+            <span className="font-extrabold text-lg tabular-nums" dir="ltr" style={{ color: '#141414' }}>
+              {config.currencySymbol}
+              {product.price.toFixed(2)}
+            </span>
+            <span className="text-xs" style={{ color: '#5C554C' }}>
+              {rtl ? 'באליאקספרס עכשיו' : 'on AliExpress now'}
+            </span>
+          </div>
+          <a
+            href={product.affiliateLink}
+            target="_blank"
+            rel="nofollow sponsored noopener noreferrer"
+            className="flex-1 text-center font-bold rounded-xl py-3"
+            style={{ background: 'var(--shopli-orange)', border: '2.5px solid #141414', boxShadow: '3px 3px 0 #141414', color: '#141414' }}
+            data-product-id={product.id}
+            data-product-title={product.title}
+            data-price={product.price.toFixed(2)}
+            data-currency={config.currencySymbol}
+            data-category={product.category || ''}
+            data-region={region}
+          >
+            {rtl ? 'לקנייה באליאקספרס' : 'Get it on AliExpress'}
+          </a>
+        </div>
       </main>
 
     </>
@@ -512,7 +564,11 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
   // row costs one cheap query, and only a product nobody has opened in a week
   // pays a live fetch. Bounded tightly and null on any failure — this section
   // enriches the page, it must never be why the page is slow or blank.
-  const reviews = product ? await getProductReviews(productId, region, { timeoutMs: 2500 }) : null;
+  const [reviews, history] = await Promise.all([
+    getProductReviews(productId, region, { timeoutMs: 2500 }),
+    getPriceHistory(productId, region),
+  ]);
+  const verdict = computeVerdict({ priceNow: product.price, rating: product.rating, history });
 
   const description = product ? buildPdpDescription(product, rtl) : '';
   const { pros, cons } = product
@@ -536,6 +592,8 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
         : [],
       similarEnabled: trendingEnabled(),
       reviews,
+      verdict,
+      sparkline: verdict.kind === 'new' ? '' : sparklinePoints(history, product.price, 320, 72),
     },
   };
 };
