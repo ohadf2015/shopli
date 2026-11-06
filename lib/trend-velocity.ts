@@ -170,3 +170,35 @@ export function computeVolumeVelocity(
   }
   return out;
 }
+
+/**
+ * One product's daily price and order count, oldest first, for the PDP verdict
+ * (lib/verdict.ts). Fails open to [] like everything else here: no history
+ * means the page says "new to our tracking", never that it errors.
+ */
+export async function getPriceHistory(
+  productId: string,
+  region: string,
+  windowDays = 60
+): Promise<Array<{ day: string; price: number; volume: number }>> {
+  const sql = db();
+  if (!sql || !productId) return [];
+  if (!(await ensureTable(sql))) return [];
+  try {
+    const rows: Array<{ seen_on: string | Date; price: string | number | null; volume: string | number }> = await sql`
+      SELECT seen_on, price, volume
+      FROM product_volume_snapshots
+      WHERE product_id = ${productId}
+        AND region = ${region}
+        AND price IS NOT NULL
+        AND seen_on >= CURRENT_DATE - ${windowDays}::int
+      ORDER BY seen_on ASC`;
+    return rows.map((r) => ({
+      day: new Date(r.seen_on).toISOString().slice(0, 10),
+      price: Number(r.price),
+      volume: Number(r.volume),
+    }));
+  } catch {
+    return [];
+  }
+}
