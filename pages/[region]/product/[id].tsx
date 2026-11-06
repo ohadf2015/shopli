@@ -566,7 +566,12 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
   // enriches the page, it must never be why the page is slow or blank.
   const [reviews, history] = await Promise.all([
     getProductReviews(productId, region, { timeoutMs: 2500 }),
-    getPriceHistory(productId, region),
+    // Time-boxed: a cold database must not hold the page; no history just
+    // means "new to our tracking".
+    Promise.race([
+      getPriceHistory(productId, region),
+      new Promise<Awaited<ReturnType<typeof getPriceHistory>>>((resolve) => setTimeout(() => resolve([]), 1500)),
+    ]),
   ]);
   const verdict = computeVerdict({ priceNow: product.price, rating: product.rating, history });
 

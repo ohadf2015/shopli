@@ -44,6 +44,8 @@ const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, m
 // burst. A page like /trending fans out one search per category at once, which
 // is self-inflicted 429s. Four in flight is enough to keep those pages fast.
 const MAX_IN_FLIGHT = 4;
+/** Per attempt. The API answers in well under a second when it answers at all. */
+const API_TIMEOUT_MS = 3500;
 let inFlight = 0;
 const waiting: Array<() => void> = [];
 
@@ -87,7 +89,11 @@ async function callApi(params: Record<string, string>, attempts = 2): Promise<an
       const signed: Record<string, string> = { ...params, timestamp: getTimestamp() };
       signed.sign = signParams(signed, ALIE_SECRET);
       try {
-        const res = await fetch(API_URL + '?' + new URLSearchParams(signed));
+        // Bounded: an API call that hangs used to hold the whole page render
+        // (and an in-flight slot) for as long as the socket stayed open.
+        const res = await fetch(API_URL + '?' + new URLSearchParams(signed), {
+          signal: AbortSignal.timeout(API_TIMEOUT_MS),
+        });
         const data = await res.json();
         if (!data?.error_response) return data;
         last = data;

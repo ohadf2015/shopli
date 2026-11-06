@@ -421,6 +421,13 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
   // cannot stampede the rate limiter.
   // Fetch double the display count: title-dedupe against the rail and
   // earlier sections can drop relistings, and sections should still fill.
+  // Our own tables (movers, their reviews) are read at the same time as the
+  // AliExpress searches instead of after them, so the page waits for the
+  // slowest source, not the sum of all of them.
+  const picksPromise = getPicks(region, { limit: 8 }).catch(() => [] as Awaited<ReturnType<typeof getPicks>>);
+  const moverReviewsPromise = picksPromise.then((ps) =>
+    ps.length ? getReviewsBatch(region, ps.map((p) => p.productId)).catch(() => ({})) : {}
+  );
   const fetched = await Promise.all(
     collections.map((coll) => fetchCollectionProducts(region, [coll.keywords[0]], 8))
   );
@@ -465,13 +472,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
   // a database, which just hides the rail. Only the fields the rail renders are
   // passed through — Next serialises every prop into __NEXT_DATA__, and a Pick
   // carries snapshot internals no card reads.
-  const picks = await getPicks(region, { limit: 8 }).catch(() => []);
+  const picks = await picksPromise;
   // Trust data from the review store (feedback.aliexpress.com, warmed by the
   // daily cron and PDP views). Store-only — a homepage render must not fan out
   // upstream calls; a product nobody has warmed simply shows no count.
-  const moverReviews = picks.length
-    ? await getReviewsBatch(region, picks.map((p) => p.productId)).catch(() => ({}))
-    : {};
+  const moverReviews: Record<string, any> = await moverReviewsPromise;
   const movers: MoverItem[] = picks.map((p) => ({
     productId: p.productId,
     title: p.title,
