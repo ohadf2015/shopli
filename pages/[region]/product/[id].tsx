@@ -10,7 +10,8 @@ import { cacheIfNotEmpty } from '../../../lib/cache';
 import { trendingEnabled } from '../../../lib/flags';
 import { productImage } from '../../../lib/img';
 import { getRegion, RegionCode, RegionConfig } from '../../../lib/regions';
-import { getProductsByIds, SearchProduct } from '../../../lib/aliexpress';
+import { getProductsByIds, ensureAffiliateTracking, SearchProduct } from '../../../lib/aliexpress';
+import { getFeedProduct } from '../../../lib/feed-store';
 import { getDemoProductById } from '../../../lib/demo-products';
 import { getProductReviews } from '../../../lib/review-store';
 import type { ProductReviews } from '../../../lib/reviews';
@@ -446,6 +447,37 @@ export default function ProductPage({
   );
 }
 
+/**
+ * The daily sweep's copy of a product, shaped like a live one. Used only when
+ * the live by-id call comes back empty, so a flaky API call no longer turns a
+ * product we featured yesterday into a dead end.
+ */
+async function storedProduct(id: string, region: string): Promise<SearchProduct | null> {
+  const row = await getFeedProduct(id, region);
+  if (!row || !(row.price > 0)) return null;
+  return {
+    id: row.id,
+    sku: '',
+    title: row.title,
+    price: row.price,
+    originalPrice: null,
+    currency: row.currency,
+    imageUrl: row.imageUrl,
+    images: row.imageUrl ? [row.imageUrl] : [],
+    affiliateLink: ensureAffiliateTracking('', row.id),
+    rating: row.rating,
+    reviewCount: 0,
+    volume: row.volume || 0,
+    category: row.productType || '',
+    categoryPath: row.productType || '',
+    shopName: row.brand || '',
+    shopId: '',
+    discount: '',
+    commissionRate: 0,
+    freeShipping: false,
+  };
+}
+
 export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (context) => {
   const region = ((context.params?.region as string) || 'eu') as RegionCode;
   const config = getRegion(region);
@@ -459,6 +491,7 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
   // Dual-source: AliExpress → demo catalog. Both miss → hard 404 (not soft-404 props).
   const product = await resolvePdpProduct(productId, region, config.currency, {
     getProductsByIds,
+    getStoredProduct: storedProduct,
     getDemoProductById,
   });
   if (!product) {

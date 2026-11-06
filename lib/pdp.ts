@@ -178,13 +178,16 @@ export function listingAggregateFields(
 }
 
 /**
- * Dual-source product resolution for PDP GSSP (docs/specs/pdp-hard-404.md).
- * Order: AliExpress by-id fetch, then local demo catalog. Returns null only
- * when both miss — GSSP must map that to `{ notFound: true }` (hard 404).
+ * Product resolution for PDP GSSP (docs/specs/pdp-hard-404.md).
+ * Order: AliExpress by-id fetch, then our own daily-sweep store (when wired),
+ * then the local demo catalog. Returns null only when all miss — GSSP must map
+ * that to `{ notFound: true }` (hard 404; pages/404.tsx then offers live picks).
  * Deps are injectable so tests can cover outage/stale-id paths without network.
  */
 export type ResolvePdpProductDeps = {
   getProductsByIds: (ids: string[], region: string) => Promise<SearchProduct[]>;
+  /** Optional: a stored copy of the product from the daily sweep. */
+  getStoredProduct?: (id: string, region: string) => Promise<SearchProduct | null>;
   getDemoProductById: (
     id: string,
     region: string,
@@ -204,6 +207,13 @@ export async function resolvePdpProduct(
     product = products[0] || null;
   } catch {
     product = null;
+  }
+  if (!product && deps.getStoredProduct) {
+    try {
+      product = await deps.getStoredProduct(productId, region);
+    } catch {
+      product = null;
+    }
   }
   if (!product) {
     product = deps.getDemoProductById(productId, region, currency);
