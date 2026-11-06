@@ -1,9 +1,6 @@
 {
   "version": 2,
   "framework": "nextjs",
-  "regions": [
-    "fra1"
-  ],
   "buildCommand": "npx next build",
   "installCommand": "npm install",
   "outputDirectory": ".next",
