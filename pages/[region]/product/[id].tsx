@@ -7,7 +7,7 @@ import FindSimilar from '../../../components/FindSimilar';
 import BuyerReviews from '../../../components/BuyerReviews';
 import LandedCostBadge from '../../../components/LandedCostBadge';
 import VerdictCard from '../../../components/VerdictCard';
-import { computeVerdict, sparklinePoints, type Verdict } from '../../../lib/verdict';
+import { computeVerdict, sparklineSegments, type Verdict } from '../../../lib/verdict';
 import { getPriceHistory } from '../../../lib/trend-velocity';
 import { cacheIfNotEmpty } from '../../../lib/cache';
 import { trendingEnabled } from '../../../lib/flags';
@@ -47,7 +47,7 @@ interface ProductPageProps {
   similarEnabled: boolean;
   reviews: ProductReviews | null;
   verdict: Verdict;
-  sparkline: string;
+  sparkline: { solid: string[]; gaps: string[] };
 }
 
 function ratingStars(rating: number): number {
@@ -286,7 +286,7 @@ export default function ProductPage({
 
             <VerdictCard
               verdict={verdict}
-              points={sparkline}
+              spark={sparkline}
               rating={product.rating}
               ratingCount={reviews && reviews.ratingCount > 0 ? reviews.ratingCount : null}
               currencySymbol={config.currencySymbol}
@@ -593,7 +593,7 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
       similarEnabled: trendingEnabled(),
       reviews,
       verdict,
-      sparkline: verdict.kind === 'new' ? '' : sparklinePoints(history, product.price, 320, 72),
+      sparkline: verdict.kind === 'new' ? { solid: [], gaps: [] } : sparklineSegments(history, product.price, 320, 72),
     },
   };
 };

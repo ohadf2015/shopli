@@ -74,7 +74,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+    <header className="sticky top-0 z-50 backdrop-blur-md" style={{ background: 'color-mix(in srgb, var(--shopli-cream) 92%, transparent)', borderBottom: '2.5px solid var(--shopli-ink)' }}>
       <div className="max-w-7xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
         {/* Logo */}
         <Link
@@ -110,7 +110,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={rtl ? 'חפשו או הדביקו קישור מאליאקספרס' : 'Search or paste an AliExpress link'}
-              className="w-full ps-9 pe-3 py-2 text-sm rounded-xl border border-gray-200 bg-gray-50/80 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-300 transition-colors"
+              className="w-full ps-9 pe-3 py-2 text-sm rounded-xl border-2 border-[#141414] bg-white focus:outline-none focus:ring-2 focus:ring-orange-300 transition-colors"
               style={{ color: 'var(--shopli-navy)' }}
               aria-label={rtl ? 'חיפוש מוצרים' : 'Search products'}
             />

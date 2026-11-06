@@ -141,7 +141,7 @@ export default function ProductCard({
 
   return (
     <article
-      className={`product-card group bg-white rounded-xl border border-gray-100 overflow-hidden flex flex-col h-full relative ${className}`}
+      className={`product-card group overflow-hidden flex flex-col h-full relative ${className}`}
       data-product-id={product.id}
       data-product-title={product.title}
       data-price={price.toFixed(2)}

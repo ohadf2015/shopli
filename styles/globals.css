@@ -3,7 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --shopli-navy: oklch(22.5% 0.04 264);
+  /* Neo-brutalist look (redesign, Nov 2026): ink outlines, offset shadows, cream ground. */
+  --shopli-ink: #141414;
+  --shopli-cream: #FFF4E4;
+  --shopli-navy: #141414;
   --shopli-navy-light: oklch(30% 0.05 264);
   --shopli-orange: oklch(65% 0.18 45);
   --shopli-orange-dark: oklch(55% 0.2 45);
@@ -20,6 +23,15 @@ html[dir="rtl"] {
 
 body {
   font-family: system-ui, -apple-system, sans-serif;
+  background: var(--shopli-cream);
+  color: var(--shopli-ink);
+}
+
+html:not([dir="rtl"]) h1,
+html:not([dir="rtl"]) h2,
+html:not([dir="rtl"]) .section-title {
+  font-family: var(--font-display), system-ui, sans-serif;
+  letter-spacing: -0.01em;
 }
 
 @layer base {
@@ -33,19 +45,25 @@ body {
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all;
     background-color: var(--shopli-orange);
-    color: white;
-    box-shadow: 0 4px 14px oklch(65% 0.18 45 / 0.25);
+    color: var(--shopli-ink);
+    border: 2.5px solid var(--shopli-ink);
+    border-radius: 12px;
+    box-shadow: 3px 3px 0 var(--shopli-ink);
   }
   .btn-primary:hover {
-    background-color: var(--shopli-orange-dark);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px oklch(65% 0.18 45 / 0.35);
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--shopli-ink);
+  }
+  .btn-primary:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--shopli-ink);
   }
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all;
     background: white;
-    color: var(--shopli-navy);
-    border: 1.5px solid oklch(85% 0.01 80);
+    color: var(--shopli-ink);
+    border: 2.5px solid var(--shopli-ink);
+    border-radius: 12px;
   }
   .btn-secondary:hover {
     background: oklch(96% 0.005 80);
@@ -64,13 +82,15 @@ body {
     text-underline-offset: 3px;
   }
   .product-card {
-    @apply bg-white rounded-xl overflow-hidden shadow-sm transition-all;
-    box-shadow: 0 1px 3px oklch(0% 0 0 / 0.06);
+    @apply bg-white overflow-hidden transition-all;
+    border: 2.5px solid var(--shopli-ink);
+    border-radius: 16px;
+    box-shadow: 4px 4px 0 var(--shopli-ink);
   }
   @media (hover: hover) {
     .product-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px oklch(0% 0 0 / 0.1);
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 var(--shopli-ink);
     }
   }
   /* Logical padding helpers for search inputs in RTL */

@@ -17,15 +17,15 @@ const TONE: Record<Verdict['kind'], string> = {
 
 export default function VerdictCard({
   verdict,
-  points,
+  spark,
   rating,
   ratingCount,
   currencySymbol,
   rtl,
 }: {
   verdict: Verdict;
-  /** Precomputed sparkline points for a 320×72 box, or '' when there is too little history. */
-  points: string;
+  /** Precomputed sparkline for a 320×72 box; empty when there is too little history. */
+  spark: { solid: string[]; gaps: string[] };
   /** 0–100 positive feedback. */
   rating: number;
   ratingCount: number | null;
@@ -84,7 +84,7 @@ export default function VerdictCard({
         </div>
       )}
 
-      {points && (
+      {spark.solid.length > 0 && (
         <figure className="m-0">
           <svg
             viewBox="0 0 320 72"
@@ -98,18 +98,36 @@ export default function VerdictCard({
             }
             style={{ transform: rtl ? 'scaleX(-1)' : undefined }}
           >
-            <polyline
-              fill="none"
-              stroke="#141414"
-              strokeWidth="2.5"
-              strokeLinejoin="round"
-              vectorEffect="non-scaling-stroke"
-              points={points}
-            />
+            {spark.gaps.map((g) => (
+              <polyline
+                key={g}
+                fill="none"
+                stroke="#9A9184"
+                strokeWidth="2"
+                strokeDasharray="4 5"
+                vectorEffect="non-scaling-stroke"
+                points={g}
+              />
+            ))}
+            {spark.solid.map((seg) => (
+              <polyline
+                key={seg}
+                fill="none"
+                stroke="#141414"
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+                vectorEffect="non-scaling-stroke"
+                points={seg}
+              />
+            ))}
           </svg>
           <figcaption className="text-xs flex justify-between" style={{ color: '#5C554C' }}>
             <span>{rtl ? `לפני ${verdict.spanDays} ימים` : `${verdict.spanDays} days ago`}</span>
-            <span>{rtl ? 'מחיר שתיעדנו כל יום' : 'Price we record daily'}</span>
+            <span>
+              {spark.gaps.length > 0
+                ? rtl ? 'מקווקו: ימים בלי נתונים' : 'Dashed: days we have no reading'
+                : rtl ? 'מחיר שתיעדנו כל יום' : 'Price we record daily'}
+            </span>
             <span>{rtl ? 'היום' : 'Today'}</span>
           </figcaption>
         </figure>
