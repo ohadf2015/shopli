@@ -1,6 +1,5 @@
 import { GetServerSideProps } from 'next';
 import { REGIONS } from '../lib/regions';
-import { DEMO_PRODUCT_IDS } from '../lib/demo-products';
 import { cacheIfNotEmpty } from '../lib/cache';
 import { SITE_URL, getCollectionOgImage } from '../lib/seo';
 import { COLLECTION_CONTENT } from '../lib/collection-content';
@@ -84,8 +83,12 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       }
     })
   );
-  // Merge dynamic IDs with static demo IDs, preserving the 4 hardcoded ones
-  const allProductIds = [...new Set([...DEMO_PRODUCT_IDS, ...dynamicProductIds])];
+  // Only products the live catalogue returned. The four demo ids used to be
+  // merged in here, but they are placeholder listings with made-up ratings and
+  // review counts that never appear in the live catalogue, and their buy
+  // button has no promotion link behind it, so a visit through them earns
+  // nothing.
+  const allProductIds = [...dynamicProductIds];
 
   const urls: SitemapUrl[] = [];
 

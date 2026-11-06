@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { passesQualityGate } from './quality';
+import { rankForFeature } from './quality';
 import { getHebrewTitles } from './hebrew-titles';
 import { cleanTitle } from './titles';
 
@@ -103,13 +103,14 @@ async function callApi(params: Record<string, string>, attempts = 2): Promise<an
 }
 
 /**
- * Guarantee every exit URL carries our affiliate tracking.
- * A `promotion_link` (s.click...) already converts, but when the API returns
- * none we fell back to a bare `product_detail_url`, and demo products built
- * bare item links by hand — those exits earn ZERO commission (kg 88; demo PDPs
- * sit in the sitemap, so they do get organic traffic). Appending `aff_fcid`
- * to a bare item URL follows the same convention as lib/api.ts's
- * generateAffiliateLink.
+ * Last-resort exit URL for a product we could not get a promotion link for.
+ *
+ * Only an `s.click.aliexpress.com` promotion link, issued by the API for our
+ * tracking id, is attributed to us. `aff_fcid` is a parameter that redirect
+ * adds on its own way out, so writing it onto a bare item URL by hand does not
+ * credit the visit to anyone. It stays here as a marker that the link is
+ * untracked (and for the demo catalog, which has no API behind it), while
+ * withPromotionLinks below converts every real product to a proper link.
  */
 export function ensureAffiliateTracking(url: string, productId?: string | number): string {
   const id = String(productId ?? '').trim();
@@ -120,6 +121,81 @@ export function ensureAffiliateTracking(url: string, productId?: string | number
   if (url.includes('s.click.aliexpress.com') || /[?&]aff[_%]/i.test(url)) return url;
   if (!/(^|\.)aliexpress\.com/i.test(new URL(url, 'https://www.aliexpress.com').hostname)) return url;
   return url + (url.includes('?') ? '&' : '?') + `aff_fcid=${TRACKING_ID}`;
+}
+
+/** True only for a link AliExpress will credit to our tracking id. */
+export function isPromotionLink(url: string | undefined | null): boolean {
+  return /^https:\/\/s\.click\.aliexpress\.com\//i.test(url || '');
+}
+
+/** AliExpress item id from an item URL, or '' when there is none. */
+export function itemIdFromUrl(url: string): string {
+  return url.match(/\/item\/(\d+)\.html/)?.[1] || '';
+}
+
+/**
+ * Item id -> promotion link, from an `aliexpress.affiliate.link.generate`
+ * response. Keyed by item id rather than by the echoed source URL, because the
+ * API may normalise the URL it echoes back.
+ */
+export function parsePromotionLinks(data: any): Map<string, string> {
+  const out = new Map<string, string>();
+  const raw = data?.aliexpress_affiliate_link_generate_response?.resp_result?.result?.promotion_links?.promotion_link;
+  const list = Array.isArray(raw) ? raw : raw ? [raw] : [];
+  for (const entry of list) {
+    const link = String(entry?.promotion_link || '');
+    const id = itemIdFromUrl(String(entry?.source_value || ''));
+    if (id && isPromotionLink(link)) out.set(id, link);
+  }
+  return out;
+}
+
+/** link.generate takes a comma-separated list; 50 per call is the documented cap. */
+const LINK_BATCH = 50;
+
+/**
+ * Promotion links for item ids, one signed call per 50. Fails open to an
+ * empty map, so a failure leaves the fallback link in place rather than
+ * breaking the page.
+ */
+export async function generatePromotionLinks(ids: string[]): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  const unique = [...new Set(ids.filter((id) => /^\d+$/.test(id)))];
+  if (!ALIE_KEY || !ALIE_SECRET || unique.length === 0) return out;
+  for (let i = 0; i < unique.length; i += LINK_BATCH) {
+    const batch = unique.slice(i, i + LINK_BATCH);
+    try {
+      const data = await callApi({
+        app_key: ALIE_KEY,
+        format: 'json',
+        v: '2.0',
+        sign_method: 'md5',
+        method: 'aliexpress.affiliate.link.generate',
+        tracking_id: TRACKING_ID,
+        promotion_link_type: '0',
+        source_values: batch.map((id) => `https://www.aliexpress.com/item/${id}.html`).join(','),
+      });
+      for (const [id, link] of parsePromotionLinks(data)) out.set(id, link);
+    } catch { /* keep the fallback links */ }
+  }
+  return out;
+}
+
+/**
+ * Give every product an exit link that earns. The search API usually returns
+ * `promotion_link` already; when it does not (PDPs fetched by id are where
+ * this was seen), the item gets one from link.generate instead of leaving the
+ * visit untracked.
+ */
+export async function withPromotionLinks<T extends { id: string; affiliateLink: string }>(products: T[]): Promise<T[]> {
+  const missing = products.filter((p) => !isPromotionLink(p.affiliateLink)).map((p) => p.id);
+  if (missing.length === 0) return products;
+  const links = await generatePromotionLinks(missing);
+  if (links.size === 0) return products;
+  return products.map((p) => {
+    const link = isPromotionLink(p.affiliateLink) ? null : links.get(p.id);
+    return link ? { ...p, affiliateLink: link } : p;
+  });
 }
 
 export interface SearchProduct {
@@ -199,7 +275,8 @@ export async function searchAliExpress(keywords: string, region: string, pageSiz
     freeShipping: false,
     };
   });
-  return cfg.language === 'HE' ? applyHebrewOverrides(mapped) : mapped;
+  const tracked = await withPromotionLinks(mapped as SearchProduct[]);
+  return cfg.language === 'HE' ? applyHebrewOverrides(tracked) : tracked;
 }
 
 export async function searchCollection(region: string, keywords: string[], limit = 4): Promise<SearchProduct[]> {
@@ -226,12 +303,13 @@ export async function searchCollection(region: string, keywords: string[], limit
   //
   // Fails open: if the floor would empty a non-empty result, the unfiltered
   // list is ranked instead. An empty section is worse than a mediocre product.
-  const kept = all.filter(passesQualityGate);
-  const ranked = kept.length > 0 ? kept : all;
-
-  // Sort by volume (most sold), then rating, then commission
-  ranked.sort((a, b) => (b.volume * 10 + b.rating * 3 + b.commissionRate) - (a.volume * 10 + a.rating * 3 + a.commissionRate));
-  return ranked.slice(0, limit);
+  //
+  // Ranking used to be volume * 10 + rating * 3, which let order count decide
+  // everything: a 91%-rated item with 9k orders beat a 98% one with 5k. Now
+  // products that clear the featured bar (94%+, 1,000+ orders) come first,
+  // ordered by rating with orders as the tiebreak (lib/quality.ts), and the
+  // rest of the floor only tops the list up.
+  return rankForFeature(all).slice(0, limit);
 }
 
 /**
@@ -326,7 +404,8 @@ export async function getProductsByIds(ids: string[], region: string): Promise<S
       const ordered = cleanIds
         .map(id => mapped.find((p: SearchProduct) => p.id === id))
         .filter(Boolean) as SearchProduct[];
-      return cfg.language === 'HE' ? applyHebrewOverrides(ordered) : ordered;
+      const tracked = await withPromotionLinks(ordered);
+      return cfg.language === 'HE' ? applyHebrewOverrides(tracked) : tracked;
     }
   } catch { /* fall through */ }
 
@@ -353,7 +432,8 @@ export async function getProductsByIds(ids: string[], region: string): Promise<S
       const ordered = cleanIds
         .map(id => mapped.find((p: SearchProduct) => p.id === id))
         .filter(Boolean) as SearchProduct[];
-      return cfg.language === 'HE' ? applyHebrewOverrides(ordered) : ordered;
+      const tracked = await withPromotionLinks(ordered);
+      return cfg.language === 'HE' ? applyHebrewOverrides(tracked) : tracked;
     }
   } catch { /* ignore */ }
 

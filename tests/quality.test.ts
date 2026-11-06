@@ -49,3 +49,29 @@ test('filtering never empties a non-empty list', () => {
   assert.equal(out.length, 2);
   assert.equal(out[0].id, 'b'); // still ranked, best-of-a-bad-lot first
 });
+
+import { passesFeaturedGate, rankForFeature, FEATURED_MIN_RATE, FEATURED_MIN_VOLUME } from '../lib/quality';
+
+test('featured gate needs a known high rating and real sales', () => {
+  assert.equal(passesFeaturedGate({ rating: FEATURED_MIN_RATE, volume: FEATURED_MIN_VOLUME }), true);
+  assert.equal(passesFeaturedGate({ rating: 98, volume: 900 }), false);
+  assert.equal(passesFeaturedGate({ rating: 91.7, volume: 9000 }), false);
+  // The 0 / 0 storage rack that sat in the homepage hero.
+  assert.equal(passesFeaturedGate({ rating: 0, volume: 0 }), false);
+});
+
+test('rankForFeature puts featured products first, rating before orders', () => {
+  const out = rankForFeature([
+    { id: 'volume-only', rating: 91, volume: 90000 },
+    { id: 'unknown', rating: 0, volume: 0 },
+    { id: 'strong', rating: 98, volume: 5000 },
+    { id: 'strong-more-orders', rating: 95, volume: 60000 },
+    { id: 'weak', rating: 80, volume: 5000 },
+  ]);
+  assert.deepEqual(out.map((p) => p.id), ['strong', 'strong-more-orders', 'volume-only', 'unknown']);
+});
+
+test('rankForFeature never empties a list', () => {
+  const out = rankForFeature([{ id: 'a', rating: 70, volume: 50 }]);
+  assert.equal(out.length, 1);
+});

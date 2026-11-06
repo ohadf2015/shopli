@@ -14,6 +14,7 @@ import { getReviewsBatch } from '../../lib/review-store';
 import { breadcrumbJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
 import { buildTrending, dedupeAcrossSections } from '../../lib/trending';
 import { trendingEnabled } from '../../lib/flags';
+import { computeVolumeVelocity, getVolumeBaselines } from '../../lib/trend-velocity';
 import type { RegionConfig } from '../../lib/regions';
 import type { Product } from '../../lib/types';
 import { cacheIfNotEmpty } from '../../lib/cache';
@@ -443,9 +444,22 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
 
   // Trending rail reuses the already-fetched collection pool — zero extra
   // AliExpress calls, no render-blocking work for the hero.
-  const trending = trendingEnabled()
-    ? buildTrending(groups.flatMap((g) => g.products), 8)
-    : [];
+  // Ordered by units sold per day from our daily snapshots, the same signal
+  // /trending ranks on. Time-boxed like there: a cold Neon wake must not land
+  // on homepage TTFB, and no reading just means the usual ordering.
+  const pool = groups.flatMap((g) => g.products);
+  let soldPerDay: Record<string, number> = {};
+  if (trendingEnabled() && pool.length) {
+    const baselines = await Promise.race([
+      getVolumeBaselines(region, pool.map((p) => p.id).filter(Boolean)).catch(() => ({})),
+      new Promise<{}>((resolve) => setTimeout(() => resolve({}), 2000)),
+    ]);
+    const velocity = computeVolumeVelocity(baselines, pool);
+    soldPerDay = Object.fromEntries(
+      Object.entries(velocity).map(([id, v]) => [id, v?.perDay ?? 0]),
+    );
+  }
+  const trending = trendingEnabled() ? buildTrending(pool, 8, soldPerDay) : [];
 
   // Movers: our own snapshot history, no AliExpress call. Fails to [] without
   // a database, which just hides the rail. Only the fields the rail renders are
