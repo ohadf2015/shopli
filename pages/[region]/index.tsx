@@ -1,92 +1,163 @@
 import { GetServerSideProps } from 'next';
 import Header from '../../components/Header';
-import Icon from '../../components/icons';
-import ProductCard, { ProductCardProduct } from '../../components/ProductCard';
-import HomeAboveFold from '../../components/HomeAboveFold';
 import SeoHead from '../../components/SeoHead';
-import TrendingRail, { TrendingItem } from '../../components/TrendingRail';
-import MoversRail, { MoverItem } from '../../components/MoversRail';
+import DealAlertsForm from '../../components/DealAlertsForm';
 import { getRegion, isValidRegion, RegionCode } from '../../lib/regions';
-import { getFeaturedCollections } from '../../lib/collections';
-import { getThemeGroups, type ThemeGroup } from '../../lib/collection-themes';
-import { getPicks } from '../../lib/picks';
-import { getReviewsBatch } from '../../lib/review-store';
-import { breadcrumbJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
-import { buildTrending, dedupeAcrossSections } from '../../lib/trending';
-import { trendingEnabled } from '../../lib/flags';
-import { computeVolumeVelocity, getVolumeBaselines } from '../../lib/trend-velocity';
 import type { RegionConfig } from '../../lib/regions';
-import type { Product } from '../../lib/types';
+import { getFeaturedCollections } from '../../lib/collections';
+import { getPicks, type Pick } from '../../lib/picks';
+import { getReviewsBatch } from '../../lib/review-store';
+import { productImage } from '../../lib/img';
+import { breadcrumbJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
 import { cacheIfNotEmpty } from '../../lib/cache';
 
-interface FlatProduct extends Product { collectionSlug?: string; collectionName?: string; }
+/**
+ * Home: "Is that AliExpress deal actually good?"
+ *
+ * Built only from our own tables — the daily price/order snapshots behind
+ * lib/picks.ts (already quality-gated by lib/quality.ts) and the review store.
+ * No live AliExpress call on the render path, which is what made this page take
+ * seconds: a cold visitor used to wait on three API searches with retries.
+ *
+ * Picks come from every product the daily sweep tracks, not from three
+ * featured collections, so the best sellers show whatever category they sit in.
+ */
 
-interface CollectionGroup {
-  slug: string;
-  name: string;
-  desc: string;
-  icon: string;
-  products: FlatProduct[];
+interface HomeCard {
+  productId: string;
+  title: string;
+  imageUrl: string;
+  price: number;
+  /** Short, factual reason line: "Usually ~€9.99" / "290 sold a day". */
+  why: string;
+  badge: string;
+  tone: 'drop' | 'hot';
+  stars: number;
 }
-
-interface CardGroup extends Omit<CollectionGroup, 'products'> { products: ProductCardProduct[]; }
 
 interface HomePageProps {
   region: RegionCode;
   config: RegionConfig;
-  groups: CardGroup[];
   rtl: boolean;
-  orderedSlugs: string[];
-  themes: ThemeGroup[];
-  trending: TrendingItem[];
-  movers: MoverItem[];
-  /** YYYY-MM-DD of the newest snapshot behind the movers rail; '' when unknown. */
-  moversAsOf: string;
+  drops: HomeCard[];
+  sellers: HomeCard[];
+  chips: Array<{ slug: string; name: string }>;
+  asOf: string;
 }
 
-/**
- * Keep only what ProductCard renders. The raw AliExpress record carries an
- * images array, sku, shopId, categoryPath and commission rate that no card
- * reads, and Next serialises every prop into __NEXT_DATA__ — so shipping the
- * raw record duplicated ~50KB of dead JSON into every homepage response.
- */
-function toCardProduct(p: any): ProductCardProduct {
-  return {
-    id: p.id,
-    title: p.title,
-    originalTitle: p.originalTitle ?? null,
-    price: p.price,
-    originalPrice: p.originalPrice ?? null,
-    currency: p.currency ?? null,
-    imageUrl: p.imageUrl || '',
-    affiliateLink: p.affiliateLink || '',
-    rating: p.rating,
-    reviewCount: p.reviewCount,
-    volume: p.volume,
-    discount: p.discount,
-    freeShipping: p.freeShipping,
-    shopName: p.shopName,
-  };
+const COPY = {
+  en: {
+    h1: 'Is that AliExpress deal actually good?',
+    sub: 'We record prices and orders on thousands of products every day, so you can tell a real price drop from a made-up one.',
+    label: 'Paste an AliExpress link or search',
+    placeholder: 'aliexpress.com/item/… or wireless earbuds',
+    check: 'Check it',
+    drops: 'Real price drops today',
+    dropsSub: "Cheaper than the product's own price over recent weeks, not a list price the seller made up.",
+    sellers: 'Selling fast, rated well',
+    sellersSub: 'What buyers are actually ordering right now, from well-rated sellers.',
+    browse: 'Browse',
+    seeAll: 'See all',
+    howTitle: 'How we judge a deal',
+    how: 'Every day we record each product’s price and order count. A deal is good when the price is under its own recent level and buyers rate it well. We earn a small commission if you buy, and it never changes the verdict.',
+    asOf: 'Data as of',
+    empty: "Today's numbers are still being collected. Search above, or browse a category.",
+  },
+  he: {
+    h1: 'הדיל הזה מאליאקספרס באמת שווה?',
+    sub: 'אנחנו מתעדים מחירים והזמנות של אלפי מוצרים כל יום, כדי שתדעו להבדיל בין ירידת מחיר אמיתית למזויפת.',
+    label: 'הדביקו קישור מאליאקספרס או חפשו',
+    placeholder: 'aliexpress.com/item/… או אוזניות אלחוטיות',
+    check: 'בדיקה',
+    drops: 'ירידות מחיר אמיתיות היום',
+    dropsSub: 'זול יותר מהמחיר של אותו מוצר בשבועות האחרונים, לא ממחיר מחירון שהמוכר המציא.',
+    sellers: 'נמכרים מהר, עם דירוג טוב',
+    sellersSub: 'מה שקונים מזמינים עכשיו, ממוכרים עם דירוג גבוה.',
+    browse: 'קטגוריות',
+    seeAll: 'לכל המוצרים',
+    howTitle: 'איך אנחנו שופטים דיל',
+    how: 'כל יום אנחנו מתעדים את המחיר ומספר ההזמנות של כל מוצר. דיל טוב הוא כשהמחיר מתחת לרמה הרגילה שלו והקונים מדרגים אותו גבוה. אנחנו מרוויחים עמלה קטנה אם קונים, והיא אף פעם לא משנה את ההמלצה.',
+    asOf: 'נתונים נכון ל־',
+    empty: 'המספרים של היום עוד נאספים. חפשו למעלה או בחרו קטגוריה.',
+  },
+};
+
+function Card({ c, region, sym, rtl }: { c: HomeCard; region: string; sym: string; rtl: boolean }) {
+  return (
+    <a
+      href={`/${region}/product/${c.productId}`}
+      className="product-card group flex flex-col"
+      style={{ textDecoration: 'none', color: 'var(--shopli-ink)' }}
+    >
+      <div
+        className="relative aspect-square overflow-hidden"
+        style={{ background: '#F1ECE4', borderBottom: '2.5px solid var(--shopli-ink)' }}
+      >
+        {c.imageUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            {...productImage(c.imageUrl, 320, '(max-width: 640px) 50vw, 25vw')}
+            alt={c.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+          />
+        )}
+        <span
+          className="absolute top-2 start-2 text-xs font-bold px-2 py-0.5 rounded-full"
+          style={{ background: c.tone === 'drop' ? '#B8F2C9' : '#FFE08A', border: '2px solid var(--shopli-ink)' }}
+        >
+          {c.badge}
+        </span>
+      </div>
+      <div className="p-3 flex flex-col gap-1 flex-1">
+        <span className="text-sm leading-snug line-clamp-2">{c.title}</span>
+        <span className="font-extrabold text-lg tabular-nums" dir="ltr" style={{ textAlign: rtl ? 'right' : 'left' }}>
+          {sym}
+          {c.price.toFixed(2)}
+        </span>
+        <span className="text-xs mt-auto" style={{ color: '#5C554C' }}>
+          {c.stars > 0 ? `★ ${c.stars.toFixed(1)} · ` : ''}
+          {c.why}
+        </span>
+      </div>
+    </a>
+  );
 }
 
-async function fetchCollectionProducts(region: string, keywords: string[], limit = 4): Promise<FlatProduct[]> {
-  try {
-    const { searchCollection: sc } = await import('../../lib/aliexpress');
-    return (await sc(region, keywords, limit)) as any;
-  } catch { return []; }
-}
-
-export default function HomePage({ region, config, groups, rtl, orderedSlugs, themes, trending, movers, moversAsOf }: HomePageProps) {
+export default function HomePage({ region, config, rtl, drops, sellers, chips, asOf }: HomePageProps) {
+  const t = rtl ? COPY.he : COPY.en;
   const pageUrl = `${SITE_URL}/${region}`;
   const structuredData = [
     breadcrumbJsonLd([{ name: rtl ? 'דף הבית' : 'Home', url: pageUrl }]),
     websiteJsonLd(`${SITE_URL}/${region}/search?q={search_term_string}`, region as RegionCode),
   ];
+  const sym = config.currencySymbol;
+
+  const section = (id: string, title: string, sub: string, cards: HomeCard[]) =>
+    cards.length ? (
+      <section aria-labelledby={id} className="flex flex-col gap-3">
+        <div className="flex items-end justify-between gap-4">
+          <h2 id={id} className="text-xl sm:text-2xl font-bold m-0">
+            {title}
+          </h2>
+          <a href={`/${region}/trending`} className="text-sm font-semibold shrink-0" style={{ color: 'var(--shopli-ink)' }}>
+            {t.seeAll} {rtl ? '←' : '→'}
+          </a>
+        </div>
+        <p className="text-sm m-0" style={{ color: '#5C554C' }}>
+          {sub}
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+          {cards.map((c) => (
+            <Card key={c.productId} c={c} region={region} sym={sym} rtl={rtl} />
+          ))}
+        </div>
+      </section>
+    ) : null;
 
   return (
     <>
       <SeoHead
-        region={region as RegionCode}
+        region={region}
         path=""
         title={config.meta.title}
         description={config.meta.description}
@@ -94,431 +165,153 @@ export default function HomePage({ region, config, groups, rtl, orderedSlugs, th
       />
       <Header currentRegion={region} dir={config.direction} />
 
-      <main style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}>
+      <main
+        dir={config.direction}
+        className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-10 flex flex-col gap-10 sm:gap-14"
+        style={{ fontFamily: rtl ? 'var(--font-assistant), system-ui, sans-serif' : undefined }}
+      >
+        <section className="flex flex-col gap-4 max-w-2xl">
+          <h1 className="text-4xl sm:text-6xl font-bold leading-[1.03] m-0">{t.h1}</h1>
+          <p className="text-base sm:text-lg leading-relaxed m-0" style={{ color: '#4A443C' }}>
+            {t.sub}
+          </p>
+          <form action={`/${region}/search`} method="get" role="search" className="flex flex-col gap-2">
+            <label htmlFor="home-q" className="text-sm font-semibold">
+              {t.label}
+            </label>
+            <div className="flex gap-2">
+              <input
+                id="home-q"
+                name="q"
+                placeholder={t.placeholder}
+                className="flex-1 min-w-0 h-14 px-4 text-base bg-white rounded-xl"
+                style={{ border: '2.5px solid var(--shopli-ink)' }}
+              />
+              <button type="submit" className="btn-primary h-14 px-5 text-base">
+                {t.check}
+              </button>
+            </div>
+          </form>
+        </section>
 
-        {/* HERO — above-fold value + sole Browse CTA + deal preview (t_2ecfa746) */}
-        <HomeAboveFold
-          region={region}
-          lang={config.lang}
-          rtl={rtl}
-          currencySymbol={config.currencySymbol}
-          tgChannel={config.tgChannel}
-          trending={trending}
-        />
-
-        {/* TRENDING RAIL — directly below hero */}
-        {trending.length > 0 && (
-          <TrendingRail
-            items={trending}
-            region={region}
-            locale={config.lang}
-            currencySymbol={config.currencySymbol}
-            rtl={rtl}
-          />
+        {drops.length === 0 && sellers.length === 0 && (
+          <p className="m-0" style={{ color: '#5C554C' }}>
+            {t.empty}
+          </p>
+        )}
+        {section('drops', t.drops, t.dropsSub, drops)}
+        {section('sellers', t.sellers, t.sellersSub, sellers)}
+        {asOf && (
+          <p className="text-xs -mt-6 m-0" style={{ color: '#5C554C' }}>
+            {t.asOf} {asOf}
+          </p>
         )}
 
-        {/* MOVERS — what our own price/volume history says is moving today */}
-        <MoversRail
-          items={movers}
-          region={region}
-          rtl={rtl}
-          lang={config.lang || 'en'}
-          currencySymbol={config.currencySymbol}
-          asOf={moversAsOf}
-        />
-
-        {/* COLLECTIONS GRID */}
-        {groups.filter(g => g.products.length > 0).slice(0, 3).map((group, gi) => (
-          <section key={group.slug} className={`py-10 md:py-14 ${gi % 2 === 1 ? 'bg-white' : 'bg-gray-50/50'}`}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <div className="flex items-center gap-3 mb-1">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'oklch(90% 0.06 45)', color: 'var(--shopli-orange)' }}>
-                      <Icon name={group.icon as any} size={16} />
-                    </div>
-                    <h2 className="text-xl md:text-2xl font-bold" style={{ color: 'var(--shopli-navy)' }}>{group.name}</h2>
-                  </div>
-                  <p className="text-sm mt-1" style={{ color: 'var(--shopli-warm-gray)' }}>{group.desc}</p>
-                </div>
-                <a href={`/${region}/collection/${group.slug}`} className="text-sm font-semibold flex items-center gap-1 hover:underline whitespace-nowrap" style={{ color: 'var(--shopli-orange)' }}>
-                  {rtl ? 'לכל המוצרים' : 'View All'}
-                  <Icon name={rtl ? 'chevron-left' : 'chevron-right'} size={14} />
+        {chips.length > 0 && (
+          <section aria-labelledby="browse" className="flex flex-col gap-3">
+            <h2 id="browse" className="text-xl sm:text-2xl font-bold m-0">
+              {t.browse}
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {chips.map((c) => (
+                <a
+                  key={c.slug}
+                  href={`/${region}/collection/${c.slug}`}
+                  className="px-4 py-2.5 rounded-full bg-white text-sm font-semibold"
+                  style={{ border: '2.5px solid var(--shopli-ink)', color: 'var(--shopli-ink)', textDecoration: 'none' }}
+                >
+                  {c.name}
                 </a>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                {group.products.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    currencySymbol={config.currencySymbol}
-                    rtl={rtl}
-                    locale={config.lang}
-                    region={region}
-                    showCompareLink
-                    category={group.name}
-                  />
-                ))}
-              </div>
+              ))}
+              <a
+                href={`/${region}/collections`}
+                className="px-4 py-2.5 rounded-full text-sm font-semibold"
+                style={{
+                  border: '2.5px solid var(--shopli-ink)',
+                  background: 'var(--shopli-ink)',
+                  color: 'var(--shopli-cream)',
+                  textDecoration: 'none',
+                }}
+              >
+                {t.seeAll}
+              </a>
             </div>
           </section>
-        ))}
+        )}
 
-        {/* FULL COLLECTIONS LIST */}
-        <section id="categories" className="py-14 bg-white scroll-mt-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <h2 className="text-xl md:text-2xl font-bold mb-2" style={{ color: 'var(--shopli-navy)' }}>
-              {rtl ? 'כל הקטגוריות' : 'All Collections'}
-            </h2>
-            <p className="text-sm mb-8" style={{ color: 'var(--shopli-warm-gray)' }}>
-              {rtl ? 'מוצרים מקובצים לפי נושא — בחרו מה שמעניין אתכם' : 'Products grouped by theme — pick what interests you'}
-            </p>
-            {/*
-              Was: all 78 collections as one wall of tiles, 50 of them beauty
-              niches, sorted by a seasonal order nobody could see. Now: seven
-              themes, each showing its first few collections with the rest one
-              click away on /collections. Nothing was deleted — see
-              lib/collection-themes.ts.
-            */}
-            <div className="space-y-6">
-              {themes.map((th) => (
-                <div key={th.key}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'oklch(90% 0.06 45)', color: 'var(--shopli-orange)' }}>
-                      <Icon name={th.icon as any} size={14} />
-                    </div>
-                    <h3 className="font-bold text-sm" style={{ color: 'var(--shopli-navy)' }}>
-                      {th.name[config.lang || 'en'] || th.name.en}
-                    </h3>
-                    <a
-                      href={`/${region}/collections#${th.key}`}
-                      className="text-xs font-medium hover:underline"
-                      style={{ color: 'var(--shopli-orange)' }}
-                    >
-                      {rtl ? `כל ${th.collections.length} ←` : `all ${th.collections.length} →`}
-                    </a>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                    {th.collections.slice(0, 5).map((coll) => (
-                      <a
-                        key={coll.slug}
-                        href={`/${region}/collection/${coll.slug}`}
-                        className="flex items-center gap-2 p-3 rounded-xl border border-gray-100 hover:border-orange-200 hover:bg-orange-50/30 transition-all"
-                      >
-                        <Icon name={(coll.icon || 'package') as any} size={16} />
-                        <span className="text-sm font-medium" style={{ color: 'var(--shopli-navy)' }}>{coll.name}</span>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* MOOD BOARDS — Complete Looks & Room Designs */}
-        <section className="py-10 bg-orange-50/50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <h2 className="text-xl md:text-2xl font-bold mb-2" style={{ color: 'var(--shopli-navy)' }}>
-              {rtl ? 'לוקים שלמים, חדרים וערכות' : 'Complete Looks, Rooms & Kits'}
-            </h2>
-            <p className="text-sm mb-6" style={{ color: 'var(--shopli-warm-gray)' }}>
-              {rtl ? 'כל ערכה משלבת כמה פריטים למראה שלם, חדר מעוצב או קיט מלא' : 'Each board combines multiple products into a complete look, room design, or kit.'}
-            </p>
-
-            <h3 className="text-xs font-semibold uppercase tracking-widest mb-3 mt-4" style={{ color: 'var(--shopli-orange)' }}>{rtl ? 'תחפושות לפורים / הלווין' : 'PURIM & HALLOWEEN COSTUMES'}</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-              {[
-                { link: 'jack-sparrow', titleEn: 'Pirate Jack Sparrow', titleHe: 'פיראט ג׳ק ספארו', descEn: 'Complete pirate costume €30', descHe: 'תחפושת פיראט ₪120' },
-                { link: 'queen-esther', titleEn: 'Queen Esther', titleHe: 'אסתר המלכה', descEn: 'Royal costume €25', descHe: 'תחפושת מלכותית ₪100' },
-                { link: 'pikachu', titleEn: 'Pikachu Cosplay', titleHe: 'פיקאצ׳ו', descEn: 'Cute Pokemon cosplay €20', descHe: 'קוספליי פוקימון ₪80' },
-                { link: 'spiderman', titleEn: 'Spider-Man', titleHe: 'ספיידרמן', descEn: 'Superhero costume €25', descHe: 'תחפושת גיבור על ₪100' },
-                { link: 'wonder-woman', titleEn: 'Wonder Woman', titleHe: 'ונדר וומן', descEn: 'Amazon warrior €30', descHe: 'תחפושת לוחמת ₪120' },
-                { link: 'ninja-turtle', titleEn: 'Ninja Turtle', titleHe: 'צב נינג׳ה', descEn: 'Hero in a half shell €20', descHe: 'תחפושת צב נינג׳ה ₪80' },
-                { link: 'superman', titleEn: 'Superman', titleHe: 'סופרמן', descEn: 'Man of Steel €25', descHe: 'איש הפלדה ₪100' },
-              ].map(b => (                <a key={b.link} href={`/${region}/mood/${b.link}`}
-                  className="p-3 rounded-xl border border-orange-200 bg-white hover:shadow-md transition-all">
-                  <div className="font-semibold text-sm mb-0.5" style={{ color: 'var(--shopli-navy)' }}>{rtl ? b.titleHe : b.titleEn}</div>
-                  <p className="text-[0.6rem]" style={{ color: 'var(--shopli-warm-gray)' }}>{rtl ? b.descHe : b.descEn}</p>
-                </a>
-              ))}
-            </div>
-
-            <h3 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--shopli-orange)' }}>{rtl ? 'עיצובי חדרים' : 'ROOM DESIGN'}</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-              {[
-                { link: 'japandi-office', titleEn: 'Japandi Office', titleHe: 'משרד ג׳פנדי', descEn: 'Minimalist serene workspace €80', descHe: 'מרחב עבודה שלו ומינימליסטי ₪320' },
-                { link: 'gamer-den', titleEn: 'RGB Gamer Den', titleHe: 'פינת גיימינג', descEn: 'Ultimate gaming setup €120', descHe: 'עמדת משחק אולטימטיבית ₪480' },
-                { link: 'boho-bedroom', titleEn: 'Boho Bedroom', titleHe: 'חדר בוהו', descEn: 'Cozy aesthetic bedroom €50', descHe: 'חדר נעים בסגנון בוהמי ₪200' },
-                { link: 'scandinavian-reading-nook', titleEn: 'Reading Nook', titleHe: 'פינת קריאה', descEn: 'Hygge cozy corner €60', descHe: 'פינת קריאה נעימה בסגנון סקנדינבי ₪240' },
-                { link: 'indoor-jungle', titleEn: 'Indoor Jungle', titleHe: 'ג׳ונגל ביתי', descEn: 'Plant corner €40', descHe: 'פינת צמחים שופעת ₪160' },
-              ].map(b => (                <a key={b.link} href={`/${region}/mood/${b.link}`}
-                  className="p-3 rounded-xl border border-orange-200 bg-white hover:shadow-md transition-all">
-                  <div className="font-semibold text-sm mb-0.5" style={{ color: 'var(--shopli-navy)' }}>{rtl ? b.titleHe : b.titleEn}</div>
-                  <p className="text-[0.6rem]" style={{ color: 'var(--shopli-warm-gray)' }}>{rtl ? b.descHe : b.descEn}</p>
-                </a>
-              ))}
-            </div>
-
-            <h3 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--shopli-orange)' }}>{rtl ? 'ערכות נבחרות' : 'CURATED KITS'}</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {[
-                { link: 'sushi-night', titleEn: 'Sushi Night', titleHe: 'ערב סושי', descEn: 'Kitchen kit under €25', descHe: 'ערכת סושי ₪100' },
-                { link: 'mechanical-keyboard', titleEn: 'Mech Keyboard', titleHe: 'מקלדת מכנית', descEn: 'Custom build under €70', descHe: 'מקלדת מותאמת ₪300' },
-                { link: 'home-bar', titleEn: 'Home Bar', titleHe: 'בר ביתי', descEn: 'Cocktail kit under €35', descHe: 'ערכת קוקטיילים ₪140' },
-                { link: 'digital-nomad', titleEn: 'Digital Nomad', titleHe: 'נווד דיגיטלי', descEn: 'Work anywhere under €60', descHe: 'לעבוד מכל מקום ₪240' },
-                { link: 'streaming-setup', titleEn: 'Streaming Setup', titleHe: 'עמדת סטרימינג', descEn: 'Go live under €60', descHe: 'לשדר בשידור חי ₪240' },
-                { link: 'dessert-baking', titleEn: 'Baking Kit', titleHe: 'ערכת אפייה', descEn: 'Bake like a pro under €30', descHe: 'אפייה מקצועית ₪120' },
-                { link: 'home-gym-pro', titleEn: 'Home Gym Pro', titleHe: 'חדר כושר מתקדם', descEn: 'Serious setup under €80', descHe: 'ציוד מתקדם ₪320' },
-                { link: 'jewelry-making', titleEn: 'Jewelry Making', titleHe: 'תכשיטנות', descEn: 'DIY jewelry under €25', descHe: 'תכשיטים בעבודת יד ₪100' },
-                { link: 'camping-coffee', titleEn: 'Camping Coffee', titleHe: 'קפה בקמפינג', descEn: 'Brew in the wild under €20', descHe: 'קפה בשטח ₪80' },
-                { link: 'study-corner', titleEn: 'Study Corner', titleHe: 'פינת לימוד', descEn: 'Focus workspace under €40', descHe: 'מרחב לימוד ממוקד ₪160' },
-                { link: 'morning-routine', titleEn: 'Morning Routine', titleHe: 'ערכת בוקר', descEn: 'Start your day under €25', descHe: 'בוקר מושלם ₪100' },
-                { link: 'beach-day', titleEn: 'Beach Day', titleHe: 'יום חוף', descEn: 'Stress-free kit under €30', descHe: 'ערכת חוף ₪120' },
-                { link: 'wireless-audio', titleEn: 'Wireless Audio', titleHe: 'אודיו אלחוטי', descEn: 'Earbuds, headphones & speaker €60', descHe: 'אוזניות ורמקולים ₪240' },
-                { link: 'phone-accessories', titleEn: 'Phone Kit', titleHe: 'אביזרים לטלפון', descEn: 'Protect, charge & mount €25', descHe: 'הגנה וטעינה ₪100' },
-                { link: 'summer-essentials', titleEn: 'Summer Survival', titleHe: 'ערכת קיץ', descEn: 'Beat the heat kit under €25', descHe: 'ערכת קיץ מושלמת ₪100' },
-              ].map(b => (                <a key={b.link} href={`/${region}/mood/${b.link}`}
-                  className="p-3 rounded-xl border border-orange-200 bg-white hover:shadow-md transition-all">
-                  <div className="font-semibold text-sm mb-0.5" style={{ color: 'var(--shopli-navy)' }}>{rtl ? b.titleHe : b.titleEn}</div>
-                  <p className="text-[0.6rem]" style={{ color: 'var(--shopli-warm-gray)' }}>{rtl ? b.descHe : b.descEn}</p>
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* COMPARISONS */}
-        <section className="py-10 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <h2 className="text-xl md:text-2xl font-bold mb-2" style={{ color: 'var(--shopli-navy)' }}>
-              {rtl ? 'השוואות מוצרים' : 'Product Comparisons'}
-            </h2>
-            <p className="text-sm mb-6" style={{ color: 'var(--shopli-warm-gray)' }}>
-              {rtl ? 'לא בטוחים מה לבחור? ההשוואות שלנו עוזרות להחליט' : 'Not sure what to pick? Our comparisons help you decide.'}
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[
-                { slug: 'french-press-vs-drip', titleEn: 'French Press vs Drip Maker', titleHe: 'פרנץ׳ פרס מול פילטר', descEn: 'Which brew method wins?', descHe: 'איזו שיטת חליטה עדיפה?' },
-                { slug: 'resistance-bands-vs-dumbbells', titleEn: 'Bands vs Dumbbells', titleHe: 'רצועות מול משקולות', descEn: 'Best home gym gear', descHe: 'איזה ציוד כושר עדיף?' },
-                { slug: 'ring-light-vs-softbox', titleEn: 'Ring Light vs Softbox', titleHe: 'רינג לייט מול סופטבוקס', descEn: 'Perfect lighting choice', descHe: 'בחירת התאורה המושלמת' },
-              ].map(c => (
-                <a key={c.slug} href={`/${region}/compare/${c.slug}`}
-                  className="p-5 rounded-xl border border-gray-100 hover:border-orange-200 hover:shadow-md transition-all bg-white">
-                  <h3 className="font-bold text-sm mb-1" style={{ color: 'var(--shopli-navy)' }}>{rtl ? c.titleHe : c.titleEn}</h3>
-                  <p className="text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>{rtl ? c.descHe : c.descEn}</p>
-                  <span className="text-xs font-semibold mt-2 inline-block" style={{ color: 'var(--shopli-orange)' }}>
-                    {rtl ? 'קראו השוואה →' : 'Read comparison →'}
-                  </span>
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA — Newsletter + Telegram */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
-          <div className="rounded-2xl p-8 md:p-12 text-center" style={{ background: 'var(--shopli-navy)', color: 'white' }}>
-            <h2 className="text-xl md:text-2xl font-bold mb-3">
-              {rtl ? 'רוצים לקבל עדכונים שווים?' : 'Want the Best Deals First?'}
-            </h2>
-            <p className="mb-6 max-w-md mx-auto text-sm" style={{ color: 'oklch(70% 0.02 80)' }}>
-              {rtl ? 'הירשמו לניוזלטר וקבלו מבצעים חמים ישירות למייל' : 'Subscribe for hot deals straight to your inbox'}
-            </p>
-            
-            {/* Newsletter form */}
-            <div className="max-w-sm mx-auto mb-6">
-              <form id="newsletter-form" data-region={region} onSubmit={async (e) => {
-                e.preventDefault();
-                const input = e.currentTarget.querySelector('input') as HTMLInputElement;
-                const btn = e.currentTarget.querySelector('button') as HTMLButtonElement;
-                const status = e.currentTarget.querySelector('.status') as HTMLElement;
-                const formRegion = e.currentTarget.getAttribute('data-region') || 'eu';
-                if (!input.value) return;
-                btn.disabled = true;
-                btn.textContent = rtl ? 'נרשם...' : 'Subscribing...';
-                try {
-                  const res = await fetch('/api/newsletter', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ email: input.value, region: formRegion }),
-                  });
-                  const data = await res.json();
-                  status.textContent = data.message;
-                  status.style.display = 'block';
-                  if (data.ok) {
-                    // Mirror onto the company-brain interest rail (deal-alerts list)
-                    // so every homepage signup pings Telegram and lands in the
-                    // central interest table. Fire-and-forget: the Neon row above
-                    // is the primary store, the rail must never block or fail it.
-                    fetch('https://company-brain-production-841e.up.railway.app/interest', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        product: 'shopli', kind: 'notify', source: 'home',
-                        email: input.value, website: '',
-                      }),
-                    }).catch(() => {});
-                    input.value = '';
-                  }
-                } catch {
-                  status.textContent = rtl ? 'שגיאה, נסו שוב' : 'Error, try again';
-                  status.style.display = 'block';
-                }
-                btn.disabled = false;
-                btn.textContent = rtl ? 'הצטרפו' : 'Subscribe';
-              }} className="flex gap-2">
-                <input type="email" required placeholder={rtl ? 'האימייל שלך' : 'your@email.com'}
-                  className="flex-1 px-4 py-2.5 rounded-xl text-sm text-gray-900 placeholder-gray-400 border-0 focus:outline-none focus:ring-2 focus:ring-orange-400" />
-                <button type="submit"
-                  className="px-5 py-2.5 rounded-xl font-bold text-sm cursor-pointer"
-                  style={{ background: 'var(--shopli-orange)', color: 'white' }}>
-                  {rtl ? 'הצטרפו' : 'Subscribe'}
-                </button>
-              </form>
-              <p className="status text-xs mt-2 hidden" style={{ color: 'oklch(80% 0.05 130)' }}></p>
-            </div>
-
-            <div className="text-xs" style={{ color: 'oklch(70% 0.02 80)' }}>
-              {rtl ? 'או' : 'or'}
-            </div>
-
-            {config.tgChannel && (
-              <a href={`https://t.me/${config.tgChannel}`} target="_blank" rel="noopener"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm mt-4"
-                style={{ background: 'var(--shopli-orange)', color: 'white' }}>
-                <Icon name="telegram" size={18} />
-                {rtl ? 'הצטרפו לטלגרם' : 'Join Telegram'}
-              </a>
-            )}
-          </div>
+        <section
+          className="rounded-2xl p-5 sm:p-6 flex flex-col gap-2"
+          style={{ background: 'var(--shopli-ink)', color: 'var(--shopli-cream)', border: '2.5px solid var(--shopli-ink)' }}
+        >
+          <h2 className="text-lg sm:text-xl font-bold m-0">{t.howTitle}</h2>
+          <p className="text-sm sm:text-base leading-relaxed m-0">{t.how}</p>
         </section>
       </main>
 
+      <DealAlertsForm source="home" rtl={rtl} />
     </>
   );
 }
 
+function toCard(p: Pick, rtl: boolean, sym: string, reviews: Record<string, any>): HomeCard {
+  const nf = (n: number) => Math.round(n).toLocaleString(rtl ? 'he-IL' : 'en-US');
+  const drop = p.reason === 'price_drop' && p.dropPct > 0;
+  const usual = (p.priceMedian ?? p.price).toFixed(2);
+  const why = drop
+    ? rtl
+      ? `בדרך כלל ~${sym}${usual}`
+      : `Usually ~${sym}${usual}`
+    : rtl
+      ? `${nf(p.recentPerDay)} נמכרים ביום`
+      : `${nf(p.recentPerDay)} sold a day`;
+  const badge = drop
+    ? `−${p.dropPct}%`
+    : p.reason === 'surging'
+      ? rtl
+        ? `פי ${p.surge.toFixed(1)} מהרגיל`
+        : `${p.surge.toFixed(1)}× usual`
+      : rtl
+        ? 'רב מכר'
+        : 'Best seller';
+  return {
+    productId: p.productId,
+    title: p.title,
+    imageUrl: p.imageUrl || '',
+    price: p.price,
+    why,
+    badge,
+    tone: drop ? 'drop' : 'hot',
+    stars: reviews[p.productId]?.averageStars ?? 0,
+  };
+}
+
 export const getServerSideProps: GetServerSideProps = async ({ params, query, res }) => {
   const region = (query?.region as string) || (params?.region as string) || 'eu';
-  // Unknown region slugs (e.g. /deals before it existed) must 404, not silently render the EU homepage as a self-canonical duplicate.
+  // Unknown region slugs must 404, not render the EU homepage as a duplicate.
   if (!isValidRegion(region)) return { notFound: true };
   const config = getRegion(region);
   const rtl = config.direction === 'rtl';
+  const lang = config.lang || 'en';
 
-  const t = (text: Record<string, string>) => text[config.lang] || text.en || '';
+  const [dropPicks, allPicks] = await Promise.all([
+    getPicks(region, { limit: 8, reason: 'price_drop' }).catch(() => [] as Pick[]),
+    getPicks(region, { limit: 16 }).catch(() => [] as Pick[]),
+  ]);
+  const dropIds = new Set(dropPicks.map((p) => p.productId));
+  const sellerPicks = allPicks.filter((p) => !dropIds.has(p.productId)).slice(0, 8);
+  const ids = [...dropPicks, ...sellerPicks].map((p) => p.productId);
+  const reviews: Record<string, any> = ids.length ? await getReviewsBatch(region, ids).catch(() => ({})) : {};
 
-  // Three rails, not six: cutting the homepage's product sections in half
-  // keeps the primary CTA and trending rail dominant.
-  const collections = getFeaturedCollections(region, 3);
-  const orderedSlugs = getFeaturedCollections(region, 100).map((c) => c.slug);
-  const groups: CollectionGroup[] = [];
-
-  // Collections are fetched together rather than one after another: these are
-  // independent AliExpress searches and awaiting them in sequence made the
-  // homepage's TTFB their sum. lib/aliexpress caps real concurrency, so this
-  // cannot stampede the rate limiter.
-  // Fetch double the display count: title-dedupe against the rail and
-  // earlier sections can drop relistings, and sections should still fill.
-  // Our own tables (movers, their reviews) are read at the same time as the
-  // AliExpress searches instead of after them, so the page waits for the
-  // slowest source, not the sum of all of them.
-  const picksPromise = getPicks(region, { limit: 8 }).catch(() => [] as Awaited<ReturnType<typeof getPicks>>);
-  const moverReviewsPromise = picksPromise.then((ps) =>
-    ps.length ? getReviewsBatch(region, ps.map((p) => p.productId)).catch(() => ({})) : {}
-  );
-  const fetched = await Promise.all(
-    collections.map((coll) => fetchCollectionProducts(region, [coll.keywords[0]], 8))
-  );
-
-  collections.forEach((coll, i) => {
-    const products = fetched[i];
-    if (products.length > 0) {
-      groups.push({
-        slug: coll.slug,
-        name: t(coll.name),
-        desc: t(coll.desc),
-        icon: coll.icon,
-        products,
-      });
-    }
-  });
-
-  // Homepage content is fully keyed by region (in the URL) — no cookies/auth —
-  // so it's safe to cache at the CDN. Revalidate every 5 min, serve stale up to a day.
-  cacheIfNotEmpty(res, groups.length > 0, 'public, s-maxage=300, stale-while-revalidate=86400');
-
-  // Trending rail reuses the already-fetched collection pool — zero extra
-  // AliExpress calls, no render-blocking work for the hero.
-  // Ordered by units sold per day from our daily snapshots, the same signal
-  // /trending ranks on. Time-boxed like there: a cold Neon wake must not land
-  // on homepage TTFB, and no reading just means the usual ordering.
-  const pool = groups.flatMap((g) => g.products);
-  let soldPerDay: Record<string, number> = {};
-  if (trendingEnabled() && pool.length) {
-    const baselines = await Promise.race([
-      getVolumeBaselines(region, pool.map((p) => p.id).filter(Boolean)).catch(() => ({})),
-      new Promise<{}>((resolve) => setTimeout(() => resolve({}), 2000)),
-    ]);
-    const velocity = computeVolumeVelocity(baselines, pool);
-    soldPerDay = Object.fromEntries(
-      Object.entries(velocity).map(([id, v]) => [id, v?.perDay ?? 0]),
-    );
-  }
-  const trending = trendingEnabled() ? buildTrending(pool, 8, soldPerDay) : [];
-
-  // Movers: our own snapshot history, no AliExpress call. Fails to [] without
-  // a database, which just hides the rail. Only the fields the rail renders are
-  // passed through — Next serialises every prop into __NEXT_DATA__, and a Pick
-  // carries snapshot internals no card reads.
-  const picks = await picksPromise;
-  // Trust data from the review store (feedback.aliexpress.com, warmed by the
-  // daily cron and PDP views). Store-only — a homepage render must not fan out
-  // upstream calls; a product nobody has warmed simply shows no count.
-  const moverReviews: Record<string, any> = await moverReviewsPromise;
-  const movers: MoverItem[] = picks.map((p) => ({
-    productId: p.productId,
-    title: p.title,
-    imageUrl: p.imageUrl,
-    price: p.price,
-    reason: p.reason,
-    recentPerDay: p.recentPerDay,
-    perDay: p.perDay,
-    surge: p.surge,
-    dropPct: p.dropPct,
-    spanDays: p.spanDays,
-    rating: p.rating,
-    stars: moverReviews[p.productId]?.averageStars ?? 0,
-    reviewCount: moverReviews[p.productId]?.writtenCount ?? 0,
+  const sym = config.currencySymbol;
+  const drops = dropPicks.map((p) => toCard(p, rtl, sym, reviews));
+  const sellers = sellerPicks.map((p) => toCard(p, rtl, sym, reviews));
+  const chips = getFeaturedCollections(region, 10).map((c) => ({
+    slug: c.slug,
+    name: c.name?.[lang] || c.name?.en || c.slug,
   }));
-  // The rail's freshness date is the newest snapshot any pick is ranked on.
-  const moversAsOf = picks.map((p) => p.asOf).sort().pop() ?? '';
+  const asOf = [...dropPicks, ...sellerPicks].map((p) => p.asOf).sort().pop() ?? '';
 
-  // Same supplier item is often relisted under new IDs, so ID-dedupe alone
-  // lets one title appear in the rail AND a section (or twice across
-  // sections). Rail wins the title; sections are filtered against the rail
-  // plus every earlier section, then trimmed back to 4 cards.
-  const dedupedSections = dedupeAcrossSections<any>(
-    trending.map((entry) => entry.product),
-    groups.map((g) => g.products),
-    (p) => p.title || ''
-  );
-  const finalGroups = groups
-    .map((g, i) => ({ ...g, products: dedupedSections[i].slice(0, 4).map(toCardProduct) }))
-    .filter((g) => g.products.length > 0);
+  cacheIfNotEmpty(res, drops.length + sellers.length > 0, 'public, s-maxage=600, stale-while-revalidate=86400');
 
-  return {
-    props: {
-      region,
-      config,
-      groups: finalGroups,
-      rtl,
-      orderedSlugs,
-      themes: getThemeGroups(config.lang || 'en'),
-      trending,
-      movers,
-      moversAsOf,
-    },
-  };
+  return { props: { region, config, rtl, drops, sellers, chips, asOf } };
 };
