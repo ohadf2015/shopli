@@ -13,7 +13,7 @@ import { cacheIfNotEmpty } from '../../../lib/cache';
 import { trendingEnabled } from '../../../lib/flags';
 import { productImage } from '../../../lib/img';
 import { getRegion, RegionCode, RegionConfig } from '../../../lib/regions';
-import { getProductsByIds, ensureAffiliateTracking, SearchProduct } from '../../../lib/aliexpress';
+import { getProductsByIds, ensureAffiliateTracking, isPromotionLink, SearchProduct } from '../../../lib/aliexpress';
 import { getFeedProduct } from '../../../lib/feed-store';
 import { getDemoProductById } from '../../../lib/demo-products';
 import { getProductReviews } from '../../../lib/review-store';
@@ -545,6 +545,9 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
     getProductsByIds,
     getStoredProduct: storedProduct,
     getDemoProductById,
+    // Past this, a tap on a product card shows our stored copy instead of
+    // hanging on a slow AliExpress answer.
+    liveBudgetMs: 3000,
   });
   if (!product) {
     return pdpGsspWhenMissing();
@@ -554,7 +557,15 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
   // API — but only once we actually have a product. This header used to be set
   // before the fetch, so a rate-limited call pinned "Product not found" over a
   // live product for ten minutes.
-  cacheIfNotEmpty(context.res, !!product, 'public, s-maxage=600, stale-while-revalidate=3600');
+  // A stored or demo copy carries no tracked buy link, so keep it at the edge
+  // only briefly and let the next view pick up the live, tracked product.
+  cacheIfNotEmpty(
+    context.res,
+    !!product,
+    isPromotionLink(product.affiliateLink)
+      ? 'public, s-maxage=600, stale-while-revalidate=3600'
+      : 'public, s-maxage=60, stale-while-revalidate=60'
+  );
 
   const lang = config.lang || 'en';
   const collName = (c: CollectionDef) =>

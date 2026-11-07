@@ -128,3 +128,42 @@ test('store fallback: store throws + unknown demo id → still a hard 404 (null)
   });
   assert.equal(product, null);
 });
+
+test('live budget: slow AliExpress answer → stored copy served', async () => {
+  const stored = fakeProduct('slow-1');
+  stored.title = 'stored';
+  const started = Date.now();
+  const product = await resolvePdpProduct('slow-1', 'eu', 'EUR', {
+    getProductsByIds: () => new Promise((resolve) => setTimeout(() => resolve([fakeProduct('slow-1')]), 2000)),
+    getStoredProduct: async () => stored,
+    getDemoProductById,
+    liveBudgetMs: 50,
+  });
+  assert.equal(product?.title, 'stored');
+  assert.ok(Date.now() - started < 1000, 'must not wait for the slow live call');
+});
+
+test('live budget: slow answer and nothing stored → still waits for live', async () => {
+  const product = await resolvePdpProduct('slow-2', 'eu', 'EUR', {
+    getProductsByIds: () => new Promise((resolve) => setTimeout(() => resolve([fakeProduct('slow-2')]), 100)),
+    getStoredProduct: async () => null,
+    getDemoProductById,
+    liveBudgetMs: 20,
+  });
+  assert.equal(product?.id, 'slow-2');
+});
+
+test('live budget: fast live answer wins over stored', async () => {
+  let storedCalled = false;
+  const product = await resolvePdpProduct('fast-1', 'eu', 'EUR', {
+    getProductsByIds: async () => [fakeProduct('fast-1')],
+    getStoredProduct: async () => {
+      storedCalled = true;
+      return null;
+    },
+    getDemoProductById,
+    liveBudgetMs: 1000,
+  });
+  assert.equal(product?.title, 'Product fast-1');
+  assert.equal(storedCalled, false);
+});
