@@ -2,6 +2,8 @@
 
 export interface CollectionContent {
   slug: string;
+  /** ISO date the guide first went live, from git history. */
+  published: string;
   // SEO
   metaTitle: Record<string, string>;
   metaDesc: Record<string, string>;
@@ -24,6 +26,7 @@ export interface CollectionContent {
 export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
   'home-gym': {
     slug: 'home-gym',
+    published: '2026-07-12',
     metaTitle: { en: 'Home Gym Essentials: Build Your Home Workout Under €50', he: 'חדר כושר ביתי: ציוד אימון ביתי בלי לשבור את הכיס', fr: 'Équipement de Sport à Domicile: Salle de Sport à Moins de 50€', de: 'Heim-Fitnessstudio unter 50€: Die besten Geräte für Zuhause', es: 'Equipo de Gimnasio en Casa por menos de 50€', it: 'Palestra in Casa: Attrezzatura Sotto i 50€' },
     metaDesc: { en: 'Complete home gym setup with resistance bands, yoga mats, push-up bars & more. No membership needed, start today.', he: 'חדר כושר ביתי מלא עם רצועות התנגדות, מזרני יוגה, מתקני שכיבות סמיכה ועוד. בלי מנוי מיותר.', fr: 'Salle de sport à domicile complète avec élastiques, tapis de yoga, barres de pompes.', de: 'Komplettes Heim-Fitnessstudio mit Widerstandsbändern, Yogamatten, Liegestützgriffen.', es: 'Gimnasio en casa completo con bandas, tapetes, barras de flexiones.', it: 'Palestra in casa completa con fasce, tappetini, barre per flessioni.' },
     h1: { en: 'Build a Home Gym That Actually Works (Under €50)', he: 'בנו חדר כושר ביתי שעובד באמת (פחות מ-₪200)', fr: 'Construisez une salle de sport à domicile efficace (moins de 50€)', de: 'Baue dir ein Fitnessstudio zu Hause (unter 50€)', es: 'Construye un gimnasio en casa que funcione (menos de 50€)', it: 'Costruisci una palestra in casa che funziona (sotto i 50€)' },
@@ -49,6 +52,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
 
   'coffee-ritual': {
     slug: 'coffee-ritual',
+    published: '2026-07-12',
     metaTitle: { en: 'The Ultimate Home Coffee Setup: Brew Like a Pro Under €60', he: 'פינת קפה ביתית: לחלוט כמו מקצוען בפחות מ-₪250', fr: 'Kit Café à Domicile: Préparez un Café Pro à Moins de 60€', de: 'Die ultimative Kaffeestation zu Hause unter 60€', es: 'Kit de Café en Casa: Café Profesional por Menos de 60€', it: 'Kit Caffè a Casa: Caffè da Bar Sotto i 60€' },
     metaDesc: { en: 'French press, burr grinder, milk frother & more. Complete guide to brewing specialty coffee at home without the café markup.', he: 'פרנץ\' פרס, מטחנת בור, מקציף חלב ועוד. מדריך שלם לקפה מיוחד בבית.', fr: 'French press, moulin à café, mousseur à lait. Guide complet du café maison.', de: 'French Press, Kaffeemühle, Milchaufschäumer. Komplette Anleitung.', es: 'Prensa francesa, molinillo, espumador de leche.', it: 'French press, macinacaffè, montalatte.' },
     h1: { en: 'Brew Barista-Quality Coffee at Home Under €60', he: 'קפה באיכות בריסטה בבית בפחות מ-₪250', fr: 'Café de Barista à Domicile pour Moins de 60€', de: 'Barista-Qualität zu Hause unter 60€', es: 'Café de Barista en Casa por Menos de 60€', it: 'Caffè da Bar a Casa Sotto i 60€' },
@@ -72,6 +76,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
 
   'content-creator': {
     slug: 'content-creator',
+    published: '2026-07-12',
     metaTitle: { en: 'Content Creator Starter Kit: Record Like a Pro Under €80', he: 'ערכת יוצרי תוכן: להקליט כמו מקצוען בפחות מ-₪350', fr: 'Kit Créateur de Contenu: Enregistrez Comme un Pro à Moins de 80€', de: 'Content Creator Starter-Kit unter 80€', es: 'Kit Creador de Contenido: Graba Como un Pro por Menos de 80€', it: 'Kit Creator: Registra Come un Pro Sotto gli 80€' },
     metaDesc: { en: 'Complete content creation setup: lav mic, ring light, mini tripod, phone gimbal & more. Start your YouTube or TikTok channel today.', he: 'ערכת הקלטה מלאה: מיקרופון לאבליר, רינג לייט, חצובה מיני ועוד. התחילו ערוץ יוטיוב או טיקטוק.', fr: 'Kit création complet: micro-cravate, ring light, mini trépied, gimbal.', de: 'Komplettes Creator-Set: Lav-Mikrofon, Ringlicht, Mini-Stativ, Gimbal.', es: 'Kit completo: mic de solapa, ring light, mini trípode, gimbal.', it: 'Kit completo: microfono lavalier, anello luce, mini treppiede, gimbal.' },
     h1: { en: 'Start Creating Content Like a Pro (Under €80)', he: 'התחילו ליצור תוכן כמו מקצוענים (פחות מ-₪350)', fr: 'Créez du contenu comme un pro (moins de 80€)', de: 'Starte als Content Creator (unter 80€)', es: 'Crea contenido como un pro (menos de 80€)', it: 'Crea contenuti come un professionista (sotto 80€)' },
@@ -95,6 +100,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
 
   'balcony-garden': {
     slug: 'balcony-garden',
+    published: '2026-07-12',
     metaTitle: { en: 'Balcony Garden Starter Kit: Grow Herbs & Veggies in Small Spaces', he: 'גינת מרפסת: לגדל עשבי תיבול וירקות במרחב קטן', fr: 'Kit Jardin de Balcon: Faites Pousser Herbes et Légumes en Petit Espace', de: 'Balkon-Garten: Kräuter & Gemüse auf kleinem Raum anbauen', es: 'Kit Jardín de Balcón: Cultiva Hierbas y Verduras en Espacios Pequeños', it: 'Kit Giardino da Balcone: Coltiva Erbe e Verdure in Piccoli Spazi' },
     metaDesc: { en: 'Grow your own herbs, veggies and flowers on a balcony. Smart pots, irrigation systems, grow lights & seed starters — complete setup under €40.', he: 'לגדל עשבי תיבול, ירקות ופרחים במרפסת. עציצים חכמים, מערכות השקיה ואורות גידול — פחות מ-₪160.', fr: 'Faites pousser herbes, légumes et fleurs sur votre balcon. Moins de 40€.', de: 'Kräuter, Gemüse und Blumen auf dem Balkon anbauen. Komplett unter 40€.', es: 'Cultiva hierbas, verduras y flores en tu balcón. Completo por menos de 40€.', it: 'Coltiva erbe, verdure e fiori sul balcone. Completo sotto i 40€.' },
     h1: { en: 'Turn Your Balcony Into a Productive Garden (Under €40)', he: 'הפכו את המרפסת לגינה פורייה (פחות מ-₪160)', fr: 'Transformez votre balcon en jardin productif (moins de 40€)', de: 'Mach deinen Balkon zum Nutzgarten (unter 40€)', es: 'Convierte tu balcón en un jardín productivo (menos de 40€)', it: 'Trasforma il tuo balcone in un giardino produttivo (sotto 40€)' },
@@ -115,6 +121,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
 
   'sleep-sanctuary': {
     slug: 'sleep-sanctuary',
+    published: '2026-07-12',
     metaTitle: { en: 'Create a Sleep Sanctuary: The Ultimate Bedtime Setup Under €40', he: 'פינת שינה מושלמת: ערכת שינה לשיפור האיכות בפחות מ-₪150', fr: 'Créez un Sanctuaire du Sommeil: Le Kit Ultimate Moins de 40€', de: 'Schlaf-Oase: Das ultimative Schlafzimmer-Set unter 40€', es: 'Crea un Santuario del Sueño: El Kit Definitivo por menos de 40€', it: 'Crea un Santuario del Sonno: Il Kit Definitivo Sotto i 40€' },
     metaDesc: { en: 'Natural sleep aids: weighted eye mask, lavender pillow, aromatherapy diffuser, memory foam pillow. Better sleep starts tonight.', he: 'עזרי שינה טבעיים: מסכת עיניים, כרית לבנדר, מפזר ארומתרפיה, כרית זיכרון. שינה טובה יותר מתחילה הלילה.', fr: 'Aides naturelles au sommeil: masque, coussin lavande, diffuseur, oreiller mémoire de forme.', de: 'Natürliche Schlafhilfen: Maske, Lavendelkissen, Diffuser, Memory-Foam-Kissen.', es: 'Ayudas naturales: máscara, almohada de lavanda, difusor, almohada de espuma.', it: 'Aiuti naturali: mascherina, cuscino lavanda, diffusore, cuscino memory foam.' },
     h1: { en: 'Transform Your Bedroom Into a Sleep Sanctuary (Under €40)', he: 'הפכו את חדר השינה לפינת שינה מושלמת (פחות מ-₪150)', fr: 'Transformez votre chambre en sanctuaire du sommeil (moins de 40€)', de: 'Verwandle dein Schlafzimmer in eine Wohlfühloase (unter 40€)', es: 'Transforma tu dormitorio en un santuario del sueño (menos de 40€)', it: 'Trasforma la tua camera da letto in un santuario (sotto 40€)' },
@@ -136,6 +143,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
   // ====== WIRELESS AUDIO — SEO content ======
   'wireless-audio': {
     slug: 'wireless-audio',
+    published: '2026-07-15',
     metaTitle: { en: 'Wireless Audio Guide: Best TWS Earbuds, Headphones & Speakers Under €50', he: 'מדריך אודיו אלחוטי: אוזניות TWS, אוזניות ורמקולים מומלצים בפחות מ-₪200', fr: 'Guide Audio Sans Fil: Meilleurs Casques et Écouteurs à Moins de 50€', de: 'Kabelloses Audio: Beste TWS-Kopfhörer & Lautsprecher unter 50€', es: 'Guía de Audio Inalámbrico: Mejores Auriculares TWS y Altavoces', it: 'Guida Audio Senza Fili: Migliori Auricolari TWS e Altoparlanti' },
     metaDesc: { en: 'Complete guide to wireless audio on a budget. TWS earbuds, over-ear headphones, and portable speakers — all under €50 on AliExpress.', he: 'מדריך שלם לאודיו אלחוטי בתקציב. אוזניות TWS, אוזניות קשת ורמקולים ניידים — הכל בפחות מ-₪200.', fr: 'Guide complet de l\'audio sans fil économique. Écouteurs TWS, casques et enceintes portables.', de: 'Komplette Anleitung zu kabellosem Audio. TWS-Kopfhörer, Over-Ear-Kopfhörer und tragbare Lautsprecher.', es: 'Guía completa de audio inalámbrico económico.', it: 'Guida completa all\'audio senza fili economico.' },
     h1: { en: 'The Best Wireless Audio Gear Under €50 (2026 Guide)', he: 'ציוד האודיו האלחוטי הטוב ביותר בפחות מ-₪200', fr: 'Les Meilleurs Équipements Audio Sans Fil à Moins de 50€', de: 'Die beste kabellose Audio-Ausrüstung unter 50€', es: 'El Mejor Equipo de Audio Inalámbrico por menos de 50€', it: 'La Migliore Attrezzatura Audio Senza Fili Sotto i 50€' },
@@ -162,6 +170,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
   // ====== PHONE ACCESSORIES — SEO content ======
   'phone-accessories': {
     slug: 'phone-accessories',
+    published: '2026-07-15',
     metaTitle: { en: 'Must-Have Phone Accessories: Protect, Power & Go Under €20', he: 'אביזרים חיוניים לטלפון: הגנה, טעינה וניידות בפחות מ-₪80', fr: 'Accessoires Téléphone Indispensables: Protection, Charge et Mobilité', de: 'Must-Have Handy-Zubehör: Schutz, Strom & Unterwegs unter 20€', es: 'Accesorios Esenciales para el Móvil: Protección, Carga y Movilidad', it: 'Accessori Telefono Indispensabili: Protezione, Ricarica e Mobilità' },
     metaDesc: { en: 'Essential phone accessories every smartphone owner needs: cases, screen protectors, power banks, car mounts, and fast charging cables.', he: 'אביזרים חיוניים לכל בעל סמארטפון: כיסויים, מגיני מסך, בנקי כוח, אוחזים לרכב וכבלי טעינה מהירה.', fr: 'Accessoires essentiels: coques, protecteurs d\'écran, batteries externes, supports de voiture et câbles.', de: 'Essenzielle Handy-Zubehör: Hüllen, Displayschutz, Powerbanks, Halterungen und Ladekabel.', es: 'Accesorios esenciales: fundas, protectores, power banks, soportes y cables.', it: 'Accessori essenziali: custodie, protezioni schermo, power bank, supporti e cavi.' },
     h1: { en: 'Essential Phone Accessories Every Smartphone Owner Needs (Under €20)', he: 'אביזרים חיוניים לכל בעל סמארטפון (פחות מ-₪80)', fr: 'Accessoires Téléphone Indispensables (Moins de 20€)', de: 'Essenzielle Handy-Zubehör (Unter 20€)', es: 'Accesorios Esenciales para el Móvil (Menos de 20€)', it: 'Accessori Telefono Indispensabili (Sotto i 20€)' },
@@ -186,6 +195,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
   // ====== SUMMER ESSENTIALS — SEO content ======
   'summer-essentials': {
     slug: 'summer-essentials',
+    published: '2026-07-15',
     metaTitle: { en: 'Summer Essentials on a Budget: Beat the Heat Under €25', he: 'מוצרי קיץ חיוניים בתקציב: לנצח את החום בפחות מ-₪100', fr: 'Essentiels d\'Été Économiques: Vaincre la Chaleur à Moins de 25€', de: 'Sommer-Essentials: Hitzewelle unter 25€ überstehen', es: 'Esenciales de Verano: Vence el Calor por menos de 25€', it: 'Essenziali Estivi: Sconfiggi il Caldo Sotto i 25€' },
     metaDesc: { en: 'Beat the summer heat without breaking the bank. Portable fans, cooling towels, UV protection, and hydration gear — all under €25 on AliExpress.', he: 'לנצח את חום הקיץ בלי לשבור את הכיס. מאווררים ניידים, מגבות קירור, הגנת UV וציוד שתייה.', fr: 'Vaincre la chaleur estivale sans se ruiner. Ventilateurs, serviettes rafraîchissantes, protection UV.', de: 'Die Sommerhitze besiegen ohne das Budget zu sprengen. Ventilatoren, Kühltücher, UV-Schutz.', es: 'Vence el calor del verano sin gastar mucho. Ventiladores, toallas refrescantes, protección UV.', it: 'Sconfiggi il caldo estivo senza spendere una fortuna. Ventilatori, asciugamani rinfrescanti, protezione UV.' },
     h1: { en: 'Summer Survival Kit: Beat the Heat on a Budget (Under €25)', he: 'ערכת הישרדות קיץ: לנצח את החום בתקציב (פחות מ-₪100)', fr: 'Kit de Survie Estivale: Vaincre la Chaleur à Moins de 25€', de: 'Sommer-Überlebensset: Hitze unter 25€ besiegen', es: 'Kit de Supervivencia de Verano: Vence el Calor por menos de 25€', it: 'Kit di Sopravvivenza Estiva: Sconfiggi il Caldo Sotto i 25€' },
@@ -209,6 +219,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
 
   'maker-lab': {
     slug: 'maker-lab',
+    published: '2026-07-31',
     metaTitle: { en: 'DIY Electronics Starter Kit: Arduino, Soldering & Maker Projects Under €30', he: 'ערכת אלקטרוניקה למתחילים: ארדואינו, הלחמה ופרויקטי יצירה בפחות מ-₪120', fr: 'Kit Électronique DIY: Arduino, Soudure et Projets Maker à Moins de 30€', de: 'DIY Elektronik Starter-Kit: Arduino, Löten & Maker Projekte unter 30€', es: 'Kit de Electrónica DIY: Arduino, Soldadura y Proyectos Maker por menos de 30€', it: 'Kit Elettronica Fai-da-Te: Arduino, Saldatura e Progetti Maker sotto i 30€' },
     metaDesc: { en: 'Complete DIY electronics starter guide. Arduino boards, soldering practice kits, sensors & breadboards — everything for your first maker project.', he: 'מדריך אלקטרוניקה למתחילים. ארדואינו, ערכות הלחמה, סנסורים — הכל לפרויקט היצירה הראשון שלכם.', fr: "Guide complet de l'électronique DIY. Arduino, kits de soudure, capteurs — tout pour votre premier projet maker.", de: 'Komplette DIY-Elektronik-Anleitung. Arduino, Lötkits, Sensoren — alles für dein erstes Maker-Projekt.', es: 'Guía completa de electrónica DIY. Arduino, kits de soldadura, sensores — todo para tu primer proyecto maker.', it: "Guida completa all'elettronica fai-da-te. Arduino, kit di saldatura, sensori — tutto per il tuo primo progetto maker." },
     h1: { en: 'Start Your DIY Electronics Journey (Under €30)', he: 'התחילו במסע האלקטרוניקה הביתית (פחות מ-₪120)', fr: 'Commencez votre voyage en électronique DIY (moins de 30€)', de: 'Starte deine DIY-Elektronik-Reise (unter 30€)', es: 'Comienza tu viaje en electrónica DIY (menos de 30€)', it: "Inizia il tuo viaggio nell'elettronica fai-da-te (sotto i 30€)" },
@@ -234,6 +245,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
 
   'home-bar': {
     slug: 'home-bar',
+    published: '2026-07-31',
     metaTitle: { en: 'Home Bar Starter Kit: Mix Craft Cocktails at Home Under €30', he: 'בר ביתי: להכין קוקטיילים ביתיים כמו ברמנים בפחות מ-₪120', fr: 'Kit Bar à Domicile: Préparez des Cocktails Maison à Moins de 30€', de: 'Hausbar Starter-Kit: Cocktails wie ein Bartender unter 30€', es: 'Kit Bar en Casa: Prepara Cócteles Caseros por Menos de 30€', it: 'Kit Bar in Casa: Prepara Cocktail Fatti in Casa Sotto i 30€' },
     metaDesc: { en: 'Complete home bar setup: shaker, jigger, muddler, strainer & premium ice molds. Mix margaritas, old fashioneds & more without the bar markup.', he: 'ערכת בר ביתי שלמה: שייקר, ג\'יגר, מודלר, מסנן ותבניות קרח. להכין מרגריטות ואולד פאשנד ללא תיוג בר.', fr: 'Kit bar complet: shaker, doseur, pilon, passoire et moules à glace. Préparez margaritas et old fashioneds.', de: 'Komplettes Hausbar-Set: Shaker, Jigger, Mudler, Sieb & Eisformen. Mixe Margaritas und Old Fashioneds.', es: 'Kit de bar completo: coctelera, dosificador, machacador, colador. Prepara margaritas y old fashioneds.', it: 'Kit bar completo: shaker, misurino, pestello, colino e stampi per ghiaccio. Prepara margarita e old fashioned.' },
     h1: { en: 'Build a Home Bar That Actually Makes Great Cocktails (Under €30)', he: 'בנו בר ביתי שעושה קוקטיילים מעולים באמת (פחות מ-₪120)', fr: 'Construisez un bar à domicile qui fait de vrais cocktails (moins de 30€)', de: 'Baue eine Hausbar, die richtig gute Cocktails macht (unter 30€)', es: 'Construye un bar en casa que haga buenos cócteles (menos de 30€)', it: 'Costruisci un bar in casa che prepara ottimi cocktail (sotto 30€)' },
@@ -257,6 +269,7 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
 
   'zero-waste': {
     slug: 'zero-waste',
+    published: '2026-07-31',
     metaTitle: { en: 'Zero Waste Starter Kit: Plastic-Free Living Under €25', he: 'ערכת אפס פסולת: חיים נטולי פלסטיק בפחות מ-₪100', fr: 'Kit Zéro Déchet: Vie Sans Plastique à Moins de 25€', de: 'Zero Waste Starter-Kit: Plastikfrei Leben unter 25€', es: 'Kit Cero Residuos: Vida Sin Plástico por Menos de 25€', it: 'Kit Zero Sprechi: Vita Senza Plastica Sotto i 25€' },
     metaDesc: { en: 'Bamboo toothbrushes, reusable produce bags, beeswax wraps & stainless straws. Complete guide to starting a zero-waste lifestyle on a budget.', he: 'מברשות שיניים במבוק, שקיות רב-פעמיות, עטיפות שעווה וקשיות נירוסטה. מדריך מלא לאורח חיים נטול פסולת בתקציב.', fr: "Brosses à dents bambou, sacs réutilisables, bee wraps et pailles inox. Guide complet du zéro déchet économique.", de: 'Bambus-Zahnbürsten, wiederverwendbare Beutel, Bienenwachstücher & Edelstahlhalme. Komplette Zero-Waste-Anleitung.', es: 'Cepillos de bambú, bolsas reutilizables, envoltorios de cera y pajitas de acero. Guía completa de cero residuos.', it: "Spazzolini in bambù, borse riutilizzabili, involucri in cera e cannucce in acciaio. Guida completa a rifiuti zero." },
     h1: { en: 'Start Your Zero Waste Journey (Under €25)', he: 'התחילו במסע אפס הפסולת (פחות מ-₪100)', fr: 'Commencez votre voyage zéro déchet (moins de 25€)', de: 'Starte deine Zero-Waste-Reise (unter 25€)', es: 'Comienza tu viaje de cero residuos (menos de 25€)', it: 'Inizia il tuo viaggio verso rifiuti zero (sotto 25€)' },
@@ -278,3 +291,20 @@ export const COLLECTION_CONTENT: Record<string, CollectionContent> = {
     ],
   },
 };
+
+const BYLINE: Record<string, (date: string) => string> = {
+  en: (d) => `By Shopli · Published ${d}`,
+  he: (d) => `מאת Shopli · פורסם ב-${d}`,
+  fr: (d) => `Par Shopli · Publié le ${d}`,
+  de: (d) => `Von Shopli · Veröffentlicht am ${d}`,
+  es: (d) => `Por Shopli · Publicado el ${d}`,
+  it: (d) => `Di Shopli · Pubblicato il ${d}`,
+  ru: (d) => `Shopli · Опубликовано ${d}`,
+};
+
+export function collectionByline(published: string, lang: string): { iso: string; text: string } {
+  const date = new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
+    new Date(`${published}T00:00:00Z`)
+  );
+  return { iso: published, text: (BYLINE[lang] || BYLINE.en)(date) };
+}
