@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { rankForFeature } from './quality';
 import { getHebrewTitles } from './hebrew-titles';
 import { cleanTitle } from './titles';
+import { keepLinkable } from './linkable';
 
 const REGION_MAP: Record<string, { language: string; currency: string; shipToCountry: string }> = {
   il: { language: 'HE', currency: 'ILS', shipToCountry: 'IL' },
@@ -315,7 +316,10 @@ export async function searchCollection(region: string, keywords: string[], limit
   // products that clear the featured bar (94%+, 1,000+ orders) come first,
   // ordered by rating with orders as the tiebreak (lib/quality.ts), and the
   // rest of the floor only tops the list up.
-  return rankForFeature(all).slice(0, limit);
+  //
+  // Every card links to /product/<id>, which resolves by id. Search returns
+  // some items the by-id lookup never does, and those cards were dead 404 links.
+  return keepLinkable(rankForFeature(all).slice(0, limit), (ids) => getProductsByIds(ids, region));
 }
 
 /**
