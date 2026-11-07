@@ -115,8 +115,8 @@ export default function MarketplaceIwishbagHowTo({
             </div>
             <Link
               href="/landed"
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold text-white shrink-0"
-              style={{ background: 'var(--shopli-orange)' }}
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold shrink-0"
+              style={{ background: 'var(--shopli-orange)', color: 'var(--shopli-on-orange)' }}
               data-landed-cta="button"
             >
               Open /landed

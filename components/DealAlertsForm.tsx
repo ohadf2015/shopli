@@ -70,7 +70,7 @@ export default function DealAlertsForm({ source, rtl }: DealAlertsFormProps) {
             <button
               type="submit"
               className="px-5 py-2.5 rounded-xl font-bold text-sm cursor-pointer"
-              style={{ background: 'var(--shopli-orange)', color: 'white' }}
+              style={{ background: 'var(--shopli-orange)', color: 'var(--shopli-on-orange)' }}
             >
               {rtl ? 'עדכנו אותי' : 'Notify me'}
             </button>

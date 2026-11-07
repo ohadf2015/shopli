@@ -203,7 +203,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             {rtl ? 'מועדפים' : 'Wishlist'}
             {wishlistCount > 0 && (
               <span className="absolute -top-0.5 -end-0.5 min-w-[18px] h-[18px] rounded-full text-[10px] font-bold flex items-center justify-center px-1"
-                style={{ background: 'var(--shopli-orange)', color: 'white' }}
+                style={{ background: 'var(--shopli-orange)', color: 'var(--shopli-on-orange)' }}
               >
                 {wishlistCount > 99 ? '99+' : wishlistCount}
               </span>
@@ -319,8 +319,8 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             />
             <button
               type="submit"
-              className="px-4 py-2.5 rounded-xl text-sm font-semibold text-white shrink-0 min-h-[44px]"
-              style={{ background: 'var(--shopli-orange)' }}
+              className="px-4 py-2.5 rounded-xl text-sm font-semibold shrink-0 min-h-[44px]"
+              style={{ background: 'var(--shopli-orange)', color: 'var(--shopli-on-orange)' }}
             >
               {rtl ? 'חפש' : 'Go'}
             </button>
@@ -371,7 +371,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             {rtl ? 'מועדפים' : 'Wishlist'}
             {wishlistCount > 0 && (
               <span className="text-[10px] font-bold ml-auto rounded-full px-1.5 py-0.5"
-                style={{ background: 'var(--shopli-orange)', color: 'white' }}
+                style={{ background: 'var(--shopli-orange)', color: 'var(--shopli-on-orange)' }}
               >
                 {wishlistCount > 99 ? '99+' : wishlistCount}
               </span>

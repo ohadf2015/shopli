@@ -10,6 +10,8 @@
   --shopli-navy-light: oklch(30% 0.05 264);
   --shopli-orange: oklch(65% 0.18 45);
   --shopli-orange-dark: oklch(55% 0.2 45);
+  /* White on this orange is 3.4:1, under WCAG AA; ink is 5.6:1. */
+  --shopli-on-orange: var(--shopli-ink);
   /* Prices and positive marks read in ink in the new look. */
   --shopli-teal: #141414;
   --shopli-red: oklch(55% 0.22 25);
