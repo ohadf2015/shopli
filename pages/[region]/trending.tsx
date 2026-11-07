@@ -316,7 +316,7 @@ export default function TrendingPage({ region, config, products, rtl, generatedA
               <div key={p.id} className="relative">
                 <div
                   className="absolute -top-2 start-2 z-10 text-[0.65rem] font-bold px-2.5 py-1 rounded-full "
-                  style={{ background: 'var(--shopli-orange)', color: 'white' }}
+                  style={{ background: 'var(--shopli-orange)', color: 'var(--shopli-on-orange)' }}
                 >
                   {p.trendReason}
                 </div>

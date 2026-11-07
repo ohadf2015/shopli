@@ -259,7 +259,7 @@ export default function WishlistPage() {
                     type="submit"
                     disabled={submitting}
                     className="px-5 py-2.5 rounded-xl font-bold text-sm shrink-0 disabled:opacity-50 cursor-pointer"
-                    style={{ background: 'var(--shopli-orange)', color: 'white' }}
+                    style={{ background: 'var(--shopli-orange)', color: 'var(--shopli-on-orange)' }}
                   >
                     {submitting
                       ? (rtl ? '...' : '...')

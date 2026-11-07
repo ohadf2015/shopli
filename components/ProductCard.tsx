@@ -316,8 +316,8 @@ export default function ProductCard({
             href={product.affiliateLink}
             target="_blank"
             rel="noopener noreferrer sponsored"
-            className="flex items-center justify-center gap-1 w-full text-[0.7rem] font-bold px-3 py-2 rounded-lg text-white transition-opacity hover:opacity-90"
-            style={{ background: 'var(--shopli-orange)' }}
+            className="flex items-center justify-center gap-1 w-full text-[0.7rem] font-bold px-3 py-2 rounded-lg transition-opacity hover:opacity-90"
+            style={{ background: 'var(--shopli-orange)', color: 'var(--shopli-on-orange)' }}
           >
             {rtl ? 'לצפייה בדיל באליאקספרס' : 'View deal on AliExpress'}
             <span aria-hidden="true">↗</span>

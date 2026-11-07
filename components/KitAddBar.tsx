@@ -96,8 +96,8 @@ export default function KitAddBar({ region, rtl, currency, skus }: KitAddBarProp
           type="button"
           onClick={addKit}
           data-kit-sku-count={kitSkus.length}
-          className="inline-flex items-center justify-center gap-2 text-sm font-bold px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90"
-          style={{ background: 'var(--shopli-orange)' }}
+          className="inline-flex items-center justify-center gap-2 text-sm font-bold px-4 py-2.5 rounded-lg transition-opacity hover:opacity-90"
+          style={{ background: 'var(--shopli-orange)', color: 'var(--shopli-on-orange)' }}
         >
           <Icon name="heart" size={16} />
           {rtl ? 'הוסף ערכה למועדפים' : 'Add kit to wishlist'}
