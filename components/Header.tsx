@@ -79,6 +79,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
         {/* Logo */}
         <Link
           href={`/${currentRegion}`}
+          aria-label={rtl ? 'shopli – דף הבית' : 'shopli home'}
           className="flex items-center gap-2 text-lg sm:text-xl font-extrabold tracking-tight shrink-0"
           style={{ color: 'var(--shopli-navy)' }}
         >
