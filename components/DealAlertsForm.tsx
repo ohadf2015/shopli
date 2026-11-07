@@ -10,6 +10,21 @@ interface DealAlertsFormProps {
   rtl: boolean;
 }
 
+/** Invisible, unfocusable and zero-size, without moving it in either direction. */
+const HONEYPOT_STYLE = {
+  position: 'absolute',
+  width: '1px',
+  height: '1px',
+  padding: 0,
+  margin: '-1px',
+  border: 0,
+  overflow: 'hidden',
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  whiteSpace: 'nowrap',
+  opacity: 0,
+} as const;
+
 export default function DealAlertsForm({ source, rtl }: DealAlertsFormProps) {
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
@@ -31,7 +46,7 @@ export default function DealAlertsForm({ source, rtl }: DealAlertsFormProps) {
             data-kind="notify"
             data-source={source}
             data-done={rtl ? 'נרשמת! נעדכן כשיש דיל חדש' : "You're in — we'll ping you on the next deal"}
-            className="flex gap-2"
+            className="relative flex gap-2"
           >
             <input
               type="email"
@@ -40,14 +55,17 @@ export default function DealAlertsForm({ source, rtl }: DealAlertsFormProps) {
               placeholder={rtl ? 'האימייל שלך' : 'your@email.com'}
               className="flex-1 px-4 py-2.5 rounded-xl text-sm text-gray-900 placeholder-gray-400 border-0 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
-            {/* Honeypot: real users never see or fill this; the rail drops bots that do. */}
+            {/* Honeypot: real users never see or fill this; the rail drops bots that do.
+                Hidden by clipping in place, not by pushing it 9999px off to the left: that
+                made every Hebrew (right-to-left) page with this form 10,000px wide,
+                and the browser showed an empty strip of it instead of the page. */}
             <input
               type="text"
               name="website"
               tabIndex={-1}
               autoComplete="off"
               aria-hidden="true"
-              style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }}
+              style={HONEYPOT_STYLE}
             />
             <button
               type="submit"
