@@ -515,3 +515,33 @@ export function productGroupJsonLd({
     hasVariant,
   };
 }
+
+/** ItemList plus one Product per card for a listing page; no ratings on listings (docs/PDP-V1-SPEC.md). */
+export function listingProductsJsonLd(
+  name: string,
+  pageUrl: string,
+  region: string,
+  currency: string,
+  items: Array<{ id: string; title: string; imageUrl: string; price: number }>
+): Record<string, unknown>[] {
+  if (items.length === 0) return [];
+  const pdp = (id: string) => `${SITE_URL}/${region}/product/${encodeURIComponent(id)}`;
+  return [
+    itemListJsonLd(
+      name,
+      pageUrl,
+      items.map((p) => ({ name: p.title, url: pdp(p.id), image: p.imageUrl || undefined }))
+    ),
+    ...items.map((p) =>
+      productJsonLd({
+        title: p.title,
+        description: p.title,
+        image: p.imageUrl || undefined,
+        url: pdp(p.id),
+        price: p.price,
+        currency,
+        region,
+      })
+    ),
+  ];
+}

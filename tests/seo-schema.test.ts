@@ -47,3 +47,20 @@ test('faqJsonLd returns null rather than an invalid empty FAQPage', () => {
   const ld = faqJsonLd([{ question: 'Q?', answer: 'A.' }, { question: 'Q2?', answer: '' }]) as any;
   assert.equal(ld.mainEntity.length, 1);
 });
+
+test('listingProductsJsonLd lists each card as a Product linked to its on-site page, without ratings', async () => {
+  const { listingProductsJsonLd } = await import('../lib/seo');
+  const out = listingProductsJsonLd('Today', 'https://www.tryshopli.com/eu', 'eu', 'EUR', [
+    { id: '1005007791905416', title: 'Earphone clip', imageUrl: 'https://ae-pic-a1.aliexpress-media.com/kf/a.png', price: 2.12 },
+    { id: '1005009384662260', title: 'Cable clips', imageUrl: '', price: 3.19 },
+  ]) as any[];
+  assert.equal(out[0]['@type'], 'ItemList');
+  assert.equal(out[0].itemListElement[0].url, 'https://www.tryshopli.com/eu/product/1005007791905416');
+  const products = out.filter((x) => x['@type'] === 'Product');
+  assert.equal(products.length, 2);
+  assert.equal(products[0].offers.price, '2.12');
+  assert.equal(products[0].offers.priceCurrency, 'EUR');
+  assert.equal(products[0].offers.url, 'https://www.tryshopli.com/eu/product/1005007791905416');
+  assert.ok(products.every((p) => !p.aggregateRating));
+  assert.deepEqual(listingProductsJsonLd('x', 'u', 'eu', 'EUR', []), []);
+});

@@ -8,7 +8,7 @@ import { getFeaturedCollections } from '../../lib/collections';
 import { getPicks, type Pick } from '../../lib/picks';
 import { getReviewsBatch } from '../../lib/review-store';
 import { productImage } from '../../lib/img';
-import { breadcrumbJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
+import { breadcrumbJsonLd, listingProductsJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
 import { cacheIfNotEmpty } from '../../lib/cache';
 
 /**
@@ -137,6 +137,18 @@ export default function HomePage({ region, config, rtl, drops, sellers, chips, a
   const structuredData = [
     breadcrumbJsonLd([{ name: rtl ? 'דף הבית' : 'Home', url: pageUrl }]),
     websiteJsonLd(`${SITE_URL}/${region}/search?q={search_term_string}`, region as RegionCode),
+    ...listingProductsJsonLd(
+      t.finds,
+      pageUrl,
+      region,
+      config.currency,
+      (drops.length >= 3 ? [...drops, ...sellers] : [...drops, ...sellers].slice(0, 8)).map((c) => ({
+        id: c.productId,
+        title: c.title,
+        imageUrl: c.imageUrl,
+        price: c.price,
+      }))
+    ),
   ];
   const sym = config.currencySymbol;
 
