@@ -281,13 +281,28 @@ export function comparePageDescription(
       ? 'השוו מוצרים מאליאקספרס זה לצד זה — מחיר, דירוג, הנחות ועוד. קבלו החלטת קנייה חכמה.'
       : 'Compare AliExpress products side by side — price, rating, discounts and more. Make a smarter purchase decision.';
   }
-  const prices = products
-    .map((p) => `${currencySymbol}${p.price.toFixed(2)}`)
-    .join(', ');
-  if (lang === 'he') {
-    return `השוואת ${products.length} מוצרים: ${prices}. מחיר, דירוג, מכירות וחנות — הבדלים מודגשים.`;
+  const price = (p: SearchProduct) => `${currencySymbol}${p.price.toFixed(2)}`;
+  const short = (t: string, n: number) => (t.length > n ? t.slice(0, n - 1).trimEnd() + '…' : t);
+  const clamp = (s: string) => (s.length > 160 ? s.slice(0, 159).trimEnd() + '…' : s);
+  if (products.length === 1) {
+    const [p] = products;
+    return clamp(
+      lang === 'he'
+        ? `${short(p.title, 70)} ב-${price(p)}. הוסיפו מוצר נוסף כדי להשוות מחיר, דירוג, מכירות וחנות.`
+        : `${short(p.title, 70)} at ${price(p)}. Add another product to compare price, rating, sales and shop side by side.`
+    );
   }
-  return `Side-by-side comparison of ${products.length} products (${prices}). Price, rating, sales volume and shop — differences highlighted.`;
+  const n = Math.floor(90 / products.length);
+  const items = products.map((p) => `${short(p.title, n)} (${price(p)})`).join(' vs ');
+  return clamp(
+    lang === 'he'
+      ? `השוואה: ${items}. מחיר, דירוג, מכירות וחנות זה לצד זה.`
+      : `Compare ${items}. Price, rating, sales and shop side by side.`
+  );
+}
+
+export function compareNoindex(products: SearchProduct[]): boolean {
+  return products.length < MIN_COMPARE_PRODUCTS;
 }
 
 /**
