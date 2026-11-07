@@ -102,7 +102,7 @@ function Card({ c, region, sym, rtl }: { c: HomeCard; region: string; sym: strin
         {c.imageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            {...productImage(c.imageUrl, 320, '(max-width: 640px) 50vw, 25vw')}
+            {...productImage(c.imageUrl, 320, '(max-width: 640px) calc(50vw - 22px), (max-width: 1024px) 33vw, 260px')}
             alt={c.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform"
           />

@@ -31,7 +31,9 @@
  */
 const CDN_WIDTHS = [50, 100, 120, 140, 200, 220, 250, 300, 350, 480, 500, 640, 720, 800, 960] as const;
 
-const CDN_HOSTS = /(^|\.)(alicdn\.com|aliexpress-media\.com)$/i;
+const SRCSET_LADDER = [120, 200, 300, 350, 480, 640, 720, 800, 960] as const;
+
+const CDN_HOSTS =/(^|\.)(alicdn\.com|aliexpress-media\.com)$/i;
 
 function isCdnImage(url: string): boolean {
   if (!url) return false;
@@ -75,8 +77,18 @@ export function productImage(url: string, displayWidth: number, sizes?: string) 
 
   if (!isCdnImage(url)) return { src: url, ...common };
 
-  // 1x and 2x — enough for retina without shipping a monster srcset.
   const retina = nearestWidth(width * 2);
+
+  if (sizes) {
+    // With `sizes`, x descriptors are ignored by spec intent: a 1.75x phone
+    // always took the 2x file (720px for a ~320px slot). Width descriptors let
+    // the browser match slot × DPR.
+    const floor = nearestWidth(width / 2);
+    const candidates = SRCSET_LADDER.filter((w) => w >= floor && w <= retina);
+    const srcSet = candidates.map((w) => `${cdnImage(url, w)} ${w}w`).join(', ');
+    return { src: cdnImage(url, width), srcSet, sizes, ...common };
+  }
+
   const srcSet =
     retina > width
       ? `${cdnImage(url, width)} 1x, ${cdnImage(url, retina)} 2x`
