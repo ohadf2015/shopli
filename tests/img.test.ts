@@ -61,3 +61,15 @@ test('productImage emits a 1x/2x srcset within CDN limits', () => {
   // Non-CDN images get no srcset at all.
   assert.equal((productImage('https://example.com/a.jpg', 200) as any).srcSet, undefined);
 });
+
+test('with sizes, productImage offers width candidates so a phone takes the file its slot needs', () => {
+  const p = productImage(CDN, 350, '(max-width: 640px) calc(50vw - 22px), 25vw') as any;
+  const widths = p.srcSet.split(', ').map((c: string) => c.split(' ')[1]);
+  assert.ok(widths.every((w: string) => /^\d+w$/.test(w)), p.srcSet);
+  // A 184px slot on a 1.75x phone needs ~322px: a 350 candidate must exist below 720.
+  assert.ok(p.srcSet.includes(`${CDN}_350x350.jpg 350w`));
+  assert.ok(p.srcSet.includes(`${CDN}_720x720.jpg 720w`));
+  assert.ok(p.srcSet.includes(`${CDN}_480x480.jpg 480w`));
+  assert.equal(p.sizes, '(max-width: 640px) calc(50vw - 22px), 25vw');
+  assert.equal(p.src, `${CDN}_350x350.jpg`);
+});
