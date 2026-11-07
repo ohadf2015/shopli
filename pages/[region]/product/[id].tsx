@@ -19,6 +19,7 @@ import { getDemoProductById } from '../../../lib/demo-products';
 import { getProductReviews } from '../../../lib/review-store';
 import type { ProductReviews } from '../../../lib/reviews';
 import {
+  buildPdpAbout,
   buildPdpDescription,
   buildPdpSpecs,
   buildPdpProsCons,
@@ -128,6 +129,7 @@ export default function ProductPage({
     lang,
   });
   const stars = ratingStars(product.rating);
+  const about = buildPdpAbout(product, rtl);
   const originalPrice = product.originalPrice != null && product.originalPrice > product.price ? product.originalPrice : null;
 
   // Still no aggregateRating, deliberately, now that the page HAS reviews: they
@@ -141,7 +143,7 @@ export default function ProductPage({
     ]),
     productJsonLd({
       title: product.title,
-      description,
+      description: about,
       image: product.imageUrl,
       url: pageUrl,
       brand: product.shopName,
@@ -294,7 +296,7 @@ export default function ProductPage({
             />
 
             <p className="text-sm sm:text-base leading-relaxed mb-6" style={{ color: 'var(--shopli-warm-gray)' }}>
-              {description}
+              {about}
             </p>
 
             <div className="flex flex-wrap gap-3 mb-6">

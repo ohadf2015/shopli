@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildPdpDescription,
+  buildPdpAbout,
   buildPdpSpecs,
   buildPdpProsCons,
   buildPdpFaq,
@@ -76,4 +77,23 @@ test('listingAggregateFields strips ratings when the schema URL is an on-site PD
   );
   assert.equal(kept.ratingValue, 4.7);
   assert.equal(kept.reviewCount, 2341);
+});
+
+const words = (s: string) => s.split(/\s+/).filter(Boolean).length;
+
+test('about text gives 50+ words from the product\'s own data', () => {
+  const p = { ...product, title: 'Bone conduction earphone clip', rating: 96.4, volume: 1200, shopName: "Stone's Store" };
+  const about = buildPdpAbout(p, false);
+  assert.ok(about.startsWith(buildPdpDescription(p, false)));
+  assert.ok(words(about) >= 50, `got ${words(about)} words`);
+  assert.ok(about.includes("Stone's Store"));
+  assert.ok(about.includes('96%'));
+  assert.ok(about.includes('1,200'));
+  assert.ok(/[\u0590-\u05FF]/.test(buildPdpAbout(p, true)));
+});
+
+test('about text leaves out signals the product does not have', () => {
+  const p = { ...product, rating: 0, volume: 0, shopName: '' };
+  const about = buildPdpAbout(p, false);
+  assert.ok(!/0%|0 orders|Sold by\s*\./.test(about));
 });
