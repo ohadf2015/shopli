@@ -9,6 +9,7 @@ import { organizationJsonLd } from '../lib/seo';
 import { installClickTracking } from '../lib/analytics';
 import { getRegion } from '../lib/regions';
 import Footer from '../components/Footer';
+import RouteProgress from '../components/RouteProgress';
 
 // Self-hosted so there is no render-blocking round trip to fonts.googleapis.com,
 // and so Next can emit size-adjusted fallback metrics (swap without the shift).
@@ -83,6 +84,7 @@ export default function ShopliApp({ Component, pageProps }: AppProps) {
           --font-display: ${display.style.fontFamily};
         }
       `}</style>
+      <RouteProgress />
       <Component {...pageProps} />
       {/* Company-brain interest rail: delegated submit listener that powers every
           data-interest="shopli" form (deal alerts on mood/collection pages).

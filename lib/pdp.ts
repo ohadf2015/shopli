@@ -193,6 +193,11 @@ export type ResolvePdpProductDeps = {
     region: string,
     currency: string
   ) => SearchProduct | null;
+  /**
+   * Optional: how long to wait on the live API before serving the stored copy.
+   * Needs getStoredProduct; without either, the live answer is awaited in full.
+   */
+  liveBudgetMs?: number;
 };
 
 export async function resolvePdpProduct(
@@ -201,14 +206,40 @@ export async function resolvePdpProduct(
   currency: string,
   deps: ResolvePdpProductDeps
 ): Promise<SearchProduct | null> {
+  const live = deps
+    .getProductsByIds([productId], region)
+    .then((products) => products[0] || null)
+    .catch(() => null);
+
   let product: SearchProduct | null = null;
-  try {
-    const products = await deps.getProductsByIds([productId], region);
-    product = products[0] || null;
-  } catch {
-    product = null;
+  let storedTried = false;
+  const budget = deps.liveBudgetMs;
+  if (budget && budget > 0 && deps.getStoredProduct) {
+    // A slow AliExpress answer (rate limit retry, hung socket) used to hold the
+    // whole page: on a client-side tap nothing happens until it returns, which
+    // reads as a dead link. Past the budget, serve our own stored copy if we
+    // have one and let the live call finish (or fail) on its own.
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const late = Symbol('late');
+    const first = await Promise.race([
+      live,
+      new Promise<typeof late>((resolve) => {
+        timer = setTimeout(() => resolve(late), budget);
+      }),
+    ]);
+    if (timer) clearTimeout(timer);
+    if (first !== late) {
+      product = first;
+    } else {
+      storedTried = true;
+      const stored = await deps.getStoredProduct(productId, region).catch(() => null);
+      product = stored || (await live);
+    }
+  } else {
+    product = await live;
   }
-  if (!product && deps.getStoredProduct) {
+
+  if (!product && deps.getStoredProduct && !storedTried) {
     try {
       product = await deps.getStoredProduct(productId, region);
     } catch {
