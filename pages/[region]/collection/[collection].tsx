@@ -8,7 +8,7 @@ import SeoHead from '../../../components/SeoHead';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getCollection } from '../../../lib/collections';
 import { listingAggregateFields } from '../../../lib/pdp';
-import { COLLECTION_CONTENT } from '../../../lib/collection-content';
+import { COLLECTION_CONTENT, collectionByline } from '../../../lib/collection-content';
 import { cacheIfNotEmpty } from '../../../lib/cache';
 import {
   articleJsonLd,
@@ -19,7 +19,7 @@ import {
   SITE_URL,
 } from '../../../lib/seo';
 
-export default function CollectionPage({ region, config, collection, content, sections, rtl, noindex, error }: any) {
+export default function CollectionPage({ region, config, collection, content, sections, rtl, noindex, byline, error }: any) {
   if (error) {
     return (
       <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>
@@ -68,6 +68,7 @@ export default function CollectionPage({ region, config, collection, content, se
         description,
         url: pageUrl,
         image: ogImage,
+        datePublished: content.published,
       })
     );
   }
@@ -151,6 +152,11 @@ export default function CollectionPage({ region, config, collection, content, se
         >
           {headline}
         </h1>
+        {byline && (
+          <p className="text-sm font-semibold mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
+            <time dateTime={byline.iso}>{byline.text}</time>
+          </p>
+        )}
         {content && (
           <p
             className="max-w-2xl text-base leading-relaxed mb-8"
@@ -327,6 +333,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
         sections: JSON.parse(JSON.stringify(sections)),
         rtl: config?.direction === 'rtl',
         noindex,
+        byline: content ? collectionByline(content.published, lang) : null,
         error: null,
       },
     };
