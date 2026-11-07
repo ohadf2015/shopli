@@ -44,6 +44,31 @@ export function buildPdpDescription(p: SearchProduct, rtl: boolean): string {
   return parts.join(t(rtl, ' · ', ' · ')) + '.';
 }
 
+export function buildPdpAbout(p: SearchProduct, rtl: boolean): string {
+  const parts = [buildPdpDescription(p, rtl)];
+  if (p.shopName) parts.push(t(rtl, `נמכר על ידי ${p.shopName}.`, `Sold by ${p.shopName}.`));
+  const rate = Math.round(p.rating);
+  if (rate > 0 && p.volume > 0) {
+    const orders = p.volume.toLocaleString('en-US');
+    parts.push(
+      t(rtl, `${rate}% מהקונים מדרגים אותו לחיוב, מתוך יותר מ-${orders} הזמנות.`, `${rate}% of buyers rate it positively, across more than ${orders} orders.`)
+    );
+  } else if (rate > 0) {
+    parts.push(t(rtl, `${rate}% מהקונים מדרגים אותו לחיוב.`, `${rate}% of buyers rate it positively.`));
+  } else if (p.volume > 0) {
+    const orders = p.volume.toLocaleString('en-US');
+    parts.push(t(rtl, `יותר מ-${orders} הזמנות עד כה.`, `More than ${orders} orders so far.`));
+  }
+  parts.push(
+    t(
+      rtl,
+      'הרכישה מתבצעת באלי אקספרס, תחת מדיניות ההגנה על הקונים שלה, ומשלוח בינלאומי מגיע בדרך כלל תוך 2–4 שבועות. Shopli משווה את המחיר להיסטוריה שלו כדי שתדעו אם זה דיל אמיתי.',
+      'You complete the purchase on AliExpress under its buyer protection, and international delivery usually takes 2–4 weeks. Shopli checks the price against its history so you can tell whether this is a real deal.'
+    )
+  );
+  return parts.join(' ');
+}
+
 export function buildPdpSpecs(p: SearchProduct, rtl: boolean): SpecRow[] {
   const rows: SpecRow[] = [
     { label: t(rtl, 'מחיר', 'Price'), value: `${p.price.toFixed(2)} ${p.currency}` },
