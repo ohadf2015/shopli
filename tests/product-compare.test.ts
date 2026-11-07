@@ -5,6 +5,8 @@ import {
   pickBestCompareProduct,
   parseCompareIds,
   MIN_COMPARE_PRODUCTS,
+  comparePageDescription,
+  compareNoindex,
 } from '../lib/product-compare';
 import type { SearchProduct } from '../lib/aliexpress';
 
@@ -86,4 +88,29 @@ test('pickBestCompareProduct price-tiebreaks when wins are equal', () => {
   const pick = pickBestCompareProduct(products, rows);
   assert.ok(pick);
   assert.equal(pick!.product.id, 'b');
+});
+
+test('a compare page with fewer than two products is not indexed', () => {
+  assert.equal(compareNoindex([]), true);
+  assert.equal(compareNoindex([fakeProduct({ id: '1', price: 10 })]), true);
+  assert.equal(
+    compareNoindex([fakeProduct({ id: '1', price: 10 }), fakeProduct({ id: '2', price: 12 })]),
+    false
+  );
+});
+
+test('two compare pages at the same price get different descriptions', () => {
+  const a = comparePageDescription([fakeProduct({ id: '1', price: 3.98, title: 'Clip-on LED desk lamp' })], '€', 'en');
+  const b = comparePageDescription([fakeProduct({ id: '2', price: 3.98, title: 'Silicone ice ball mold' })], '€', 'en');
+  assert.notEqual(a, b);
+  assert.match(a, /Clip-on LED desk lamp/);
+  const he = comparePageDescription([fakeProduct({ id: '2', price: 3.98, title: 'תבנית קרח' })], '€', 'he');
+  assert.match(he, /תבנית קרח/);
+});
+
+test('compare descriptions stay within 160 characters', () => {
+  const long = 'x'.repeat(200);
+  const four = ['1', '2', '3', '4'].map((id) => fakeProduct({ id, price: 1234.56, title: long + id }));
+  assert.ok(comparePageDescription(four, '€', 'en').length <= 160);
+  assert.ok(comparePageDescription(four, '₪', 'he').length <= 160);
 });

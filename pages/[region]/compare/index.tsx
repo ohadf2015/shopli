@@ -19,6 +19,7 @@ import {
   comparePageTitle,
   MAX_COMPARE_PRODUCTS,
   MIN_COMPARE_PRODUCTS,
+  compareNoindex,
   parseCompareIds,
   pickBestCompareProduct,
   type CompareSpecRow,
@@ -200,7 +201,7 @@ export default function ProductComparePage({
         image={products[0]?.imageUrl || undefined}
         ogType="product"
         canonical={shareUrl}
-        noindex={emptyState}
+        noindex={compareNoindex(products)}
         jsonLd={structuredData}
       />
       <Header currentRegion={region} dir={config.direction} />
