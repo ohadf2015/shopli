@@ -88,7 +88,7 @@ const COPY = {
   },
 };
 
-function Card({ c, region, sym, rtl }: { c: HomeCard; region: string; sym: string; rtl: boolean }) {
+function Card({ c, region, sym, rtl, lead = false }: { c: HomeCard; region: string; sym: string; rtl: boolean; lead?: boolean }) {
   return (
     <a
       href={`/${region}/product/${c.productId}`}
@@ -105,6 +105,8 @@ function Card({ c, region, sym, rtl }: { c: HomeCard; region: string; sym: strin
             {...productImage(c.imageUrl, 320, '(max-width: 640px) calc(50vw - 22px), (max-width: 1024px) 33vw, 260px')}
             alt={c.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+            loading={lead ? 'eager' : 'lazy'}
+            fetchpriority={lead ? 'high' : 'auto'}
           />
         )}
         <span
@@ -138,7 +140,7 @@ export default function HomePage({ region, config, rtl, drops, sellers, chips, a
   ];
   const sym = config.currencySymbol;
 
-  const section = (id: string, title: string, sub: string, cards: HomeCard[]) =>
+  const section = (id: string, title: string, sub: string, cards: HomeCard[], lead = false) =>
     cards.length ? (
       <section aria-labelledby={id} className="flex flex-col gap-3">
         <div className="flex items-end justify-between gap-4">
@@ -153,8 +155,8 @@ export default function HomePage({ region, config, rtl, drops, sellers, chips, a
           {sub}
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
-          {cards.map((c) => (
-            <Card key={c.productId} c={c} region={region} sym={sym} rtl={rtl} />
+          {cards.map((c, i) => (
+            <Card key={c.productId} c={c} region={region} sym={sym} rtl={rtl} lead={lead && i < 2} />
           ))}
         </div>
       </section>
@@ -237,12 +239,12 @@ export default function HomePage({ region, config, rtl, drops, sellers, chips, a
         )}
         {drops.length >= 3 ? (
           <>
-            {section('drops', t.drops, t.dropsSub, drops)}
+            {section('drops', t.drops, t.dropsSub, drops, true)}
             {section('sellers', t.sellers, t.sellersSub, sellers)}
           </>
         ) : (
           // One or two drops make a lonely row: show them first in a single grid.
-          section('finds', t.finds, t.findsSub, [...drops, ...sellers].slice(0, 8))
+          section('finds', t.finds, t.findsSub, [...drops, ...sellers].slice(0, 8), true)
         )}
         {asOf && (
           <p className="text-xs -mt-6 m-0" style={{ color: '#5C554C' }}>
