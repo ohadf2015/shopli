@@ -541,6 +541,7 @@ export function listingProductsJsonLd(
         price: p.price,
         currency,
         region,
+        sku: p.id,
       })
     ),
   ];
