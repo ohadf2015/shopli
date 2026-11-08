@@ -42,6 +42,8 @@ function regionFromPath(asPath?: string, query?: unknown): string {
   return 'eu';
 }
 
+const GA_ID = process.env.NEXT_PUBLIC_GA4_ID || process.env.NEXT_PUBLIC_GA_ID;
+
 export default function ShopliApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
@@ -86,6 +88,9 @@ export default function ShopliApp({ Component, pageProps }: AppProps) {
       `}</style>
       <RouteProgress />
       <Component {...pageProps} />
+      {GA_ID && (
+        <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="lazyOnload" />
+      )}
       {/* Company-brain interest rail: delegated submit listener that powers every
           data-interest="shopli" form (deal alerts on mood/collection pages).
           afterInteractive so the affiliate-click listener in analytics stays first. */}
