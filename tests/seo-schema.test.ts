@@ -61,6 +61,7 @@ test('listingProductsJsonLd lists each card as a Product linked to its on-site p
   assert.equal(products[0].offers.price, '2.12');
   assert.equal(products[0].offers.priceCurrency, 'EUR');
   assert.equal(products[0].offers.url, 'https://www.tryshopli.com/eu/product/1005007791905416');
+  assert.equal(products[0].sku, '1005007791905416');
   assert.ok(products.every((p) => !p.aggregateRating));
   assert.deepEqual(listingProductsJsonLd('x', 'u', 'eu', 'EUR', []), []);
 });
