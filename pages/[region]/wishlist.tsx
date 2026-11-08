@@ -169,7 +169,7 @@ export default function WishlistPage() {
     <>
       <SeoHead
         region={region as RegionCode}
-        path={`/${region}/wishlist`}
+        path="/wishlist"
         title={rtl ? 'המועדפים שלי | Shopli' : 'My Wishlist | Shopli'}
         description={rtl ? 'שמרתם מוצרים שאהבתם? המועדפים שלכם מחכים לכם כאן.' : 'Saved products you love — your wishlist awaits.'}
         noindex
