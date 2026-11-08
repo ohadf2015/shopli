@@ -11,6 +11,16 @@ module.exports = {
       { protocol: 'https', hostname: '**.alicdn.com' },
     ],
   },
+  async redirects() {
+    return [
+      // Ended Andoer softbox light kit; bookmarked visitors still arrive here.
+      {
+        source: '/:region/product/1005011681039717',
+        destination: '/:region/collection/content-creator',
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     // AliExpress deals feed aliases on the canonical /il path.
     const feedAliases = [
