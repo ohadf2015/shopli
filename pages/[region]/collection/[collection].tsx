@@ -19,6 +19,16 @@ import {
   SITE_URL,
 } from '../../../lib/seo';
 
+const SOURCES_HEADING: Record<string, string> = {
+  en: 'Sources',
+  he: 'מקורות',
+  fr: 'Sources',
+  de: 'Quellen',
+  es: 'Fuentes',
+  it: 'Fonti',
+  ru: 'Источники',
+};
+
 export default function CollectionPage({ region, config, collection, content, sections, rtl, noindex, byline, error }: any) {
   if (error) {
     return (
@@ -238,6 +248,23 @@ export default function CollectionPage({ region, config, collection, content, se
                 </p>
               </details>
             ))}
+          </section>
+        )}
+
+        {content?.sources?.length > 0 && (
+          <section className="py-6">
+            <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--shopli-navy)' }}>
+              {SOURCES_HEADING[lang] || SOURCES_HEADING.en}
+            </h2>
+            <ul className="list-disc ps-5 text-sm space-y-1" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {content.sources.map((s: any) => (
+                <li key={s.url}>
+                  <a href={s.url} target="_blank" rel="noopener" className="underline">
+                    {get(s.label)}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </section>
         )}
 
