@@ -1,3 +1,19 @@
+// 'unsafe-inline' on scripts: _document inlines the PostHog and GA bootstraps.
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.posthog.com https://growthradar.app https://company-brain-production-841e.up.railway.app",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://*.aliexpress-media.com https://*.alicdn.com https://*.google-analytics.com https://*.googletagmanager.com",
+  "font-src 'self' data:",
+  "connect-src 'self' https://*.posthog.com https://growthradar.app https://company-brain-production-841e.up.railway.app https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
+  "worker-src 'self' blob:",
+  "frame-src 'self'",
+  "frame-ancestors 'none'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join('; ');
+
 /** @type {import('next').NextConfig} */
 module.exports = {
   reactStrictMode: true,
@@ -41,6 +57,7 @@ module.exports = {
       {
         source: '/:path*',
         headers: [
+          { key: 'Content-Security-Policy', value: CSP },
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
