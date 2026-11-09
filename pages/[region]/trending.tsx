@@ -109,7 +109,7 @@ async function fetchTrendingProducts(region: string, limit = 30): Promise<Trendi
   await Promise.allSettled(
     categories.map(async (cat) => {
       try {
-        const products = await searchCollection(region, cat.keywords, perCategory);
+        const products = await searchCollection(region, cat.keywords.slice(0, 1), perCategory);
         for (const p of products) {
           if (!p.id || seen.has(p.id)) continue;
           seen.add(p.id);
