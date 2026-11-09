@@ -101,7 +101,11 @@ async function callApi(params: Record<string, string>, attempts = 2): Promise<an
       } catch {
         last = null;
       }
-      if (attempt < attempts - 1) await sleep(1200 * (attempt + 1));
+      if (attempt < attempts - 1) {
+        release();
+        await sleep(1200 * (attempt + 1));
+        await acquire();
+      }
     }
     return last ?? {};
   } finally {
@@ -289,17 +293,19 @@ export async function searchAliExpress(keywords: string, region: string, pageSiz
 export async function searchCollection(region: string, keywords: string[], limit = 4): Promise<SearchProduct[]> {
   const all: SearchProduct[] = [];
   const seen = new Set<string>();
-  for (const kw of keywords.slice(0, 3)) {
-    try {
-      const products = await searchAliExpress(kw, region, Math.ceil(limit * 1.5));
-      for (const p of products) {
-        if (!seen.has(p.id) && !seen.has(p.sku)) {
-          seen.add(p.id);
-          if (p.sku) seen.add(p.sku);
-          all.push(p);
-        }
+  const batches = await Promise.all(
+    keywords.slice(0, 3).map((kw) =>
+      searchAliExpress(kw, region, Math.ceil(limit * 1.5)).catch(() => [] as SearchProduct[])
+    )
+  );
+  for (const products of batches) {
+    for (const p of products) {
+      if (!seen.has(p.id) && !seen.has(p.sku)) {
+        seen.add(p.id);
+        if (p.sku) seen.add(p.sku);
+        all.push(p);
       }
-    } catch { /* ignore */ }
+    }
   }
   // Drop the products we would not stand behind before ranking what is left.
   // Measured over 395 live products, the floor removes ~13% and still leaves
