@@ -546,3 +546,15 @@ export function listingProductsJsonLd(
     ),
   ];
 }
+
+const TITLE_BUDGET = 60;
+
+export function productPageTitle(productTitle: string): string {
+  const suffix = ` | ${SITE_NAME}`;
+  const max = TITLE_BUDGET - suffix.length;
+  const t = productTitle.trim().replace(/\s+/g, ' ');
+  if (t.length <= max) return t + suffix;
+  const cut = t.slice(0, max - 1);
+  const atWord = cut.slice(0, cut.lastIndexOf(' '));
+  return (atWord.length >= max * 0.6 ? atWord : cut).trimEnd() + '…' + suffix;
+}
