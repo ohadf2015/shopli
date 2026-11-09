@@ -30,7 +30,7 @@ import {
   SpecRow,
   FaqItem,
 } from '../../../lib/pdp';
-import { breadcrumbJsonLd, productJsonLd, getProductOgImage, SITE_URL } from '../../../lib/seo';
+import { breadcrumbJsonLd, productJsonLd, getProductOgImage, SITE_URL, productPageTitle } from '../../../lib/seo';
 import type { CollectionDef } from '../../../lib/collections';
 
 interface ProductPageProps {
@@ -113,7 +113,7 @@ export default function ProductPage({
     );
   }
 
-  const title = `${product.title} | Shopli`;
+  const title = productPageTitle(product.title);
   // og:image: branded card with product image + title + price.
   // Always uses the dynamic card for consistent branding on shares.
   const ogImage = getProductOgImage({
