@@ -43,8 +43,10 @@ const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, m
 
 // The affiliate API rate-limits per app key, not per connection, and it bans on
 // burst. A page like /trending fans out one search per category at once, which
-// is self-inflicted 429s. Four in flight is enough to keep those pages fast.
-const MAX_IN_FLIGHT = 4;
+// is self-inflicted 429s. Measured 2026-11-09: 14 concurrent searches all
+// returned products with no ApiCallLimit, and at 4 in flight a 10-category
+// trending render queued into 3 waves of ~3s (13s cold). 10 clears it in one.
+const MAX_IN_FLIGHT = 10;
 /** Per attempt. The API answers in well under a second when it answers at all. */
 const API_TIMEOUT_MS = 3500;
 let inFlight = 0;
