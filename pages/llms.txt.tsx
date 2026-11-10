@@ -37,6 +37,7 @@ function buildLlmsTxt(): string {
     '',
     '## Machine-readable endpoints',
     '',
+    `- [Full text of every guide, comparison and collection](${SITE_URL}/llms-full.txt): one Markdown file.`,
     `- [Sitemap](${SITE_URL}/sitemap.xml): every indexable URL across all regions.`,
     `- [Product feed](${SITE_URL}/products-feed.xml): current products in XML.`,
     `- [Hot products API](${SITE_URL}/api/products/hot): JSON, trending picks.`,

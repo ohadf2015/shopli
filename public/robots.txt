@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Allow: /llms.txt
+Allow: /llms-full.txt
 Disallow: /admin/
 Disallow: /api/
 
