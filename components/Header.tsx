@@ -97,6 +97,8 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
           onSubmit={onSearch}
           className="hidden md:flex flex-1 max-w-md mx-4"
           role="search"
+          toolname="search_site"
+          tooldescription="Search shopli for AliExpress products by keyword or by pasting an AliExpress link."
         >
           <div className="relative w-full">
             <span
@@ -108,6 +110,7 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             </span>
             <input
               type="search"
+              toolparamdescription="Product keywords, or a full AliExpress product link."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={rtl ? 'חפשו או הדביקו קישור מאליאקספרס' : 'Search or paste an AliExpress link'}

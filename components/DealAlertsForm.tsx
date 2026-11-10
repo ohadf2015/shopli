@@ -47,10 +47,13 @@ export default function DealAlertsForm({ source, rtl }: DealAlertsFormProps) {
             data-source={source}
             data-done={rtl ? 'נרשמת! נעדכן כשיש דיל חדש' : "You're in — we'll ping you on the next deal"}
             className="relative flex gap-2"
+            toolname="get_deal_alerts"
+            tooldescription="Subscribe an email address to shopli's short updates about new collections and price drops."
           >
             <input
               type="email"
               name="email"
+              toolparamdescription="The email address that should receive deal alerts."
               required
               placeholder={rtl ? 'האימייל שלך' : 'your@email.com'}
               className="flex-1 px-4 py-2.5 rounded-xl text-sm text-gray-900 placeholder-gray-400 border-0 focus:outline-none focus:ring-2 focus:ring-orange-400"
