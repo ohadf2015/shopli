@@ -10,6 +10,8 @@ import { getReviewsBatch } from '../../lib/review-store';
 import { productImage } from '../../lib/img';
 import { breadcrumbJsonLd, listingProductsJsonLd, websiteJsonLd, SITE_URL } from '../../lib/seo';
 import { cacheIfNotEmpty } from '../../lib/cache';
+import type { HomeCard, HomePageProps } from '../../lib/home-markdown';
+import { wantsMarkdown, homeMarkdown } from '../../lib/home-markdown';
 
 /**
  * Home: "Is that AliExpress deal actually good?"
@@ -23,29 +25,7 @@ import { cacheIfNotEmpty } from '../../lib/cache';
  * featured collections, so the best sellers show whatever category they sit in.
  */
 
-interface HomeCard {
-  productId: string;
-  title: string;
-  imageUrl: string;
-  price: number;
-  /** Short, factual reason line: "Usually ~€9.99" / "290 sold a day". */
-  why: string;
-  badge: string;
-  tone: 'drop' | 'hot';
-  stars: number;
-}
-
-interface HomePageProps {
-  region: RegionCode;
-  config: RegionConfig;
-  rtl: boolean;
-  drops: HomeCard[];
-  sellers: HomeCard[];
-  chips: Array<{ slug: string; name: string }>;
-  asOf: string;
-}
-
-const COPY = {
+export const COPY = {
   en: {
     h1: 'Is that AliExpress deal actually good?',
     sub: 'We record prices and orders on thousands of products every day, so you can tell a real price drop from a made-up one.',
@@ -350,10 +330,7 @@ function toCard(p: Pick, rtl: boolean, sym: string, reviews: Record<string, any>
   };
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params, query, res }) => {
-  const region = (query?.region as string) || (params?.region as string) || 'eu';
-  // Unknown region slugs must 404, not render the EU homepage as a duplicate.
-  if (!isValidRegion(region)) return { notFound: true };
+export async function loadHomeProps(region: RegionCode): Promise<HomePageProps> {
   const config = getRegion(region);
   const rtl = config.direction === 'rtl';
   const lang = config.lang || 'en';
@@ -375,8 +352,26 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
     name: c.name?.[lang] || c.name?.en || c.slug,
   }));
   const asOf = [...dropPicks, ...sellerPicks].map((p) => p.asOf).sort().pop() ?? '';
+  return { region, config, rtl, drops, sellers, chips, asOf };
+}
 
-  cacheIfNotEmpty(res, drops.length + sellers.length > 0, 'public, s-maxage=600, stale-while-revalidate=86400');
+export const getServerSideProps: GetServerSideProps = async ({ params, query, req, res }) => {
+  const region = (query?.region as string) || (params?.region as string) || 'eu';
+  // Unknown region slugs must 404, not render the EU homepage as a duplicate.
+  if (!isValidRegion(region)) return { notFound: true };
 
-  return { props: { region, config, rtl, drops, sellers, chips, asOf } };
+  res.setHeader('Vary', 'Accept');
+  const props = await loadHomeProps(region);
+  const found = props.drops.length + props.sellers.length > 0;
+
+  cacheIfNotEmpty(res, found, 'public, s-maxage=600, stale-while-revalidate=86400');
+
+  if (wantsMarkdown(req.headers.accept)) {
+    res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+    res.write(homeMarkdown(props, props.rtl ? COPY.he : COPY.en));
+    res.end();
+    return { props };
+  }
+
+  return { props };
 };
