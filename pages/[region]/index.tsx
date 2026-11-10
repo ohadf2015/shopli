@@ -196,7 +196,14 @@ export default function HomePage({ region, config, rtl, drops, sellers, chips, a
           <p className="text-base sm:text-lg leading-relaxed m-0" style={{ color: '#4A443C' }}>
             {t.sub}
           </p>
-          <form action={`/${region}/search`} method="get" role="search" className="flex flex-col gap-2">
+          <form
+            action={`/${region}/search`}
+            method="get"
+            role="search"
+            className="flex flex-col gap-2"
+            toolname="search_aliexpress_deals"
+            tooldescription="Search AliExpress products by keyword and open the results ranked by price, rating and orders."
+          >
             <label htmlFor="home-q" className="text-sm font-semibold">
               {t.label}
             </label>
@@ -204,6 +211,7 @@ export default function HomePage({ region, config, rtl, drops, sellers, chips, a
               <input
                 id="home-q"
                 name="q"
+                toolparamdescription="Product keywords to search for, for example 'wireless earbuds'."
                 placeholder={t.placeholder}
                 className="flex-1 min-w-0 h-14 px-4 text-base bg-white rounded-xl"
                 style={{ border: '2.5px solid var(--shopli-ink)' }}

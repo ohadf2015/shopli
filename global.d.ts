@@ -11,3 +11,13 @@ declare namespace React {
     fetchpriority?: 'high' | 'low' | 'auto';
   }
 }
+
+declare namespace React {
+  interface FormHTMLAttributes<T> {
+    toolname?: string;
+    tooldescription?: string;
+  }
+  interface InputHTMLAttributes<T> {
+    toolparamdescription?: string;
+  }
+}
