@@ -211,7 +211,7 @@ export default function HomePage({ region, config, rtl, drops, sellers, chips, a
               <input
                 id="home-q"
                 name="q"
-                toolparamdescription="Product keywords to search for, for example 'wireless earbuds'."
+                toolparamdescription="Product keywords such as 'wireless earbuds', or an AliExpress product link."
                 placeholder={t.placeholder}
                 className="flex-1 min-w-0 h-14 px-4 text-base bg-white rounded-xl"
                 style={{ border: '2.5px solid var(--shopli-ink)' }}
