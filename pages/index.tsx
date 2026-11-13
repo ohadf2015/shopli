@@ -1,5 +1,6 @@
 import { GetServerSideProps } from 'next';
-import { COPY, loadHomeProps } from './[region]/index';
+import { COPY } from './[region]/index';
+import { loadHomeProps } from '../lib/home-props';
 import { cacheIfNotEmpty } from '../lib/cache';
 import { wantsMarkdown, homeMarkdown } from '../lib/home-markdown';
 import type { RegionCode } from '../lib/regions';
