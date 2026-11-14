@@ -15,6 +15,7 @@ declare global {
       capture: (event: string, properties?: Record<string, unknown>) => void;
       init?: (key: string, opts: Record<string, unknown>) => void;
     };
+    gr?: { capture: (event: string, properties?: Record<string, unknown>) => void };
   }
 }
 
@@ -202,6 +203,7 @@ export function installClickTracking(): () => void {
         url: anchor.href,
       };
       capture('affiliate_click', baseProps);
+      window.gr && window.gr.capture('growth:affiliate_click', { product_id: baseProps.product_id, region: baseProps.region });
       if (card?.getAttribute('data-trending-hub') === 'true') {
         capture('trending_hub_click', baseProps);
       }

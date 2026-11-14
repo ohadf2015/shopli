@@ -5,6 +5,8 @@
 // to /interest and swaps in the data-done message on success.
 // 'website' is the rail's honeypot — keep it invisible and empty.
 
+import { useEffect, useRef } from 'react';
+
 interface DealAlertsFormProps {
   source: string; // e.g. 'mood' | 'collection' — recorded on the interest row
   rtl: boolean;
@@ -26,6 +28,21 @@ const HONEYPOT_STYLE = {
 } as const;
 
 export default function DealAlertsForm({ source, rtl }: DealAlertsFormProps) {
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // interest.js owns the submit and only signals success by swapping in .interest-done.
+  useEffect(() => {
+    const form = formRef.current;
+    if (!form) return;
+    const observer = new MutationObserver(() => {
+      if (!form.querySelector('.interest-done')) return;
+      observer.disconnect();
+      window.gr && window.gr.capture('growth:lead_submitted', { source });
+    });
+    observer.observe(form, { childList: true });
+    return () => observer.disconnect();
+  }, [source]);
+
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
       <div
@@ -42,6 +59,7 @@ export default function DealAlertsForm({ source, rtl }: DealAlertsFormProps) {
         </p>
         <div className="max-w-sm mx-auto">
           <form
+            ref={formRef}
             data-interest="shopli"
             data-kind="notify"
             data-source={source}

@@ -156,7 +156,10 @@ export default function WishlistPage() {
         });
         const data = await res.json();
         setEmailStatus(data);
-        if (data.ok) setEmail('');
+        if (data.ok) {
+          setEmail('');
+          window.gr && window.gr.capture('growth:lead_submitted', { source: 'wishlist' });
+        }
       } catch {
         setEmailStatus({ ok: false, message: rtl ? 'שגיאה, נסו שוב' : 'Error, try again' });
       }
