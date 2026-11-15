@@ -24,6 +24,12 @@ export interface BlogPick {
   keyword: string;
   /** Drop results cheaper than this (in USD) before choosing the listing. */
   minPriceUsd?: number;
+  /**
+   * Keep only results whose title contains one of these (case-insensitive).
+   * For model picks: "70mai A810S" also returns the older A810, which is a
+   * different camera. Model names stay in Latin script in translated titles.
+   */
+  titleIncludes?: string[];
 }
 
 /** USD per one unit of each currency. Rough: only used for a price floor. */
@@ -42,7 +48,7 @@ export function priceInUsd(price: number, currency?: string): number | null {
 
 /** Result page size to ask for: wider when a floor will thin the results. */
 export function pickPageSize(pick: BlogPick): number {
-  return pick.minPriceUsd ? 20 : 6;
+  return pick.minPriceUsd || pick.titleIncludes?.length ? 20 : 6;
 }
 
 /**
@@ -50,13 +56,23 @@ export function pickPageSize(pick: BlogPick): number {
  * A result in a currency we cannot convert is kept: the floor exists to drop
  * accessories, and failing closed on an unknown currency would empty the pick.
  */
-export function pickCandidates<T extends { price: number; currency?: string }>(
+export function pickCandidates<T extends { price: number; currency?: string; title?: string }>(
   products: T[],
-  minPriceUsd?: number
+  minPriceUsd?: number,
+  titleIncludes?: string[]
 ): T[] {
-  if (!minPriceUsd) return products;
-  return products.filter((p) => {
-    const usd = priceInUsd(p.price, p.currency);
-    return usd == null || usd >= minPriceUsd;
-  });
+  let out = products;
+  if (minPriceUsd) {
+    out = out.filter((p) => {
+      const usd = priceInUsd(p.price, p.currency);
+      return usd == null || usd >= minPriceUsd;
+    });
+  }
+  if (titleIncludes?.length) {
+    const needles = titleIncludes.map((n) => n.toLowerCase());
+    // No fallback: a pick with no matching title shows its search chip, which
+    // is better than a card for a different model.
+    out = out.filter((p) => needles.some((n) => (p.title || '').toLowerCase().includes(n)));
+  }
+  return out;
 }
