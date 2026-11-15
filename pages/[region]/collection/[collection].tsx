@@ -404,7 +404,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
     const noindex = !content && sections.length === 0;
 
     // Each section is a live AliExpress search; uncached this is a 5s+ SSR per hit.
-    cacheIfNotEmpty(res, sections.length > 0, 'public, s-maxage=3600, stale-while-revalidate=3600');
+    cacheIfNotEmpty(res, sections.length > 0, 'public, s-maxage=3600, stale-while-revalidate=21600'); // stale window keeps crawler visits off the cold 2-9 s path
 
     return {
       props: {

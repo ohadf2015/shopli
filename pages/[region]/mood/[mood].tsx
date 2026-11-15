@@ -289,7 +289,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
 
     // Mood boards are curated + slow to build (several AliExpress searches each).
     // Without this every crawl and every visitor pays a 5-8s uncached SSR.
-    cacheIfNotEmpty(res, itemGroups.length > 0, 'public, s-maxage=3600, stale-while-revalidate=3600');
+    cacheIfNotEmpty(res, itemGroups.length > 0, 'public, s-maxage=3600, stale-while-revalidate=21600'); // stale window keeps crawler visits off the cold 2-9 s path
 
     return {
       props: {
