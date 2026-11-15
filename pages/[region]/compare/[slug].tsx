@@ -6,6 +6,9 @@ import CompareAboveFoldExit from '../../../components/CompareAboveFoldExit';
 import SeoHead from '../../../components/SeoHead';
 import ShareBar from '../../../components/ShareBar';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
+import RelatedReads from '../../../components/RelatedReads';
+import { collectionLinks } from '../../../lib/related-links';
+import { collectionsForComparison } from '../../../lib/related-content';
 import { trackCompareNextAction } from '../../../lib/analytics';
 import { getComparison } from '../../../lib/comparisons';
 import { productImage } from '../../../lib/img';
@@ -264,6 +267,12 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
             </div>
           </div>
         )}
+
+        <RelatedReads
+          links={collectionLinks(collectionsForComparison(c.slug), region, lang)}
+          region={region}
+          lang={lang}
+        />
 
         <BrowseNext region={region} rtl={rtl} surface="compare_article" />
       </main>

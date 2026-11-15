@@ -1,0 +1,20 @@
+import { getCollection } from './collections';
+
+export interface RelatedLink {
+  href: string;
+  title: string;
+  kind: 'guide' | 'compare' | 'collection';
+}
+
+/** Collection slugs -> localized "Shop the picks" links for RelatedReads. */
+export function collectionLinks(slugs: string[], region: string, lang: string): RelatedLink[] {
+  const pick = (obj: any) => obj?.[lang] || obj?.en || '';
+  return slugs
+    .map((s) => getCollection(s))
+    .filter(Boolean)
+    .map((c: any) => ({
+      href: `/${region}/collection/${c.slug}`,
+      title: pick(c.name) || pick(c.tag) || c.slug,
+      kind: 'collection' as const,
+    }));
+}

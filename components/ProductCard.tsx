@@ -37,6 +37,8 @@ interface ProductCardProps {
   /** Share page URL when affiliate link missing */
   fallbackUrl?: string;
   compact?: boolean;
+  /** Show the outbound AliExpress button even on a compact card. */
+  dealButton?: boolean;
   showShare?: boolean;
   showCompareLink?: boolean;
   region?: string;
@@ -73,6 +75,7 @@ export default function ProductCard({
   locale = 'en',
   fallbackUrl,
   compact = false,
+  dealButton = false,
   showShare = false,
   showCompareLink = false,
   region,
@@ -310,12 +313,13 @@ export default function ProductCard({
 
       {/* Explicit outbound CTA: the card itself links to the on-site PDP, so
           the money link gets its own unmissable button. */}
-      {!compact && product.affiliateLink && (
+      {(!compact || dealButton) && product.affiliateLink && (
         <div className="px-2 pb-2.5 relative z-10">
           <a
             href={product.affiliateLink}
             target="_blank"
             rel="noopener noreferrer sponsored"
+            data-cta="card_button"
             className="flex items-center justify-center gap-1 w-full text-[0.7rem] font-bold px-3 py-2 rounded-lg transition-opacity hover:opacity-90"
             style={{ background: 'var(--shopli-orange)', color: 'var(--shopli-on-orange)' }}
           >
