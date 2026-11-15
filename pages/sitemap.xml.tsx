@@ -148,13 +148,6 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       priority: 0.8,
       lastmod: today,
     });
-    // Search landing (noindex when empty; still useful for discovery of path)
-    urls.push({
-      loc: `${SITE_URL}/${region}/search`,
-      changefreq: 'weekly',
-      priority: 0.4,
-      lastmod: today,
-    });
     // /{region}/compare hub is always empty-state + noindex without ?ids= —
     // keep it out of the sitemap (t_bc8dc5f7 kill dead SEO compare landings).
     // Indexed compare URLs are the /compare/<slug> articles below.
