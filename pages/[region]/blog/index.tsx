@@ -5,8 +5,9 @@ import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getBlogPostsForRegion } from '../../../lib/blog';
 import Link from 'next/link';
 import { breadcrumbJsonLd, SITE_URL } from '../../../lib/seo';
+import { isWeeklyRegion } from '../../../lib/weekly';
 
-export default function BlogIndexPage({ region, config, posts, rtl }: any) {
+export default function BlogIndexPage({ region, config, posts, rtl, hasWeekly }: any) {
   const lang = config?.lang || 'en';
 
   const title = rtl ? 'בלוג שופלי — מדריכי קנייה והשוואות' : 'Shopli Blog — Buying Guides & Comparisons';
@@ -40,6 +41,25 @@ export default function BlogIndexPage({ region, config, posts, rtl }: any) {
             {rtl ? 'מדריכי קנייה מומחים, השוואות מעמיקות, וטיפים לחיסכון — הכל כדי שתקנו חכם יותר' : 'Expert buying guides, deep-dive comparisons, and money-saving tips — so you shop smarter'}
           </p>
         </div>
+
+        {hasWeekly && (
+          <Link
+            href={`/${region}/weekly`}
+            className="block mb-8 rounded-2xl border border-[#141414] bg-orange-50 hover:shadow-lg transition-all p-6 md:p-8"
+          >
+            <span className="text-xs font-semibold uppercase tracking-wider px-2 py-1 rounded-full bg-[#141414] text-white">
+              {rtl ? 'כל יום ראשון' : 'Every Sunday'}
+            </span>
+            <h2 className="text-xl md:text-2xl font-bold mt-3 mb-2" style={{ color: 'var(--shopli-navy)' }}>
+              {rtl ? 'שופלי השבועי: מה נמכר, ומה באמת ירד במחיר' : "The Shopli Weekly: what's selling, and what really got cheaper"}
+            </h2>
+            <p className="text-base" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {rtl
+                ? 'הנמכרים הכי מהר השבוע וירידות המחיר האמיתיות, מהמחירים וההזמנות שאנחנו רושמים כל יום.'
+                : "This week's fastest sellers and the real price drops, from the prices and orders we record every day."}
+            </p>
+          </Link>
+        )}
 
         <div className="grid gap-6">
           {posts.map((post: any) => (
@@ -101,6 +121,6 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
   res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
 
   return {
-    props: { region, config, posts, rtl },
+    props: { region, config, posts, rtl, hasWeekly: isWeeklyRegion(region) },
   };
 };

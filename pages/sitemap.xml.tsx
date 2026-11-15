@@ -5,6 +5,7 @@ import { SITE_URL, getCollectionOgImage } from '../lib/seo';
 import { COLLECTION_CONTENT } from '../lib/collection-content';
 import { searchCollection } from '../lib/aliexpress';
 import { MARKETPLACE_HOW_TOS } from '../lib/landed-url';
+import { isWeeklyRegion, issueDates } from '../lib/weekly';
 
 function xmlEncode(s: string): string {
   return s
@@ -183,6 +184,19 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       priority: 0.8,
       lastmod: getBlogPostsForRegion(region)[0]?.publishDate?.slice(0, 10),
     });
+  }
+
+  // The Shopli Weekly: the current issue at /weekly, each past Sunday at its
+  // own date. Issues are rebuilt from our snapshots, so these never 404.
+  {
+    const dates = issueDates(today);
+    for (const region of regionCodes) {
+      if (!isWeeklyRegion(region) || !dates.length) continue;
+      urls.push({ loc: `${SITE_URL}/${region}/weekly`, changefreq: 'weekly', priority: 0.8, lastmod: dates[0] });
+      for (const d of dates.slice(1)) {
+        urls.push({ loc: `${SITE_URL}/${region}/weekly/${d}`, changefreq: 'yearly', priority: 0.4, lastmod: d });
+      }
+    }
   }
 
   // Collection pages — only include slugs that have either editorial content
