@@ -142,13 +142,13 @@ export default function BlogPostPage({ region, config, post, rtl, regionOnly, pi
       />
       <Header currentRegion={region} dir={config?.direction} />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
-        <Link href={`/${region}/blog`} className="text-orange-600 hover:underline text-sm mb-6 inline-block">
+        <Link href={`/${region}/blog`} className="text-orange-700 hover:underline text-sm mb-6 inline-block">
           &larr; {rtl ? 'כל הכתבות' : 'All Articles'}
         </Link>
 
         <article>
           <header className="mb-8">
-            <span className="text-xs font-semibold uppercase tracking-wider text-orange-600">
+            <span className="text-xs font-semibold uppercase tracking-wider text-orange-700">
               {rtl ? 'מדריך קנייה' : 'Buying Guide'}
             </span>
             <h1 className="text-2xl md:text-4xl font-extrabold mt-2 mb-4" style={{ color: 'var(--shopli-navy)' }}>
