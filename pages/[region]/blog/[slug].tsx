@@ -177,7 +177,7 @@ export default function BlogPostPage({ region, config, post, rtl, regionOnly, pi
               {t(p.intro)}
             </p>
             <time className="text-xs mt-3 block" style={{ color: 'var(--shopli-warm-gray)' }} dateTime={p.publishDate}>
-              {new Date(p.publishDate).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              {new Date(p.publishDate).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
             </time>
             <div className="mt-4">
               <ShareBar
