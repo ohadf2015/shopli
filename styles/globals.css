@@ -17,7 +17,10 @@
   --shopli-red: oklch(55% 0.22 25);
   --shopli-warm-bg: #FFF4E4;
   --shopli-warm-card: #FFFFFF;
-  --shopli-warm-gray: oklch(55% 0.01 80);
+  /* 50%, not 55%: at 55% this gray was 4.46:1 on the cream background, under
+     WCAG AA's 4.5:1 for body text (Lighthouse flagged every secondary line on
+     product pages). 50% is 5.5:1 on cream and 6.0:1 on white. */
+  --shopli-warm-gray: oklch(50% 0.01 80);
 }
 
 html[dir="rtl"] {

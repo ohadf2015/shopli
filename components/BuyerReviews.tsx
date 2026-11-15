@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { ProductReviews } from '../lib/reviews';
+import { cdnImage } from '../lib/img';
 
 /**
  * What people who actually bought it think.
@@ -107,14 +108,16 @@ export default function BuyerReviews({ reviews, rtl, lang }: Props) {
                 <span className="text-xs w-10 shrink-0" style={{ color: 'var(--shopli-warm-gray)' }}>
                   {s} ★
                 </span>
-                <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'oklch(94% 0.01 60)' }}>
+                {/* Decorative: the star label and the count beside it carry the
+                    data. An aria-label on a role-less div is prohibited ARIA and
+                    broke the accessibility tree assistants and agents read. */}
+                <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'oklch(94% 0.01 60)' }} aria-hidden="true">
                   <div
                     className="h-full rounded-full"
                     style={{
                       width: `${(reviews.histogram[s] / maxBar) * 100}%`,
                       background: 'var(--shopli-orange)',
                     }}
-                    aria-label={c.stars(s)}
                   />
                 </div>
                 <span className="text-xs w-12 text-end shrink-0" style={{ color: 'var(--shopli-warm-gray)' }}>
@@ -149,7 +152,9 @@ export default function BuyerReviews({ reviews, rtl, lang }: Props) {
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 key={src}
-                src={src}
+                // 96px slot: the 200px CDN variant covers 2x screens. The raw
+                // URL is the full upload (540px+, up to 40 KB per thumb).
+                src={cdnImage(src, 200)}
                 alt=""
                 loading="lazy"
                 decoding="async"
