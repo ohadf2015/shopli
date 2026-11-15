@@ -45,6 +45,19 @@ export function renderHreflangLinks(region: RegionCode, path: string): string {
     .join('\n');
 }
 
+/**
+ * Search results cut a description at roughly 160 characters, mid-word.
+ * Product descriptions are built from raw AliExpress titles and ran 163–177
+ * characters, so end them on a word boundary instead.
+ */
+export function clampDescription(text: string, max = 160): string {
+  const t = text.replace(/\s+/g, ' ').trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max - 1);
+  const space = cut.lastIndexOf(' ');
+  return `${(space > max * 0.6 ? cut.slice(0, space) : cut).replace(/[\s,;:·–—-]+$/, '')}…`;
+}
+
 interface SeoProps {
   region: RegionCode;
   path?: string;
@@ -78,7 +91,7 @@ export function getSeoHead(props: SeoProps) {
   const config = REGIONS[region];
   const url = canonical || getCanonical(region, path);
   const finalTitle = title || config?.meta?.title || SITE_NAME;
-  const finalDesc = description || config?.meta?.description || SITE_TAGLINE;
+  const finalDesc = clampDescription(description || config?.meta?.description || SITE_TAGLINE);
   const finalImage = image || OG_IMAGE_URL;
 
   const meta: Array<{

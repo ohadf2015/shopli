@@ -34,8 +34,7 @@ function buildUrlEntry(u: SitemapUrl): string {
 
   return `  <url>
     <loc>${xmlEncode(u.loc)}</loc>
-    <lastmod>${u.lastmod || new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>${u.changefreq}</changefreq>
+${u.lastmod ? `    <lastmod>${u.lastmod}</lastmod>\n` : ''}    <changefreq>${u.changefreq}</changefreq>
     <priority>${u.priority.toFixed(1)}</priority>${imageTags ? '\n' + imageTags : ''}
   </url>`;
 }
@@ -51,10 +50,13 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     getAllComparisonSlugs: () => [] as string[],
   }));
   const { getBlogPostsForRegion } = await import('../lib/blog').catch(() => ({
-    getBlogPostsForRegion: (_r: string) => [] as Array<{ slug: string }>,
+    getBlogPostsForRegion: (_r: string) => [] as Array<{ slug: string; publishDate?: string }>,
   }));
 
-  // Fresh lastmod on every generation (hourly revalidation via Cache-Control)
+  // lastmod: today only for pages whose content is live AliExpress data
+  // (prices and picks change daily). Static pages carry their real date or no
+  // lastmod at all — stamping every URL with today taught Google to ignore the
+  // field, including on the guides where it is true.
   const now = new Date();
   const today = now.toISOString().split('T')[0];
   const regionCodes = Object.keys(REGIONS);
@@ -112,7 +114,6 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       loc: `${SITE_URL}${m.path}`,
       changefreq: 'weekly',
       priority: 0.7,
-      lastmod: today,
     });
   }
 
@@ -146,7 +147,6 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       loc: `${SITE_URL}/${region}/collections`,
       changefreq: 'weekly',
       priority: 0.8,
-      lastmod: today,
     });
     // /{region}/compare hub is always empty-state + noindex without ?ids= —
     // keep it out of the sitemap (t_bc8dc5f7 kill dead SEO compare landings).
@@ -156,35 +156,32 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       loc: `${SITE_URL}/${region}/about`,
       changefreq: 'monthly',
       priority: 0.5,
-      lastmod: today,
     });
     urls.push({
       loc: `${SITE_URL}/${region}/privacy`,
       changefreq: 'monthly',
       priority: 0.5,
-      lastmod: today,
     });
     urls.push({
       loc: `${SITE_URL}/${region}/terms`,
       changefreq: 'monthly',
       priority: 0.5,
-      lastmod: today,
     });
     urls.push({
       loc: `${SITE_URL}/${region}/contact`,
       changefreq: 'monthly',
       priority: 0.5,
-      lastmod: today,
     });
   }
 
   // Blog index pages
   for (const region of regionCodes) {
+    // The index changes when a post is published.
     urls.push({
       loc: `${SITE_URL}/${region}/blog`,
       changefreq: 'weekly',
       priority: 0.8,
-      lastmod: today,
+      lastmod: getBlogPostsForRegion(region)[0]?.publishDate?.slice(0, 10),
     });
   }
 
@@ -259,12 +256,12 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   // Blog posts — per region, since a region-restricted post 404s elsewhere and
   // listing it for all nine would put eight dead URLs in the sitemap.
   for (const region of regionCodes) {
-    for (const { slug } of getBlogPostsForRegion(region)) {
+    for (const { slug, publishDate } of getBlogPostsForRegion(region)) {
       urls.push({
         loc: `${SITE_URL}/${region}/blog/${slug}`,
         changefreq: 'monthly',
         priority: 0.6,
-        lastmod: today,
+        lastmod: publishDate?.slice(0, 10),
       });
     }
   }
