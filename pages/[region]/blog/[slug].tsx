@@ -306,7 +306,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
       // scoring the whole set can answer "adjustable dumbbells set" with the
       // sixth-most relevant listing. A pick with a price floor drops the
       // accessories under it first (lib/blog-picks.ts).
-      const best = filterQuality(pickCandidates(products, pick.minPriceUsd).slice(0, 3))[0];
+      const best = filterQuality(pickCandidates(products, pick.minPriceUsd, pick.titleIncludes).slice(0, 3))[0];
       return best ? { pick, best } : null;
     })
   );

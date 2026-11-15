@@ -32,9 +32,19 @@ test('an unconvertible currency is kept rather than emptying the pick', () => {
   assert.equal(pickCandidates([{ price: 1, currency: 'XYZ' }], 50).length, 1);
 });
 
+test('titleIncludes keeps only the named model, with no fallback', () => {
+  const results = [
+    { id: 'a810', title: '70mai A810 4K+1080P dash cam', price: 97, currency: 'USD' },
+    { id: 'a810s', title: '70mai a810s 4K dash cam', price: 97, currency: 'USD' },
+  ];
+  assert.deepEqual(pickCandidates(results, 50, ['A810S']).map((p) => p.id), ['a810s']);
+  assert.equal(pickCandidates(results.slice(0, 1), 50, ['A810S']).length, 0);
+});
+
 test('a floored pick asks for a wider result page', () => {
   assert.equal(pickPageSize({ name: 'a', keyword: 'a' }), 6);
   assert.equal(pickPageSize({ name: 'a', keyword: 'a', minPriceUsd: 10 }), 20);
+  assert.equal(pickPageSize({ name: 'a', keyword: 'a', titleIncludes: ['X1'] }), 20);
 });
 
 test('every guide links only to posts that exist, and every pick has a keyword', () => {

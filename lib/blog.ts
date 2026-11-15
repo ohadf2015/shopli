@@ -1206,10 +1206,10 @@ export const blogPosts: BlogPost[] = [
     ],
     keywords: ['mini projector', 'HY300 projector review', 'cheap projector buying guide', 'ANSI lumens explained', 'מקרן', 'מקרן ביתי', 'מקרן זול', 'מקרן HY300'],
     relatedProducts: [
-      { name: 'HY300 Pro (720p)', label: { en: 'HY300 Pro (720p)', he: 'HY300 Pro (720p)' }, keyword: 'HY300 Pro projector', minPriceUsd: 30 },
+      { name: 'HY300 Pro (720p)', label: { en: 'HY300 Pro (720p)', he: 'HY300 Pro (720p)' }, keyword: 'HY300 Pro projector', minPriceUsd: 30, titleIncludes: ['HY300'] },
       { name: 'Native 1080p, autofocus', label: { en: 'Native 1080p, autofocus', he: '1080p מקורי, פוקוס אוטומטי' }, keyword: 'projector native 1080P autofocus', minPriceUsd: 90 },
       { name: 'Projector screen', label: { en: 'Projector screen', he: 'מסך הקרנה' }, keyword: 'projector screen 100 inch foldable', minPriceUsd: 5 },
-      { name: 'Projector stand', label: { en: 'Projector stand', he: 'מעמד למקרן' }, keyword: 'projector stand tripod adjustable', minPriceUsd: 5 },
+      { name: 'Projector stand', label: { en: 'Projector stand', he: 'מעמד למקרן' }, keyword: 'projector stand tripod adjustable', minPriceUsd: 5, titleIncludes: ['projector', 'מקרן'] },
     ],
     relatedPosts: ['budget-streaming-setup-guide', 'smart-home-beginners-guide'],
     publishDate: '2026-11-15',
@@ -1259,8 +1259,8 @@ export const blogPosts: BlogPost[] = [
       {
         heading: { en: '3. 70mai A210: GPS, and a rear camera when you want one', he: '3. 70mai A210: GPS, ומצלמה אחורית כשתרצו' },
         body: {
-          en: "1080p front at 30 fps with HDR or 60 fps without, a 132° view, built-in GPS, Wi-Fi 6 and a supercapacitor. The RC21 rear camera is optional and sold separately, so you can start with the front and add the back later. GPS stamps your location and speed into the footage, which is what makes a clip useful as evidence. It listed at ₪146 (about $40) on November 15. Pick it if you want GPS without paying for 4K.",
-          he: "1080p מקדימה ב-30 פריימים עם HDR או 60 בלי, זווית של 132°, GPS מובנה, Wi-Fi 6 וסופר-קבל. המצלמה האחורית RC21 היא תוספת שנמכרת בנפרד, כך שאפשר להתחיל מקדימה ולהוסיף אחורית אחר כך. ה-GPS מטביע מיקום ומהירות בתוך הצילום, וזה מה שהופך קטע וידאו לראיה שימושית. ב-15 בנובמבר היא הוצעה ב-146 ש\"ח. מתאימה למי שרוצה GPS בלי לשלם על 4K.",
+          en: "1080p front at 30 fps with HDR or 60 fps without, a 132° view, built-in GPS, Wi-Fi 6 and a supercapacitor. The RC21 rear camera is optional and sold separately, so you can start with the front and add the back later. GPS stamps your location and speed into the footage, which is what makes a clip useful as evidence. It listed at ₪146-150 (about $40) on November 15. Pick it if you want GPS without paying for 4K.",
+          he: "1080p מקדימה ב-30 פריימים עם HDR או 60 בלי, זווית של 132°, GPS מובנה, Wi-Fi 6 וסופר-קבל. המצלמה האחורית RC21 היא תוספת שנמכרת בנפרד, כך שאפשר להתחיל מקדימה ולהוסיף אחורית אחר כך. ה-GPS מטביע מיקום ומהירות בתוך הצילום, וזה מה שהופך קטע וידאו לראיה שימושית. ב-15 בנובמבר היא הוצעה ב-146-150 ש\"ח. מתאימה למי שרוצה GPS בלי לשלם על 4K.",
         },
       },
       {
@@ -1317,9 +1317,9 @@ export const blogPosts: BlogPost[] = [
     ],
     keywords: ['best dash cam', '70mai dash cam review', '70mai A810S', '70mai M310 Plus', '70mai A210', 'dash cam parking mode', 'מצלמת רכב', 'מצלמת דרך לרכב', 'מצלמת רכב מומלצת'],
     relatedProducts: [
-      { name: '70mai M310 Plus 2K', label: { en: '70mai M310 Plus 2K', he: '70mai M310 Plus 2K' }, keyword: '70mai M310 Plus dash cam', minPriceUsd: 15 },
-      { name: '70mai A210 (GPS)', label: { en: '70mai A210 (GPS)', he: '70mai A210 עם GPS' }, keyword: '70mai A210 dash cam', minPriceUsd: 20 },
-      { name: '70mai A810S 4K', label: { en: '70mai A810S 4K', he: '70mai A810S 4K' }, keyword: '70mai A810S 4K dash cam', minPriceUsd: 50 },
+      { name: '70mai M310 Plus 2K', label: { en: '70mai M310 Plus 2K', he: '70mai M310 Plus 2K' }, keyword: '70mai M310 Plus dash cam', minPriceUsd: 15, titleIncludes: ['M310'] },
+      { name: '70mai A210 (GPS)', label: { en: '70mai A210 (GPS)', he: '70mai A210 עם GPS' }, keyword: '70mai A210 dash cam', minPriceUsd: 20, titleIncludes: ['A210'] },
+      { name: '70mai A810S 4K', label: { en: '70mai A810S 4K', he: '70mai A810S 4K' }, keyword: '70mai A810S 4K dash cam', minPriceUsd: 50, titleIncludes: ['A810S'] },
       { name: '70mai hardwire kit', label: { en: '70mai hardwire kit', he: 'ערכת חיבור קשיח 70mai' }, keyword: '70mai hardwire kit parking', minPriceUsd: 5 },
       { name: 'High-endurance microSD', label: { en: 'High-endurance microSD', he: 'כרטיס microSD עמיד' }, keyword: 'high endurance microSD card dash cam', minPriceUsd: 5 },
     ],
