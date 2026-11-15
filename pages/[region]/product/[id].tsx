@@ -555,18 +555,27 @@ export const getServerSideProps: GetServerSideProps<ProductPageProps> = async (c
     return pdpGsspWhenMissing();
   }
 
-  // Cache at the edge (10m, SWR 1h) so repeat views don't re-hit the AliExpress
-  // API — but only once we actually have a product. This header used to be set
-  // before the fetch, so a rate-limited call pinned "Product not found" over a
-  // live product for ten minutes.
-  // A stored or demo copy carries no tracked buy link, so keep it at the edge
-  // only briefly and let the next view pick up the live, tracked product.
+  // Cache at the edge so repeat views don't re-hit the AliExpress API — but
+  // only once we actually have a product. This header used to be set before
+  // the fetch, so a rate-limited call pinned "Product not found" over a live
+  // product for ten minutes.
+  //
+  // The stale window is what keeps long-tail pages fast: a cold render costs
+  // ~3.2 s (two AliExpress calls, then the stored-copy fallback), and with a
+  // 1 h window almost every crawler and AI-bot visit to a product page landed
+  // cold. Inside the window the edge answers at once and re-renders in the
+  // background, so the following view gets fresh price data. 6 h, not a day:
+  // the page emits offers.price in its Product markup.
+  //
+  // A stored or demo copy carries no tracked buy link, so its fresh period
+  // stays short; the background re-render then swaps in the live, tracked
+  // product on the next view instead of holding the untracked one.
   cacheIfNotEmpty(
     context.res,
     !!product,
     isPromotionLink(product.affiliateLink)
-      ? 'public, s-maxage=600, stale-while-revalidate=3600'
-      : 'public, s-maxage=60, stale-while-revalidate=60'
+      ? 'public, s-maxage=600, stale-while-revalidate=21600'
+      : 'public, s-maxage=60, stale-while-revalidate=21600'
   );
 
   const lang = config.lang || 'en';

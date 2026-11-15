@@ -362,10 +362,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
   const products = await fetchTrendingProducts(region, 30);
   const generatedAt = new Date().toISOString().split('T')[0];
 
-  // SEO landing page updated daily — let the edge cache absorb renders (1h, SWR 24h).
-  // Short SWR: this page emits Product offers.price, and a long stale window
-  // would serve stale prices in structured data.
-  cacheIfNotEmpty(res, products.length > 0, 'public, s-maxage=3600, stale-while-revalidate=3600');
+  // SEO landing page updated daily — let the edge cache absorb renders.
+  // 6h stale window, not a day: this page emits Product offers.price, and a
+  // day-old copy would serve stale prices in structured data; 1h left most
+  // crawler visits rendering cold.
+  cacheIfNotEmpty(res, products.length > 0, 'public, s-maxage=3600, stale-while-revalidate=21600');
 
   return {
     props: {
