@@ -141,7 +141,7 @@ export function trackShareClick(props: {
 export function trackCompareNextAction(props: {
   region: string;
   surface: 'compare_tool' | 'compare_article';
-  target: 'pdp' | 'best_pick' | 'search' | 'trending' | 'deals';
+  target: 'pdp' | 'best_pick' | 'search' | 'trending' | 'deals' | 'article';
   product_id?: string;
 }) {
   capture('compare_next_action', props);
@@ -199,6 +199,8 @@ export function installClickTracking(): () => void {
         price: numericPrice(attr(card, 'data-price')),
         currency: attr(card, 'data-currency'),
         region: attr(card, 'data-region') || regionFromPath(page),
+        // Which outbound button was used (e.g. collection_glance), when it says.
+        placement: anchor.getAttribute('data-cta') || undefined,
         page,
         url: anchor.href,
       };

@@ -5,6 +5,9 @@ import SeoHead from '../../../components/SeoHead';
 import ShareBar from '../../../components/ShareBar';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getBlogPost, isBlogPostInRegion } from '../../../lib/blog';
+import RelatedReads from '../../../components/RelatedReads';
+import { collectionLinks } from '../../../lib/related-links';
+import { collectionsForBlog } from '../../../lib/related-content';
 import { blogPostingJsonLd, breadcrumbJsonLd, faqJsonLd, SITE_URL } from '../../../lib/seo';
 import ProductCard, { ProductCardProduct } from '../../../components/ProductCard';
 import { searchAliExpress } from '../../../lib/aliexpress';
@@ -229,6 +232,12 @@ export default function BlogPostPage({ region, config, post, rtl, regionOnly, pi
                 items={p.relatedProducts}
               />
             </section>
+
+            <RelatedReads
+              links={collectionLinks(collectionsForBlog(p.slug), region, lang)}
+              region={region}
+              lang={lang}
+            />
           </div>
         </article>
       </main>

@@ -9,6 +9,7 @@ import WhatsAppShare from '../../../components/WhatsAppShare';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, isValidRegion, RegionCode, RegionConfig } from '../../../lib/regions';
 import { trackCompareNextAction } from '../../../lib/analytics';
+import { comparisons as COMPARISON_ARTICLES } from '../../../lib/comparisons';
 import type { SearchProduct } from '../../../lib/aliexpress';
 import { productImage } from '../../../lib/img';
 import { listingAggregateFields } from '../../../lib/pdp';
@@ -456,6 +457,29 @@ export default function ProductComparePage({
                 {rtl ? 'גלו מה טרנדי עכשיו' : 'browse what is trending now'}
               </a>
             </p>
+            {!error && (
+              <div className="mt-10 text-start" data-compare-articles>
+                <h2 className="text-base font-bold mb-3" style={{ color: 'var(--shopli-navy)' }}>
+                  {rtl ? 'או קראו השוואה מוכנה' : 'Or read a ready-made comparison'}
+                </h2>
+                <ul className="grid gap-2 sm:grid-cols-2">
+                  {COMPARISON_ARTICLES.map((a) => (
+                    <li key={a.slug}>
+                      <a
+                        href={`/${region}/compare/${a.slug}`}
+                        onClick={() =>
+                          trackCompareNextAction({ region, surface: 'compare_tool', target: 'article' })
+                        }
+                        className="block rounded-lg border border-[#141414] bg-white px-3 py-2 text-sm font-semibold hover:bg-orange-50/40"
+                        style={{ color: 'var(--shopli-navy)' }}
+                      >
+                        {a.title[config?.lang || 'en'] || a.title.en}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         ) : (
           <>
