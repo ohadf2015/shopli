@@ -65,9 +65,12 @@ export default function BlogIndexPage({ region, config, posts, rtl }: any) {
                   <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
                     {(post.intro?.[lang] || post.intro?.en || '').substring(0, 180)}...
                   </p>
-                  <Link href={`/${region}/blog/${post.slug}`} className="text-sm font-semibold text-orange-600 hover:underline inline-flex items-center gap-1">
+                  <Link href={`/${region}/blog/${post.slug}`} className="text-sm font-semibold text-orange-700 hover:underline inline-flex items-center gap-1">
                     {rtl ? 'קראו עוד' : 'Read more'}
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    {/* "Read more" alone tells search engines and screen readers
+                        nothing about the target; the title does. */}
+                    <span className="sr-only">: {post.title?.[lang] || post.title?.en || ''}</span>
+                    <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                   </Link>
                 </div>
               </div>

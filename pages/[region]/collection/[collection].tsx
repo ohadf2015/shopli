@@ -4,6 +4,13 @@ import Icon from '../../../components/icons';
 import ProductCard from '../../../components/ProductCard';
 import ShareBar from '../../../components/ShareBar';
 import DealAlertsForm from '../../../components/DealAlertsForm';
+import CollectionGlance from '../../../components/CollectionGlance';
+import RelatedReads, { type RelatedLink } from '../../../components/RelatedReads';
+import { collectionFacts } from '../../../lib/collection-facts';
+import { relatedForCollection } from '../../../lib/related-content';
+import { themeForCollection, themeName as themeLabel } from '../../../lib/collection-themes';
+import { getBlogPost, isBlogPostInRegion } from '../../../lib/blog';
+import { getComparison } from '../../../lib/comparisons';
 import SeoHead from '../../../components/SeoHead';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getCollection } from '../../../lib/collections';
@@ -29,7 +36,22 @@ const SOURCES_HEADING: Record<string, string> = {
   ru: 'Источники',
 };
 
-export default function CollectionPage({ region, config, collection, content, sections, rtl, noindex, byline, error }: any) {
+const PICKS_HEADING: Record<string, string> = {
+  en: 'Our picks', he: 'הבחירות שלנו', fr: 'Notre sélection', de: 'Unsere Auswahl', es: 'Nuestra selección', it: 'La nostra selezione', ru: 'Наш выбор',
+};
+
+/** Title for a collection with no hand-written meta title, built from its live picks. */
+const PICKS_TITLE: Record<string, (name: string, n: number, from: string) => string> = {
+  en: (name, n, from) => `${name}: ${n} Top-Rated AliExpress Picks From ${from}`,
+  he: (name, n, from) => `${name}: ${n} המוצרים המדורגים ביותר באליאקספרס, החל מ-${from}`,
+  fr: (name, n, from) => `${name} : ${n} meilleurs choix AliExpress dès ${from}`,
+  de: (name, n, from) => `${name}: ${n} top bewertete AliExpress-Funde ab ${from}`,
+  es: (name, n, from) => `${name}: ${n} productos de AliExpress mejor valorados desde ${from}`,
+  it: (name, n, from) => `${name}: ${n} migliori scelte AliExpress da ${from}`,
+  ru: (name, n, from) => `${name}: ${n} лучших товаров с AliExpress от ${from}`,
+};
+
+export default function CollectionPage({ region, config, collection, content, sections, rtl, noindex, byline, error, related }: any) {
   if (error) {
     return (
       <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>
@@ -47,16 +69,24 @@ export default function CollectionPage({ region, config, collection, content, se
     : collection.metaTitle
       ? get(collection.metaTitle)
       : collection.name;
-  const title = `${metaTitleBase} | ${rtl ? 'שופלי' : 'Shopli'}`;
+  const allProducts = (sections || []).flatMap((s: any) => s.products || []);
+  const facts = content ? null : collectionFacts(allProducts);
+  const sym = config?.currencySymbol || '€';
+  const factsTitle =
+    facts && !collection.metaTitle
+      ? (PICKS_TITLE[lang] || PICKS_TITLE.en)(collection.name, facts.count, `${sym}${facts.minPrice.toFixed(2)}`)
+      : null;
+  const title = `${factsTitle || metaTitleBase} | ${rtl ? 'שופלי' : 'Shopli'}`;
   const description = content
     ? get(content.metaDesc)
     : collection.metaDesc
       ? get(collection.metaDesc)
-      : collection.desc;
+      : facts
+        ? `${collection.desc}. ${sym}${facts.minPrice.toFixed(2)}–${sym}${facts.maxPrice.toFixed(2)}, ${facts.count} picks.`.replace('..', '.')
+        : collection.desc;
   const headline = content ? get(content.h1) : collection.name;
   const ogImage = getCollectionOgImage(collection.slug, metaTitleBase, lang);
 
-  const allProducts = (sections || []).flatMap((s: any) => s.products || []);
   const structuredData: Record<string, unknown>[] = [];
 
   // BreadcrumbList: Home > Categories > Collection (Hebrew when rtl)
@@ -184,29 +214,41 @@ export default function CollectionPage({ region, config, collection, content, se
           </p>
         )}
 
+        {!content && (
+          <CollectionGlance
+            products={allProducts}
+            name={collection.name}
+            lang={lang}
+            currencySymbol={sym}
+            region={region}
+          />
+        )}
+
         {sections.map((section: any, i: number) => (
           <section
             key={i}
             className={`py-8 ${i % 2 === 1 ? 'bg-white' : 'bg-[#FFF4E4]/50'} -mx-4 sm:-mx-6 px-4 sm:px-6`}
           >
             <div className="max-w-7xl mx-auto">
-              <div className="grid md:grid-cols-2 gap-6 items-start">
-                <div>
+              <div className={content ? 'grid md:grid-cols-2 gap-6 items-start' : ''}>
+                <div className={content ? '' : 'mb-4'}>
                   <h2
                     className="text-xl font-bold mb-2"
                     style={{ color: 'var(--shopli-navy)' }}
                   >
                     {section.heading}
                   </h2>
-                  <p
-                    className="text-sm leading-relaxed"
-                    style={{ color: 'var(--shopli-warm-gray)' }}
-                  >
-                    {section.body}
-                  </p>
+                  {section.body && (
+                    <p
+                      className="text-sm leading-relaxed"
+                      style={{ color: 'var(--shopli-warm-gray)' }}
+                    >
+                      {section.body}
+                    </p>
+                  )}
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {section.products.slice(0, 4).map((p: any) => (
+                <div className={content ? 'grid grid-cols-2 gap-3' : 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3'}>
+                  {section.products.slice(0, content ? 4 : 8).map((p: any) => (
                     <ProductCard
                       key={p.id}
                       product={p}
@@ -219,6 +261,7 @@ export default function CollectionPage({ region, config, collection, content, se
                       showShare
                       showCompareLink
                       compact
+                      dealButton
                     />
                   ))}
                 </div>
@@ -266,6 +309,16 @@ export default function CollectionPage({ region, config, collection, content, se
               ))}
             </ul>
           </section>
+        )}
+
+        {related && (
+          <RelatedReads
+            links={related.links}
+            siblings={related.siblings}
+            themeName={related.themeName}
+            region={region}
+            lang={lang}
+          />
         )}
 
         <section className="py-6 border-t border-[#141414]">
@@ -337,9 +390,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
       const { searchCollection: sc } = await import('../../../lib/aliexpress');
       const products = await sc(region, coll.keywords, 8);
       if (products.length > 0) {
+        // The H1 and intro above already carry the name and description;
+        // repeating both as this section's H2 was the whole page twice.
         sections.push({
-          heading: resolvedCollection.name,
-          body: resolvedCollection.desc || '',
+          heading: PICKS_HEADING[lang] || PICKS_HEADING.en,
+          body: '',
           products,
         });
       }
@@ -361,6 +416,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
         rtl: config?.direction === 'rtl',
         noindex,
         byline: content ? collectionByline(content.published, lang) : null,
+        related: buildRelated(slug, region, lang),
         error: null,
       },
     };
@@ -378,3 +434,31 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
     };
   }
 };
+/** Guides, comparisons and same-theme collections to link from a collection page. */
+function buildRelated(slug: string, region: string, lang: string) {
+  const pick = (obj: any) => obj?.[lang] || obj?.en || '';
+  const { blog, compare } = relatedForCollection(slug);
+  const links: RelatedLink[] = [];
+  for (const b of blog) {
+    const post = getBlogPost(b);
+    if (post && isBlogPostInRegion(b, region)) {
+      links.push({ href: `/${region}/blog/${b}`, title: pick(post.title), kind: 'guide' });
+    }
+  }
+  for (const c of compare) {
+    const cmp = getComparison(c);
+    if (cmp) links.push({ href: `/${region}/compare/${c}`, title: pick(cmp.title), kind: 'compare' });
+  }
+  const theme = themeForCollection(slug);
+  const siblings = (theme?.slugs || [])
+    .filter((s) => s !== slug)
+    .map((s) => getCollection(s))
+    .filter(Boolean)
+    .slice(0, 8)
+    .map((c: any) => ({ slug: c.slug, name: pick(c.name) || pick(c.tag) || c.slug }));
+  return {
+    links: links.slice(0, 6),
+    siblings,
+    themeName: theme ? themeLabel(theme.key, lang) : '',
+  };
+}
