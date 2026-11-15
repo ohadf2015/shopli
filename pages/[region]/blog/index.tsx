@@ -54,7 +54,7 @@ export default function BlogIndexPage({ region, config, posts, rtl }: any) {
                        (rtl ? 'טיפים' : 'Tips')}
                     </span>
                     <time className="text-xs" style={{ color: 'var(--shopli-warm-gray)' }} dateTime={post.publishDate}>
-                      {new Date(post.publishDate).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      {new Date(post.publishDate).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
                     </time>
                   </div>
                   <Link href={`/${region}/blog/${post.slug}`}>
