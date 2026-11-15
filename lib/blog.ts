@@ -1,6 +1,8 @@
 // Blog posts — SEO/GEO content for organic traffic
 // Each post has: intro, sections, FAQ, JSON-LD, target keywords
 
+import type { BlogPick } from './blog-picks';
+
 export interface BlogPost {
   slug: string;
   title: { [lang: string]: string };
@@ -9,7 +11,10 @@ export interface BlogPost {
   sections: { heading: { [lang: string]: string }; body: { [lang: string]: string } }[];
   faq: { q: { [lang: string]: string }; a: { [lang: string]: string } }[];
   keywords: string[];
-  relatedProducts: { name: string; keyword: string }[];
+  /** Resolved to live listings on render; see lib/blog-picks.ts for minPriceUsd. */
+  relatedProducts: BlogPick[];
+  /** Other guides to link to, by slug. Ones not published in the region are skipped. */
+  relatedPosts?: string[];
   publishDate: string; // ISO
   category: 'buying-guide' | 'comparison' | 'seasonal' | 'tips';
   /**
@@ -986,6 +991,340 @@ export const blogPosts: BlogPost[] = [
       { name: 'OLED Display', keyword: 'oled display i2c 0.96 inch' },
     ],
     publishDate: '2026-08-08',
+    category: 'buying-guide',
+  },
+  {
+    slug: 'best-power-bank-guide-2026',
+    title: {
+      en: "Best Power Bank for Your Phone, Laptop or Flight (2026 Buying Guide)",
+      he: "איזה מטען נייד לקנות? מדריך לבחירת סוללת גיבוי לטלפון, למחשב ולטיסה (2026)",
+      fr: "Quelle batterie externe choisir pour téléphone, PC portable ou avion (2026)",
+      de: "Welche Powerbank für Handy, Laptop oder Flug? Kaufberatung 2026",
+      es: "Qué batería externa comprar para móvil, portátil o avión (Guía 2026)",
+      it: "Quale power bank comprare per telefono, portatile o volo (Guida 2026)",
+    },
+    metaDesc: {
+      en: "Why a 20,000 mAh power bank gives about 13,000 mAh, which wattage you need for a laptop, the 100 Wh flight rule, and the listings to skip.",
+      he: "למה מטען נייד של 20,000mAh נותן בערך 13,000, כמה וואט צריך למחשב נייד, חוק ה-100Wh בטיסות ומה של אל על, ואילו מודעות לדלג עליהן.",
+      fr: "Pourquoi 20 000 mAh donnent environ 13 000 mAh, quelle puissance pour un portable, la règle des 100 Wh en avion et les annonces à éviter.",
+      de: "Warum 20.000 mAh nur rund 13.000 mAh liefern, wie viel Watt ein Laptop braucht, die 100-Wh-Regel im Flugzeug und welche Angebote Sie meiden sollten.",
+      es: "Por qué 20.000 mAh dan unos 13.000 mAh, qué potencia necesita un portátil, la regla de 100 Wh en avión y qué anuncios evitar.",
+      it: "Perché 20.000 mAh ne danno circa 13.000, quanti watt servono per un portatile, la regola dei 100 Wh in volo e gli annunci da evitare.",
+    },
+    intro: {
+      en: "The number printed on a power bank is not the number you get. Capacity is rated at the cell's 3.7 V, your phone charges at 5 V or more, and the conversion loses some on top. Anker, which makes a lot of them, puts the real yield at roughly 55-70% of the label. That one fact explains most disappointed reviews, and it decides which size you actually need. Here is how to pick by what you will charge and where you will take it.",
+      he: "המספר שמודפס על מטען נייד הוא לא מה שמקבלים בפועל. הקיבולת נמדדת במתח של התא (3.7V), הטלפון נטען ב-5V ומעלה, ובהמרה הולך עוד קצת לאיבוד. Anker, אחת היצרניות הגדולות, מעריכה את התפוקה האמיתית בכ-55-70% מהמספר על התווית. העובדה הזאת מסבירה את רוב הביקורות המאוכזבות, והיא גם מה שקובע איזה גודל באמת צריך. ככה בוחרים לפי מה שתטענו ולאן תיקחו אותו.",
+      fr: "Le chiffre imprimé sur une batterie externe n'est pas celui que vous obtenez : la capacité est mesurée à 3,7 V, le téléphone se charge à 5 V ou plus, et la conversion perd encore un peu. Comptez 55 à 70 % de l'étiquette.",
+      de: "Die aufgedruckte Kapazität ist nicht das, was ankommt: Sie gilt bei 3,7 V Zellspannung, das Handy lädt mit 5 V oder mehr, und die Umwandlung kostet zusätzlich. Rechnen Sie mit 55-70 % des Etiketts.",
+      es: "La cifra impresa en una batería externa no es la que obtienes: la capacidad se mide a 3,7 V, el móvil carga a 5 V o más y la conversión pierde algo más. Cuenta con un 55-70 % de la etiqueta.",
+      it: "Il numero stampato su un power bank non è quello che ottieni: la capacità è misurata a 3,7 V, il telefono si carica a 5 V o più e la conversione perde ancora qualcosa. Conta sul 55-70% dell'etichetta.",
+    },
+    sections: [
+      {
+        heading: { en: '1. Capacity: what 10,000 and 20,000 mAh really give you', he: '1. קיבולת: מה באמת נותנים 10,000 ו-20,000 מיליאמפר' },
+        body: {
+          en: "A 20,000 mAh bank holds about 74 Wh. After conversion that is roughly 11,000-14,000 mAh at the USB port, which Anker translates to 3-4 full charges of a phone with a 3,500 mAh battery, or 2-3 of a 5,000 mAh one. A 10,000 mAh bank gives about half that: one to one and a half charges of a big phone. Weight is the trade: Anker lists typical 20,000 mAh banks at 350-530 g, about a full can of soda in your bag. Pick 10,000 mAh if it lives in a pocket and tops you up by evening; pick 20,000 mAh for a weekend away, a long travel day or two phones.",
+          he: "מטען של 20,000mAh מחזיק בערך 74 ואט-שעה. אחרי ההמרה זה בערך 11,000-14,000 מיליאמפר ביציאת ה-USB, ש-Anker מתרגמת ל-3-4 טעינות מלאות של טלפון עם סוללה של 3,500mAh, או 2-3 טעינות של סוללה של 5,000mAh. מטען של 10,000 נותן בערך חצי מזה: טעינה אחת עד אחת וחצי של טלפון גדול. המחיר הוא משקל: Anker מציינת שמטען 20,000 טיפוסי שוקל 350-530 גרם, בערך כמו פחית שתייה מלאה בתיק. 10,000 אם הוא גר בכיס ורק צריך להחזיק עד הערב; 20,000 לסוף שבוע, ליום נסיעות ארוך או לשני טלפונים.",
+        },
+      },
+      {
+        heading: { en: '2. Watts: 22.5 W for phones, 45-65 W for laptops', he: '2. וואטים: 22.5W לטלפון, 45-65W למחשב נייד' },
+        body: {
+          en: "Capacity says how much, wattage says how fast. A 20-22.5 W USB-C PD output fast-charges almost any phone, and it is what most budget banks offer. A laptop is different: it needs a USB-C PD output close to what its own charger delivers, usually 45-65 W for thin laptops. A 22.5 W bank will charge a laptop slowly at best, or refuse. If you want one bank for both, look for 65 W or more on the USB-C port itself, not the total of all ports added up. A built-in cable is worth having on a pocket bank: it is the cable you will not forget.",
+          he: "הקיבולת אומרת כמה, הוואטים אומרים כמה מהר. יציאת USB-C PD של 20-22.5W טוענת מהר כמעט כל טלפון, וזה מה שרוב המטענים הזולים מציעים. מחשב נייד זה סיפור אחר: הוא צריך יציאת USB-C PD קרובה למה שהמטען שלו נותן, בדרך כלל 45-65W במחשבים דקים. מטען של 22.5W יטען מחשב לאט במקרה הטוב, או שלא יטען בכלל. אם רוצים מטען אחד לשניהם, מחפשים 65W ומעלה על יציאת ה-USB-C עצמה, לא סך כל היציאות יחד. במטען כיס כדאי כבל מובנה: זה הכבל שלא תשכחו בבית.",
+        },
+      },
+      {
+        heading: { en: '3. Flying with a power bank: the 100 Wh line', he: '3. מטען נייד בטיסה: הקו של 100Wh' },
+        body: {
+          en: "Power banks go in your carry-on, never in checked luggage. The FAA allows banks up to 100 Wh without asking, 101-160 Wh only with the airline's approval, and nothing above 160 Wh. To get Wh, multiply mAh by 3.7 and divide by 1,000: 20,000 mAh is 74 Wh, 25,000 mAh is about 92 Wh, both under the line. Airlines can be stricter. El Al announced in February 2026 that each passenger may carry one power bank up to 100 Wh, that boarding is refused if the Wh rating is not clearly marked, and that using or charging it during the flight is banned. The practical rule: buy a bank with the Wh number printed on the case, and check your airline before you fly.",
+          he: "מטען נייד עולה איתכם לתא, אף פעם לא במזוודה הנשלחת. לפי ה-FAA מותר מטען עד 100 ואט-שעה בלי לשאול, 101-160 רק באישור חברת התעופה, ומעל 160 בכלל לא. כדי לחשב ואט-שעה מכפילים את המיליאמפר ב-3.7 ומחלקים ב-1,000: מטען של 20,000 הוא 74Wh, ושל 25,000 בערך 92Wh, שניהם מתחת לקו. חברות תעופה יכולות להחמיר. אל על הודיעה בפברואר 2026 שכל נוסע רשאי להעלות מטען נייד אחד עד 100Wh, שלא יאפשרו לעלות לטיסה אם הדירוג ב-Wh לא מסומן בבירור, ושאסור להשתמש בו או להטעין אותו במהלך הטיסה. הכלל המעשי: קונים מטען שה-Wh מודפס עליו, ובודקים את הכללים של חברת התעופה לפני הטיסה.",
+        },
+      },
+      {
+        heading: { en: '4. Magnetic wireless banks: convenient, not efficient', he: '4. מטענים מגנטיים אלחוטיים: נוחים, לא יעילים' },
+        body: {
+          en: "A magnetic bank that snaps onto the back of an iPhone is the most convenient kind there is: no cable, and you can keep using the phone. The price is efficiency. Wireless charging turns more of the energy into heat than a cable does, so the same 10,000 mAh fills your phone less, and both get warm. Treat a magnetic bank as an emergency top-up you will actually carry, and keep a cabled bank for trips.",
+          he: "מטען מגנטי שנצמד לגב האייפון הוא הסוג הכי נוח שיש: בלי כבל, ואפשר להמשיך להשתמש בטלפון. המחיר הוא יעילות. טעינה אלחוטית הופכת יותר מהאנרגיה לחום מאשר כבל, כך שאותם 10,000 מיליאמפר ממלאים את הטלפון פחות, ושניהם מתחממים. תתייחסו למטען מגנטי כגיבוי לשעת חירום שבאמת תיקחו איתכם, ולנסיעות תשאירו מטען עם כבל.",
+        },
+      },
+      {
+        heading: { en: '5. Listings to skip', he: '5. מודעות שכדאי לדלג עליהן' },
+        body: {
+          en: "Two traps show up in power bank searches. First, empty shells: \"power bank case\" listings for 18650 cells are a box without batteries. One sat third in our own search for 20,000 mAh banks on November 15, at a price no real 20,000 mAh bank could match. Second, impossible capacity: if 20,000 mAh banks weigh 350-530 g, a slim 30,000 mAh bank at a fraction of that weight does not add up. Buy from a brand's official store, check that weight and Wh are stated, and be suspicious of any capacity that looks too good for the price.",
+          he: "בחיפוש מטענים ניידים מופיעות שתי מלכודות. הראשונה, מארזים ריקים: מודעות של \"מארז סוללת גיבוי\" לתאי 18650 מוכרות קופסה בלי סוללות. מודעה כזאת הופיעה במקום השלישי בחיפוש שלנו אחרי מטענים של 20,000 ב-15 בנובמבר, במחיר שאף מטען אמיתי של 20,000 לא מגיע אליו. השנייה, קיבולת בלתי אפשרית: אם מטענים של 20,000 שוקלים 350-530 גרם, מטען דק של 30,000 שוקל שבריר מזה פשוט לא מסתדר. קונים מחנות רשמית של המותג, בודקים שהמשקל וה-Wh כתובים, וחושדים בכל קיבולת שנראית טובה מדי למחיר.",
+        },
+      },
+      {
+        heading: { en: 'What it costs', he: 'כמה זה עולה' },
+        body: {
+          en: "On November 15, 20,000 mAh, 22.5 W banks from brand stores (Toocki, Essager and QOOVI) listed between ₪50 and ₪82 shipped to Israel, roughly $14-23. Laptop-grade 65 W banks and magnetic banks cost more. The cards below show today's price for your region.",
+          he: "ב-15 בנובמבר מטענים של 20,000mAh ו-22.5W מחנויות של מותגים (Toocki, Essager ו-QOOVI) הוצעו ב-50 עד 82 ש\"ח עם משלוח לישראל, הרבה מתחת לרף ה-75$ של פטור המע\"מ. מטענים של 65W למחשב ומטענים מגנטיים עולים יותר. הכרטיסים כאן מציגים את המחיר של היום.",
+        },
+      },
+    ],
+    faq: [
+      {
+        q: { en: 'How many times will a 20,000 mAh power bank charge my phone?', he: 'כמה פעמים מטען של 20,000mAh יטען לי את הטלפון?' },
+        a: {
+          en: "About 3-4 times for a phone with a 3,500 mAh battery and 2-3 times for one with 5,000 mAh, because only 55-70% of the rated capacity reaches the phone.",
+          he: "בערך 3-4 פעמים לטלפון עם סוללה של 3,500mAh ו-2-3 פעמים לטלפון עם 5,000mAh, כי רק 55-70% מהקיבולת המוצהרת מגיעים לטלפון.",
+        },
+      },
+      {
+        q: { en: 'Can I take a 20,000 mAh power bank on a plane?', he: 'אפשר לעלות לטיסה עם מטען של 20,000mAh?' },
+        a: {
+          en: "Yes, in your carry-on. 20,000 mAh is about 74 Wh, under the 100 Wh limit. It can never go in checked luggage, and some airlines are stricter: El Al allows one bank per passenger, requires the Wh rating to be clearly marked and bans using it during the flight.",
+          he: "כן, בתיק היד. 20,000mAh הם בערך 74Wh, מתחת למגבלה של 100Wh. במזוודה הנשלחת אסור בשום מקרה, ויש חברות שמחמירות: באל על מותר מטען אחד לנוסע, הדירוג ב-Wh חייב להיות מסומן בבירור, ואסור להשתמש בו בזמן הטיסה.",
+        },
+      },
+      {
+        q: { en: 'Can a power bank charge a laptop?', he: 'מטען נייד יכול לטעון מחשב נייד?' },
+        a: {
+          en: "Only if its USB-C PD output is close to what the laptop's own charger delivers, usually 45-65 W. A 22.5 W phone bank will charge a laptop slowly or not at all.",
+          he: "רק אם יציאת ה-USB-C PD שלו קרובה למה שהמטען של המחשב נותן, בדרך כלל 45-65W. מטען טלפון של 22.5W יטען מחשב לאט מאוד, או בכלל לא.",
+        },
+      },
+      {
+        q: { en: 'Is a magnetic power bank worth it?', he: 'שווה לקנות מטען נייד מגנטי?' },
+        a: {
+          en: "For convenience, yes: it is the one you will carry. For capacity, no: wireless charging loses more energy as heat, so a cabled bank of the same size gives your phone more.",
+          he: "בשביל הנוחות, כן: זה המטען שבאמת תסחבו. בשביל קיבולת, לא: בטעינה אלחוטית הולכת יותר אנרגיה לחום, אז מטען עם כבל באותו גודל ייתן לטלפון יותר.",
+        },
+      },
+    ],
+    keywords: ['best power bank', 'power bank 20000mAh', 'power bank for laptop', 'power bank flight rules 100Wh', 'מטען נייד', 'סוללה ניידת', 'פאוור בנק', 'מטען נייד לטיסה'],
+    relatedProducts: [
+      { name: '10,000 mAh, built-in cable', label: { en: '10,000 mAh, built-in cable', he: '10,000 עם כבל מובנה' }, keyword: 'power bank 10000mAh 22.5W built in cable', minPriceUsd: 8 },
+      { name: '20,000 mAh, 22.5 W', label: { en: '20,000 mAh, 22.5 W', he: '20,000 ו-22.5W' }, keyword: 'power bank 20000mAh 22.5W fast charging', minPriceUsd: 10 },
+      { name: 'Magnetic wireless', label: { en: 'Magnetic wireless', he: 'מגנטי אלחוטי' }, keyword: 'magnetic power bank 10000mAh wireless charging', minPriceUsd: 10 },
+      { name: 'Laptop, 65 W+', label: { en: 'Laptop, 65 W+', he: 'למחשב נייד, 65W ומעלה' }, keyword: 'power bank 20000mAh 65W laptop', minPriceUsd: 20 },
+    ],
+    relatedPosts: ['travel-hacks-gadgets-packing', 'aliexpress-israel-customs-vat'],
+    publishDate: '2026-11-15',
+    category: 'buying-guide',
+  },
+  {
+    slug: 'mini-projector-buying-guide-hy300',
+    title: {
+      en: "Mini Projector Buying Guide: What \"4K, 8000 Lumens\" Really Means (HY300 and Up)",
+      he: "מקרן ביתי זול: מה באמת מקבלים מ-\"4K ו-8000 לומן\" (מדריך HY300 ומעלה)",
+      fr: "Mini vidéoprojecteur : ce que « 4K, 8000 lumens » veut vraiment dire (HY300 et plus)",
+      de: "Mini-Beamer Kaufberatung: Was „4K, 8000 Lumen“ wirklich bedeutet (HY300 und mehr)",
+      es: "Guía de mini proyectores: qué significa de verdad «4K, 8000 lúmenes» (HY300 y más)",
+      it: "Guida ai mini proiettori: cosa significa davvero «4K, 8000 lumen» (HY300 e oltre)",
+    },
+    metaDesc: {
+      en: "The HY300 Pro is native 720p at about 200-290 ANSI lumens, not 4K. Who it suits, when to pay for native 1080p, and what to check before you buy.",
+      he: "ה-HY300 Pro הוא 720p מקורי עם כ-200-290 לומן ANSI, לא 4K. למי הוא מתאים, מתי שווה לשלם על 1080p מקורי, ומה לבדוק לפני שקונים.",
+      fr: "Le HY300 Pro est en 720p natif avec environ 200-290 lumens ANSI, pas en 4K. Pour qui, quand payer le 1080p natif, et quoi vérifier.",
+      de: "Der HY300 Pro hat nativ 720p und rund 200-290 ANSI-Lumen, nicht 4K. Für wen er passt, wann sich natives 1080p lohnt und was Sie prüfen sollten.",
+      es: "El HY300 Pro es 720p nativo con unos 200-290 lúmenes ANSI, no 4K. Para quién es, cuándo pagar por 1080p nativo y qué comprobar.",
+      it: "L'HY300 Pro è 720p nativo con circa 200-290 lumen ANSI, non 4K. Per chi è, quando pagare il 1080p nativo e cosa controllare.",
+    },
+    intro: {
+      en: "One of the best-selling cheap projectors on AliExpress, the Magcubic HY300 Pro, is sold under titles with \"8K\" and \"8000 lumens\" in them. The same titles also say \"1280*720P\" and \"290ANSI\", and that second pair is the one to believe. Magcubic's own comparison lists the HY300 series as native 720p at 200 ANSI lumens. None of this makes it a bad buy. It makes it a dark-room projector for 60-80 inch pictures, and this guide is about knowing that before you pay, and about when to spend more.",
+      he: "אחד המקרנים הזולים הנמכרים ביותר באליאקספרס, Magcubic HY300 Pro, נמכר בכותרות עם \"8K\" ו-\"8000 לומן\". באותן כותרות כתוב גם \"1280*720P\" ו-\"290ANSI\", ובצמד השני צריך להאמין. בהשוואה של Magcubic עצמה סדרת HY300 מופיעה כ-720p מקורי עם 200 לומן ANSI. זה לא הופך אותו לקנייה גרועה. זה הופך אותו למקרן לחדר חשוך ולתמונה של 60-80 אינץ', והמדריך הזה עוזר לדעת את זה לפני שמשלמים, ולהבין מתי שווה להוסיף.",
+      fr: "L'un des mini projecteurs les plus vendus sur AliExpress, le Magcubic HY300 Pro, affiche « 8K » et « 8000 lumens » dans ses titres, qui précisent aussi « 1280*720P » et « 290ANSI ». C'est cette deuxième paire qu'il faut croire.",
+      de: "Einer der meistverkauften Mini-Beamer auf AliExpress, der Magcubic HY300 Pro, wirbt mit „8K“ und „8000 Lumen“. Dieselben Titel nennen auch „1280*720P“ und „290ANSI“, und diesen Angaben sollten Sie glauben.",
+      es: "Uno de los mini proyectores más vendidos de AliExpress, el Magcubic HY300 Pro, se anuncia con «8K» y «8000 lúmenes». Los mismos títulos dicen también «1280*720P» y «290ANSI», y esa segunda pareja es la que hay que creer.",
+      it: "Uno dei mini proiettori più venduti su AliExpress, il Magcubic HY300 Pro, è pubblicizzato con «8K» e «8000 lumen». Gli stessi titoli dicono anche «1280*720P» e «290ANSI», ed è a questa seconda coppia che bisogna credere.",
+    },
+    sections: [
+      {
+        heading: { en: '1. Native resolution vs "supports 4K"', he: '1. רזולוציה מקורית מול "תומך 4K"' },
+        body: {
+          en: "\"Supports 4K\" or \"8K decoding\" means the projector accepts a 4K signal and scales it down to the pixels it actually has. Magcubic's own buying guide says as much: its 4K labels do not indicate native resolution. The number that decides sharpness is the native one, the 1280×720 or 1920×1080 that appears further down the spec list. At 720p, expect a softer picture than a 1080p TV, most of all in small text and subtitles.",
+          he: "\"תומך 4K\" או \"פענוח 8K\" אומר שהמקרן מקבל אות 4K ומקטין אותו לכמות הפיקסלים שיש לו באמת. גם המדריך של Magcubic אומר את זה: התוויות של 4K לא מעידות על הרזולוציה המקורית. המספר שקובע חדות הוא הרזולוציה המקורית, ה-1280×720 או 1920×1080 שמופיעים בהמשך רשימת המפרט. ב-720p התמונה רכה יותר מטלוויזיה של 1080p, ובעיקר רואים את זה בטקסט קטן ובכתוביות.",
+        },
+      },
+      {
+        heading: { en: '2. ANSI lumens: the only brightness number that counts', he: '2. לומן ANSI: מספר הבהירות היחיד שקובע' },
+        body: {
+          en: "\"8000 lumens\" is not measured to any standard. ANSI lumens are. Magcubic rates the HY300 Pro at 200 ANSI (listings say up to 290), the HY320 Pro at 400 ANSI with native 1080p, and the HY350 Max at 600 ANSI with native 1080p and autofocus, which it recommends for 80-120 inch pictures. In practice: around 200 ANSI wants a dark room and curtains; 400-600 ANSI starts to cope with a dim living room in the evening. Daylight viewing needs far more than anything in this price range.",
+          he: "\"8000 לומן\" לא נמדד לפי שום תקן. לומן ANSI כן. Magcubic מדרגת את ה-HY300 Pro ב-200 ANSI (במודעות כתוב עד 290), את ה-HY320 Pro ב-400 ANSI עם 1080p מקורי, ואת ה-HY350 Max ב-600 ANSI עם 1080p מקורי ופוקוס אוטומטי, שאותו היא ממליצה לתמונה של 80-120 אינץ'. בפועל: סביב 200 ANSI צריך חדר חשוך ווילונות; 400-600 ANSI כבר מתחילים להסתדר עם סלון באור עמום בערב. לצפייה באור יום צריך הרבה יותר ממה שיש בטווח המחירים הזה.",
+        },
+      },
+      {
+        heading: { en: '3. Who the HY300 Pro is for', he: '3. למי ה-HY300 Pro מתאים' },
+        body: {
+          en: "Magcubic pitches the HY300 series at dorms and small rooms, at 60-80 inches, and that is the honest brief: a kids' bedroom movie night, a film projected on the ceiling, casual streaming in a dark room. Focus on most HY300 models is manual, so expect to set it once per position. It is not the right buy for daytime sport, for gaming where lag matters, or as a TV replacement in a bright living room.",
+          he: "Magcubic מכוונת את סדרת HY300 למעונות ולחדרים קטנים, בתמונה של 60-80 אינץ', וזה התיאור ההוגן: ערב סרט בחדר הילדים, סרט על התקרה, צפייה מזדמנת בחדר חשוך. ברוב דגמי ה-HY300 הפוקוס ידני, כך שצריך לכוון אותו בכל פעם שמזיזים. זו לא הקנייה הנכונה לספורט באור יום, למשחקים שבהם השהיה משנה, או כתחליף לטלוויזיה בסלון מואר.",
+        },
+      },
+      {
+        heading: { en: '4. Streaming apps: plan on a stick', he: '4. אפליקציות סטרימינג: תתכננו סטרימר' },
+        body: {
+          en: "These projectors run their own Android builds, and Magcubic's comparison does not claim Netflix certification for any of them. If Netflix or Disney+ matter to you, budget for a certified streaming stick in the projector's HDMI port rather than counting on the built-in apps. It also gives you a remote and an interface you already know.",
+          he: "המקרנים האלה מריצים גרסאות אנדרואיד משלהם, וההשוואה של Magcubic לא טוענת לאישור Netflix לאף אחד מהם. אם נטפליקס או דיסני+ חשובים לכם, תתקצבו סטרימר מאושר שמתחבר ליציאת ה-HDMI של המקרן, במקום לסמוך על האפליקציות המובנות. ככה יש גם שלט וממשק שאתם כבר מכירים.",
+        },
+      },
+      {
+        heading: { en: '5. Screen or wall', he: '5. מסך או קיר' },
+        body: {
+          en: "At 200-300 ANSI every bit of reflected light counts. A smooth matte white or light grey wall works; a textured or coloured wall eats brightness and shows its pattern through the picture. A foldable projector screen costs little and gives a flatter, brighter image than most walls, and it is the cheapest upgrade you can make to a budget projector.",
+          he: "ב-200-300 ANSI כל טיפת אור שחוזרת משנה. קיר חלק בלבן או אפור בהיר מט עובד; קיר עם טקסטורה או צבע בולע בהירות והדוגמה שלו נראית דרך התמונה. מסך הקרנה מתקפל עולה מעט ונותן תמונה שטוחה ובהירה יותר מרוב הקירות, וזה השדרוג הזול ביותר למקרן תקציבי.",
+        },
+      },
+      {
+        heading: { en: 'What it costs', he: 'כמה זה עולה' },
+        body: {
+          en: "On November 15, the HY300 Pro listed at ₪171-220 from the Magcubic Flagship Store shipped to Israel, and at $47-67 across the top listings in the US. The native-1080p models with autofocus we found started near ₪700 (about $190) and came from stores with little or no sales history, so check the seller before paying that much. The cards below show today's price for your region.",
+          he: "ב-15 בנובמבר ה-HY300 Pro הוצע ב-171-220 ש\"ח מחנות Magcubic Flagship עם משלוח לישראל, מתחת לרף ה-75$ של פטור המע\"מ. הדגמים עם 1080p מקורי ופוקוס אוטומטי שמצאנו התחילו בסביבות 700 ש\"ח, כלומר מעל הרף, כך שיתווסף להם מע\"מ של 18%, והם הגיעו מחנויות עם מעט או בלי היסטוריית מכירות. כדאי לבדוק את המוכר לפני שמשלמים סכום כזה. הכרטיסים כאן מציגים את המחיר של היום.",
+        },
+      },
+    ],
+    faq: [
+      {
+        q: { en: 'Is the HY300 Pro really 4K?', he: 'ה-HY300 Pro באמת 4K?' },
+        a: {
+          en: "No. It accepts a 4K signal, but its native resolution is 1280×720 (720p). Magcubic's own comparison lists it as 720p.",
+          he: "לא. הוא מקבל אות 4K, אבל הרזולוציה המקורית שלו היא 1280×720 (720p). גם בהשוואה של Magcubic עצמה הוא מופיע כ-720p.",
+        },
+      },
+      {
+        q: { en: 'Can I watch a mini projector in daylight?', he: 'אפשר לצפות במקרן קטן באור יום?' },
+        a: {
+          en: "Not well. At around 200-300 ANSI lumens you need a dark room. Even 600 ANSI models are meant for a dim room, not a sunny one.",
+          he: "לא ממש. בסביבות 200-300 לומן ANSI צריך חדר חשוך. גם דגמים של 600 ANSI מיועדים לחדר עמום, לא לחדר שטוף שמש.",
+        },
+      },
+      {
+        q: { en: 'How big a picture can the HY300 Pro make?', he: 'כמה גדולה התמונה של ה-HY300 Pro?' },
+        a: {
+          en: "Magcubic recommends 60-80 inches for the HY300 series. It can throw bigger, but the image gets dimmer and softer as it grows.",
+          he: "Magcubic ממליצה על 60-80 אינץ' לסדרת HY300. אפשר להקרין גדול יותר, אבל התמונה נעשית חשוכה ורכה יותר ככל שהיא גדלה.",
+        },
+      },
+      {
+        q: { en: 'Does it play Netflix?', he: 'יש בו נטפליקס?' },
+        a: {
+          en: "Do not count on it. The maker does not claim Netflix certification, so the reliable route is a certified streaming stick in the HDMI port.",
+          he: "לא כדאי לסמוך על זה. היצרנית לא טוענת לאישור Netflix, אז הדרך הבטוחה היא סטרימר מאושר ביציאת ה-HDMI.",
+        },
+      },
+    ],
+    keywords: ['mini projector', 'HY300 projector review', 'cheap projector buying guide', 'ANSI lumens explained', 'מקרן', 'מקרן ביתי', 'מקרן זול', 'מקרן HY300'],
+    relatedProducts: [
+      { name: 'HY300 Pro (720p)', label: { en: 'HY300 Pro (720p)', he: 'HY300 Pro (720p)' }, keyword: 'HY300 Pro projector', minPriceUsd: 30 },
+      { name: 'Native 1080p, autofocus', label: { en: 'Native 1080p, autofocus', he: '1080p מקורי, פוקוס אוטומטי' }, keyword: 'projector native 1080P autofocus', minPriceUsd: 90 },
+      { name: 'Projector screen', label: { en: 'Projector screen', he: 'מסך הקרנה' }, keyword: 'projector screen 100 inch foldable', minPriceUsd: 5 },
+      { name: 'Projector stand', label: { en: 'Projector stand', he: 'מעמד למקרן' }, keyword: 'projector stand tripod adjustable', minPriceUsd: 5 },
+    ],
+    relatedPosts: ['budget-streaming-setup-guide', 'smart-home-beginners-guide'],
+    publishDate: '2026-11-15',
+    category: 'buying-guide',
+  },
+  {
+    slug: 'best-dash-cam-70mai-guide',
+    title: {
+      en: "Best Dash Cam for the Money (2026): 70mai M310 Plus vs A210 vs A810S",
+      he: "איזו מצלמת רכב לקנות? 70mai M310 Plus מול A210 מול A810S (2026)",
+      fr: "Meilleure dashcam qualité-prix (2026) : 70mai M310 Plus, A210 ou A810S",
+      de: "Beste Dashcam fürs Geld (2026): 70mai M310 Plus, A210 oder A810S",
+      es: "Mejor cámara para coche calidad-precio (2026): 70mai M310 Plus, A210 o A810S",
+      it: "Migliore dashcam qualità-prezzo (2026): 70mai M310 Plus, A210 o A810S",
+    },
+    metaDesc: {
+      en: "Three 70mai dash cams for three budgets: what each records, which have GPS and a rear camera, why a capacitor beats a battery in a hot car, and what parking mode needs.",
+      he: "שלוש מצלמות רכב של 70mai לשלושה תקציבים: מה כל אחת מצלמת, לאילו יש GPS ומצלמה אחורית, למה קבל עדיף על סוללה ברכב חם, ומה צריך למצב חניה.",
+      fr: "Trois dashcams 70mai pour trois budgets : résolution, GPS, caméra arrière, pourquoi un condensateur plutôt qu'une batterie, et ce qu'il faut pour le mode parking.",
+      de: "Drei 70mai-Dashcams für drei Budgets: Auflösung, GPS, Heckkamera, warum ein Kondensator besser ist als ein Akku und was der Parkmodus braucht.",
+      es: "Tres cámaras 70mai para tres presupuestos: resolución, GPS, cámara trasera, por qué un condensador es mejor que una batería y qué necesita el modo aparcamiento.",
+      it: "Tre dashcam 70mai per tre budget: risoluzione, GPS, telecamera posteriore, perché un condensatore è meglio di una batteria e cosa serve per la modalità parcheggio.",
+    },
+    intro: {
+      en: "A dash cam earns its price on one day: the day someone says the accident was your fault. Whether the footage helps then has less to do with \"4K\" on the box than with three things: whether it survives months in a hot parked car, whether it records where and how fast you were going, and whether it is recording while you are away from the car. 70mai, which sells through its own official store on AliExpress, covers all three budgets, so here are its three models compared on what matters.",
+      he: "מצלמת רכב מחזירה את המחיר שלה ביום אחד: היום שבו מישהו טוען שהתאונה הייתה באשמתכם. אם הצילום יעזור אז, זה פחות תלוי ב-\"4K\" על הקופסה ויותר בשלושה דברים: אם היא שורדת חודשים ברכב חונה בשמש, אם היא מתעדת איפה הייתם ובאיזו מהירות, ואם היא מצלמת גם כשאתם לא ברכב. ל-70mai, שמוכרת דרך חנות רשמית משלה באליאקספרס, יש דגם לכל תקציב, אז הנה שלושתם בהשוואה לפי מה שחשוב.",
+      fr: "Une dashcam se rentabilise le jour où quelqu'un dit que l'accident était de votre faute. Ce qui compte alors : tenir dans une voiture garée en plein soleil, enregistrer position et vitesse, et filmer quand vous n'êtes pas là.",
+      de: "Eine Dashcam zahlt sich an dem Tag aus, an dem jemand behauptet, der Unfall sei Ihre Schuld gewesen. Dann zählt: Hitzebeständigkeit im geparkten Auto, GPS für Ort und Tempo und ein Parkmodus.",
+      es: "Una cámara de coche se amortiza el día en que alguien dice que el accidente fue culpa tuya. Entonces importa que aguante el calor en el coche aparcado, que registre posición y velocidad y que grabe cuando no estás.",
+      it: "Una dashcam si ripaga il giorno in cui qualcuno dice che l'incidente è stata colpa tua. Allora conta che resista al caldo in auto parcheggiata, che registri posizione e velocità e che filmi quando non ci sei.",
+    },
+    sections: [
+      {
+        heading: { en: '1. Heat: capacitor, not battery', he: '1. חום: קבל, לא סוללה' },
+        body: {
+          en: "A car parked in summer sun gets hot enough to wear out a small lithium battery fast. Better dash cams use a supercapacitor instead, which only needs to hold enough charge to save the last file when you switch off. 70mai lists a supercapacitor for the A210, and the A810S also runs on a capacitor and is rated for -10°C to 60°C. If you park outside through an Israeli summer, treat this as the first spec to check.",
+          he: "רכב שחונה בשמש של קיץ מתחמם מספיק כדי לשחוק מהר סוללת ליתיום קטנה. מצלמות טובות יותר משתמשות במקום זה בקבל-על (סופר-קבל), שצריך רק להחזיק מספיק מטען כדי לשמור את הקובץ האחרון כשמכבים את הרכב. 70mai מציינת סופר-קבל ב-A210, וגם ה-A810S עובדת עם קבל ומדורגת לטמפרטורות של 10- עד 60 מעלות. אם הרכב חונה בחוץ בקיץ הישראלי, זה המפרט הראשון שבודקים.",
+        },
+      },
+      {
+        heading: { en: '2. 70mai M310 Plus 2K: the budget pick', he: '2. 70mai M310 Plus 2K: הבחירה התקציבית' },
+        body: {
+          en: "Records 2560×1440 at 30 fps through a 143° f/1.55 lens, takes microSD cards up to 256 GB and connects to the 70mai app over Wi-Fi. Its lens rotates 360°, so you can also mount it facing the rear windshield, though 70mai notes some cars need an extension cable for that. GPS is not listed. It listed at ₪104 (about $29) on November 15. Pick it if you want one front camera that does the basics well.",
+          he: "מצלמת 2560×1440 ב-30 פריימים לשנייה דרך עדשה של 143° ו-f/1.55, מקבלת כרטיסי microSD עד 256GB ומתחברת לאפליקציה של 70mai ב-Wi-Fi. העדשה מסתובבת 360°, כך שאפשר להתקין אותה גם מול השמשה האחורית, אם כי 70mai מציינת שבחלק מהרכבים צריך לשם כבל מאריך. GPS לא מופיע במפרט. ב-15 בנובמבר היא הוצעה ב-104 ש\"ח. מתאימה למי שרוצה מצלמה קדמית אחת שעושה את הבסיס טוב.",
+        },
+      },
+      {
+        heading: { en: '3. 70mai A210: GPS, and a rear camera when you want one', he: '3. 70mai A210: GPS, ומצלמה אחורית כשתרצו' },
+        body: {
+          en: "1080p front at 30 fps with HDR or 60 fps without, a 132° view, built-in GPS, Wi-Fi 6 and a supercapacitor. The RC21 rear camera is optional and sold separately, so you can start with the front and add the back later. GPS stamps your location and speed into the footage, which is what makes a clip useful as evidence. It listed at ₪146 (about $40) on November 15. Pick it if you want GPS without paying for 4K.",
+          he: "1080p מקדימה ב-30 פריימים עם HDR או 60 בלי, זווית של 132°, GPS מובנה, Wi-Fi 6 וסופר-קבל. המצלמה האחורית RC21 היא תוספת שנמכרת בנפרד, כך שאפשר להתחיל מקדימה ולהוסיף אחורית אחר כך. ה-GPS מטביע מיקום ומהירות בתוך הצילום, וזה מה שהופך קטע וידאו לראיה שימושית. ב-15 בנובמבר היא הוצעה ב-146 ש\"ח. מתאימה למי שרוצה GPS בלי לשלם על 4K.",
+        },
+      },
+      {
+        heading: { en: '4. 70mai A810S: 4K front and rear', he: '4. 70mai A810S: 4K מקדימה ומצלמה אחורית' },
+        body: {
+          en: "4K front on Sony's STARVIS 2 IMX678 sensor plus a 1080p rear camera on an IMX662, GPS, Wi-Fi 6, buffered parking mode and microSD cards up to 512 GB. The extra resolution is what helps read a plate a few cars ahead. DashCamTalk's review notes the rear video is not its strong point, the screen is not a touchscreen and the mount is adhesive only. The front-and-rear set listed at ₪350 (about $97) on November 15. Buy it from the 70mai Official Store: buyers on dash cam forums have asked about fake units on AliExpress.",
+          he: "4K מקדימה על חיישן STARVIS 2 IMX678 של סוני ועוד מצלמה אחורית 1080p על IMX662, GPS, Wi-Fi 6, מצב חניה עם שמירת הרגעים שלפני האירוע וכרטיסי microSD עד 512GB. הרזולוציה הנוספת היא מה שעוזר לקרוא לוחית רישוי כמה מכוניות קדימה. הסקירה של DashCamTalk מציינת שהצילום האחורי הוא לא החוזקה שלה, שהמסך לא מגע ושההתקנה רק בדבק. הסט קדמי ואחורי הוצע ב-350 ש\"ח ב-15 בנובמבר, מעל רף ה-75$, כך שבקופה יתווסף מע\"מ של 18%. קונים מהחנות הרשמית של 70mai: בפורומים של מצלמות רכב קונים שאלו על יחידות מזויפות באליאקספרס.",
+        },
+      },
+      {
+        heading: { en: '5. Parking mode needs power', he: '5. מצב חניה צריך חשמל' },
+        body: {
+          en: "A dash cam that only runs while the engine is on misses the scratch in the car park. Parking mode keeps it watching, and that needs constant power: 70mai says the A210's parking mode requires its hardwire kit, sold separately. 70mai also sells a kit that plugs into the car's OBD-II port, which listed at ₪63 on November 15, so there is no fuse-box work. Whichever kit you use, check that it has a low-voltage cut-off so it cannot drain the car battery.",
+          he: "מצלמה שעובדת רק כשהמנוע פועל מפספסת את השריטה בחניון. מצב חניה משאיר אותה ערה, וזה דורש חשמל קבוע: 70mai מציינת שמצב החניה של ה-A210 דורש ערכת חיבור קשיח שנמכרת בנפרד. 70mai מוכרת גם ערכה שמתחברת לשקע ה-OBD-II של הרכב, שהוצעה ב-63 ש\"ח ב-15 בנובמבר, כך שלא צריך לגעת בתיבת הנתיכים. באיזו ערכה שלא תבחרו, תוודאו שיש לה ניתוק במתח נמוך כדי שלא תרוקן את המצבר.",
+        },
+      },
+      {
+        heading: { en: '6. The memory card matters', he: '6. כרטיס הזיכרון חשוב' },
+        body: {
+          en: "A dash cam writes video nonstop, over and over, which wears out ordinary microSD cards. Use a high-endurance card made for continuous recording, stay within the camera's limit (256 GB for the M310 Plus and A210, 512 GB for the A810S), and check a clip now and then so you find out the card has failed before you need it.",
+          he: "מצלמת רכב כותבת וידאו בלי הפסקה, שוב ושוב, וזה שוחק כרטיסי microSD רגילים. משתמשים בכרטיס High Endurance שמיועד להקלטה רציפה, נשארים בגבול של המצלמה (256GB ב-M310 Plus וב-A210, 512GB ב-A810S), ובודקים קטע מדי פעם כדי לגלות שהכרטיס הרוס לפני שצריכים אותו.",
+        },
+      },
+    ],
+    faq: [
+      {
+        q: { en: 'Do I need a 4K dash cam?', he: 'צריך מצלמת רכב 4K?' },
+        a: {
+          en: "Not to record what happened in front of you; 2K and 1080p do that. 4K helps when you need to read a number plate further away. GPS and a capacitor matter more than resolution for most drivers.",
+          he: "לא כדי לתעד מה קרה מולכם; 2K ו-1080p עושות את זה. 4K עוזרת כשצריך לקרוא לוחית רישוי ממרחק גדול יותר. לרוב הנהגים GPS וקבל חשובים יותר מרזולוציה.",
+        },
+      },
+      {
+        q: { en: 'Does the 70mai A210 come with a rear camera?', he: 'ל-70mai A210 יש מצלמה אחורית?' },
+        a: {
+          en: "It supports one, but the RC21 rear camera is sold separately, according to 70mai.",
+          he: "היא תומכת באחת, אבל לפי 70mai המצלמה האחורית RC21 נמכרת בנפרד.",
+        },
+      },
+      {
+        q: { en: 'Will parking mode drain my car battery?', he: 'מצב חניה ירוקן לי את המצבר?' },
+        a: {
+          en: "It can if nothing stops it. Parking mode runs on a hardwire kit, so choose one with a low-voltage cut-off that switches the camera off before the battery gets too low to start the car.",
+          he: "יכול להיות, אם שום דבר לא עוצר אותו. מצב חניה עובד דרך ערכת חיבור קשיח, אז בוחרים ערכה עם ניתוק במתח נמוך שמכבה את המצלמה לפני שהמצבר יורד מתחת למה שצריך כדי להניע.",
+        },
+      },
+      {
+        q: { en: 'Will a dash cam from AliExpress cost more in Israel?', he: 'מצלמת רכב מאליאקספרס תעלה יותר בישראל?' },
+        a: {
+          en: "Only above $75. Under it there is no VAT on a personal import; above it 18% VAT applies, which on November 15 meant the A810S but not the M310 Plus or A210.",
+          he: "רק מעל 75$. מתחת לזה אין מע\"מ על יבוא אישי; מעליו חל מע\"מ של 18%, וב-15 בנובמבר זה נגע ל-A810S אבל לא ל-M310 Plus או ל-A210.",
+        },
+      },
+    ],
+    keywords: ['best dash cam', '70mai dash cam review', '70mai A810S', '70mai M310 Plus', '70mai A210', 'dash cam parking mode', 'מצלמת רכב', 'מצלמת דרך לרכב', 'מצלמת רכב מומלצת'],
+    relatedProducts: [
+      { name: '70mai M310 Plus 2K', label: { en: '70mai M310 Plus 2K', he: '70mai M310 Plus 2K' }, keyword: '70mai M310 Plus dash cam', minPriceUsd: 15 },
+      { name: '70mai A210 (GPS)', label: { en: '70mai A210 (GPS)', he: '70mai A210 עם GPS' }, keyword: '70mai A210 dash cam', minPriceUsd: 20 },
+      { name: '70mai A810S 4K', label: { en: '70mai A810S 4K', he: '70mai A810S 4K' }, keyword: '70mai A810S 4K dash cam', minPriceUsd: 50 },
+      { name: '70mai hardwire kit', label: { en: '70mai hardwire kit', he: 'ערכת חיבור קשיח 70mai' }, keyword: '70mai hardwire kit parking', minPriceUsd: 5 },
+      { name: 'High-endurance microSD', label: { en: 'High-endurance microSD', he: 'כרטיס microSD עמיד' }, keyword: 'high endurance microSD card dash cam', minPriceUsd: 5 },
+    ],
+    relatedPosts: ['travel-hacks-gadgets-packing', 'aliexpress-israel-customs-vat'],
+    publishDate: '2026-11-15',
     category: 'buying-guide',
   },
 ];

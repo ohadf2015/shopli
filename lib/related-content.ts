@@ -35,6 +35,9 @@ export const BLOG_COLLECTIONS: Record<string, string[]> = {
   'home-bar-starter-kit': ['home-bar'],
   'zero-waste-kitchen-swaps': ['zero-waste', 'kitchen'],
   'arduino-starter-kit-guide': ['maker-lab'],
+  'best-power-bank-guide-2026': ['phone-accessories', 'travel'],
+  'mini-projector-buying-guide-hy300': ['dorm-room', 'smart-home'],
+  'best-dash-cam-70mai-guide': ['car'],
 };
 
 /** Comparison article slug -> collection slugs that stock both sides. */

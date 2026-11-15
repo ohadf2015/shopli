@@ -5,10 +5,11 @@ import SeoHead from '../../../components/SeoHead';
 import ShareBar from '../../../components/ShareBar';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getBlogPost, isBlogPostInRegion } from '../../../lib/blog';
+import { pickCandidates, pickPageSize, BlogPick } from '../../../lib/blog-picks';
 import RelatedReads from '../../../components/RelatedReads';
 import { collectionLinks } from '../../../lib/related-links';
 import { collectionsForBlog } from '../../../lib/related-content';
-import { blogPostingJsonLd, breadcrumbJsonLd, faqJsonLd, SITE_URL } from '../../../lib/seo';
+import { blogPostingJsonLd, breadcrumbJsonLd, faqJsonLd, itemListJsonLd, SITE_URL } from '../../../lib/seo';
 import ProductCard, { ProductCardProduct } from '../../../components/ProductCard';
 import { searchAliExpress } from '../../../lib/aliexpress';
 import { filterQuality } from '../../../lib/quality';
@@ -16,7 +17,10 @@ import { getReviewCounts } from '../../../lib/review-store';
 import { cacheIfNotEmpty } from '../../../lib/cache';
 
 interface PickProduct extends ProductCardProduct {
+  /** What the card is captioned with, in the page's language. */
   pickName: string;
+  /** The pick's `name`, to tell which picks resolved. */
+  pickKey: string;
 }
 
 /**
@@ -44,11 +48,11 @@ function ShopThePicks({
   lang: string;
   currencySymbol: string;
   products?: PickProduct[];
-  items?: Array<{ name: string; keyword: string }>;
+  items?: BlogPick[];
 }) {
   if (!items?.length) return null;
   const resolved = products || [];
-  const unresolved = items.filter((it) => !resolved.some((p) => p.pickName === it.name));
+  const unresolved = items.filter((it) => !resolved.some((p) => p.pickKey === it.name));
 
   return (
     <div className="mt-6 p-4 sm:p-5 rounded-xl border border-orange-100 bg-orange-50/50">
@@ -87,7 +91,7 @@ function ShopThePicks({
               className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-white border border-orange-200 hover:border-orange-400 hover:shadow-sm transition-all"
               style={{ color: 'var(--shopli-orange)' }}
             >
-              {rp.name}
+              {rp.label?.[lang] || rp.name}
               <span aria-hidden="true">{rtl ? '←' : '→'}</span>
             </a>
           ))}
@@ -97,7 +101,7 @@ function ShopThePicks({
   );
 }
 
-export default function BlogPostPage({ region, config, post, rtl, regionOnly, pickProducts, error }: any) {
+export default function BlogPostPage({ region, config, post, rtl, regionOnly, pickProducts, relatedLinks, error }: any) {
   if (error) {
     return <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>Error: {error}</div>;
   }
@@ -128,6 +132,18 @@ export default function BlogPostPage({ region, config, post, rtl, regionOnly, pi
     // The guide already renders this Q&A; marking it up is what makes it
     // quotable by AI Overviews and assistants.
     faqJsonLd((p.faq || []).map((f: any) => ({ question: t(f.q), answer: t(f.a) }))),
+    // The picks as an ordered list, so "best X" answers can cite them in order.
+    pickProducts?.length
+      ? itemListJsonLd(
+          t(p.title),
+          pageUrl,
+          pickProducts.map((pp: PickProduct) => ({
+            name: pp.pickName,
+            url: `${SITE_URL}/${region}/product/${pp.id}`,
+            image: pp.imageUrl || undefined,
+          }))
+        )
+      : null,
   ].filter(Boolean);
 
   return (
@@ -233,6 +249,23 @@ export default function BlogPostPage({ region, config, post, rtl, regionOnly, pi
               />
             </section>
 
+            {relatedLinks?.length > 0 && (
+              <nav aria-label={rtl ? 'מדריכים קשורים' : 'Related buying guides'} className="pt-8">
+                <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--shopli-navy)' }}>
+                  {rtl ? 'מדריכים קשורים' : 'Related buying guides'}
+                </h2>
+                <ul className="space-y-2">
+                  {relatedLinks.map((l: { href: string; label: string }) => (
+                    <li key={l.href}>
+                      <Link href={l.href} className="text-orange-700 hover:underline text-sm">
+                        {l.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            )}
+
             <RelatedReads
               links={collectionLinks(collectionsForBlog(p.slug), region, lang)}
               region={region}
@@ -253,6 +286,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
   if (!isValidRegion(region)) return { notFound: true };
   const config = getRegion(region);
   const rtl = config.direction === 'rtl';
+  const lang = config.lang || 'en';
 
   // 404 rather than render: a country-specific post (import tax rules, say) is
   // wrong in the other locales, not merely untranslated.
@@ -265,18 +299,19 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
   // so this cannot stampede the rate limiter.
   const picks = (post.relatedProducts || []).slice(0, 6);
   const found = await Promise.all(
-    picks.map(async (pick: { name: string; keyword: string }) => {
-      const products = await searchAliExpress(pick.keyword, region, 6).catch(() => []);
+    picks.map(async (pick: BlogPick) => {
+      const products = await searchAliExpress(pick.keyword, region, pickPageSize(pick)).catch(() => []);
       // Best-quality of the top three results, not of all six: the API returns
       // them in relevance order and filterQuality re-sorts on quality alone, so
       // scoring the whole set can answer "adjustable dumbbells set" with the
-      // sixth-most relevant listing.
-      const best = filterQuality(products.slice(0, 3))[0];
+      // sixth-most relevant listing. A pick with a price floor drops the
+      // accessories under it first (lib/blog-picks.ts).
+      const best = filterQuality(pickCandidates(products, pick.minPriceUsd).slice(0, 3))[0];
       return best ? { pick, best } : null;
     })
   );
 
-  const resolved = found.filter(Boolean) as Array<{ pick: { name: string }; best: any }>;
+  const resolved = found.filter(Boolean) as Array<{ pick: BlogPick; best: any }>;
   // One query for real rating counts, for the products whose reviews we already
   // hold. Cards show nothing rather than a zero for the rest.
   const counts = await getReviewCounts(region, resolved.map((r) => r.best.id)).catch(() => ({}));
@@ -295,7 +330,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
     discount: best.discount,
     freeShipping: best.freeShipping,
     shopName: best.shopName,
-    pickName: pick.name,
+    pickName: pick.label?.[lang] || pick.name,
+    pickKey: pick.name,
   }));
 
   // Editorial content is stable, but these are live listings — and an empty
@@ -306,9 +342,19 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
     'public, s-maxage=3600, stale-while-revalidate=86400'
   );
 
+  const relatedLinks = [
+    // Guide-to-guide links only; links to collection pages are lib/related-content's job.
+    ...(post.relatedPosts || [])
+      .filter((s) => isBlogPostInRegion(s, region))
+      .map((s) => {
+        const rp = getBlogPost(s)!;
+        return { href: `/${region}/blog/${s}`, label: rp.title[lang] || rp.title.en };
+      }),
+  ];
+
   return {
     // regionOnly suppresses hreflang: the alternates would point at the eight
     // locales where this post 404s.
-    props: { region, config, post, rtl, regionOnly: !!post.regions, pickProducts },
+    props: { region, config, post, rtl, regionOnly: !!post.regions, pickProducts, relatedLinks },
   };
 };
