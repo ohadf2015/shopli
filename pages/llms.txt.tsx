@@ -4,6 +4,8 @@ import { getAllCollections } from '../lib/collections';
 import { blogPosts, type BlogPost } from '../lib/blog';
 import { comparisons } from '../lib/comparisons';
 import { ALL_REGIONS, getRegion } from '../lib/regions';
+import { MARKETPLACE_HOW_TOS } from '../lib/landed-url';
+import { IL_VAT_RATE, DUTY_FREE_THRESHOLD_USD } from '../lib/landed-cost';
 
 /**
  * llms.txt — the Markdown index assistants and AI crawlers read to find out
@@ -18,6 +20,11 @@ function buildLlmsTxt(): string {
   const guides = blogPosts.filter((p) => (p.category as string) !== 'draft');
   // A region-restricted post 404s under /eu, so link it where it actually lives.
   const guideUrl = (p: BlogPost) => `${SITE_URL}/${p.regions?.[0] || 'eu'}/blog/${p.slug}`;
+  // Israel is the main market and the only one with its own tools, yet every
+  // link below used to point at /eu. List the Hebrew pages by their Hebrew
+  // titles so an assistant answering a Hebrew question can find and cite them.
+  const ilGuides = guides.filter((p) => !p.regions || p.regions.includes('il'));
+  const he = (obj: any) => obj?.he || en(obj);
   const regionList = ALL_REGIONS.map((r) => {
     const cfg = getRegion(r.code);
     return `${r.code} (${r.label}, ${cfg.currency})`;
@@ -47,6 +54,15 @@ function buildLlmsTxt(): string {
     '## Buying guides',
     '',
     ...guides.map((p) => `- [${en(p.title)}](${guideUrl(p)}): ${en(p.metaDesc)}`),
+    '',
+    '## Israel (Hebrew, ILS)',
+    '',
+    `- [Shopli Israel](${SITE_URL}/il): Hebrew home page with live deals priced in shekels.`,
+    `- [Landed-cost calculator](${SITE_URL}/landed): the final price in Israel of an order from abroad, with VAT (${Math.round(IL_VAT_RATE * 100)}%) and the $${DUTY_FREE_THRESHOLD_USD} customs-exemption threshold.`,
+    ...MARKETPLACE_HOW_TOS.map(
+      (m) => `- [How to buy from ${m.nameEn} in Israel](${SITE_URL}${m.path}): shipping options, customs and VAT for orders to Israel.`
+    ),
+    ...ilGuides.map((p) => `- [${he(p.title)}](${SITE_URL}/il/blog/${p.slug}): ${he(p.metaDesc)}`),
     '',
     '## Comparisons',
     '',
