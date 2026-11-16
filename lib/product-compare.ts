@@ -27,6 +27,9 @@ export interface CompareSpecRow {
   bestIndex: number | null;
 }
 
+// Pasted product links: /item/123.html, /i/123.html, ?productIds=123
+const PRODUCT_URL_ID = /\/item\/(\d{5,20})|\/(\d{5,20})\.html|[?&]productIds?=(\d{5,20})/;
+
 export function parseCompareIds(idsParam: string | string[] | undefined): string[] {
   if (!idsParam) return [];
   const raw = Array.isArray(idsParam) ? idsParam.join(',') : idsParam;
@@ -35,6 +38,7 @@ export function parseCompareIds(idsParam: string | string[] | undefined): string
       raw
         .split(/[,|+\s]+/)
         .map((s) => s.trim())
+        .map((s) => s.match(PRODUCT_URL_ID)?.slice(1).find(Boolean) ?? s)
         .filter((s) => /^\d{5,20}$/.test(s))
     ),
   ].slice(0, MAX_COMPARE_PRODUCTS);

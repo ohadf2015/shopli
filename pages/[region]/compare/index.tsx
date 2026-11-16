@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
 import BrowseNext from '../../../components/BrowseNext';
+import CompareAddProduct from '../../../components/CompareAddProduct';
 import CompareAboveFoldExit from '../../../components/CompareAboveFoldExit';
 import WhatsAppShare from '../../../components/WhatsAppShare';
 import SeoHead from '../../../components/SeoHead';
@@ -71,13 +72,12 @@ export default function ProductComparePage({
   const [productIds, setProductIds] = useState(initialIds);
   const [shareUrl, setShareUrl] = useState(initialShareUrl);
   const [copied, setCopied] = useState(false);
-  const [idInput, setIdInput] = useState(initialIds.join(', '));
+  const [onlyDiffs, setOnlyDiffs] = useState(true);
   const [removing, setRemoving] = useState<string | null>(null);
 
   const initialIdsKey = initialIds.join(',');
   useEffect(() => {
     setProductIds(initialIds);
-    setIdInput(initialIds.join(', '));
     setShareUrl(initialShareUrl);
     setRemoving(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -161,14 +161,15 @@ export default function ProductComparePage({
     }
   }, [shareUrl]);
 
-  const applyIds = useCallback(() => {
-    const ids = parseCompareIds(idInput);
-    if (ids.length === 0) {
-      router.push(`/${region}/compare`);
-      return;
-    }
-    router.push(`/${region}/compare?ids=${encodeURIComponent(ids.join(','))}`);
-  }, [idInput, region, router]);
+  const addIds = useCallback(
+    (ids: string[]) => {
+      const next = [...new Set([...productIds, ...ids])].slice(0, MAX_COMPARE_PRODUCTS);
+      router.push(`/${region}/compare?ids=${encodeURIComponent(next.join(','))}`, undefined, {
+        scroll: false,
+      });
+    },
+    [productIds, region, router]
+  );
 
   const removeProduct = useCallback(
     (id: string) => {
@@ -187,6 +188,7 @@ export default function ProductComparePage({
   );
 
   const emptyState = products.length === 0;
+  const visibleRows = onlyDiffs && rows.some((r) => r.differs) ? rows.filter((r) => r.differs) : rows;
 
   // "Our pick": most differing-spec wins, price tie-break. Shown ABOVE the fold
   // (t_bc8dc5f7) — #16 buried it under the table and bounce stayed 97-99%.
@@ -272,55 +274,17 @@ export default function ProductComparePage({
           )}
         </div>
 
-        {/* ID input + keyword search shortcut */}
-        <div className="bg-white rounded-xl border border-[#141414]  p-4 sm:p-5 mb-8">
-          <label
-            htmlFor="compare-ids"
-            className="block text-xs font-semibold uppercase tracking-wider mb-2"
-            style={{ color: 'var(--shopli-warm-gray)' }}
-          >
-            {rtl
-              ? `מזהי מוצר AliExpress (2–${MAX_COMPARE_PRODUCTS}, מופרדים בפסיק)`
-              : `AliExpress product IDs (2–${MAX_COMPARE_PRODUCTS}, comma-separated)`}
-          </label>
-          <div className="flex flex-col sm:flex-row gap-2">
-            <input
-              id="compare-ids"
-              type="text"
-              value={idInput}
-              onChange={(e) => setIdInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && applyIds()}
-              placeholder="1005007001, 1005007002, 1005007003"
-              className="flex-1 min-w-0 px-3 py-2.5 text-sm rounded-lg border border-[#141414] focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-300"
-              style={{ color: 'var(--shopli-navy)' }}
-              dir="ltr"
-            />
-            <button
-              type="button"
-              onClick={applyIds}
-              className="btn-primary whitespace-nowrap min-h-[44px]"
-            >
-              <Icon name="search" size={16} />
-              {rtl ? 'השווה' : 'Compare'}
-            </button>
-          </div>
-          {error && (
-            <p className="mt-2 text-sm text-red-600" role="alert">
-              {error}
-            </p>
-          )}
-          <p className="mt-2 text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
-            {rtl
-              ? 'טיפ: חפשו מוצר בעמוד החיפוש, לחצו «השווה» על כרטיס, והוסיפו מזהים נוספים כאן.'
-              : 'Tip: search a product, hit Compare on a card, then add more IDs here.'}{' '}
-            <a
-              href={`/${region}/search`}
-              className="font-semibold underline"
-              style={{ color: 'var(--shopli-orange)' }}
-            >
-              {rtl ? 'לחיפוש מוצרים' : 'Search products'}
-            </a>
-          </p>
+        {/* Search-to-add (paste a link or an ID also works) */}
+        <div className="mb-8">
+          <CompareAddProduct
+            region={region}
+            rtl={rtl}
+            currencySymbol={config.currencySymbol}
+            currentIds={productIds}
+            onAdd={addIds}
+            error={error}
+            autoFocus={emptyState}
+          />
         </div>
 
         {emptyState && (
@@ -328,11 +292,11 @@ export default function ProductComparePage({
             region={region}
             rtl={rtl}
             surface="compare_tool"
-            deadLanding
+            deadLanding={!!error}
             valueLine={
               rtl
-                ? 'הזינו מזהים למעלה, או דלגו ישר לטרנדים / דילים / חיפוש — בלי לצאת מהאתר.'
-                : 'Paste IDs above, or skip straight to trending / deals / search — without leaving the site.'
+                ? 'חפשו מוצר למעלה, או דלגו ישר לטרנדים / דילים / חיפוש — בלי לצאת מהאתר.'
+                : 'Search a product above, or skip straight to trending / deals / search — without leaving the site.'
             }
           />
         )}
@@ -435,8 +399,8 @@ export default function ProductComparePage({
               style={{ color: 'var(--shopli-warm-gray)' }}
             >
               {rtl
-                ? `הזינו לפחות ${MIN_COMPARE_PRODUCTS} מזהי מוצר למעלה, או נסו דוגמה:`
-                : `Enter at least ${MIN_COMPARE_PRODUCTS} product IDs above, or try a sample:`}
+                ? `חפשו והוסיפו לפחות ${MIN_COMPARE_PRODUCTS} מוצרים למעלה, או נסו דוגמה:`
+                : `Search and add at least ${MIN_COMPARE_PRODUCTS} products above, or try a sample:`}
             </p>
             <a
               href={`/${region}/compare?ids=sample`}
@@ -509,6 +473,14 @@ export default function ProductComparePage({
                         >
                           <Icon name="package" size={36} />
                         </div>
+                      )}
+                      {bestPick?.product.id === p.id && (
+                        <span
+                          className="absolute bottom-2 start-2 text-[0.65rem] font-bold px-2 py-0.5 rounded-full"
+                          style={{ background: 'var(--shopli-orange)', color: 'var(--shopli-ink)' }}
+                        >
+                          {rtl ? 'הבחירה שלנו' : 'Our pick'}
+                        </span>
                       )}
                       {p.discount && (
                         <span
@@ -587,6 +559,21 @@ export default function ProductComparePage({
                     </div>
                   </div>
                 ))}
+                {products.length < MAX_COMPARE_PRODUCTS && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const el = document.getElementById('compare-add');
+                      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      el?.focus();
+                    }}
+                    className="snap-start shrink-0 w-[40vw] max-w-[160px] sm:w-auto sm:max-w-none min-h-[10rem] rounded-xl border-2 border-dashed border-[#141414] flex flex-col items-center justify-center gap-1 text-sm font-semibold hover:bg-[#FFF4E4]"
+                    style={{ color: 'var(--shopli-navy)' }}
+                  >
+                    <span className="text-2xl leading-none">+</span>
+                    {rtl ? 'הוסיפו מוצר' : 'Add product'}
+                  </button>
+                )}
               </div>
             </div>
 
@@ -595,6 +582,23 @@ export default function ProductComparePage({
               className="bg-white rounded-xl border border-[#141414]  overflow-hidden"
               aria-label={rtl ? 'טבלת השוואה' : 'Comparison table'}
             >
+              <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-[#141414]">
+                <h2 className="text-sm font-bold" style={{ color: 'var(--shopli-navy)' }}>
+                  {rtl ? 'השוואת מפרט' : 'Spec comparison'}
+                </h2>
+                <label
+                  className="inline-flex items-center gap-2 text-sm cursor-pointer select-none"
+                  style={{ color: 'var(--shopli-navy)' }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={onlyDiffs}
+                    onChange={(e) => setOnlyDiffs(e.target.checked)}
+                    className="w-4 h-4 accent-orange-500"
+                  />
+                  {rtl ? 'הצג רק הבדלים' : 'Show only differences'}
+                </label>
+              </div>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[480px] border-collapse text-sm">
                   <thead>
@@ -608,20 +612,25 @@ export default function ProductComparePage({
                       {products.map((p) => (
                         <th
                           key={p.id}
-                          className="bg-[#FFF4E4] text-start px-3 sm:px-4 py-3 font-semibold text-xs line-clamp-2 max-w-[10rem]"
+                          className="bg-[#FFF4E4] text-start px-3 sm:px-4 py-3 font-semibold text-xs align-top min-w-[9rem]"
                           style={{ color: 'var(--shopli-navy)' }}
                         >
-                          <span className="line-clamp-2">
-                            {p.title.length > 36
-                              ? p.title.slice(0, 33) + '…'
-                              : p.title}
+                          <span className="flex items-center gap-2">
+                            {p.imageUrl && (
+                              <img
+                                {...productImage(p.imageUrl, 80)}
+                                alt=""
+                                className="w-9 h-9 object-contain rounded bg-white shrink-0"
+                              />
+                            )}
+                            <span className="line-clamp-2">{p.title}</span>
                           </span>
                         </th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.map((row) => (
+                    {visibleRows.map((row) => (
                       <tr
                         key={row.key}
                         className={`border-b border-gray-50 last:border-0 ${
@@ -656,7 +665,7 @@ export default function ProductComparePage({
                               key={`${row.key}-${i}`}
                               className={`px-3 sm:px-4 py-3 ${
                                 row.differs ? 'font-medium' : ''
-                              } ${isBest ? 'text-teal-700' : ''}`}
+                              } ${isBest ? 'text-teal-700 font-bold bg-teal-50' : ''}`}
                               style={{
                                 color: isBest
                                   ? undefined
@@ -700,50 +709,6 @@ export default function ProductComparePage({
                 </span>
               </div>
             </section>
-
-            {/* CTA row */}
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {products.map((p) => (
-                <a
-                  key={`cta-${p.id}`}
-                  href={p.affiliateLink || '#'}
-                  target="_blank"
-                  rel="nofollow sponsored noopener noreferrer"
-                  className="flex items-center gap-3 p-3 rounded-xl border border-[#141414] bg-white hover:border-orange-200 hover:shadow-sm transition-all"
-                  data-product-id={p.id}
-                  data-product-title={p.title}
-                  data-price={p.price.toFixed(2)}
-                  data-currency={config.currencySymbol}
-                  data-category={p.category || ''}
-                >
-                  {p.imageUrl && (
-                    <img
-                      {...productImage(p.imageUrl, 120)}
-                      alt=""
-                      className="w-12 h-12 object-contain rounded-lg bg-[#FFF4E4] shrink-0"
-                    />
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <p
-                      className="text-xs font-semibold line-clamp-2"
-                      style={{ color: 'var(--shopli-navy)' }}
-                    >
-                      {p.title}
-                    </p>
-                    <p
-                      className="text-sm font-bold mt-0.5"
-                      style={{ color: 'var(--shopli-teal)' }}
-                    >
-                      {config.currencySymbol}
-                      {p.price.toFixed(2)}
-                    </p>
-                  </div>
-                  <span style={{ color: 'var(--shopli-orange)' }}>
-                    <Icon name={rtl ? 'chevron-left' : 'chevron-right'} size={16} />
-                  </span>
-                </a>
-              ))}
-            </div>
 
             {/* Share again at bottom for mobile */}
             <div className="mt-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-xl bg-orange-50/60 border border-orange-100">
@@ -835,7 +800,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
   if (productIds.length > 0) {
     try {
       const { getProductsByIds } = await import('../../../lib/aliexpress');
-      products = await getProductsByIds(productIds, region);
+            products = await getProductsByIds(productIds, region);
 
       // Never fabricate fallback products: an empty/failed API response must
       // surface as an error, not as fake items with dead affiliate links.
