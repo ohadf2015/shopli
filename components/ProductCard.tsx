@@ -302,6 +302,11 @@ export default function ProductCard({
           {showCompareLink && region && product.id && (
             <a
               href={`/${region}/compare?ids=${encodeURIComponent(product.id)}`}
+              onClick={() => {
+                try {
+                  sessionStorage.setItem('shopli:compare-from', location.pathname + location.search);
+                } catch {}
+              }}
               className="text-[0.65rem] font-semibold px-2 py-1 rounded-lg border border-[#141414] hover:border-orange-200 hover:bg-orange-50/40 transition-colors bg-white"
               style={{ color: 'var(--shopli-navy)' }}
             >

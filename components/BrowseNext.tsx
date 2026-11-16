@@ -1,9 +1,11 @@
 import Icon from './icons';
+import { makeTr } from '../lib/compare-i18n';
 import { trackCompareNextAction } from '../lib/analytics';
 
 interface BrowseNextProps {
   region: string;
   rtl: boolean;
+  lang?: string;
   /** Which compare surface is rendering the strip, for analytics. */
   surface: 'compare_tool' | 'compare_article';
 }
@@ -13,7 +15,8 @@ interface BrowseNextProps {
  * at 97-99% because every CTA on the page leaves the site (affiliate links) —
  * this gives them an obvious on-site next step (trending / search / deals).
  */
-export default function BrowseNext({ region, rtl, surface }: BrowseNextProps) {
+export default function BrowseNext({ region, rtl, lang, surface }: BrowseNextProps) {
+  const tr = makeTr(lang ?? (rtl ? 'he' : 'en'));
   const links: {
     href: string;
     target: 'trending' | 'search' | 'deals';
@@ -25,40 +28,38 @@ export default function BrowseNext({ region, rtl, surface }: BrowseNextProps) {
       href: `/${region}/trending`,
       target: 'trending',
       icon: 'fire',
-      title: rtl ? 'טרנדים עכשיו' : 'Trending now',
-      sub: rtl ? 'מה שכולם קונים השבוע' : 'What everyone is buying this week',
+      title: tr('Trending now', 'טרנדים עכשיו'),
+      sub: tr('What everyone is buying this week', 'מה שכולם קונים השבוע'),
     },
     {
       href: `/${region}/search`,
       target: 'search',
       icon: 'search',
-      title: rtl ? 'חיפוש מוצרים' : 'Search products',
-      sub: rtl ? 'מצאו כל מוצר מ-AliExpress' : 'Find any AliExpress product',
+      title: tr('Search products', 'חיפוש מוצרים'),
+      sub: tr('Find any AliExpress product', 'מצאו כל מוצר מ-AliExpress'),
     },
     {
       href: '/deals',
       target: 'deals',
       icon: 'tag',
-      title: rtl ? 'דילים של היום' : "Today's deals",
-      sub: rtl ? 'הנחות שנאספו ביד' : 'Hand-picked discounts',
+      title: tr("Today's deals", 'דילים של היום'),
+      sub: tr('Hand-picked discounts', 'הנחות שנאספו ביד'),
     },
   ];
 
   return (
     <section
       className="mt-10 rounded-xl border border-[#141414] bg-white  p-5 sm:p-6"
-      aria-label={rtl ? 'המשך גלילה' : 'Keep browsing'}
+      aria-label={tr('Keep browsing', 'המשך גלילה')}
     >
       <h2
         className="text-base font-bold mb-1"
         style={{ color: 'var(--shopli-navy)' }}
       >
-        {rtl ? 'עוד לא החלטתם?' : 'Not decided yet?'}
+        {tr('Not decided yet?', 'עוד לא החלטתם?')}
       </h2>
       <p className="text-xs mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
-        {rtl
-          ? 'המשיכו לגלות מוצרים — בלי לצאת מהאתר.'
-          : 'Keep discovering products — without leaving the site.'}
+        {tr('Keep discovering products — without leaving the site.', 'המשיכו לגלות מוצרים — בלי לצאת מהאתר.')}
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {links.map((l) => (

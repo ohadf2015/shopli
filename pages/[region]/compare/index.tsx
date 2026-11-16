@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import Header from '../../../components/Header';
 import Icon from '../../../components/icons';
 import BrowseNext from '../../../components/BrowseNext';
+import { compareT, makeTr } from '../../../lib/compare-i18n';
 import CompareAddProduct from '../../../components/CompareAddProduct';
 import CompareAboveFoldExit from '../../../components/CompareAboveFoldExit';
 import WhatsAppShare from '../../../components/WhatsAppShare';
@@ -63,6 +64,14 @@ export default function ProductComparePage({
 }: ComparePageProps) {
   const router = useRouter();
   const lang = config.lang || 'en';
+  const tr = makeTr(lang);
+  const [backHref, setBackHref] = useState(`/${region}/search`);
+  useEffect(() => {
+    try {
+      const from = sessionStorage.getItem('shopli:compare-from');
+      if (from && from.startsWith(`/${region}/`) && !from.includes('/compare')) setBackHref(from);
+    } catch {}
+  }, [region]);
   // Products/rows come straight from props: on client-side navigation to this
   // same page, Next.js re-renders with fresh getServerSideProps props but does
   // NOT remount the component — useState(initial*) would keep stale data and
@@ -92,9 +101,9 @@ export default function ProductComparePage({
 
   const structuredData: Record<string, unknown>[] = [
     breadcrumbJsonLd([
-      { name: rtl ? 'דף הבית' : 'Home', url: `${SITE_URL}/${region}` },
+      { name: tr('Home', 'דף הבית'), url: `${SITE_URL}/${region}` },
       {
-        name: rtl ? 'השוואת מוצרים' : 'Compare products',
+        name: tr('Compare products', 'השוואת מוצרים'),
         url: shareUrl,
       },
     ]),
@@ -213,6 +222,16 @@ export default function ProductComparePage({
         className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16"
         style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}
       >
+        <a
+          href={backHref}
+          className="inline-flex items-center gap-1 text-sm font-semibold mb-3 hover:underline"
+          style={{ color: 'var(--shopli-orange)' }}
+          data-compare-back
+        >
+          <Icon name={rtl ? 'arrow-right' : 'arrow-left'} size={14} />
+          {tr('Back to results', 'חזרה לתוצאות')}
+        </a>
+
         {/* Breadcrumb */}
         <nav
           className="flex items-center gap-2 text-xs mb-4 flex-wrap"
@@ -220,11 +239,11 @@ export default function ProductComparePage({
           aria-label="Breadcrumb"
         >
           <a href={`/${region}`} className="hover:underline">
-            {rtl ? 'דף הבית' : 'Home'}
+            {tr('Home', 'דף הבית')}
           </a>
           <span>/</span>
           <span style={{ color: 'var(--shopli-navy)' }}>
-            {rtl ? 'השוואת מוצרים' : 'Compare products'}
+            {tr('Compare products', 'השוואת מוצרים')}
           </span>
         </nav>
 
@@ -234,15 +253,13 @@ export default function ProductComparePage({
               className="text-2xl md:text-3xl font-extrabold mb-2"
               style={{ color: 'var(--shopli-navy)' }}
             >
-              {rtl ? 'השוואת מוצרים' : 'Compare products'}
+              {tr('Compare products', 'השוואת מוצרים')}
             </h1>
             <p
               className="text-sm md:text-base leading-relaxed max-w-2xl"
               style={{ color: 'var(--shopli-warm-gray)' }}
             >
-              {rtl
-                ? 'השוו עד 4 מוצרים זה לצד זה. הבדלים במפרט מודגשים — קבלו החלטת קנייה בביטחון.'
-                : 'Compare up to 4 products side by side. Spec differences are highlighted so you can buy with confidence.'}
+              {tr('Compare up to 4 products side by side. Spec differences are highlighted so you can buy with confidence.', 'השוו עד 4 מוצרים זה לצד זה. הבדלים במפרט מודגשים — קבלו החלטת קנייה בביטחון.')}
             </p>
           </div>
 
@@ -256,12 +273,8 @@ export default function ProductComparePage({
               >
                 <Icon name="share" size={14} />
                 {copied
-                  ? rtl
-                    ? 'הועתק!'
-                    : 'Copied!'
-                  : rtl
-                    ? 'העתק קישור'
-                    : 'Copy link'}
+                  ? tr('Copied!', 'הועתק!')
+                  : tr('Copy link', 'העתק קישור')}
               </button>
               <WhatsAppShare
                 title={title.replace(' | Shopli', '')}
@@ -278,7 +291,7 @@ export default function ProductComparePage({
         <div className="mb-8">
           <CompareAddProduct
             region={region}
-            rtl={rtl}
+            lang={lang}
             currencySymbol={config.currencySymbol}
             currentIds={productIds}
             onAdd={addIds}
@@ -291,12 +304,11 @@ export default function ProductComparePage({
           <CompareAboveFoldExit
             region={region}
             rtl={rtl}
+            lang={lang}
             surface="compare_tool"
             deadLanding={!!error}
             valueLine={
-              rtl
-                ? 'חפשו מוצר למעלה, או דלגו ישר לטרנדים / דילים / חיפוש — בלי לצאת מהאתר.'
-                : 'Search a product above, or skip straight to trending / deals / search — without leaving the site.'
+              tr('Search a product above, or skip straight to trending / deals / search — without leaving the site.', 'חפשו מוצר למעלה, או דלגו ישר לטרנדים / דילים / חיפוש — בלי לצאת מהאתר.')
             }
           />
         )}
@@ -319,11 +331,9 @@ export default function ProductComparePage({
                 style={{ color: 'var(--shopli-orange)' }}
               >
                 <Icon name="check" size={12} />
-                {rtl ? 'הבחירה שלנו' : 'Our pick'}
+                {tr('Our pick', 'הבחירה שלנו')}
                 {bestPick.wins > 0 &&
-                  (rtl
-                    ? ` — מנצח ב-${bestPick.wins} מפרטים`
-                    : ` — wins ${bestPick.wins} spec${bestPick.wins === 1 ? '' : 's'}`)}
+                  tr.t(compareT.wins, bestPick.wins)}
               </p>
               <p
                 className="text-sm font-bold line-clamp-2"
@@ -340,6 +350,23 @@ export default function ProductComparePage({
               </p>
             </div>
             <div className="flex flex-col gap-2 shrink-0 sm:w-48">
+              {bestPick.product.affiliateLink && (
+                <a
+                  href={bestPick.product.affiliateLink}
+                  target="_blank"
+                  rel="nofollow sponsored noopener noreferrer"
+                  className="btn-primary text-sm text-center"
+                  data-compare-exit="best_pick"
+                  data-product-id={bestPick.product.id}
+                  data-product-title={bestPick.product.title}
+                  data-price={bestPick.product.price.toFixed(2)}
+                  data-currency={config.currencySymbol}
+                  data-category={bestPick.product.category || ''}
+                >
+                  <Icon name="external" size={14} />
+                  {tr('Buy now', 'קנו עכשיו')}
+                </a>
+              )}
               <a
                 href={`/${region}/product/${encodeURIComponent(bestPick.product.id)}`}
                 onClick={() =>
@@ -350,25 +377,10 @@ export default function ProductComparePage({
                     product_id: bestPick.product.id,
                   })
                 }
-                className="btn-primary text-sm text-center"
-                data-compare-exit="best_pick"
-              >
-                {rtl ? 'לפרטים המלאים' : 'View full details'}
-              </a>
-              <a
-                href={bestPick.product.affiliateLink || '#'}
-                target="_blank"
-                rel="nofollow sponsored noopener noreferrer"
-                className="text-xs text-center font-medium py-1 hover:underline inline-flex items-center justify-center gap-1"
+                className="text-xs text-center font-medium py-1 hover:underline"
                 style={{ color: 'var(--shopli-warm-gray)' }}
-                data-product-id={bestPick.product.id}
-                data-product-title={bestPick.product.title}
-                data-price={bestPick.product.price.toFixed(2)}
-                data-currency={config.currencySymbol}
-                data-category={bestPick.product.category || ''}
               >
-                <Icon name="external" size={12} />
-                {rtl ? 'קנו ישירות ב-AliExpress' : 'Buy directly on AliExpress'}
+                {tr('View full details', 'לפרטים המלאים')}
               </a>
             </div>
           </div>
@@ -387,29 +399,23 @@ export default function ProductComparePage({
               style={{ color: 'var(--shopli-navy)' }}
             >
               {error
-                ? rtl
-                  ? 'הטעינה נכשלה'
-                  : 'Could not load the comparison'
-                : rtl
-                  ? 'אין מוצרים להשוואה עדיין'
-                  : 'No products to compare yet'}
+                ? tr('Could not load the comparison', 'הטעינה נכשלה')
+                : tr('No products to compare yet', 'אין מוצרים להשוואה עדיין')}
             </h2>
             <p
               className="text-sm max-w-md mx-auto mb-6"
               style={{ color: 'var(--shopli-warm-gray)' }}
             >
-              {rtl
-                ? `חפשו והוסיפו לפחות ${MIN_COMPARE_PRODUCTS} מוצרים למעלה, או נסו דוגמה:`
-                : `Search and add at least ${MIN_COMPARE_PRODUCTS} products above, or try a sample:`}
+              {tr.t(compareT.needMore, MIN_COMPARE_PRODUCTS)}
             </p>
             <a
               href={`/${region}/compare?ids=sample`}
               className="btn-secondary text-sm"
             >
-              {rtl ? 'השוואת דוגמה' : 'Load sample comparison'}
+              {tr('Load sample comparison', 'השוואת דוגמה')}
             </a>
             <p className="mt-4 text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
-              {rtl ? 'או ' : 'or '}
+              {tr('or ', 'או ')}
               <a
                 href={`/${region}/trending`}
                 onClick={() =>
@@ -418,13 +424,13 @@ export default function ProductComparePage({
                 className="font-semibold underline"
                 style={{ color: 'var(--shopli-orange)' }}
               >
-                {rtl ? 'גלו מה טרנדי עכשיו' : 'browse what is trending now'}
+                {tr('browse what is trending now', 'גלו מה טרנדי עכשיו')}
               </a>
             </p>
             {!error && (
               <div className="mt-10 text-start" data-compare-articles>
                 <h2 className="text-base font-bold mb-3" style={{ color: 'var(--shopli-navy)' }}>
-                  {rtl ? 'או קראו השוואה מוכנה' : 'Or read a ready-made comparison'}
+                  {tr('Or read a ready-made comparison', 'או קראו השוואה מוכנה')}
                 </h2>
                 <ul className="grid gap-2 sm:grid-cols-2">
                   {COMPARISON_ARTICLES.map((a) => (
@@ -479,7 +485,7 @@ export default function ProductComparePage({
                           className="absolute bottom-2 start-2 text-[0.65rem] font-bold px-2 py-0.5 rounded-full"
                           style={{ background: 'var(--shopli-orange)', color: 'var(--shopli-ink)' }}
                         >
-                          {rtl ? 'הבחירה שלנו' : 'Our pick'}
+                          {tr('Our pick', 'הבחירה שלנו')}
                         </span>
                       )}
                       {p.discount && (
@@ -495,7 +501,7 @@ export default function ProductComparePage({
                         onClick={() => removeProduct(p.id)}
                         className="absolute top-2 start-2 w-7 h-7 rounded-full bg-white/95  flex items-center justify-center hover:bg-red-50 transition-colors"
                         style={{ color: 'var(--shopli-warm-gray)' }}
-                        aria-label={rtl ? 'הסר מהשוואה' : 'Remove from comparison'}
+                        aria-label={tr('Remove from comparison', 'הסר מהשוואה')}
                       >
                         <Icon name="close" size={14} />
                       </button>
@@ -527,7 +533,7 @@ export default function ProductComparePage({
                           )}
                         </div>
                         <a
-                          href={p.affiliateLink || '#'}
+                          href={p.affiliateLink || `/${region}/product/${encodeURIComponent(p.id)}`}
                           target="_blank"
                           rel="nofollow sponsored noopener noreferrer"
                           className="btn-primary w-full text-xs py-2"
@@ -538,7 +544,7 @@ export default function ProductComparePage({
                           data-category={p.category || ''}
                         >
                           <Icon name="external" size={12} />
-                          {rtl ? 'קנו עכשיו' : 'Buy now'}
+                          {tr('Buy now', 'קנו עכשיו')}
                         </a>
                         <a
                           href={`/${region}/product/${encodeURIComponent(p.id)}`}
@@ -553,7 +559,7 @@ export default function ProductComparePage({
                           className="mt-1.5 block text-center text-xs font-medium py-1.5 rounded-lg border border-[#141414] hover:border-orange-200 hover:bg-orange-50/50 transition-colors"
                           style={{ color: 'var(--shopli-navy)' }}
                         >
-                          {rtl ? 'פרטים ומוצרים דומים' : 'Details & similar'}
+                          {tr('Details & similar', 'פרטים ומוצרים דומים')}
                         </a>
                       </div>
                     </div>
@@ -571,7 +577,7 @@ export default function ProductComparePage({
                     style={{ color: 'var(--shopli-navy)' }}
                   >
                     <span className="text-2xl leading-none">+</span>
-                    {rtl ? 'הוסיפו מוצר' : 'Add product'}
+                    {tr('Add product', 'הוסיפו מוצר')}
                   </button>
                 )}
               </div>
@@ -580,11 +586,11 @@ export default function ProductComparePage({
             {/* Comparison table */}
             <section
               className="bg-white rounded-xl border border-[#141414]  overflow-hidden"
-              aria-label={rtl ? 'טבלת השוואה' : 'Comparison table'}
+              aria-label={tr('Comparison table', 'טבלת השוואה')}
             >
               <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-[#141414]">
                 <h2 className="text-sm font-bold" style={{ color: 'var(--shopli-navy)' }}>
-                  {rtl ? 'השוואת מפרט' : 'Spec comparison'}
+                  {tr('Spec comparison', 'השוואת מפרט')}
                 </h2>
                 <label
                   className="inline-flex items-center gap-2 text-sm cursor-pointer select-none"
@@ -596,7 +602,7 @@ export default function ProductComparePage({
                     onChange={(e) => setOnlyDiffs(e.target.checked)}
                     className="w-4 h-4 accent-orange-500"
                   />
-                  {rtl ? 'הצג רק הבדלים' : 'Show only differences'}
+                  {tr('Show only differences', 'הצג רק הבדלים')}
                 </label>
               </div>
               <div className="overflow-x-auto">
@@ -607,7 +613,7 @@ export default function ProductComparePage({
                         className="sticky start-0 z-10 bg-[#FFF4E4] text-start text-xs font-semibold uppercase tracking-wider px-3 sm:px-4 py-3 min-w-[7rem] sm:min-w-[10rem]"
                         style={{ color: 'var(--shopli-warm-gray)' }}
                       >
-                        {rtl ? 'מפרט' : 'Spec'}
+                        {tr('Spec', 'מפרט')}
                       </th>
                       {products.map((p) => (
                         <th
@@ -650,7 +656,7 @@ export default function ProductComparePage({
                               <span
                                 className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
                                 style={{ background: 'var(--shopli-orange)' }}
-                                title={rtl ? 'יש הבדל' : 'Values differ'}
+                                title={tr('Values differ', 'יש הבדל')}
                               />
                             )}
                           </span>
@@ -701,11 +707,11 @@ export default function ProductComparePage({
                     className="w-3 h-3 rounded bg-amber-50 border border-amber-200"
                     aria-hidden
                   />
-                  {rtl ? 'שורות כתומות = הבדל בין מוצרים' : 'Amber rows = specs that differ'}
+                  {tr('Amber rows = specs that differ', 'שורות כתומות = הבדל בין מוצרים')}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <Icon name="check" size={12} className="text-teal-600" />
-                  {rtl ? 'סימון = הערך הטוב יותר' : 'Check = better value'}
+                  {tr('Check = better value', 'סימון = הערך הטוב יותר')}
                 </span>
               </div>
             </section>
@@ -717,12 +723,10 @@ export default function ProductComparePage({
                   className="text-sm font-semibold mb-0.5"
                   style={{ color: 'var(--shopli-navy)' }}
                 >
-                  {rtl ? 'שתפו את ההשוואה' : 'Share this comparison'}
+                  {tr('Share this comparison', 'שתפו את ההשוואה')}
                 </p>
                 <p className="text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
-                  {rtl
-                    ? 'הקישור שומר את המוצרים שבחרתם — מושלם לחברים או לעצמכם.'
-                    : 'The link keeps your selected products — perfect for friends or later.'}
+                  {tr('The link keeps your selected products — perfect for friends or later.', 'הקישור שומר את המוצרים שבחרתם — מושלם לחברים או לעצמכם.')}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -733,12 +737,8 @@ export default function ProductComparePage({
                 >
                   <Icon name="share" size={14} />
                   {copied
-                    ? rtl
-                      ? 'הועתק!'
-                      : 'Copied!'
-                    : rtl
-                      ? 'העתק URL'
-                      : 'Copy URL'}
+                    ? tr('Copied!', 'הועתק!')
+                    : tr('Copy URL', 'העתק URL')}
                 </button>
                 <WhatsAppShare
                   title={title.replace(' | Shopli', '')}
@@ -750,7 +750,7 @@ export default function ProductComparePage({
               </div>
             </div>
 
-            <BrowseNext region={region} rtl={rtl} surface="compare_tool" />
+            <BrowseNext region={region} rtl={rtl} lang={lang} surface="compare_tool" />
           </>
         )}
       </main>
@@ -767,6 +767,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
   if (!isValidRegion(region)) return { notFound: true };
   const config = getRegion(region);
   const rtl = config.direction === 'rtl';
+  const tr = makeTr(config.lang);
   const rawIds = query.ids as string | undefined;
   let productIds: string[];
 
@@ -806,27 +807,19 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
       // surface as an error, not as fake items with dead affiliate links.
       if (products.length === 0) {
         error =
-          config.lang === 'he'
-            ? 'לא הצלחנו לטעון את המוצרים כרגע. בדקו את המזהים או נסו שוב בעוד רגע.'
-            : "We couldn't load those products right now. Check the IDs or try again in a moment.";
+          tr("We couldn't load those products right now. Check the IDs or try again in a moment.", 'לא הצלחנו לטעון את המוצרים כרגע. בדקו את המזהים או נסו שוב בעוד רגע.');
       } else if (products.length < MIN_COMPARE_PRODUCTS) {
         error =
-          config.lang === 'he'
-            ? 'נטען מוצר אחד בלבד — הוסיפו עוד מזהה כדי להשוות.'
-            : 'Only one product loaded — add another ID to compare.';
+          tr('Only one product loaded — add another ID to compare.', 'נטען מוצר אחד בלבד — הוסיפו עוד מזהה כדי להשוות.');
       }
     } catch (e: any) {
       error =
-        config.lang === 'he'
-          ? 'שגיאה בטעינת המוצרים. נסו שוב בעוד רגע.'
-          : 'Failed to load products. Please try again in a moment.';
+        tr('Failed to load products. Please try again in a moment.', 'שגיאה בטעינת המוצרים. נסו שוב בעוד רגע.');
       products = [];
     }
   } else if (rawIds && rawIds !== 'sample') {
     error =
-      config.lang === 'he'
-        ? 'מזהי המוצר לא תקינים. הזינו 2–4 מזהים מספריים מופרדים בפסיק.'
-        : 'Those product IDs look invalid. Enter 2–4 numeric IDs separated by commas.';
+      tr('Those product IDs look invalid. Enter 2–4 numeric IDs separated by commas.', 'מזהי המוצר לא תקינים. הזינו 2–4 מזהים מספריים מופרדים בפסיק.');
   }
 
   const rows = buildCompareRows(products, config.currencySymbol);
