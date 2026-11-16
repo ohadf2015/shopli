@@ -1,4 +1,5 @@
 import Icon from './icons';
+import { compareT, makeTr } from '../lib/compare-i18n';
 import { trackCompareNextAction } from '../lib/analytics';
 
 type Side = { name: string; keyword: string };
@@ -6,6 +7,7 @@ type Side = { name: string; keyword: string };
 interface CompareAboveFoldExitProps {
   region: string;
   rtl: boolean;
+  lang?: string;
   surface: 'compare_tool' | 'compare_article';
   /** SEO article sides — drives the dual search CTAs. */
   sides?: [Side, Side];
@@ -23,15 +25,17 @@ interface CompareAboveFoldExitProps {
 export default function CompareAboveFoldExit({
   region,
   rtl,
+  lang,
   surface,
   sides,
   valueLine,
   deadLanding = false,
 }: CompareAboveFoldExitProps) {
+  const tr = makeTr(lang ?? (rtl ? 'he' : 'en'));
   return (
     <section
       className="mb-6 sm:mb-8 rounded-xl border border-orange-100 bg-gradient-to-r from-orange-50 to-amber-50 p-4 sm:p-5"
-      aria-label={rtl ? 'הצעד הבא' : 'Next step'}
+      aria-label={tr('Next step', 'הצעד הבא')}
       data-compare-above-fold="1"
     >
       <p
@@ -40,21 +44,15 @@ export default function CompareAboveFoldExit({
       >
         <Icon name="check" size={12} />
         {deadLanding
-          ? rtl
-            ? 'דילים חיים לא זמינים כרגע'
-            : 'Live deals unavailable right now'
-          : rtl
-            ? 'החלטה מהירה — בלי לגלול'
-            : 'Decide above the fold'}
+          ? tr('Live deals unavailable right now', 'דילים חיים לא זמינים כרגע')
+          : tr('Decide above the fold', 'החלטה מהירה — בלי לגלול')}
       </p>
       <p
         className="text-sm font-medium mb-3 leading-snug"
         style={{ color: 'var(--shopli-navy)' }}
       >
         {valueLine ||
-          (rtl
-            ? 'דלגו על האנליזה — עברו לדילים חיים או לטרנדים באתר.'
-            : 'Skip the essay — jump to live deals or keep browsing on-site.')}
+          (tr('Skip the essay — jump to live deals or keep browsing on-site.', 'דלגו על האנליזה — עברו לדילים חיים או לטרנדים באתר.'))}
       </p>
 
       {sides && (
@@ -74,7 +72,7 @@ export default function CompareAboveFoldExit({
               data-compare-exit="search"
             >
               <Icon name="search" size={16} />
-              {rtl ? `דילים על ${side.name}` : `Browse ${side.name} deals`}
+              {tr.t(compareT.browse, side.name)}
             </a>
           ))}
         </div>
@@ -92,7 +90,7 @@ export default function CompareAboveFoldExit({
           data-compare-exit="trending"
         >
           <Icon name="fire" size={14} />
-          {rtl ? 'טרנדים עכשיו' : 'Trending now'}
+          {tr('Trending now', 'טרנדים עכשיו')}
         </a>
         <a
           href="/deals"
@@ -103,7 +101,7 @@ export default function CompareAboveFoldExit({
           data-compare-exit="deals"
         >
           <Icon name="tag" size={14} />
-          {rtl ? 'דילים של היום' : "Today's deals"}
+          {tr("Today's deals", 'דילים של היום')}
         </a>
         {!sides && (
           <a
@@ -115,7 +113,7 @@ export default function CompareAboveFoldExit({
             data-compare-exit="search"
           >
             <Icon name="search" size={14} />
-            {rtl ? 'חיפוש מוצרים' : 'Search products'}
+            {tr('Search products', 'חיפוש מוצרים')}
           </a>
         )}
       </div>

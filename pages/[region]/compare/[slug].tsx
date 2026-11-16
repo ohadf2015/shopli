@@ -274,7 +274,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
           lang={lang}
         />
 
-        <BrowseNext region={region} rtl={rtl} surface="compare_article" />
+        <BrowseNext region={region} rtl={rtl} lang={config.lang} surface="compare_article" />
       </main>
 
     </>

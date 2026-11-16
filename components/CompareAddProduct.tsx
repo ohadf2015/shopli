@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Icon from './icons';
+import { compareT, makeTr } from '../lib/compare-i18n';
 import { productImage } from '../lib/img';
 import { MAX_COMPARE_PRODUCTS, parseCompareIds } from '../lib/product-compare';
 
@@ -12,7 +13,7 @@ interface Hit {
 
 interface Props {
   region: string;
-  rtl: boolean;
+  lang: string;
   currencySymbol: string;
   currentIds: string[];
   onAdd: (ids: string[]) => void;
@@ -22,13 +23,14 @@ interface Props {
 
 export default function CompareAddProduct({
   region,
-  rtl,
+  lang,
   currencySymbol,
   currentIds,
   onAdd,
   error,
   autoFocus,
 }: Props) {
+  const tr = makeTr(lang);
   const [q, setQ] = useState('');
   const [hits, setHits] = useState<Hit[]>([]);
   const [state, setState] = useState<'idle' | 'loading' | 'done' | 'failed'>('idle');
@@ -77,13 +79,11 @@ export default function CompareAddProduct({
         className="block text-sm font-bold mb-2"
         style={{ color: 'var(--shopli-navy)' }}
       >
-        {rtl ? 'הוסיפו מוצר להשוואה' : 'Add a product to compare'}
+        {tr('Add a product to compare', 'הוסיפו מוצר להשוואה')}
       </label>
       {full ? (
         <p className="text-sm" style={{ color: 'var(--shopli-warm-gray)' }}>
-          {rtl
-            ? `אפשר להשוות עד ${MAX_COMPARE_PRODUCTS} מוצרים. הסירו אחד כדי להוסיף אחר.`
-            : `You can compare up to ${MAX_COMPARE_PRODUCTS} products. Remove one to add another.`}
+          {tr.t(compareT.full, MAX_COMPARE_PRODUCTS)}
         </p>
       ) : (
         <div className="flex gap-2">
@@ -102,9 +102,7 @@ export default function CompareAddProduct({
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && pasted.length > 0 && add(pasted)}
               placeholder={
-                rtl
-                  ? 'חפשו מוצר, או הדביקו קישור מ-AliExpress'
-                  : 'Search a product, or paste an AliExpress link'
+                tr('Search a product, or paste an AliExpress link', 'חפשו מוצר, או הדביקו קישור מ-AliExpress')
               }
               className="w-full ps-9 pe-3 py-3 text-base rounded-lg border border-[#141414] focus:outline-none focus:ring-2 focus:ring-orange-200"
               style={{ color: 'var(--shopli-navy)' }}
@@ -113,7 +111,7 @@ export default function CompareAddProduct({
           </div>
           {pasted.length > 0 && (
             <button type="button" className="btn-primary whitespace-nowrap" onClick={() => add(pasted)}>
-              {rtl ? `הוסף ${pasted.length}` : `Add ${pasted.length}`}
+              {tr.t(compareT.addN, pasted.length)}
             </button>
           )}
         </div>
@@ -127,17 +125,17 @@ export default function CompareAddProduct({
 
       {state === 'loading' && (
         <p className="mt-3 text-sm" style={{ color: 'var(--shopli-warm-gray)' }} role="status">
-          {rtl ? 'מחפשים…' : 'Searching…'}
+          {tr('Searching…', 'מחפשים…')}
         </p>
       )}
       {state === 'failed' && (
         <p className="mt-3 text-sm text-red-600" role="alert">
-          {rtl ? 'החיפוש נכשל. נסו שוב.' : 'Search failed. Try again.'}
+          {tr('Search failed. Try again.', 'החיפוש נכשל. נסו שוב.')}
         </p>
       )}
       {state === 'done' && hits.length === 0 && (
         <p className="mt-3 text-sm" style={{ color: 'var(--shopli-warm-gray)' }}>
-          {rtl ? 'לא נמצאו מוצרים. נסו מילות חיפוש אחרות.' : 'No products found. Try different words.'}
+          {tr('No products found. Try different words.', 'לא נמצאו מוצרים. נסו מילות חיפוש אחרות.')}
         </p>
       )}
       {hits.length > 0 && (
@@ -174,7 +172,7 @@ export default function CompareAddProduct({
                     </span>
                   </span>
                   <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--shopli-orange)' }}>
-                    {added ? (rtl ? 'נוסף' : 'Added') : rtl ? '+ הוסף' : '+ Add'}
+                    {added ? (tr('Added', 'נוסף')) : tr('+ Add', '+ הוסף')}
                   </span>
                 </button>
               </li>
