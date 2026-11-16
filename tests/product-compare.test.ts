@@ -33,6 +33,13 @@ function fakeProduct(partial: Partial<SearchProduct> & { id: string; price: numb
   } as SearchProduct;
 }
 
+test('parseCompareIds pulls ids out of pasted product links', () => {
+  assert.deepEqual(
+    parseCompareIds('https://www.aliexpress.com/item/1005007001.html?spm=a2g0o.1234567 https://aliexpress.com/item/1005007002.html'),
+    ['1005007001', '1005007002']
+  );
+});
+
 test('parseCompareIds keeps 2–4 numeric ids', () => {
   assert.deepEqual(parseCompareIds('1005001, 1005002'), ['1005001', '1005002']);
   assert.equal(parseCompareIds('abc').length, 0);
