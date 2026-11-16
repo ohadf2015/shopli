@@ -800,7 +800,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
   if (productIds.length > 0) {
     try {
       const { getProductsByIds } = await import('../../../lib/aliexpress');
-            products = await getProductsByIds(productIds, region);
+      products = await getProductsByIds(productIds, region);
 
       // Never fabricate fallback products: an empty/failed API response must
       // surface as an error, not as fake items with dead affiliate links.
