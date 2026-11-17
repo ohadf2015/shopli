@@ -103,6 +103,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await new Promise((r) => setTimeout(r, 1200));
   }
 
+  // A 200 here hid a missing bot token for months; Vercel only flags a cron that errors.
+  const failed = Object.entries(out).filter(([, r]) => r.startsWith('failed:'));
+  if (failed.length) console.error('[TELEGRAM-DAILY]', JSON.stringify(Object.fromEntries(failed)));
   res.setHeader('Cache-Control', 'no-store');
-  return res.status(200).json({ ok: true, dry, targets: targets.map((t) => t.code), results: out });
+  return res
+    .status(failed.length ? 500 : 200)
+    .json({ ok: !failed.length, dry, targets: targets.map((t) => t.code), results: out });
 }
