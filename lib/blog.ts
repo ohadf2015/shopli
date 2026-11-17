@@ -42,6 +42,184 @@ export function isBlogPostInRegion(slug: string, region: string): boolean {
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: 'aliexpress-black-friday-real-deals-2026',
+    title: {
+      en: 'AliExpress Black Friday 2026: How to Tell a Real Deal From a Fake One',
+      he: 'בלאק פריידי באליאקספרס 2026: איך מזהים מבצע אמיתי ומה סתם מדבקה',
+    },
+    metaDesc: {
+      en: 'The "-60%" on AliExpress is measured against a price the seller picks. What our daily price records show, and five checks before you buy on Black Friday.',
+      he: 'ה-60%- באליאקספרס נמדד מול מחיר שהמוכר בחר. מה מראים המחירים שאנחנו רושמים כל יום, וחמש בדיקות לפני שקונים בבלאק פריידי.',
+    },
+    intro: {
+      en: "Black Friday lands on November 27 this year and Cyber Monday on November 30, and every AliExpress listing will wear a big red percentage. That number compares today's price with a \"list price\" the seller types in themselves, so it tells you very little. We record the price of the products on Shopli every day, and on November 15 we checked how many were really cheaper than usual. Of the 92 products we had at least ten days of prices for in the US, 9 were 10% or more under their own usual price. Six were 10% or more above it. So real deals exist, but they're the minority.",
+      he: 'בלאק פריידי נופל השנה ב-27 בנובמבר וסייבר מאנדיי ב-30, וכל מודעה באליאקספרס תגיע עם אחוז הנחה אדום וגדול. המספר הזה משווה את המחיר של היום ל"מחיר מחירון" שהמוכר הקליד בעצמו, אז הוא כמעט לא אומר כלום. אנחנו רושמים כל יום את המחיר של המוצרים בשופלי, וב-15 בנובמבר בדקנו כמה מהם באמת זולים מהרגיל. מתוך 92 מוצרים שהיו לנו עליהם לפחות עשרה ימי מחירים בארה"ב, רק 9 היו זולים ב-10% ומעלה מהמחיר הרגיל שלהם. שישה היו יקרים ב-10% ומעלה. כלומר, יש גם מבצעים אמיתיים, אבל הם המיעוט..',
+    },
+    sections: [
+      {
+        heading: { en: '1. Ignore the percentage, look at the price history', he: '1. תתעלמו מהאחוז, תסתכלו על היסטוריית המחיר' },
+        body: {
+          en: "The only comparison that matters is today's price against what the same item usually costs. On every Shopli product page with enough history we show exactly that: the median price over the last 60 days, and a note when today's price is lower or higher. If a page says \"Pricier than usual\" on Black Friday, that's a sale sticker on a raised price, and waiting a week usually wins. If it shows a real drop, that's the one to buy.",
+          he: 'ההשוואה היחידה שחשובה היא המחיר של היום מול מה שאותו מוצר עולה בדרך כלל. בכל עמוד מוצר בשופלי שיש לו מספיק היסטוריה אנחנו מראים בדיוק את זה: המחיר החציוני ב-60 הימים האחרונים, והערה כשהמחיר של היום נמוך או גבוה ממנו. אם כתוב "יקר מהרגיל" ביום של בלאק פריידי, זאת מדבקת מבצע על מחיר שהועלה, ובדרך כלל משתלם לחכות שבוע. אם מופיעה ירידת מחיר אמיתית, את זה קונים.',
+        },
+      },
+      {
+        heading: { en: '2. Save things now, not on the day', he: '2. שומרים מוצרים עכשיו, לא ביום עצמו' },
+        body: {
+          en: "A price that was quietly raised before a sale is easy to miss on the day itself, so the useful moment to look is now. Add what you want to your Shopli wishlist and leave your email: we check those prices every day and send one email when something drops 10% or more below the price it had when we started watching it. Then on Black Friday you're comparing against a number you saw yourself, not one the seller printed.",
+          he: 'מחיר שהועלה בשקט לפני מבצע קשה לזהות ביום עצמו, אז הזמן הנכון לבדוק הוא עכשיו. תוסיפו את מה שאתם רוצים לרשימת המשאלות בשופלי ותשאירו מייל: אנחנו בודקים את המחירים האלה כל יום ושולחים מייל אחד כשמשהו יורד ב-10% או יותר מהמחיר שהיה כשהתחלנו לעקוב אחריו. ככה בבלאק פריידי אתם משווים למספר שראיתם בעצמכם, לא למספר שהמוכר הדפיס.',
+        },
+      },
+      {
+        heading: { en: '3. The cheapest card is often a different product', he: '3. התוצאה הכי זולה היא לפעמים מוצר אחר' },
+        body: {
+          en: "Search results put accessories and look-alikes next to the real thing. When we searched for 20,000 mAh power banks, an empty battery case with no cells in it came up third, at a price no real bank could match. During a sale this gets worse, because a low price is exactly what grabs attention. Read the title to the end, check the variant you're actually selecting (the headline price is often the cheapest option, like a cable instead of the charger), and compare the weight and specs with the brand's own store.",
+          he: 'בתוצאות החיפוש מופיעים אביזרים וחיקויים ליד המוצר האמיתי. כשחיפשנו מטענים ניידים של 20,000mAh, מארז סוללה ריק, בלי תאים בפנים, הופיע במקום השלישי במחיר שאף מטען אמיתי לא מגיע אליו. במבצעים זה מחמיר, כי מחיר נמוך הוא בדיוק מה שתופס את העין. קוראים את הכותרת עד הסוף, בודקים איזו גרסה בוחרים בפועל (המחיר בכותרת הוא הרבה פעמים של האפשרות הזולה, למשל כבל במקום המטען), ומשווים משקל ומפרט לחנות הרשמית של המותג.',
+        },
+      },
+      {
+        heading: { en: '4. Orders and feedback beat stars', he: '4. הזמנות ופידבק שווים יותר מכוכבים' },
+        body: {
+          en: "A 4.9 rating on 30 reviews says less than a 4.7 on 3,000. On Shopli we only push products with at least 90% positive seller feedback and real order volume into our picks, and you can apply the same rule yourself on any listing: thousands of orders, a store that has been open for years, and recent photo reviews from buyers in your country. If a brand-new store sells a famous product far under everyone else, don't buy it.",
+          he: 'דירוג 4.9 על 30 ביקורות אומר פחות מ-4.7 על 3,000. בשופלי אנחנו מכניסים להמלצות רק מוצרים עם לפחות 90% פידבק חיובי למוכר ונפח הזמנות אמיתי, ואפשר להפעיל את אותו כלל בעצמכם על כל מודעה: אלפי הזמנות, חנות שפתוחה כבר כמה שנים, וביקורות עם תמונות מקונים מהארץ. אם חנות חדשה לגמרי מוכרת מוצר מוכר בהרבה פחות מכולם, אל תקנו.',
+        },
+      },
+      {
+        heading: { en: '5. Coupons stack, so do the maths at checkout', he: '5. קופונים מצטרפים, אז עושים את החשבון בקופה' },
+        body: {
+          en: "AliExpress sale coupons usually need a minimum spend, and store coupons can stack on top. That's where a real saving can come from, but it also pushes people to pad a cart with things they didn't want. Decide your list first, then see which coupon it reaches, and check the final total including shipping rather than the per-item price.",
+          he: 'קופונים של אליאקספרס במבצעים דורשים בדרך כלל סכום מינימום, ואפשר להוסיף עליהם קופוני חנות. משם יכול להגיע חיסכון אמיתי, אבל זה גם דוחף לנפח את העגלה בדברים שלא רציתם. קובעים קודם רשימה, בודקים לאיזה קופון היא מגיעה, ומסתכלים על הסכום הסופי כולל משלוח ולא על המחיר ליחידה. ואם אתם מזמינים לישראל: מעל 75$ שווי סחורה משלמים 18% מע"מ, ואליאקספרס גובה אותו כבר בקופה. עגלה של 80$ יכולה לצאת יקרה יותר משתי הזמנות נפרדות, אבל רק אם הן באמת נשלחות כחבילות נפרדות.',
+        },
+      },
+    ],
+    faq: [
+      {
+        q: { en: 'When is AliExpress Black Friday 2026?', he: 'מתי בלאק פריידי באליאקספרס ב-2026?' },
+        a: {
+          en: "Black Friday is November 27, 2026 and Cyber Monday is November 30. AliExpress announces its own sale window shortly before, and in past years it ran for several days around those dates, so check the app for the exact start.",
+          he: 'בלאק פריידי יוצא ב-27 בנובמבר 2026 וסייבר מאנדיי ב-30 בנובמבר. אליאקספרס מכריזה על חלון המבצע שלה זמן קצר לפני, ובשנים קודמות הוא נמשך כמה ימים סביב התאריכים האלה, אז כדאי לבדוק באפליקציה מתי בדיוק הוא מתחיל.',
+        },
+      },
+      {
+        q: { en: 'Are AliExpress Black Friday discounts real?', he: 'ההנחות של בלאק פריידי באליאקספרס אמיתיות?' },
+        a: {
+          en: "Some are. The percentage on the listing is measured against a list price the seller sets, so it isn't proof. In our own price records for the US on November 15, about one product in ten was 10% or more under its usual price, and a similar number were 10% or more above it.",
+          he: 'חלק כן. האחוז במודעה נמדד מול מחיר מחירון שהמוכר קובע, אז הוא לא הוכחה. ברישומי המחירים שלנו לארה"ב ב-15 בנובמבר, בערך מוצר אחד מכל עשרה היה זול ב-10% ומעלה מהמחיר הרגיל שלו, ומספר דומה היה יקר ב-10% ומעלה.',
+        },
+      },
+      {
+        q: { en: 'How do I know if an AliExpress price was raised before the sale?', he: 'איך יודעים אם המחיר באליאקספרס הועלה לפני המבצע?' },
+        a: {
+          en: "Compare it with the price over the past weeks. Shopli product pages show the 60-day usual price and say when today's price is higher than usual. Saving the item to your wishlist now also gives you your own reference price.",
+          he: 'משווים למחיר בשבועות האחרונים. בעמודי המוצר בשופלי מופיע המחיר הרגיל ב-60 הימים האחרונים, עם הערה כשהמחיר של היום גבוה ממנו. שמירה של המוצר ברשימת המשאלות כבר עכשיו נותנת לכם גם מחיר ייחוס משלכם.',
+        },
+      },
+    ],
+    keywords: ['aliexpress black friday 2026', 'aliexpress black friday deals', 'aliexpress fake discounts', 'is aliexpress black friday worth it', 'בלאק פריידי אליאקספרס', 'מבצעים עלי אקספרס', 'בלאק פריידי 2026'],
+    relatedProducts: [
+      { name: '240 W USB-C cable', label: { en: '240 W USB-C cable', he: 'כבל USB-C של 240W' }, keyword: '240W USB C to USB C cable fast charging nylon', minPriceUsd: 1 },
+      { name: '3-in-1 wireless charger', label: { en: '3-in-1 wireless charger', he: 'מטען אלחוטי 3 ב-1' }, keyword: '3 in 1 foldable wireless charger', minPriceUsd: 12 },
+      { name: '20,000 mAh power bank', label: { en: '20,000 mAh power bank', he: 'מטען נייד 20,000' }, keyword: 'power bank 20000mAh 22.5W fast charging', minPriceUsd: 10 },
+      { name: 'Label printer', label: { en: 'Label printer', he: 'מדפסת מדבקות' }, keyword: 'mini thermal label printer bluetooth', minPriceUsd: 12, titleIncludes: ['Niimbot', 'Nimbot', 'Marklife', 'D110', 'P15', 'B21'] },
+    ],
+    relatedPosts: ['aliexpress-israel-customs-vat', 'aliexpress-gift-guide-under-30-2026', 'best-power-bank-guide-2026'],
+    publishDate: '2026-11-17',
+    category: 'seasonal',
+  },
+  {
+    slug: 'aliexpress-gift-guide-under-30-2026',
+    title: {
+      en: 'AliExpress Gift Ideas Under $30 That People Actually Use (2026)',
+      he: 'מתנות לחנוכה מאליאקספרס עד 100 ש"ח שבאמת משתמשים בהן (2026)',
+    },
+    metaDesc: {
+      en: 'Six gifts from AliExpress under $30 with thousands of orders: a label printer, a 3-in-1 charger, a magnetic car mount and more, plus the ones to skip.',
+      he: 'שש מתנות מאליאקספרס עד 100 ש"ח עם אלפי הזמנות: מדפסת מדבקות, מטען 3 ב-1, מעמד מגנטי לרכב ועוד, וגם מה לא לקנות.',
+    },
+    intro: {
+      en: "The best cheap gifts are things people wouldn't buy themselves but end up using every week. That rules out most \"viral gadget\" lists, which are full of things that are fun for a day. We went through what is actually selling on AliExpress this month, kept the items with thousands of orders and 94%+ positive feedback, and dropped anything that needs a leap of faith. Order by early December: standard delivery takes one to three weeks, and the listing shows the date before you pay.",
+      he: 'מתנה טובה וזולה היא משהו שהאדם לא היה קונה לעצמו, אבל משתמש בו כל שבוע. זה פוסל את רוב הרשימות של "גאדג׳טים ויראליים", שמלאות בדברים שכיף איתם יום אחד. עברנו על מה שבאמת נמכר באליאקספרס החודש, השארנו מוצרים עם אלפי הזמנות ו-94% פידבק חיובי ומעלה, וזרקנו כל מה שצריך להמר עליו. חנוכה מתחיל השנה בערב של 4 בדצמבר, אז כדאי להזמין כבר עכשיו: משלוח רגיל לוקח שבוע עד שלושה, והתאריך מופיע במודעה לפני התשלום. כל המתנות כאן הרבה מתחת לרף ה-75$ של המע"מ.',
+    },
+    sections: [
+      {
+        heading: { en: '1. A pocket label printer (about $17-38)', he: '1. מדפסת מדבקות קטנה (בערך 60-140 ש"ח)' },
+        body: {
+          en: "The Niimbot and Marklife mini printers are thermal, so there is no ink to buy, and they print labels from a phone app over Bluetooth. They're the gift for the person who organises the pantry, the kids' school things or a cable drawer. The Niimbot D110 and the Marklife P15 each had thousands of orders and 98% positive feedback when we checked. The catch: they only print on their own rolls, so add a couple of spare rolls to the order.",
+          he: 'המדפסות הקטנות של Niimbot ו-Marklife הן תרמיות, אז אין דיו לקנות, והן מדפיסות מדבקות מאפליקציה בטלפון דרך בלוטות׳. זאת המתנה למי שמסדר את המזווה, את הציוד של הילדים לבית הספר או מגירת כבלים. ל-Niimbot D110 ול-Marklife P15 היו אלפי הזמנות ו-98% פידבק חיובי כשבדקנו. הקאץ׳: הן מדפיסות רק על הגלילים שלהן, אז תוסיפו להזמנה עוד שניים.',
+        },
+      },
+      {
+        heading: { en: '2. A folding 3-in-1 wireless charger (about $15-25)', he: '2. מטען אלחוטי מתקפל 3 ב-1 (בערך 55-90 ש"ח)' },
+        body: {
+          en: "One pad for the phone, the watch and the earbuds is the gift for anyone with an iPhone and an Apple Watch. The folding ones pack flat for travel. Two things to check: the watch charger has to match the watch (Apple Watch and Samsung use different pucks), and most need a USB-C wall plug of 20 W or more, so check whether one is in the box.",
+          he: 'משטח אחד לטלפון, לשעון ולאוזניות הוא מתנה לכל מי שיש לו אייפון ואפל ווטש. המתקפלים נכנסים שטוחים לתיק. שני דברים לבדוק: המטען של השעון צריך להתאים לשעון (לאפל ולסמסונג יש מטענים שונים), ורובם צריכים מתאם קיר USB-C של 20W ומעלה, אז בודקים אם הוא בקופסה.',
+        },
+      },
+      {
+        heading: { en: '3. A magnetic car phone mount (about $4-10)', he: '3. מעמד מגנטי לטלפון ברכב (בערך 15-35 ש"ח)' },
+        body: {
+          en: "This is the cheapest gift on the list, and probably the one that gets used most. A MagSafe-style vent mount holds the phone with a magnet, so there are no arms to squeeze. The TOPK one we looked at had over 12,000 orders. If the person's phone or case isn't magnetic, a metal ring sticker makes it work, and those cost under a dollar. A version with wireless charging costs about $10 and needs a car USB port.",
+          he: 'המתנה הכי זולה ברשימה וכנראה זאת שהכי ישתמשו בה. מעמד לפתח מזגן בסגנון MagSafe מחזיק את הטלפון עם מגנט, בלי זרועות שצריך ללחוץ עליהן. לזה של TOPK שבדקנו היו יותר מ-12,000 הזמנות. אם הטלפון או הכיסוי לא מגנטיים, מדבקת טבעת מתכת פותרת את זה, והיא עולה פחות מדולר. גרסה עם טעינה אלחוטית עולה בערך 10$ וצריכה שקע USB ברכב.',
+        },
+      },
+      {
+        heading: { en: '4. A neck and shoulder massager (about $15-30)', he: '4. מכשיר עיסוי לצוואר ולכתפיים (בערך 55-110 ש"ח)' },
+        body: {
+          en: "Good for parents and anyone who sits at a desk all day. The kneading shawl type that rests on the shoulders is the one with the most orders, and the heated wrap is cheaper and gentler. Look for a rechargeable one if it will be used on the sofa, and treat heat settings with care on bare skin.",
+          he: 'להורים, ולכל מי שיושב מול מחשב כל היום. הסוג של צעיף לישה שמונח על הכתפיים הוא זה עם הכי הרבה הזמנות, והעטיפה המחוממת זולה ועדינה יותר. אם משתמשים בו על הספה, עדיף דגם נטען, ועם החימום כדאי להיזהר על עור חשוף.',
+        },
+      },
+      {
+        heading: { en: '5. A cordless touch lamp (about $10-20)', he: '5. מנורת מגע אלחוטית (בערך 35-75 ש"ח)' },
+        body: {
+          en: "Small rechargeable table lamps, like the mushroom-shaped ones, are a nice gift for a teenager's room or a bedside table. You tap to switch it on, tap again to dim it, and charge it over USB-C. It won't work as a reading light, so pick the one you like the look of.",
+          he: 'מנורות שולחן קטנות ונטענות, כמו מנורות הפטרייה, הן מתנה נחמדה לחדר של נוער או לשידה ליד המיטה. נוגעים כדי להדליק, נוגעים שוב כדי לעמעם, טוענים ב-USB-C. היא לא מתאימה לקריאה, אז בוחרים לפי המראה.',
+        },
+      },
+      {
+        heading: { en: 'Skip these', he: 'על אלה כדאי לוותר' },
+        body: {
+          en: "Smart rings at $25-30 look like a bargain next to the brand names, but the most popular one we found had 106 orders and 85% positive feedback, well below everything else here. Cheap smartwatches that promise blood pressure or ECG readings make health claims a $30 device can't back up. And skip anything sold as a \"mystery box\": you can't check what you're buying.",
+          he: 'טבעות חכמות ב-25-30$ נראות כמו מציאה ליד המותגים, אבל לפופולרית ביותר שמצאנו היו 106 הזמנות ו-85% פידבק חיובי, הרבה מתחת לכל השאר כאן. שעונים חכמים זולים שמבטיחים מדידת לחץ דם או אק״ג, וזה לא משהו שמכשיר של 100 ש"ח יכול לעשות. ועל כל מה שנמכר כ"קופסת הפתעה" כדאי לוותר: אי אפשר לבדוק מה קונים.',
+        },
+      },
+    ],
+    faq: [
+      {
+        q: { en: 'Will AliExpress gifts arrive in time for Christmas?', he: 'מתנות מאליאקספרס יגיעו בזמן לחנוכה?' },
+        a: {
+          en: "If you order by early December, most will. Standard delivery is typically one to three weeks, and each listing shows an estimated delivery date before you pay, so check it rather than guessing.",
+          he: 'חנוכה מתחיל בערב של 4 בדצמבר 2026. אם מזמינים עכשיו, רוב המשלוחים יגיעו. משלוח רגיל לוקח בדרך כלל שבוע עד שלושה, וכל מודעה מראה תאריך הגעה משוער לפני התשלום, אז כדאי לבדוק אותו ולא לנחש.',
+        },
+      },
+      {
+        q: { en: 'What is a good AliExpress gift under $20?', he: 'מה מתנה טובה מאליאקספרס עד 75 ש"ח?' },
+        a: {
+          en: "A magnetic car phone mount, a cordless touch lamp or a mini label printer like the Marklife P15. All three had thousands of orders and high seller feedback when we checked.",
+          he: 'מעמד מגנטי לטלפון ברכב, מנורת מגע אלחוטית או מדפסת מדבקות קטנה כמו Marklife P15. לשלושתם היו אלפי הזמנות ופידבק גבוה למוכר כשבדקנו.',
+        },
+      },
+      {
+        q: { en: 'Are cheap smart rings from AliExpress worth it?', he: 'שווה לקנות טבעת חכמה זולה מאליאקספרס?' },
+        a: {
+          en: "Not as a gift. The best-known budget ring had far fewer orders and weaker feedback than the other items in this guide, and sizing a ring for someone else is hard.",
+          he: 'לא בתור מתנה. לטבעת הזולה המוכרת ביותר היו הרבה פחות הזמנות ופידבק חלש יותר מכל שאר המוצרים במדריך, וגם קשה לנחש מידה של טבעת בשביל מישהו אחר.',
+        },
+      },
+    ],
+    keywords: ['aliexpress gift ideas', 'aliexpress gifts under 30', 'christmas gifts aliexpress 2026', 'cheap gadget gifts', 'מתנות לחנוכה', 'מתנות מאליאקספרס', 'מתנה עד 100 שקל'],
+    relatedProducts: [
+      { name: 'Mini label printer', label: { en: 'Mini label printer', he: 'מדפסת מדבקות' }, keyword: 'mini thermal label printer bluetooth', minPriceUsd: 12, titleIncludes: ['Niimbot', 'Nimbot', 'Marklife', 'D110', 'P15', 'B21'] },
+      { name: '3-in-1 wireless charger', label: { en: '3-in-1 wireless charger', he: 'מטען אלחוטי 3 ב-1' }, keyword: '3 in 1 foldable wireless charger', minPriceUsd: 12 },
+      { name: 'Magnetic car mount', label: { en: 'Magnetic car mount', he: 'מעמד מגנטי לרכב' }, keyword: 'magnetic car phone holder air vent magsafe', minPriceUsd: 3 },
+      { name: 'Neck and shoulder massager', label: { en: 'Neck and shoulder massager', he: 'מעסה לצוואר ולכתפיים' }, keyword: 'neck shoulder massager electric', minPriceUsd: 15 },
+      { name: 'Cordless touch lamp', label: { en: 'Cordless touch lamp', he: 'מנורת מגע נטענת' }, keyword: 'cordless rechargeable touch table lamp', minPriceUsd: 8 },
+    ],
+    relatedPosts: ['aliexpress-black-friday-real-deals-2026', 'best-power-bank-guide-2026', 'aliexpress-israel-customs-vat'],
+    publishDate: '2026-11-17',
+    category: 'seasonal',
+  },
+  {
     slug: 'best-home-gym-under-500',
     title: {
       en: 'Best Home Gym Equipment Under $500 (2026 Guide)',
