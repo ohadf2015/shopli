@@ -137,8 +137,8 @@ export const blogPosts: BlogPost[] = [
       he: 'שש מתנות מאליאקספרס עד 100 ש"ח עם אלפי הזמנות: מדפסת מדבקות, מטען 3 ב-1, מעמד מגנטי לרכב ועוד, וגם מה לא לקנות.',
     },
     intro: {
-      en: "The best cheap gifts are things people wouldn't buy themselves but end up using every week. That rules out most \"viral gadget\" lists, which are full of things that are fun for a day. We went through what is actually selling on AliExpress this month, kept the items with thousands of orders and 94%+ positive feedback, and dropped anything that needs a leap of faith. Order as early as you can: standard delivery usually takes two to four weeks, and the listing shows the estimated date before you pay. The prices in the headings are rough US dollar ranges, and the product cards show today's price in your own currency.",
-      he: 'מתנה טובה וזולה היא משהו שהאדם לא היה קונה לעצמו, אבל משתמש בו כל שבוע. זה פוסל את רוב הרשימות של "גאדג׳טים ויראליים", שמלאות בדברים שכיף איתם יום אחד. עברנו על מה שבאמת נמכר באליאקספרס החודש, השארנו מוצרים עם אלפי הזמנות ו-94% פידבק חיובי ומעלה, וזרקנו כל מה שצריך להמר עליו. חנוכה מתחיל השנה בערב של 4 בדצמבר, אז כדאי להזמין כבר עכשיו: משלוח רגיל לוקח בדרך כלל שבועיים עד ארבעה, והתאריך מופיע במודעה לפני התשלום. כל המתנות כאן הרבה מתחת לרף ה-75$ של המע"מ.',
+      en: "The best cheap gifts are things people wouldn't buy themselves but end up using every week. That rules out most \"viral gadget\" lists, which are full of things that are fun for a day. We went through what is actually selling on AliExpress this month, kept the items with thousands of orders and 94%+ positive feedback, and dropped anything that needs a leap of faith. Order as early as you can, because delivery time depends on your destination and the shipping speed you pick at AliExpress checkout. The prices in the headings are rough US dollar ranges, and the product cards show today's price in your own currency.",
+      he: 'מתנה טובה וזולה היא משהו שהאדם לא היה קונה לעצמו, אבל משתמש בו כל שבוע. זה פוסל את רוב הרשימות של "גאדג׳טים ויראליים", שמלאות בדברים שכיף איתם יום אחד. עברנו על מה שבאמת נמכר באליאקספרס החודש, השארנו מוצרים עם אלפי הזמנות ו-94% פידבק חיובי ומעלה, וזרקנו כל מה שצריך להמר עליו. חנוכה מתחיל השנה בערב של 4 בדצמבר, אז כדאי להזמין כבר עכשיו: זמן המשלוח תלוי ביעד ובמהירות המשלוח שבוחרים בקופה של אלי אקספרס. כל המתנות כאן הרבה מתחת לרף ה-75$ של המע"מ.',
     },
     sections: [
       {
@@ -188,8 +188,8 @@ export const blogPosts: BlogPost[] = [
       {
         q: { en: 'Will AliExpress gifts arrive in time for Christmas?', he: 'מתנות מאליאקספרס יגיעו בזמן לחנוכה?' },
         a: {
-          en: "It depends on when you order. Standard delivery usually takes two to four weeks, and each listing shows an estimated delivery date before you pay, so check that date rather than guessing.",
-          he: 'חנוכה מתחיל בערב של 4 בדצמבר 2026. זה תלוי במועד ההזמנה. משלוח רגיל לוקח בדרך כלל שבועיים עד ארבעה, וכל מודעה מראה תאריך הגעה משוער לפני התשלום, אז כדאי לבדוק אותו ולא לנחש.',
+          en: "It depends on when you order, where you live and the shipping speed you pick at AliExpress checkout, so check the delivery option there before you pay.",
+          he: 'חנוכה מתחיל בערב של 4 בדצמבר 2026. זה תלוי במועד ההזמנה, ביעד ובמהירות המשלוח שבוחרים בקופה של אלי אקספרס, אז כדאי לבדוק את אפשרות המשלוח שם לפני התשלום.',
         },
       },
       {

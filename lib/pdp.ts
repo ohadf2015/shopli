@@ -62,8 +62,8 @@ export function buildPdpAbout(p: SearchProduct, rtl: boolean): string {
   parts.push(
     t(
       rtl,
-      'הרכישה מתבצעת באלי אקספרס, תחת מדיניות ההגנה על הקונים שלה, ומשלוח בינלאומי רגיל מגיע בדרך כלל תוך 2–4 שבועות. Shopli משווה את המחיר להיסטוריה שלו כדי שתדעו אם זה דיל אמיתי.',
-      'You complete the purchase on AliExpress under its buyer protection, and international delivery usually takes 2–4 weeks with standard shipping. Shopli checks the price against its history so you can tell whether this is a real deal.'
+      'הרכישה מתבצעת באלי אקספרס, תחת מדיניות ההגנה על הקונים שלה, וזמן המשלוח תלוי ביעד ובמהירות המשלוח שבוחרים בקופה. Shopli משווה את המחיר להיסטוריה שלו כדי שתדעו אם זה דיל אמיתי.',
+      'You complete the purchase on AliExpress under its buyer protection, and delivery time depends on your destination and the shipping speed you pick at checkout. Shopli checks the price against its history so you can tell whether this is a real deal.'
     )
   );
   return parts.join(' ');
@@ -147,8 +147,8 @@ export function buildPdpFaq(p: SearchProduct, rtl: boolean): FaqItem[] {
       q: t(rtl, 'כמה זמן לוקח למוצר להגיע?', 'How long does delivery take?'),
       a: t(
         rtl,
-        'משלוח בינלאומי מאלי אקספרס נמשך בדרך כלל 2–4 שבועות, בהתאם ליעד ולשיטת המשלוח.',
-        'International AliExpress delivery typically takes 2–4 weeks depending on destination and shipping method.'
+        'זמן המשלוח תלוי ביעד ובמהירות המשלוח שבוחרים בקופה של אלי אקספרס.',
+        'Delivery time depends on your destination and the shipping speed you pick at AliExpress checkout.'
       ),
     },
     {
