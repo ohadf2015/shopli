@@ -37,3 +37,28 @@ test('keeps the original order', async () => {
   const kept = await keepLinkable(['1', '2', '3', '4', '5', '6'].map(p), lookup);
   assert.deepEqual(kept.map((x) => x.id), ['1', '2', '3', '4', '6']);
 });
+
+const card = (id: string, price: number) => ({ id, title: `p${id}`, price, originalPrice: price + 1, currency: 'EUR', discount: '10%' });
+
+test('a kept card carries the by-id price, the one its product page shows', async () => {
+  const lookup = async (ids: string[]) => [{ id: ids[0], price: 30.19, originalPrice: null, currency: 'EUR', discount: '' }];
+  const [kept] = await keepLinkable([card('1', 23.19)], lookup);
+  assert.equal(kept.price, 30.19);
+  assert.equal(kept.originalPrice, null);
+  assert.equal(kept.discount, '');
+  assert.equal(kept.title, 'p1');
+});
+
+test('a by-id answer without a price leaves the card price alone', async () => {
+  const lookup = async (ids: string[]) => [{ id: ids[0], price: 0 }];
+  const [kept] = await keepLinkable([card('1', 23.19)], lookup);
+  assert.equal(kept.price, 23.19);
+  assert.equal(kept.originalPrice, 24.19);
+});
+
+test('every lookup failing keeps the search prices', async () => {
+  const kept = await keepLinkable([card('1', 5), card('2', 6)], async () => {
+    throw new Error('rate limited');
+  });
+  assert.deepEqual(kept.map((x) => x.price), [5, 6]);
+});
