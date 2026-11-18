@@ -28,8 +28,8 @@ export function buildPdpDescription(p: SearchProduct, rtl: boolean): string {
     parts.push(
       t(
         rtl,
-        `במקום ${p.originalPrice.toFixed(2)} — חיסכון של ${p.discount}`,
-        `down from ${p.originalPrice.toFixed(2)} — save ${p.discount}`
+        `מחיר המחירון של המוכר ${p.originalPrice.toFixed(2)}, הנחה של ${p.discount} ממנו`,
+        `the seller's list price is ${p.originalPrice.toFixed(2)}, which makes it ${p.discount} off that`
       )
     );
   }
@@ -62,8 +62,8 @@ export function buildPdpAbout(p: SearchProduct, rtl: boolean): string {
   parts.push(
     t(
       rtl,
-      'הרכישה מתבצעת באלי אקספרס, תחת מדיניות ההגנה על הקונים שלה, ומשלוח בינלאומי מגיע בדרך כלל תוך 2–4 שבועות. Shopli משווה את המחיר להיסטוריה שלו כדי שתדעו אם זה דיל אמיתי.',
-      'You complete the purchase on AliExpress under its buyer protection, and international delivery usually takes 2–4 weeks. Shopli checks the price against its history so you can tell whether this is a real deal.'
+      'הרכישה מתבצעת באלי אקספרס, תחת מדיניות ההגנה על הקונים שלה, ומשלוח בינלאומי רגיל מגיע בדרך כלל תוך 2–4 שבועות. Shopli משווה את המחיר להיסטוריה שלו כדי שתדעו אם זה דיל אמיתי.',
+      'You complete the purchase on AliExpress under its buyer protection, and international delivery usually takes 2–4 weeks with standard shipping. Shopli checks the price against its history so you can tell whether this is a real deal.'
     )
   );
   return parts.join(' ');
