@@ -100,7 +100,10 @@ export default function CompareAddProduct({
               value={q}
               autoFocus={autoFocus}
               onChange={(e) => setQ(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && pasted.length > 0 && add(pasted)}
+              onKeyDown={(e) => {
+                if (e.nativeEvent.isComposing || e.keyCode === 229) return
+                if (e.key === 'Enter' && pasted.length > 0) add(pasted)
+              }}
               placeholder={
                 tr('Search a product, or paste an AliExpress link', 'חפשו מוצר, או הדביקו קישור מ-AliExpress')
               }
