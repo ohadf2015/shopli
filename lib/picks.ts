@@ -1,4 +1,5 @@
 import { passesQualityGate } from './quality';
+import { PRICE_SERIES_START } from './verdict';
 import { ensureFeedProductsTable } from './feed-store';
 import { rankPicks, scoreTerms, type PickReason } from './ranking';
 
@@ -202,7 +203,8 @@ export async function getPickCandidates(
   let rows: Array<Record<string, any>>;
   try {
     rows = await sql`
-      SELECT s.product_id, s.seen_on, s.volume, s.price,
+      SELECT s.product_id, s.seen_on, s.volume,
+             CASE WHEN s.seen_on >= ${PRICE_SERIES_START}::date THEN s.price END AS price,
              f.title, f.currency, f.image_url, f.rating, f.product_type
       FROM product_volume_snapshots s
       JOIN feed_products f ON f.product_id = s.product_id AND f.region = s.region
