@@ -34,6 +34,10 @@ export interface Verdict {
   spanDays: number;
 }
 
+// Snapshots switched from the search price to the product page's by-id price on
+// this day; outside the US the two differ by 50-90%, so older readings are not comparable.
+export const PRICE_SERIES_START = '2026-11-18';
+
 /** Fewer readings than this and the price story is too thin to judge. */
 export const MIN_READINGS = 5;
 /** Buyer rating (0–100 positive feedback) under which we warn rather than recommend. */

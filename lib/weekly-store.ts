@@ -6,6 +6,7 @@
  * would ship to the browser, the Neon driver included (see PR #89).
  */
 
+import { PRICE_SERIES_START } from './verdict';
 import {
   addDays,
   buildWeeklyIssue,
@@ -42,7 +43,9 @@ export async function loadWeeklyIssue(region: WeeklyRegion, issueDate: string): 
     const [snapRows, metaRows] = await Promise.all([
       sql`
         SELECT product_id,
-               json_agg(json_build_array(to_char(seen_on, 'YYYY-MM-DD'), volume, price) ORDER BY seen_on) AS s
+               json_agg(json_build_array(to_char(seen_on, 'YYYY-MM-DD'), volume,
+                 CASE WHEN seen_on >= ${PRICE_SERIES_START}::date OR ${issueDate}::date < ${PRICE_SERIES_START}::date THEN price END)
+                 ORDER BY seen_on) AS s
         FROM product_volume_snapshots
         WHERE region = ${region}
           AND seen_on BETWEEN ${from}::date AND ${issueDate}::date

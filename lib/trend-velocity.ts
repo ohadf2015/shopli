@@ -1,3 +1,5 @@
+import { PRICE_SERIES_START } from './verdict';
+
 /**
  * Real sales velocity, from AliExpress order counts we snapshot ourselves.
  *
@@ -192,6 +194,7 @@ export async function getPriceHistory(
         AND region = ${region}
         AND price IS NOT NULL
         AND seen_on >= CURRENT_DATE - ${windowDays}::int
+        AND seen_on >= ${PRICE_SERIES_START}::date
       ORDER BY seen_on ASC`;
     return rows.map((r) => ({
       day: new Date(r.seen_on).toISOString().slice(0, 10),
