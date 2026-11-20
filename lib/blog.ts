@@ -52,8 +52,8 @@ export const blogPosts: BlogPost[] = [
       he: 'ה-60%- באליאקספרס נמדד מול מחיר שהמוכר בחר. מה מראים המחירים שאנחנו רושמים כל יום, וחמש בדיקות לפני שקונים בבלאק פריידי.',
     },
     intro: {
-      en: "Black Friday lands on November 27 this year and Cyber Monday on November 30, and every AliExpress listing will wear a big red percentage. That number compares today's price with a \"list price\" the seller types in themselves, so it tells you very little. We record the price of the products on Shopli every day, and on November 15 we checked how many were really cheaper than usual. Of the 92 products we had at least ten days of prices for in the US, 9 were 10% or more under their own usual price. Six were 10% or more above it. So real deals exist, but they're the minority. These numbers come from the US catalog only, so read them as a US sample, not a European one.",
-      he: 'בלאק פריידי נופל השנה ב-27 בנובמבר וסייבר מאנדיי ב-30, וכל מודעה באליאקספרס תגיע עם אחוז הנחה אדום וגדול. המספר הזה משווה את המחיר של היום ל"מחיר מחירון" שהמוכר הקליד בעצמו, אז הוא כמעט לא אומר כלום. אנחנו רושמים כל יום את המחיר של המוצרים בשופלי, וב-15 בנובמבר בדקנו כמה מהם באמת זולים מהרגיל. מתוך 92 מוצרים שהיו לנו עליהם לפחות עשרה ימי מחירים בארה"ב, רק 9 היו זולים ב-10% ומעלה מהמחיר הרגיל שלהם. שישה היו יקרים ב-10% ומעלה. כלומר, יש גם מבצעים אמיתיים, אבל הם המיעוט. המספרים האלה מגיעים מהקטלוג האמריקאי בלבד, אז כדאי לקרוא אותם כמדגם אמריקאי ולא כמדגם ישראלי או אירופי.',
+      en: "Black Friday lands on November 27 this year and Cyber Monday on November 30, but AliExpress runs longer than that. In the sale calendar it announced at the end of October, its Black Friday campaign runs from November 19 to 30, and a Cyber Monday phase follows from November 30 to December 3, on US Pacific time. Every listing in that stretch will wear a big red percentage. That number compares today's price with a \"list price\" the seller types in themselves, so it tells you very little. We record the price of the products on Shopli every day, and on November 15 we checked how many were really cheaper than usual. Of the 92 products we had at least ten days of prices for in the US, 9 were 10% or more under their own usual price. Six were 10% or more above it. So real deals exist, but they're the minority. These numbers come from the US catalog only, so read them as a US sample, not a European one.",
+      he: 'בלאק פריידי נופל השנה ב-27 בנובמבר וסייבר מאנדיי ב-30, אבל אצל אליאקספרס המבצע ארוך יותר. לפי לוח המבצעים שהחברה פרסמה בסוף אוקטובר, קמפיין הבלאק פריידי רץ מ-19 עד 30 בנובמבר, ושלב הסייבר מאנדיי ממשיך מ-30 בנובמבר עד 3 בדצמבר, לפי שעון החוף המערבי בארה"ב (עשר שעות אחרי ישראל). כל מודעה בתקופה הזאת תגיע עם אחוז הנחה אדום וגדול. המספר הזה משווה את המחיר של היום ל"מחיר מחירון" שהמוכר הקליד בעצמו, אז הוא כמעט לא אומר כלום. אנחנו רושמים כל יום את המחיר של המוצרים בשופלי, וב-15 בנובמבר בדקנו כמה מהם באמת זולים מהרגיל. מתוך 92 מוצרים שהיו לנו עליהם לפחות עשרה ימי מחירים בארה"ב, רק 9 היו זולים ב-10% ומעלה מהמחיר הרגיל שלהם. שישה היו יקרים ב-10% ומעלה. כלומר, יש גם מבצעים אמיתיים, אבל הם המיעוט. המספרים האלה מגיעים מהקטלוג האמריקאי בלבד, אז כדאי לקרוא אותם כמדגם אמריקאי ולא כמדגם ישראלי או אירופי.',
     },
     sections: [
       {
@@ -96,8 +96,8 @@ export const blogPosts: BlogPost[] = [
       {
         q: { en: 'When is AliExpress Black Friday 2026?', he: 'מתי בלאק פריידי באליאקספרס ב-2026?' },
         a: {
-          en: "Black Friday is November 27, 2026 and Cyber Monday is November 30. AliExpress announces its own sale window shortly before, and in past years it ran for several days around those dates, so check the app for the exact start.",
-          he: 'בלאק פריידי יוצא ב-27 בנובמבר 2026 וסייבר מאנדיי ב-30 בנובמבר. אליאקספרס מכריזה על חלון המבצע שלה זמן קצר לפני, ובשנים קודמות הוא נמשך כמה ימים סביב התאריכים האלה, אז כדאי לבדוק באפליקציה מתי בדיוק הוא מתחיל.',
+          en: "Black Friday is November 27, 2026 and Cyber Monday is November 30. AliExpress's own sale calendar for 2026, announced on October 30, runs its Black Friday campaign from November 19 to 30 and a Cyber Monday phase from November 30 to December 3, on US Pacific time. The 11.11 sale before it ran from November 1 to 18.",
+          he: 'בלאק פריידי יוצא ב-27 בנובמבר 2026 וסייבר מאנדיי ב-30 בנובמבר. לפי לוח המבצעים שאליאקספרס פרסמה ב-30 באוקטובר, קמפיין הבלאק פריידי שלה רץ מ-19 עד 30 בנובמבר, ושלב הסייבר מאנדיי מ-30 בנובמבר עד 3 בדצמבר, לפי שעון החוף המערבי בארה"ב. מבצע 11.11 שלפניו רץ מ-1 עד 18 בנובמבר.',
         },
       },
       {
@@ -115,7 +115,7 @@ export const blogPosts: BlogPost[] = [
         },
       },
     ],
-    keywords: ['aliexpress black friday 2026', 'aliexpress black friday deals', 'aliexpress fake discounts', 'is aliexpress black friday worth it', 'בלאק פריידי אליאקספרס', 'מבצעים עלי אקספרס', 'בלאק פריידי 2026'],
+    keywords: ['aliexpress black friday 2026', 'aliexpress black friday deals', 'aliexpress sale calendar 2026', 'aliexpress fake discounts', 'is aliexpress black friday worth it', 'בלאק פריידי אליאקספרס', 'מבצעים עלי אקספרס', 'בלאק פריידי 2026'],
     relatedProducts: [
       { name: '240 W USB-C cable', label: { en: '240 W USB-C cable', he: 'כבל USB-C של 240W' }, keyword: '240W USB C to USB C cable fast charging nylon', minPriceUsd: 1 },
       { name: '3-in-1 wireless charger', label: { en: '3-in-1 wireless charger', he: 'מטען אלחוטי 3 ב-1' }, keyword: '3 in 1 foldable wireless charger', minPriceUsd: 12 },
