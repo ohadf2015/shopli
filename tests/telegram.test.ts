@@ -1,73 +1,64 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildPicksMessage, escapeMarkdown, shortTitle } from '../lib/telegram';
+import { buildPickPost, escapeHtml, shortTitle } from '../lib/telegram';
 import type { Pick, PickReason } from '../lib/picks';
 
 function pick(over: Partial<Pick> = {}): Pick {
   return {
     productId: '1005001', title: 'Silicone Face Brush', price: 5.98, currency: 'ILS',
-    imageUrl: 'x', rating: 96, volume: 4000, category: 'Beauty', reason: 'surging' as PickReason, score: 80,
+    imageUrl: 'https://ae01.alicdn.com/x.jpg', rating: 96, volume: 4000, category: 'Beauty', reason: 'surging' as PickReason, score: 80,
     perDay: 551, recentPerDay: 2178, surge: 3.95, spanDays: 4,
     priceNow: 5.98, priceMedian: 6.92, dropPct: 14, asOf: '2026-08-15', ...over,
   };
 }
 
-test('nothing to say means no post', () => {
-  // A filler roundup every day regardless is what made the old channel dead.
-  assert.equal(buildPicksMessage('il', []), null);
+const LINK = 'https://s.click.aliexpress.com/e/_abc';
+
+test('a post is a photo with the reason, price and why it is here', () => {
+  const post = buildPickPost('us', pick(), { currencySymbol: '$' });
+  assert.equal(post.photo, 'https://ae01.alicdn.com/x.jpg');
+  assert.match(post.caption, /Selling fast/);
+  assert.match(post.caption, /\$5\.98/);
+  assert.match(post.caption, /2,178 sold a day, 4\.0x its usual pace/);
 });
 
-test('the post states why each product is in it', () => {
-  const msg = buildPicksMessage('us', [pick(), pick({ productId: '2', reason: 'price_drop', dropPct: 28 })], {
-    currencySymbol: '$',
-  })!;
-  assert.match(msg, /2178 selling a day right now/);
-  assert.match(msg, /4\\\.0x its usual rate/);
-  assert.match(msg, /28% below its own median price over 4 days/);
+test('a price drop shows the usual price it dropped from', () => {
+  const post = buildPickPost('us', pick({ reason: 'price_drop', dropPct: 28, priceMedian: 8.3 }), { currencySymbol: '$' });
+  assert.match(post.caption, /usually \$8\.30/);
+  assert.match(post.caption, /28% below its usual price/);
 });
 
-test('review counts appear in the post when provided', () => {
-  const msg = buildPicksMessage('us', [pick()], {
-    currencySymbol: '$',
-    reviews: { '1005001': { writtenCount: 124 } },
-  })!;
-  assert.match(msg, /124 buyer reviews/);
+test('the buy button appears only with a tracked promotion link', () => {
+  const withLink = buildPickPost('il', pick(), { currencySymbol: '₪', buyLink: LINK });
+  assert.deepEqual(withLink.buttons.map((b) => b.url), [LINK, 'https://www.tryshopli.com/il/product/1005001']);
+  const untracked = buildPickPost('il', pick(), { buyLink: 'https://www.aliexpress.com/item/1.html' });
+  assert.equal(untracked.buttons.length, 1);
+  assert.match(untracked.buttons[0].url, /tryshopli\.com\/il\/product\/1005001/);
 });
 
-test('missing review count omits the line rather than showing zero', () => {
-  const msg = buildPicksMessage('us', [pick()], {
-    currencySymbol: '$',
-    // No review data provided for this product
-  })!;
-  // No "0 buyer reviews" or similar line should appear
-  assert.equal(msg.split('\n').filter(line => line.includes('buyer reviews')).length, 0);
+test('review count is shown when known and omitted rather than zero', () => {
+  assert.match(buildPickPost('us', pick(), { reviews: 124 }).caption, /124 reviews/);
+  assert.doesNotMatch(buildPickPost('us', pick()).caption, /reviews/);
 });
 
-test('links go to Shopli, never straight to AliExpress', () => {
-  const msg = buildPicksMessage('il', [pick()], { currencySymbol: '₪' })!;
-  assert.match(msg, /\/il\/product\/1005001/);
-  assert.doesNotMatch(msg, /aliexpress/i);
+test('Israel posts are in Hebrew, use the Hebrew title and flag duty-free items', () => {
+  const post = buildPickPost('il', pick(), { currencySymbol: '₪', title: 'מברשת ניקוי פנים מסיליקון' });
+  assert.match(post.caption, /מזנק עכשיו/);
+  assert.match(post.caption, /מברשת ניקוי פנים/);
+  assert.match(post.caption, /בלי מע״מ ומכס/);
+  const pricey = buildPickPost('il', pick({ price: 900 }), { currencySymbol: '₪' });
+  assert.doesNotMatch(pricey.caption, /מע״מ/);
 });
 
-test('MarkdownV2 reserved characters are escaped', () => {
-  // One unescaped '.' and Telegram rejects the entire message.
-  const msg = buildPicksMessage('us', [pick({ title: 'Pro-Grade (v2.0) Kit!' })], { currencySymbol: '$' })!;
-  // Strip escaped pairs and the link URLs (the one place escaping is not
-  // required), then nothing reserved may remain.
-  const bare = msg.replace(/\\./g, '').replace(/\]\([^)]*\)/g, ']');
-  assert.doesNotMatch(bare, /[.!()-]/);
-  assert.equal(escapeMarkdown('a.b-c!'), 'a\\.b\\-c\\!');
+test('titles are escaped for HTML and cut at a word', () => {
+  const post = buildPickPost('us', pick({ title: 'Cable <USB-C> & Lightning' }));
+  assert.match(post.caption, /Cable &lt;USB-C&gt; &amp; Lightning/);
+  assert.equal(escapeHtml('a<b'), 'a&lt;b');
+  const out = shortTitle('Wireless Bluetooth Earphones With Charging Case And Noise Cancelling Microphone For Sport');
+  assert.ok(out.length <= 71 && out.endsWith('…'));
 });
 
-test('titles are cut at a word', () => {
-  const long = 'Wireless Bluetooth Earphones With Charging Case And Noise Cancelling Microphone For Sport';
-  const out = shortTitle(long);
-  assert.ok(out.length <= 71);
-  assert.ok(out.endsWith('…'));
-  assert.ok(!out.includes('  '));
-});
-
-test('the region decides the language', () => {
-  assert.match(buildPicksMessage('il', [pick()], { currencySymbol: '₪' })!, /מזנק/);
-  assert.match(buildPicksMessage('de', [pick()], { currencySymbol: '€' })!, /Surging/);
+test('captions stay under the Telegram photo caption limit', () => {
+  const post = buildPickPost('il', pick({ title: 'x '.repeat(500) }), { currencySymbol: '₪', reviews: 99999, buyLink: LINK });
+  assert.ok(post.caption.length < 1024);
 });

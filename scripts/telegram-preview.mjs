@@ -31,10 +31,10 @@ try {
   // No .env.local is fine if the variables are already exported.
 }
 
-let getPicks, buildPicksMessage, getRegion;
+let getPicks, buildPickPost, getRegion;
 try {
   ({ getPicks } = require('../.test-build/lib/picks.js'));
-  ({ buildPicksMessage } = require('../.test-build/lib/telegram.js'));
+  ({ buildPickPost } = require('../.test-build/lib/telegram.js'));
   ({ getRegion } = require('../.test-build/lib/regions.js'));
 } catch {
   console.error('Build the TS first:  npm test');
@@ -42,18 +42,14 @@ try {
 }
 
 const region = process.argv[2] || 'il';
-const count = parseInt(process.argv[3], 10) || 5;
+const count = parseInt(process.argv[3], 10) || 4;
 
-const picks = await getPicks(region, { limit: 12 });
-const message = buildPicksMessage(region, picks, {
-  currencySymbol: getRegion(region).currencySymbol,
-  count,
-});
-
-if (!message) {
-  console.log(`No picks for ${region} — the cron would post nothing today.`);
+const picks = (await getPicks(region, { limit: 12 })).slice(0, count);
+if (!picks.length) {
+  console.log(`No picks for ${region}; the cron would post nothing today.`);
 } else {
-  console.log(message);
-  console.log('\n---');
-  console.log(`${picks.length} picks available · ${message.length} chars (Telegram limit 4096)`);
+  for (const p of picks) {
+    const post = buildPickPost(region, p, { currencySymbol: getRegion(region).currencySymbol });
+    console.log(`[photo] ${post.photo}\n${post.caption}\n${post.buttons.map((b) => `[${b.text}] ${b.url}`).join('\n')}\n`);
+  }
 }
