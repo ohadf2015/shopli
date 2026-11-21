@@ -211,6 +211,12 @@ export default function Footer({ currentRegion }: { currentRegion: RegionCode | 
                   </Link>
                 </li>
               ))}
+              <li className="flex items-center">
+                <a href="https://oddities.app/app/shopli?ref=badge">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="https://oddities.app/badge/shopli" alt="Shopli on Oddities" height="20" width="204" loading="lazy" decoding="async" className="opacity-80 hover:opacity-100 transition-opacity" />
+                </a>
+              </li>
             </ul>
           </nav>
 
