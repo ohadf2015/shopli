@@ -1,13 +1,21 @@
 // Comparison articles — high-converting affiliate content
 // Each comparison has: intro, product1, product2, verdict, faq, jsonld
 
+export interface ComparisonSide {
+  name: string;
+  keyword: string;
+  pros: string[];
+  cons: string[];
+  localized?: { [lang: string]: { name: string; pros: string[]; cons: string[] } };
+}
+
 export interface ComparisonArticle {
   slug: string;
   title: { [lang: string]: string };
   metaDesc: { [lang: string]: string };
   intro: { [lang: string]: string };
-  product1: { name: string; keyword: string; pros: string[]; cons: string[] };
-  product2: { name: string; keyword: string; pros: string[]; cons: string[] };
+  product1: ComparisonSide;
+  product2: ComparisonSide;
   verdict: { [lang: string]: string };
   faq: { q: { [lang: string]: string }; a: { [lang: string]: string } }[];
   keywords: string[];
@@ -83,8 +91,8 @@ export const comparisons: ComparisonArticle[] = [
       es: 'Dos métodos dominan las rutinas matutinas: la prensa francesa y la cafetera de goteo. Ambos producen café excelente, pero difieren en sabor, conveniencia, precio y ritual.',
       it: 'Due metodi dominano le routine mattutine: la French Press e la Macchina da Caffè a Goccia. Entrambi producono un caffè eccellente, ma differiscono per gusto, praticità, prezzo e rituale.',
     },
-    product1: { name: 'French Press', keyword: 'french press coffee maker', pros: ['Richer, full-bodied flavor', 'Simple design, no filters needed', 'Easy to clean', 'Affordable price point', 'Portable for travel'], cons: ['Sediment in cup', 'Coffee cools faster', 'Manual process', 'Smaller batch sizes'] },
-    product2: { name: 'Drip Coffee Maker', keyword: 'automatic drip coffee maker', pros: ['Set-and-forget convenience', 'Programmable timer', 'Larger batches', 'Consistent results', 'Keeps coffee warm'], cons: ['Takes counter space', 'Paper filters cost', 'Less flavor extraction', 'Harder to clean thoroughly'] },
+    product1: { name: 'French Press', keyword: 'french press coffee maker', pros: ['Richer, full-bodied flavor', 'Simple design, no filters needed', 'Easy to clean', 'Affordable price point', 'Portable for travel'], cons: ['Sediment in cup', 'Coffee cools faster', 'Manual process', 'Smaller batch sizes'], localized: { es: { name: 'Prensa francesa', pros: ['Sabor más intenso y con cuerpo', 'Diseño sencillo, sin filtros', 'Fácil de limpiar', 'Precio asequible', 'Cómoda para viajar'], cons: ['Deja sedimento en la taza', 'El café se enfría antes', 'Preparación manual', 'Prepara menos cantidad'] } } },
+    product2: { name: 'Drip Coffee Maker', keyword: 'automatic drip coffee maker', pros: ['Set-and-forget convenience', 'Programmable timer', 'Larger batches', 'Consistent results', 'Keeps coffee warm'], cons: ['Takes counter space', 'Paper filters cost', 'Less flavor extraction', 'Harder to clean thoroughly'], localized: { es: { name: 'Cafetera de goteo', pros: ['Comodidad total: la programas y te olvidas', 'Temporizador programable', 'Prepara más café de una vez', 'Resultados constantes', 'Mantiene el café caliente'], cons: ['Ocupa espacio en la encimera', 'Los filtros de papel son un gasto extra', 'Extrae menos sabor', 'Más difícil de limpiar a fondo'] } } },
     verdict: {
       en: 'Choose a French Press if you value rich, full-bodied flavor and don\'t mind a simple manual ritual. Choose a Drip Coffee Maker if convenience and batch size matter more — especially for busy mornings or multiple coffee drinkers. For most households, having both covers every scenario.',
       he: 'בחרו פרנץ׳ פרס אם אתם מעריכים טעם עשיר ומלא ולא אכפת לכם מטקס ידני פשוט. בחרו מכונת פילטר אם נוחות וכמות גדולה חשובים יותר — במיוחד לבקרים עמוסים או למספר שותי קפה. לרוב המשקי בית, שני הכלים מכסים כל תרחיש.',
