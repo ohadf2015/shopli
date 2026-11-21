@@ -32,7 +32,7 @@ export default function BlogIndexPage({ region, config, posts, rtl, hasWeekly }:
         jsonLd={structuredData}
       />
       <Header currentRegion={region} dir={config?.direction} />
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-16">
         <div className="mb-12">
           <h1 className="text-3xl md:text-5xl font-extrabold mb-4" style={{ color: 'var(--shopli-navy)' }}>
             {rtl ? 'בלוג שופלי' : 'Shopli Blog'}

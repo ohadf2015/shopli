@@ -163,7 +163,7 @@ export default function LandedPage({ boiRate, boiDate }: LandedProps) {
       <Header currentRegion="il" dir="rtl" />
 
       <main dir="rtl" className="min-h-screen" style={{ fontFamily: 'var(--font-assistant), system-ui, sans-serif' }}>
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-16">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-16">
           <p className="text-xs font-semibold tracking-wider text-orange-700 mb-2">מחשבון יבוא אישי</p>
           <h1 className="text-3xl md:text-4xl font-extrabold leading-tight mb-3" style={{ color: INK }}>
             כמה ההזמנה מחו״ל תעלה לכם עד הבית?

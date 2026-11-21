@@ -7,6 +7,7 @@ import FindSimilar from '../../../components/FindSimilar';
 import BuyerReviews from '../../../components/BuyerReviews';
 import LandedCostBadge from '../../../components/LandedCostBadge';
 import VerdictCard from '../../../components/VerdictCard';
+import { buyCopy } from '../../../lib/buy-copy';
 import { computeVerdict, sparklineSegments, type Verdict } from '../../../lib/verdict';
 import { getPriceHistory } from '../../../lib/trend-velocity';
 import { cacheIfNotEmpty } from '../../../lib/cache';
@@ -92,7 +93,7 @@ export default function ProductPage({
           noindex
         />
         <Header currentRegion={region} dir={config.direction} />
-        <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16 text-center">
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-16 text-center">
           <div
             className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
             style={{ background: 'oklch(90% 0.06 45)', color: 'var(--shopli-orange)' }}
@@ -130,6 +131,13 @@ export default function ProductPage({
   });
   const stars = ratingStars(product.rating);
   const about = buildPdpAbout(product, rtl);
+  const copy = buyCopy(lang);
+  const locale = lang === 'he' ? 'he-IL' : lang;
+  const trust = [
+    product.rating > 0 ? `${Math.round(product.rating)}${copy.positive}` : '',
+    product.volume > 0 ? `${product.volume.toLocaleString(locale)}${copy.orders}` : '',
+    copy.protection,
+  ].filter(Boolean);
   const originalPrice = product.originalPrice != null && product.originalPrice > product.price ? product.originalPrice : null;
 
   // Still no aggregateRating, deliberately, now that the page HAS reviews: they
@@ -170,7 +178,7 @@ export default function ProductPage({
       <Header currentRegion={region} dir={config.direction} />
 
       <main
-        className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-32 md:pb-16"
+        className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-32 md:pb-16"
         style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}
       >
         {/* Breadcrumb */}
@@ -190,7 +198,7 @@ export default function ProductPage({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 fade-in">
           {/* Image */}
-          <div className="bg-white rounded-xl border border-[#141414]  overflow-hidden">
+          <div className="bg-white rounded-xl border border-[#141414] overflow-hidden self-start md:sticky md:top-24">
             <div className="aspect-square bg-[#FFF4E4] flex items-center justify-center relative">
               {product.imageUrl ? (
                 <img
@@ -220,7 +228,7 @@ export default function ProductPage({
           {/* Details */}
           <div className="flex flex-col">
             <h1
-              className="text-2xl sm:text-3xl font-extrabold leading-tight mb-3"
+              className="text-xl sm:text-3xl font-extrabold leading-tight mb-3 line-clamp-3 sm:line-clamp-none"
               style={{ color: 'var(--shopli-navy)' }}
               title={product.originalTitle || undefined}
             >
@@ -286,6 +294,38 @@ export default function ProductPage({
               />
             )}
 
+            <div className="mb-6">
+              <a
+                href={product.affiliateLink}
+                target="_blank"
+                rel="nofollow sponsored noopener noreferrer"
+                data-cta="pdp_main"
+                className="btn-primary w-full text-base py-4"
+                data-product-id={product.id}
+                data-product-title={product.title}
+                data-price={product.price.toFixed(2)}
+                data-currency={config.currencySymbol}
+                data-category={product.category || ''}
+                data-region={region}
+              >
+                {copy.cta}
+                <Icon name="external" size={16} />
+              </a>
+              {trust.length > 0 && (
+                <p className="mt-3 text-sm font-medium flex flex-wrap gap-x-3 gap-y-1" style={{ color: 'var(--shopli-navy)' }}>
+                  {trust.map((t) => (
+                    <span key={t} className="inline-flex items-center gap-1">
+                      <span aria-hidden="true" style={{ color: 'var(--shopli-teal)' }}>✓</span>
+                      {t}
+                    </span>
+                  ))}
+                </p>
+              )}
+              <p className="mt-1 text-xs" style={{ color: 'var(--shopli-warm-gray)' }}>
+                {copy.note}
+              </p>
+            </div>
+
             <VerdictCard
               verdict={verdict}
               spark={sparkline}
@@ -317,22 +357,7 @@ export default function ProductPage({
               )}
             </div>
 
-            <div className="mt-auto flex flex-col sm:flex-row gap-3">
-              <a
-                href={product.affiliateLink}
-                target="_blank"
-                rel="nofollow sponsored noopener noreferrer"
-                className="btn-primary text-center text-base"
-                data-product-id={product.id}
-                data-product-title={product.title}
-                data-price={product.price.toFixed(2)}
-                data-currency={config.currencySymbol}
-                data-category={product.category || ''}
-                data-region={region}
-              >
-                <Icon name="external" size={16} />
-                {rtl ? 'קנו עכשיו באליאקספרס' : 'Buy now on AliExpress'}
-              </a>
+            <div className="flex flex-wrap items-center gap-3 mb-2">
               <ShareBar
                 title={product.title}
                 url={pageUrl}
@@ -476,13 +501,14 @@ export default function ProductPage({
               {product.price.toFixed(2)}
             </span>
             <span className="text-xs" style={{ color: '#5C554C' }}>
-              {rtl ? 'באליאקספרס עכשיו' : 'on AliExpress now'}
+              {copy.now}
             </span>
           </div>
           <a
             href={product.affiliateLink}
             target="_blank"
             rel="nofollow sponsored noopener noreferrer"
+            data-cta="pdp_sticky"
             className="flex-1 text-center font-bold rounded-xl py-3"
             style={{ background: 'var(--shopli-orange)', border: '2.5px solid #141414', boxShadow: '3px 3px 0 #141414', color: '#141414' }}
             data-product-id={product.id}
@@ -492,7 +518,7 @@ export default function ProductPage({
             data-category={product.category || ''}
             data-region={region}
           >
-            {rtl ? 'לקנייה באליאקספרס' : 'Get it on AliExpress'}
+            {copy.cta}
           </a>
         </div>
       </main>

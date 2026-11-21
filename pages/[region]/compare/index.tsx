@@ -219,7 +219,7 @@ export default function ProductComparePage({
       <Header currentRegion={region} dir={config.direction} />
 
       <main
-        className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16"
+        className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-16"
         style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}
       >
         <a

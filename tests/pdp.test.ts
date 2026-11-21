@@ -63,6 +63,19 @@ test('related collections returns valid collection slugs', () => {
   for (const c of rel) assert.ok(slugs.has(c.slug), `unknown slug ${c.slug}`);
 });
 
+test('related collections match whole words and stay empty without a match', () => {
+  const chair = {
+    ...product,
+    title: 'Big and Tall Cloud Office Chair with Foot Rest',
+    category: 'Furniture',
+    categoryPath: 'Furniture > Office Furniture',
+  };
+  const names = relatedCollections(chair).map((c) => c.slug);
+  assert.ok(!names.some((s) => s.includes('hair')), `chair matched ${names.join(',')}`);
+  const nothing = { ...product, title: 'Zqxv', category: '', categoryPath: '' };
+  assert.deepEqual(relatedCollections(nothing), []);
+});
+
 test('listingAggregateFields strips ratings when the schema URL is an on-site PDP', () => {
   const stripped = listingAggregateFields(
     { id: '1005007001' },
