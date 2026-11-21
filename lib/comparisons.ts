@@ -1,6 +1,8 @@
 // Comparison articles — high-converting affiliate content
 // Each comparison has: intro, product1, product2, verdict, faq, jsonld
 
+import { localizedSides } from './comparison-localized';
+
 export interface ComparisonSide {
   name: string;
   keyword: string;
@@ -91,8 +93,8 @@ export const comparisons: ComparisonArticle[] = [
       es: 'Dos métodos dominan las rutinas matutinas: la prensa francesa y la cafetera de goteo. Ambos producen café excelente, pero difieren en sabor, conveniencia, precio y ritual.',
       it: 'Due metodi dominano le routine mattutine: la French Press e la Macchina da Caffè a Goccia. Entrambi producono un caffè eccellente, ma differiscono per gusto, praticità, prezzo e rituale.',
     },
-    product1: { name: 'French Press', keyword: 'french press coffee maker', pros: ['Richer, full-bodied flavor', 'Simple design, no filters needed', 'Easy to clean', 'Affordable price point', 'Portable for travel'], cons: ['Sediment in cup', 'Coffee cools faster', 'Manual process', 'Smaller batch sizes'], localized: { es: { name: 'Prensa francesa', pros: ['Sabor más intenso y con cuerpo', 'Diseño sencillo, sin filtros', 'Fácil de limpiar', 'Precio asequible', 'Cómoda para viajar'], cons: ['Deja sedimento en la taza', 'El café se enfría antes', 'Preparación manual', 'Prepara menos cantidad'] } } },
-    product2: { name: 'Drip Coffee Maker', keyword: 'automatic drip coffee maker', pros: ['Set-and-forget convenience', 'Programmable timer', 'Larger batches', 'Consistent results', 'Keeps coffee warm'], cons: ['Takes counter space', 'Paper filters cost', 'Less flavor extraction', 'Harder to clean thoroughly'], localized: { es: { name: 'Cafetera de goteo', pros: ['Comodidad total: la programas y te olvidas', 'Temporizador programable', 'Prepara más café de una vez', 'Resultados constantes', 'Mantiene el café caliente'], cons: ['Ocupa espacio en la encimera', 'Los filtros de papel son un gasto extra', 'Extrae menos sabor', 'Más difícil de limpiar a fondo'] } } },
+    product1: { name: 'French Press', keyword: 'french press coffee maker', pros: ['Richer, full-bodied flavor', 'Simple design, no filters needed', 'Easy to clean', 'Affordable price point', 'Portable for travel'], cons: ['Sediment in cup', 'Coffee cools faster', 'Manual process', 'Smaller batch sizes'] },
+    product2: { name: 'Drip Coffee Maker', keyword: 'automatic drip coffee maker', pros: ['Set-and-forget convenience', 'Programmable timer', 'Larger batches', 'Consistent results', 'Keeps coffee warm'], cons: ['Takes counter space', 'Paper filters cost', 'Less flavor extraction', 'Harder to clean thoroughly'] },
     verdict: {
       en: 'Choose a French Press if you value rich, full-bodied flavor and don\'t mind a simple manual ritual. Choose a Drip Coffee Maker if convenience and batch size matter more — especially for busy mornings or multiple coffee drinkers. For most households, having both covers every scenario.',
       he: 'בחרו פרנץ׳ פרס אם אתם מעריכים טעם עשיר ומלא ולא אכפת לכם מטקס ידני פשוט. בחרו מכונת פילטר אם נוחות וכמות גדולה חשובים יותר — במיוחד לבקרים עמוסים או למספר שותי קפה. לרוב המשקי בית, שני הכלים מכסים כל תרחיש.',
@@ -550,6 +552,14 @@ export const comparisons: ComparisonArticle[] = [
         keywords: ['usb c hub vs docking station', 'laptop hub or dock', 'best usb c hub', 'docking station for laptop', 'macbook hub vs dock'],
       },
 ];
+
+for (const c of comparisons) {
+  const l = localizedSides[c.slug];
+  if (l) {
+    c.product1.localized = l.product1;
+    c.product2.localized = l.product2;
+  }
+}
 
 export function getComparison(slug: string): ComparisonArticle | undefined {
   return comparisons.find(c => c.slug === slug);
