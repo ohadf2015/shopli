@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 
-const nextConfig = require(path.join(process.cwd(), 'next.config.js'));
+const nextConfig = require(path.join(process.cwd(), 'next.config.js')).base;
 
 async function sitewideCsp(): Promise<Record<string, string[]>> {
   const rules: Array<{ source: string; headers: Array<{ key: string; value: string }> }> =

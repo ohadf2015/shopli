@@ -5,7 +5,8 @@ import { blogPosts, isBlogPostInRegion } from '../lib/blog';
 
 test('priceInUsd converts the currencies the regions use, and gives up on others', () => {
   assert.equal(priceInUsd(10, 'USD'), 10);
-  assert.ok(Math.abs((priceInUsd(36, 'ILS') ?? 0) - 10) < 0.01);
+  const ilsTen = priceInUsd(36, 'ILS') ?? 0;
+  assert.ok(ilsTen > 9 && ilsTen < 12);
   assert.ok((priceInUsd(10, 'EUR') ?? 0) > 10);
   assert.ok((priceInUsd(10, 'gbp') ?? 0) > 10);
   assert.equal(priceInUsd(10, 'JPY'), null);

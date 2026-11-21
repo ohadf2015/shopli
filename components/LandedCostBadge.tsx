@@ -6,7 +6,6 @@ import {
   USD_TO_ILS_RATE,
   IL_VAT_RATE,
   customsFxTooltipHe,
-  vatFxHonestyStripHe,
   type LandedCostInput,
 } from '../lib/landed-cost';
 
@@ -15,21 +14,17 @@ interface LandedCostBadgeProps {
   currency?: string | null;
   freeShipping?: boolean;
   shippingIls?: number;
-  /** 'chip' = one-line badge (ProductCard), 'full' = breakdown block (PDP / kit). */
   variant?: 'chip' | 'full';
-  /** 'kit' uses the SKU-sum rollup copy; product chip/full stay as in #14. */
   scope?: 'product' | 'kit';
-  /** When set, roll up these SKUs vs $75 instead of a single price. */
+  /** When set, the items are summed and tested against $75 as one parcel. */
   skus?: LandedCostInput[];
+  /** Customs shekels per dollar; defaults to the site-wide rate. */
+  usdIls?: number;
 }
 
 const ils = (n: number) => `₪${Math.round(n).toLocaleString('he-IL')}`;
 
-/**
- * IL landed-cost badge — Hebrew only by design: it renders exclusively on the
- * /il region (Hebrew, RTL) and encodes Israeli import rules that are
- * meaningless elsewhere.
- */
+/** Hebrew only: it renders on the Israel region alone and encodes Israeli import rules. */
 export default function LandedCostBadge({
   price,
   currency,
@@ -38,60 +33,51 @@ export default function LandedCostBadge({
   variant = 'chip',
   scope = 'product',
   skus,
+  usdIls = USD_TO_ILS_RATE,
 }: LandedCostBadgeProps) {
   const kit = scope === 'kit' || (skus != null && skus.length > 0);
   const est =
     skus && skus.length > 0
-      ? estimateKitLandedCost(skus)
-      : estimateLandedCost({ price: price ?? 0, currency, freeShipping, shippingIls });
+      ? estimateKitLandedCost(skus, usdIls)
+      : estimateLandedCost({ price: price ?? 0, currency, freeShipping, shippingIls }, usdIls);
   if (!est) return null;
 
   const vatPct = Math.round(IL_VAT_RATE * 100);
   const skuCount = skus && skus.length > 0 ? skus.length : 1;
 
-  const fxTip = customsFxTooltipHe(USD_TO_ILS_RATE);
-  const honesty = vatFxHonestyStripHe();
+  const fxTip = customsFxTooltipHe(usdIls);
 
   if (variant === 'chip') {
     return (
-      <span className="inline-flex flex-col items-stretch gap-0.5 mt-1 self-start" dir="rtl">
-        <span
-          className="inline-flex items-center gap-1 text-[0.6rem] sm:text-[0.65rem] font-semibold px-2 py-0.5 rounded-full"
-          style={
-            est.dutyFree
-              ? { background: 'rgba(16,185,129,0.1)', color: '#047857' }
-              : { background: 'rgba(245,158,11,0.12)', color: '#b45309' }
-          }
-          data-landed-cost={est.dutyFree ? 'duty-free' : 'vat'}
-          data-landed-total-ils={est.totalIls.toFixed(2)}
-          data-fx-source="boi-plus-0.5"
-          data-vat-rate={String(vatPct)}
-          title={fxTip}
-          {...(kit ? { 'data-landed-scope': 'kit', 'data-landed-sku-count': skuCount } : {})}
-        >
-          <Icon name="shield" size={10} className="shrink-0" />
-          {est.dutyFree ? (
-            <span>{kit ? 'פטור ממכס ומע״ם לערכה · מתחת ל-$75' : 'פטור ממכס ומע״ם · מתחת ל-$75'}</span>
-          ) : (
-            <span>
-              {kit ? 'ערכה כולל מע״ם' : 'כולל מע״ם'} {vatPct}% ≈ {ils(est.totalIls)}
-            </span>
-          )}
-          <span
-            className="inline-flex shrink-0 opacity-70"
-            aria-label={fxTip}
-            data-fx-tooltip="boi-plus-0.5"
-          >
-            <Icon name="info" size={10} />
+      <span
+        dir="rtl"
+        className="inline-flex items-center gap-1 mt-1 self-start text-[0.6rem] sm:text-[0.65rem] font-semibold px-2 py-0.5 rounded-full"
+        style={
+          est.dutyFree
+            ? { background: 'rgba(16,185,129,0.1)', color: '#047857' }
+            : { background: 'rgba(245,158,11,0.12)', color: '#b45309' }
+        }
+        data-landed-cost={est.dutyFree ? 'duty-free' : 'vat'}
+        data-landed-total-ils={est.totalIls.toFixed(2)}
+        data-fx-source="boi-plus-0.5"
+        data-vat-rate={String(vatPct)}
+        title={fxTip}
+        {...(kit ? { 'data-landed-scope': 'kit', 'data-landed-sku-count': skuCount } : {})}
+      >
+        <Icon name="shield" size={10} className="shrink-0" />
+        {est.dutyFree ? (
+          <span>{kit ? 'ההזמנה פטורה ממע״מ וממכס · מתחת ל-$75' : 'פטור ממע״מ וממכס · מתחת ל-$75'}</span>
+        ) : (
+          <span>
+            {kit ? 'ההזמנה כולל מע״מ' : 'כולל מע״מ'} {vatPct}% ≈ {ils(est.totalIls)}
           </span>
-        </span>
+        )}
         <span
-          className="text-[0.55rem] sm:text-[0.6rem] font-medium px-2 leading-tight"
-          style={{ color: 'var(--shopli-warm-gray)' }}
-          data-honesty-strip="vat-18-not-17-boi-0.5"
-          data-vat-rate={String(vatPct)}
+          className="inline-flex shrink-0 opacity-70"
+          aria-label={fxTip}
+          data-fx-tooltip="boi-plus-0.5"
         >
-          {honesty}
+          <Icon name="info" size={10} />
         </span>
       </span>
     );
@@ -120,27 +106,16 @@ export default function LandedCostBadge({
         <Icon name="shield" size={14} className="shrink-0" />
         {est.dutyFree
           ? kit
-            ? 'פטור ממכס וממע״ם לערכה — מתחת לתקרת ה-$75'
-            : 'פטור ממכס וממע״ם — מתחת לתקרת ה-$75'
+            ? 'ההזמנה כולה מתחת ל-$75, ולכן פטורה ממע״מ וממכס'
+            : 'מתחת ל-$75, ולכן פטור ממע״מ וממכס'
           : kit
-            ? `מעבר לתקרת ה-$75 לערכה — מתווסף מע״ם ${vatPct}%`
-            : `מעבר לתקרת ה-$75 — מתווסף מע״ם ${vatPct}%`}
+            ? `ההזמנה כולה מעל $75, ולכן מתווסף מע״מ של ${vatPct}%`
+            : `מעל $75, ולכן מתווסף מע״מ של ${vatPct}%`}
       </div>
-      <p
-        className="text-[0.65rem] font-semibold mb-2 px-2 py-1 rounded-md inline-block"
-        style={{
-          color: 'var(--shopli-navy)',
-          background: 'rgba(15, 23, 42, 0.04)',
-        }}
-        data-honesty-strip="vat-18-not-17-boi-0.5"
-        data-vat-rate={String(vatPct)}
-      >
-        {honesty}
-      </p>
       <dl className="text-xs sm:text-sm space-y-1" style={{ color: 'var(--shopli-navy)' }}>
         <div className="flex justify-between gap-4">
           <dt style={{ color: 'var(--shopli-warm-gray)' }}>
-            {kit ? 'מחיר הערכה (סה״כ SKU)' : 'מחיר המוצר'}
+            {kit ? 'מחיר המוצרים' : 'מחיר המוצר'}
           </dt>
           <dd className="tabular-nums font-medium" dir="ltr">{ils(est.priceIls)}</dd>
         </div>
@@ -152,7 +127,7 @@ export default function LandedCostBadge({
         </div>
         {!est.dutyFree && (
           <div className="flex justify-between gap-4">
-            <dt style={{ color: 'var(--shopli-warm-gray)' }}>מע״ם {vatPct}%</dt>
+            <dt style={{ color: 'var(--shopli-warm-gray)' }}>מע״מ {vatPct}%</dt>
             <dd className="tabular-nums font-medium" dir="ltr">{ils(est.vatIls)}</dd>
           </div>
         )}
@@ -160,7 +135,7 @@ export default function LandedCostBadge({
           className="flex justify-between gap-4 pt-1.5 mt-1.5 border-t font-bold"
           style={{ borderColor: est.dutyFree ? 'rgba(16,185,129,0.25)' : 'rgba(245,158,11,0.25)' }}
         >
-          <dt>סה״כ משוער לארץ</dt>
+          <dt>סה״כ משוער עד הבית</dt>
           <dd className="tabular-nums" dir="ltr">{ils(est.totalIls)}</dd>
         </div>
       </dl>

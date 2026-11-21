@@ -31,7 +31,7 @@ export const REGIONS: Record<string, RegionConfig> = {
     direction: 'rtl',
     meta: {
       title: 'שופלי — המוצרים הכי שווים מאליאקספרס',
-      description: 'AI בוחר את המוצרים הכי שווים מאליאקספרס במיוחד בשבילך. מחירים מטורפים, משלוח חינם, איכות מובטחת.',
+      description: 'שופלי רושמת כל יום את המחירים וההזמנות של אלפי מוצרים באליאקספרס, כדי שתדעו אם ירידת המחיר אמיתית. מחירים בשקלים, בלי הרשמה.',
     },
     tgChannel: 'shoppingisraelnew',
   },
@@ -64,7 +64,7 @@ export const REGIONS: Record<string, RegionConfig> = {
     direction: 'ltr',
     meta: {
       title: 'Shopli — Best AliExpress Deals Picked by AI',
-      description: 'AI-curated AliExpress deals picked just for you. Unbeatable prices, free shipping to the US, quality guaranteed.',
+      description: 'Shopli records AliExpress prices and orders every day, so you can tell a real price drop from a made-up one. Prices in USD, no signup.',
     },
   },
   uk: {
@@ -80,7 +80,7 @@ export const REGIONS: Record<string, RegionConfig> = {
     direction: 'ltr',
     meta: {
       title: 'Shopli — Best AliExpress Deals Picked by AI',
-      description: 'AI-curated AliExpress deals picked just for you. Unbeatable prices, free delivery to the UK, quality guaranteed.',
+      description: 'Shopli records AliExpress prices and orders every day, so you can tell a real price drop from a made-up one. Prices in GBP, no signup.',
     },
   },
   fr: {
@@ -96,7 +96,7 @@ export const REGIONS: Record<string, RegionConfig> = {
     direction: 'ltr',
     meta: {
       title: 'Shopli — Les meilleures offres AliExpress sélectionnées par IA',
-      description: 'Recommandations de produits IA depuis AliExpress. Offres curated, livraison gratuite, qualité garantie.',
+      description: 'Shopli relève chaque jour les prix et les commandes sur AliExpress, pour distinguer une vraie baisse de prix d\'une fausse promo. Prix en euros, sans inscription.',
     },
   },
   de: {
@@ -112,7 +112,7 @@ export const REGIONS: Record<string, RegionConfig> = {
     direction: 'ltr',
     meta: {
       title: 'Shopli — Die besten AliExpress-Angebote von KI ausgewählt',
-      description: 'KI-gestützte Produktempfehlungen von AliExpress. Kuratierte Angebote, kostenloser Versand, Qualitätsgarantie.',
+      description: 'Shopli erfasst täglich Preise und Bestellungen auf AliExpress, damit Sie echte Preissenkungen von Scheinrabatten unterscheiden können. Preise in Euro, ohne Anmeldung.',
     },
   },
   it: {
@@ -128,7 +128,7 @@ export const REGIONS: Record<string, RegionConfig> = {
     direction: 'ltr',
     meta: {
       title: 'Shopli — Le migliori offerte AliExpress selezionate dall\'IA',
-      description: 'Raccomandazioni di prodotti IA da AliExpress. Offerte curate, spedizione gratuita, qualità garantita.',
+      description: 'Shopli registra ogni giorno prezzi e ordini su AliExpress, così puoi distinguere un vero ribasso da uno sconto finto. Prezzi in euro, senza registrazione.',
     },
   },
   es: {
@@ -144,7 +144,7 @@ export const REGIONS: Record<string, RegionConfig> = {
     direction: 'ltr',
     meta: {
       title: 'Shopli — Las mejores ofertas de AliExpress seleccionadas por IA',
-      description: 'Recomendaciones de productos con IA desde AliExpress. Ofertas seleccionadas, envío gratis, calidad garantizada.',
+      description: 'Shopli registra cada día los precios y pedidos de AliExpress, para que distingas una rebaja real de un descuento inventado. Precios en euros, sin registro.',
     },
   },
   ru: {
@@ -160,7 +160,7 @@ export const REGIONS: Record<string, RegionConfig> = {
     direction: 'ltr',
     meta: {
       title: 'Shopli — Лучшие предложения AliExpress, подобранные ИИ',
-      description: 'Рекомендации товаров с AliExpress на основе ИИ. Подобранные предложения, бесплатная доставка, гарантия качества.',
+      description: 'Shopli каждый день записывает цены и заказы на AliExpress, чтобы вы отличали настоящую скидку от выдуманной. Без регистрации.',
     },
     tgChannel: 'shoppingisraelnew',
   },

@@ -4,7 +4,7 @@ import { getAllCollections } from '../lib/collections';
 import { blogPosts, type BlogPost } from '../lib/blog';
 import { comparisons } from '../lib/comparisons';
 import { ALL_REGIONS, getRegion } from '../lib/regions';
-import { MARKETPLACE_HOW_TOS } from '../lib/landed-url';
+import { MARKETPLACE_HOW_TOS } from '../lib/landed-guide';
 import { IL_VAT_RATE, DUTY_FREE_THRESHOLD_USD } from '../lib/landed-cost';
 
 /**

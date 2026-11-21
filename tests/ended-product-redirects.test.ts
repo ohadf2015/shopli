@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 
-const nextConfig = require(path.join(process.cwd(), 'next.config.js'));
+const nextConfig = require(path.join(process.cwd(), 'next.config.js')).base;
 
 test('an ended product with direct visits redirects permanently to its collection in the same region', async () => {
   const redirects: Array<{ source: string; destination: string; permanent: boolean }> =

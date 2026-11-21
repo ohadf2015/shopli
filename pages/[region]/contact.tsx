@@ -22,30 +22,18 @@ const CONTENT: Record<string, { title: string; heading: string; intro: string; m
         link: 'mailto:ohadf2015@gmail.com',
         linkText: 'ohadf2015@gmail.com',
       },
-      {
-        title: 'WhatsApp',
-        description: 'Send us a message on WhatsApp for quick communication:',
-        link: 'https://wa.me/?text=Hi%20Shopli%2C%20I%20have%20a%20question',
-        linkText: 'Message on WhatsApp',
-      },
     ],
   },
   he: {
     title: 'צור קשר',
     heading: 'צור קשר',
-    intro: 'יש לכם שאלה, הצעה או בעיה? היינו שמחים לשמוע ממכם. שלחו לנו הודעה דרך כל אחד מהערוצים להלן.',
+    intro: 'יש לכם שאלה, הצעה או בעיה? נשמח לשמוע מכם.',
     methods: [
       {
         title: 'דוא"ל',
         description: 'לשאלות כלליות, משוב או תמיכה:',
         link: 'mailto:ohadf2015@gmail.com',
         linkText: 'ohadf2015@gmail.com',
-      },
-      {
-        title: 'וואטסאפ',
-        description: 'שלחו לנו הודעה בוואטסאפ לתקשורת מהירה:',
-        link: 'https://wa.me/?text=שלום%20שופלי%2C%20יש%20לי%20שאלה',
-        linkText: 'שלח הודעה בוואטסאפ',
       },
     ],
   },
@@ -60,12 +48,6 @@ const CONTENT: Record<string, { title: string; heading: string; intro: string; m
         link: 'mailto:ohadf2015@gmail.com',
         linkText: 'ohadf2015@gmail.com',
       },
-      {
-        title: 'WhatsApp',
-        description: 'Envoyez-nous un message sur WhatsApp pour une communication rapide :',
-        link: 'https://wa.me/?text=Bonjour%20Shopli%2C%20j\'ai%20une%20question',
-        linkText: 'Envoyer un message sur WhatsApp',
-      },
     ],
   },
   de: {
@@ -78,12 +60,6 @@ const CONTENT: Record<string, { title: string; heading: string; intro: string; m
         description: 'Bei allgemeinen Anfragen, Feedback oder Support:',
         link: 'mailto:ohadf2015@gmail.com',
         linkText: 'ohadf2015@gmail.com',
-      },
-      {
-        title: 'WhatsApp',
-        description: 'Schreiben Sie uns auf WhatsApp für schnelle Kommunikation:',
-        link: 'https://wa.me/?text=Hallo%20Shopli%2C%20ich%20habe%20eine%20Frage',
-        linkText: 'Nachricht auf WhatsApp senden',
       },
     ],
   },
@@ -98,12 +74,6 @@ const CONTENT: Record<string, { title: string; heading: string; intro: string; m
         link: 'mailto:ohadf2015@gmail.com',
         linkText: 'ohadf2015@gmail.com',
       },
-      {
-        title: 'WhatsApp',
-        description: 'Envíanos un mensaje en WhatsApp para una comunicación rápida:',
-        link: 'https://wa.me/?text=Hola%20Shopli%2C%20tengo%20una%20pregunta',
-        linkText: 'Mensaje en WhatsApp',
-      },
     ],
   },
   it: {
@@ -117,12 +87,6 @@ const CONTENT: Record<string, { title: string; heading: string; intro: string; m
         link: 'mailto:ohadf2015@gmail.com',
         linkText: 'ohadf2015@gmail.com',
       },
-      {
-        title: 'WhatsApp',
-        description: 'Inviaci un messaggio su WhatsApp per una comunicazione rapida:',
-        link: 'https://wa.me/?text=Ciao%20Shopli%2C%20ho%20una%20domanda',
-        linkText: 'Messaggio su WhatsApp',
-      },
     ],
   },
   ru: {
@@ -135,12 +99,6 @@ const CONTENT: Record<string, { title: string; heading: string; intro: string; m
         description: 'Для общих вопросов, отзывов или поддержки:',
         link: 'mailto:ohadf2015@gmail.com',
         linkText: 'ohadf2015@gmail.com',
-      },
-      {
-        title: 'WhatsApp',
-        description: 'Отправьте нам сообщение в WhatsApp для быстрого общения:',
-        link: 'https://wa.me/?text=Привет%20Shopli%2C%20у%20меня%20есть%20вопрос',
-        linkText: 'Сообщение в WhatsApp',
       },
     ],
   },
@@ -157,7 +115,7 @@ export default function ContactPage({ region, config, rtl }: ContactPageProps) {
         region={region}
         path="/contact"
         title={content.title}
-        description="Contact Shopli with questions, feedback, or support."
+        description={content.intro}
         canonical={pageUrl}
       />
       <Header currentRegion={region} dir={config.direction} />
