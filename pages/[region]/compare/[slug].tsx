@@ -10,6 +10,7 @@ import RelatedReads from '../../../components/RelatedReads';
 import { collectionLinks } from '../../../lib/related-links';
 import { collectionsForComparison } from '../../../lib/related-content';
 import { trackCompareNextAction } from '../../../lib/analytics';
+import { compareT, makeTr } from '../../../lib/compare-i18n';
 import { getComparison } from '../../../lib/comparisons';
 import { productImage } from '../../../lib/img';
 import { listingAggregateFields } from '../../../lib/pdp';
@@ -26,6 +27,9 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
 
   const c = comparison;
   if (!c) return null;
+  const tr = makeTr(lang);
+  const side = (prod: any) => ({ ...prod, ...prod.localized?.[lang] });
+  const sides = [side(c.product1), side(c.product2)];
 
   const hasLiveDeals = (prod1Items?.length || 0) + (prod2Items?.length || 0) > 0;
   const deadLanding = !hasLiveDeals;
@@ -112,16 +116,15 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
         <CompareAboveFoldExit
           region={region}
           rtl={rtl}
+          lang={lang}
           surface="compare_article"
           sides={[
-            { name: c.product1.name, keyword: c.product1.keyword },
-            { name: c.product2.name, keyword: c.product2.keyword },
+            { name: sides[0].name, keyword: sides[0].keyword },
+            { name: sides[1].name, keyword: sides[1].keyword },
           ]}
           valueLine={
             deadLanding
-              ? rtl
-                ? 'לא הצלחנו לטעון דילים חיים להשוואה הזו. המשיכו לטרנדים או חפשו באתר.'
-                : 'We could not load live deals for this comparison. Keep browsing trending or search on-site.'
+              ? tr('We could not load live deals for this comparison. Keep browsing trending or search on-site.', 'לא הצלחנו לטעון דילים חיים להשוואה הזו. המשיכו לטרנדים או חפשו באתר.')
               : verdictTeaser
           }
           deadLanding={deadLanding}
@@ -129,7 +132,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
 
         {/* Side-by-side comparison */}
         <div className="grid md:grid-cols-2 gap-6 mb-10">
-          {[c.product1, c.product2].map((prod: any, pi: number) => {
+          {sides.map((prod: any, pi: number) => {
             const items = pi === 0 ? prod1Items : prod2Items;
             return (
               <div key={pi} className="bg-white rounded-xl  border border-[#141414] p-6">
@@ -137,7 +140,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
 
                 <div className="mb-4">
                   <h3 className="text-xs font-semibold uppercase tracking-wider text-green-700 mb-2">
-                    {rtl ? 'יתרונות' : 'Pros'}
+                    {tr('Pros', 'יתרונות')}
                   </h3>
                   <ul className="space-y-1">
                     {prod.pros.map((p: string, i: number) => (
@@ -150,7 +153,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
 
                 <div className="mb-6">
                   <h3 className="text-xs font-semibold uppercase tracking-wider text-red-700 mb-2">
-                    {rtl ? 'חסרונות' : 'Cons'}
+                    {tr('Cons', 'חסרונות')}
                   </h3>
                   <ul className="space-y-1">
                     {prod.cons.map((c: string, i: number) => (
@@ -165,7 +168,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
                 {items?.length > 0 && (
                   <div className="border-t pt-4">
                     <h3 className="text-xs font-semibold mb-3" style={{ color: 'var(--shopli-warm-gray)' }}>
-                      {rtl ? `מוצרים מ-AliExpress` : `Shop ${prod.name} on AliExpress`}
+                      {tr.t(compareT.shop, prod.name)}
                     </h3>
                     <div className="grid grid-cols-2 gap-2">
                       {items.slice(0, 4).map((item: any, i: number) => (
@@ -203,7 +206,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
                               className="mt-1 inline-block text-[0.7rem] font-semibold hover:underline"
                               style={{ color: 'var(--shopli-teal)' }}
                             >
-                              {rtl ? 'פרטים ומוצרים דומים ←' : 'Details & similar →'}
+                              {tr('Details & similar →', 'פרטים ומוצרים דומים ←')}
                             </a>
                           )}
                         </div>
@@ -219,7 +222,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
         {/* Verdict */}
         <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-6 mb-6 border border-orange-100">
           <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--shopli-navy)' }}>
-            {rtl ? 'פסק הדין' : 'The Verdict'}
+            {tr('The Verdict', 'פסק הדין')}
           </h2>
           <p className="text-gray-700 leading-relaxed text-sm">{t(c.verdict)}</p>
         </div>
@@ -227,15 +230,13 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
         {/* Next step — route the reader into a real browse path instead of bouncing */}
         <div className="bg-white rounded-xl  border border-[#141414] p-6 mb-10">
           <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--shopli-navy)' }}>
-            {rtl ? 'מוכנים להחליט? הצעד הבא' : 'Ready to decide? Your next step'}
+            {tr('Ready to decide? Your next step', 'מוכנים להחליט? הצעד הבא')}
           </h2>
           <p className="text-sm mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
-            {rtl
-              ? 'ראו דילים חיים, מחירים ומוצרים דומים לכל צד של ההשוואה:'
-              : 'See live deals, prices and similar products for each side of the comparison:'}
+            {tr('See live deals, prices and similar products for each side of the comparison:', 'ראו דילים חיים, מחירים ומוצרים דומים לכל צד של ההשוואה:')}
           </p>
           <div className="grid sm:grid-cols-2 gap-3">
-            {[c.product1, c.product2].map((prod: any, i: number) => (
+            {sides.map((prod: any, i: number) => (
               <a
                 key={i}
                 href={`/${region}/search?q=${encodeURIComponent(prod.keyword)}`}
@@ -245,7 +246,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
                 className="btn-primary justify-center text-sm"
               >
                 <Icon name="search" size={16} />
-                {rtl ? `דילים על ${prod.name}` : `Browse ${prod.name} deals`}
+                {tr.t(compareT.browse, prod.name)}
               </a>
             ))}
           </div>
