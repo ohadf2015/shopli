@@ -3,7 +3,7 @@ const CSP = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.posthog.com https://growthradar.app https://company-brain-production-841e.up.railway.app",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://*.aliexpress-media.com https://*.alicdn.com https://*.google-analytics.com https://*.googletagmanager.com",
+  "img-src 'self' data: blob: https://*.aliexpress-media.com https://*.alicdn.com https://oddities.app https://*.google-analytics.com https://*.googletagmanager.com",
   "font-src 'self' data:",
   "connect-src 'self' https://*.posthog.com https://growthradar.app https://company-brain-production-841e.up.railway.app https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
   "worker-src 'self' blob:",
