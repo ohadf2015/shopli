@@ -64,7 +64,7 @@ export default function MarketplaceHowTo({ marketplace }: { marketplace: Marketp
       <Header currentRegion="il" dir="rtl" />
 
       <main dir="ltr" lang="en" className="min-h-screen" data-marketplace-how-to={spec.id}>
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-16">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-16">
           <p className="text-xs font-semibold uppercase tracking-wider text-orange-700 mb-2">
             Shopping from abroad to Israel
           </p>

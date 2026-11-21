@@ -172,19 +172,20 @@ export function buildPdpFaq(p: SearchProduct, rtl: boolean): FaqItem[] {
 
 /** Rank collections by keyword overlap with product title/category. */
 export function relatedCollections(p: SearchProduct, limit = 4): CollectionDef[] {
-  const hay = `${p.title} ${p.category} ${p.categoryPath}`.toLowerCase();
-  const scored = COLLECTIONS.map((c) => {
+  const words = new Set(`${p.title} ${p.category} ${p.categoryPath}`.toLowerCase().split(/[^\p{L}\p{N}]+/u));
+  return COLLECTIONS.map((c) => {
     let score = 0;
     for (const kw of c.keywords || []) {
       for (const token of kw.toLowerCase().split(/\s+/)) {
-        if (token.length > 3 && hay.includes(token)) score += 1;
+        if (token.length > 3 && words.has(token)) score += 1;
       }
     }
     return { c, score };
-  });
-  const matched = scored.filter((s) => s.score > 0).sort((a, b) => b.score - a.score);
-  const picked = (matched.length > 0 ? matched : scored).slice(0, limit).map((s) => s.c);
-  return picked;
+  })
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map((s) => s.c);
 }
 
 /**

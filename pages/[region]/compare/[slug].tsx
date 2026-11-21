@@ -92,7 +92,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
         jsonLd={structuredData}
       />
       <Header currentRegion={region} dir={config?.direction} />
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-16">
         <div className="flex items-center gap-2 text-xs mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
           <a href={`/${region}`}>{rtl ? 'דף הבית' : 'Home'}</a> <span>/</span>
           <span style={{ color: 'var(--shopli-navy)' }}>{t(c.title)}</span>

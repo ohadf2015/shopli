@@ -126,7 +126,7 @@ export default function GamePage({ region, config, rtl, rounds }: GamePageProps)
       <>
         <SeoHead region={region} path="/game" title={`${c.title} | Shopli`} description={c.lead} noindex />
         <Header currentRegion={region} dir={config.direction} />
-        <main className="max-w-2xl mx-auto px-4 pt-24 pb-16 text-center">
+        <main className="max-w-2xl mx-auto px-4 pt-6 sm:pt-8 pb-16 text-center">
           <h1 className="text-2xl font-bold mb-3" style={{ color: 'var(--shopli-navy)' }}>{c.title}</h1>
           <p className="text-sm mb-6" style={{ color: 'var(--shopli-warm-gray)' }}>{c.empty}</p>
           <Link href={`/${region}/trending`} className="btn-primary text-sm">{c.browse}</Link>
@@ -140,7 +140,7 @@ export default function GamePage({ region, config, rtl, rounds }: GamePageProps)
       <SeoHead region={region} path="/game" title={`${c.title} | Shopli`} description={c.lead} />
       <Header currentRegion={region} dir={config.direction} />
 
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 pt-24 pb-16" style={{ fontFamily: rtl ? 'var(--font-assistant), system-ui, sans-serif' : undefined }}>
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-16" style={{ fontFamily: rtl ? 'var(--font-assistant), system-ui, sans-serif' : undefined }}>
         <h1 className="text-2xl md:text-3xl font-extrabold mb-1" style={{ color: 'var(--shopli-navy)' }}>
           {c.title}
         </h1>

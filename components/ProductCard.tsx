@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Icon from './icons';
 import WhatsAppShare from './WhatsAppShare';
+import { buyCopy } from '../lib/buy-copy';
 import { SITE_URL } from '../lib/seo';
 import { isInWishlist, syncAdd, syncRemove } from '../lib/useWishlist';
 import { productImage } from '../lib/img';
@@ -289,14 +290,33 @@ export default function ProductCard({
         </div>
       </div>
 
+      {/* Explicit outbound CTA: the card itself links to the on-site PDP, so
+          the money link gets its own unmissable button. */}
+      {(!compact || dealButton) && product.affiliateLink && (
+        <div className="px-2 pb-2 relative z-10">
+          <a
+            href={product.affiliateLink}
+            target="_blank"
+            rel="noopener noreferrer sponsored"
+            data-cta="card_button"
+            className="flex items-center justify-center gap-1 w-full text-[0.7rem] font-bold px-3 py-2 rounded-lg transition-opacity hover:opacity-90"
+            style={{ background: 'var(--shopli-orange)', color: 'var(--shopli-on-orange)' }}
+          >
+            {buyCopy(locale).cta}
+            <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      )}
       {(showShare || showCompareLink) && (
-        <div className="px-2 pb-2 pt-0 flex items-center gap-1.5 relative z-10">
+        <div className="px-2 pb-2.5 pt-0 flex items-center justify-between gap-2 relative z-10">
           {showShare && (
             <WhatsAppShare
               title={product.title}
               url={shareUrl}
               locale={(locale as 'he' | 'en' | 'fr' | 'de' | 'es' | 'it' | 'ru') || 'en'}
               size="sm"
+              variant="text"
+              className="text-[0.7rem] gap-1 min-w-0 text-[#128C7E] hover:underline"
             />
           )}
           {showCompareLink && region && product.id && (
@@ -316,23 +336,6 @@ export default function ProductCard({
         </div>
       )}
 
-      {/* Explicit outbound CTA: the card itself links to the on-site PDP, so
-          the money link gets its own unmissable button. */}
-      {(!compact || dealButton) && product.affiliateLink && (
-        <div className="px-2 pb-2.5 relative z-10">
-          <a
-            href={product.affiliateLink}
-            target="_blank"
-            rel="noopener noreferrer sponsored"
-            data-cta="card_button"
-            className="flex items-center justify-center gap-1 w-full text-[0.7rem] font-bold px-3 py-2 rounded-lg transition-opacity hover:opacity-90"
-            style={{ background: 'var(--shopli-orange)', color: 'var(--shopli-on-orange)' }}
-          >
-            {rtl ? 'לצפייה בדיל באליאקספרס' : 'View deal on AliExpress'}
-            <span aria-hidden="true">↗</span>
-          </a>
-        </div>
-      )}
     </article>
   );
 }

@@ -84,7 +84,7 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
 
       <main className="pb-16" style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}>
         {/* HERO */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-8 md:pt-32">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-8 md:pt-12">
           <div className="flex items-center gap-2 text-xs mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
             <a href={`/${region}`}>{rtl ? 'דף הבית' : 'Home'}</a>
             <span>/</span>

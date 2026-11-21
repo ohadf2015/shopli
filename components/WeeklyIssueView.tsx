@@ -91,7 +91,7 @@ export default function WeeklyIssueView({ region, config, issue, archive, latest
         jsonLd={jsonLd}
       />
       <Header currentRegion={region} dir={config.direction} />
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-24 pb-16" dir={rtl ? 'rtl' : 'ltr'}>
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-16" dir={rtl ? 'rtl' : 'ltr'}>
         <nav className="text-xs mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
           <Link href={`/${region}/blog`} className="hover:underline">
             {he ? 'בלוג' : 'Blog'}
