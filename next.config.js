@@ -14,8 +14,10 @@ const CSP = [
   "form-action 'self'",
 ].join('; ');
 
+const { fetchBoiUsdIls } = require('./lib/boi-rate');
+
 /** @type {import('next').NextConfig} */
-module.exports = {
+const config = {
   reactStrictMode: true,
   experimental: {
     // Constrained CI runner (shared pid/thread cgroup cap): keep workers low.
@@ -81,3 +83,11 @@ module.exports = {
     ];
   },
 };
+
+// Israel price estimates convert at the Bank of Israel rate of the day the
+// site was built; lib/landed-cost.ts holds the dated fallback.
+module.exports = async () => {
+  const boi = await fetchBoiUsdIls();
+  return boi ? { ...config, env: { NEXT_PUBLIC_BOI_USD_ILS: String(boi.rate) } } : config;
+};
+module.exports.base = config;

@@ -4,7 +4,7 @@ import { cacheIfNotEmpty } from '../lib/cache';
 import { SITE_URL, getCollectionOgImage } from '../lib/seo';
 import { COLLECTION_CONTENT } from '../lib/collection-content';
 import { searchCollection } from '../lib/aliexpress';
-import { MARKETPLACE_HOW_TOS } from '../lib/landed-url';
+import { MARKETPLACE_HOW_TOS } from '../lib/landed-guide';
 import { isWeeklyRegion, issueDates } from '../lib/weekly';
 
 function xmlEncode(s: string): string {
@@ -103,7 +103,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     lastmod: today,
   });
 
-  // /landed estimator + marketplace→IL how-tos (iWishBag 17% foil)
+  // Israel import calculator and the per-store guides
   urls.push({
     loc: `${SITE_URL}/landed`,
     changefreq: 'weekly',

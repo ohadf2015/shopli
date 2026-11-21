@@ -1155,7 +1155,7 @@ export const blogPosts: BlogPost[] = [
       {
         q: { he: 'האם כדאי לקנות ערכה או חלקים בנפרד?', en: 'Kit or individual parts?' },
         a: {
-          he: 'ערכה משתלמת בפעם הראשונה כי היא כוללת לוח מטריצה, נגדים, LEDים וחוטים במחיר שקשה להרכיב לבד. מהפרויקט השני והלאה עדיף לקנות ספציפית — תשלמו פחות ותקבלו רכיבים טובים יותר.',
+          he: 'ערכה משתלמת בפעם הראשונה כי היא כוללת לוח מטריצה, נגדים, נורות LED וחוטים במחיר שקשה להרכיב לבד. מהפרויקט השני והלאה עדיף לקנות ספציפית — תשלמו פחות ותקבלו רכיבים טובים יותר.',
           en: 'A kit is worth it the first time, because it bundles a breadboard, resistors, LEDs and wires for less than assembling them separately. From the second project on, buy specifically — you pay less and get better parts.',
         },
       },

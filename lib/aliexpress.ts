@@ -333,7 +333,7 @@ export async function searchCollection(region: string, keywords: string[], limit
 /**
  * Clean up common machine-translation artifacts in Hebrew product titles
  * returned by the AliExpress API (broken geresh spacing like "גאדג 'טים",
- * Latin words fused into Hebrew ones like "Nonלהחליק", doubled spaces).
+ * Latin words fused into Hebrew ones, doubled spaces).
  * Applied only when the request language is HE.
  */
 function sanitizeHebrewTitle(title: string): string {

@@ -9,42 +9,41 @@ import {
   IL_VAT_RATE,
   BOI_CUSTOMS_FX_UPLIFT,
   customsFxTooltipHe,
-  vatFxHonestyStripHe,
+  customsRate,
+  isPlausibleUsdIls,
+  FALLBACK_BOI_USD_ILS,
 } from '../lib/landed-cost';
 
 test('constants encode the IL import rules', () => {
   assert.equal(DUTY_FREE_THRESHOLD_USD, 75);
   assert.equal(DUTY_WAIVER_CEILING_USD, 500);
   assert.equal(IL_VAT_RATE, 0.18);
-  assert.ok(USD_TO_ILS_RATE > 3 && USD_TO_ILS_RATE < 5);
-  // Skills IL foil: goods on a rashimon use BoI representative + 0.5%
   assert.equal(BOI_CUSTOMS_FX_UPLIFT, 0.005);
 });
 
-test('customs FX tooltip explains BoI representative rate + 0.5%', () => {
-  const tip = customsFxTooltipHe();
+test('site-wide rate is the Bank of Israel rate plus the customs uplift', () => {
+  assert.ok(isPlausibleUsdIls(FALLBACK_BOI_USD_ILS));
+  assert.ok(Math.abs(customsRate(3.4) - 3.417) < 1e-9);
+  assert.ok(Math.abs(USD_TO_ILS_RATE - customsRate(FALLBACK_BOI_USD_ILS)) < 1e-9);
+  assert.equal(isPlausibleUsdIls(0), false);
+  assert.equal(isPlausibleUsdIls(NaN), false);
+  assert.equal(isPlausibleUsdIls(36), false);
+});
+
+test('a supplied rate moves the $75 line: the same shekel price flips from exempt to taxed', () => {
+  const item = { price: 260, currency: 'ILS', freeShipping: true };
+  assert.equal(estimateLandedCost(item, 3.6)!.dutyFree, true);
+  assert.equal(estimateLandedCost(item, 3.3)!.dutyFree, false);
+  assert.equal(estimateKitLandedCost([item], 3.6)!.dutyFree, true);
+  assert.equal(estimateKitLandedCost([item], 3.3)!.dutyFree, false);
+});
+
+test('customs FX tooltip names the Bank of Israel rate, the uplift and the rate used', () => {
+  const tip = customsFxTooltipHe(3.41);
   assert.match(tip, /בנק ישראל/);
-  assert.match(tip, /\+ 0\.5%/);
-  assert.match(tip, /רשומון/);
-  assert.match(tip, new RegExp(USD_TO_ILS_RATE.toFixed(2).replace('.', '\\.')));
-  assert.match(tip, /רשות המסים/);
+  assert.match(tip, /0\.5%/);
+  assert.match(tip, /3\.41/);
 });
-
-test('VAT/FX honesty strip labels 18% VAT (not 17%) and BoI representative +0.5% (rashimon)', () => {
-  const strip = vatFxHonestyStripHe();
-  assert.match(strip, /מע״ם 18%/);
-  assert.match(strip, /לא 17%/); // explicit foil vs rivals' stale 17%
-  assert.match(strip, /בנק ישראל/);
-  assert.match(strip, /\+ 0\.5%/);
-  assert.match(strip, /רשומון/);
-  // Foil calls out "not 17%" but never claims מע״ם 17%.
-  assert.doesNotMatch(strip, /מע״ם 17%/);
-  // Keep #18 tooltip math/wording independent of the strip.
-  const tip = customsFxTooltipHe();
-  assert.match(tip, /\+ 0\.5%/);
-  assert.notEqual(strip, tip);
-});
-
 
 test('74.99 USD (free shipping) is duty-free: no VAT, total = goods price', () => {
   const est = estimateLandedCost({ price: 74.99, currency: 'USD', freeShipping: true });
@@ -118,7 +117,7 @@ test('missing currency defaults to ILS (IL feed rows)', () => {
   const est = estimateLandedCost({ price: 36, freeShipping: true });
   assert.ok(est);
   assert.equal(est.priceIls, 36);
-  assert.equal(est.usdPrice, 10);
+  assert.ok(Math.abs(est.usdPrice - 36 / USD_TO_ILS_RATE) < 1e-9);
   assert.equal(est.dutyFree, true);
 });
 
@@ -221,6 +220,6 @@ test('kit rollup: unknown-currency SKU is skipped; remaining SKUs still estimate
   ]);
   assert.ok(est);
   assert.equal(est.priceIls, 36);
-  assert.equal(est.usdPrice, 10);
+  assert.ok(Math.abs(est.usdPrice - 36 / USD_TO_ILS_RATE) < 1e-9);
   assert.equal(est.dutyFree, true);
 });
