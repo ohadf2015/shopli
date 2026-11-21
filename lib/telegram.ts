@@ -1,69 +1,61 @@
 import type { Pick } from './picks';
 import { SITE_URL } from './seo';
+import { estimateLandedCost } from './landed-cost';
+import { isPromotionLink } from './aliexpress';
 
 /**
- * The daily channel post.
- *
- * There were three copies of this before: two scripts with their own hardcoded
- * 13-collection lists (the site has 78), their own weekday rotation, and links
- * that went straight to AliExpress. Neither was scheduled anywhere, so the
- * channel only posted when someone ran a script by hand.
- *
- * One copy now, fed by lib/picks.ts — the same data the site's own surfaces
- * use — and posted by /api/cron/telegram-daily on a schedule.
- *
- * Every link goes to a Shopli product page: the reviews, the momentum and the
- * quality signals are there, and Telegram renders that page's OG card as the
- * preview for free.
+ * The daily channel posts, fed by lib/picks.ts (the same data the site uses)
+ * and sent by /api/cron/telegram-daily. Each product is its own photo post with
+ * a tracked AliExpress button and a button to its Shopli page.
  */
 
 const LANG: Record<string, string> = {
   il: 'he', ru: 'ru', us: 'en', uk: 'en', eu: 'en', fr: 'fr', de: 'de', es: 'es', it: 'it',
 };
-const FLAG: Record<string, string> = {
-  il: '🇮🇱', ru: '🇮🇱', us: '🇺🇸', uk: '🇬🇧', eu: '🇪🇺', fr: '🇫🇷', de: '🇩🇪', es: '🇪🇸', it: '🇮🇹',
-};
 
 const COPY: Record<string, {
-  header: string;
   reason: Record<Pick['reason'], string>;
-  perDay: (n: number) => string;
+  perDay: (n: string) => string;
   surge: (x: string) => string;
   drop: (p: number, d: number) => string;
+  usually: (price: string) => string;
   rating: (r: number) => string;
   reviews: (n: string) => string;
-  footer: string;
+  dutyFree: string;
+  buy: string;
   see: string;
 }> = {
   he: {
-    header: 'מה זז היום בשופלי',
-    reason: { surging: 'מזנק', price_drop: 'ירידת מחיר אמיתית', bestseller: 'רב מכר' },
-    perDay: (n) => `${n} נמכרים ביום עכשיו`,
-    surge: (x) => `פי ${x} מהקצב הרגיל שלו`,
-    drop: (p, d) => `${p}% מתחת למחיר החציוני שלו ב-${d} הימים האחרונים`,
+    reason: { surging: 'מזנק עכשיו', price_drop: 'ירידת מחיר אמיתית', bestseller: 'רב מכר' },
+    perDay: (n) => `${n} נמכרים ביום`,
+    surge: (x) => `פי ${x} מהקצב הרגיל`,
+    drop: (p, d) => `${p}% מתחת למחיר הרגיל שלו ב-${d} הימים האחרונים`,
+    usually: (price) => `בדרך כלל ${price}`,
     rating: (r) => `${r}% משוב חיובי`,
-    reviews: (n) => `${n} ביקורות קונים`,
-    footer: 'כל מוצר נבדק מול דירוג המוכר וכמות ההזמנות — מה שלא עובר, לא נכנס.',
-    see: 'לצפייה בשופלי',
+    reviews: (n) => `${n} ביקורות`,
+    dutyFree: 'מתחת ל-$75, בלי מע״מ ומכס',
+    buy: '🛒 לקנייה באליאקספרס',
+    see: '📊 מחיר וביקורות בשופלי',
   },
   en: {
-    header: "What's actually moving on Shopli",
-    reason: { surging: 'Surging', price_drop: 'Real price drop', bestseller: 'Best seller' },
-    perDay: (n) => `${n} selling a day right now`,
-    surge: (x) => `${x}x its usual rate`,
-    drop: (p, d) => `${p}% below its own median price over ${d} days`,
-    rating: (r) => `${r}% positive feedback`,
-    reviews: (n) => `${n} buyer reviews`,
-    footer: 'Every pick is checked against seller rating and order count — what fails is not shown.',
-    see: 'See it on Shopli',
+    reason: { surging: 'Selling fast', price_drop: 'Real price drop', bestseller: 'Best seller' },
+    perDay: (n) => `${n} sold a day`,
+    surge: (x) => `${x}x its usual pace`,
+    drop: (p, d) => `${p}% below its usual price over the last ${d} days`,
+    usually: (price) => `usually ${price}`,
+    rating: (r) => `${r}% positive`,
+    reviews: (n) => `${n} reviews`,
+    dutyFree: '',
+    buy: '🛒 Buy on AliExpress',
+    see: '📊 Price and reviews on Shopli',
   },
 };
 
-const ICON: Record<Pick['reason'], string> = { surging: '🚀', price_drop: '💸', bestseller: '🏆' };
+const ICON: Record<Pick['reason'], string> = { surging: '🚀', price_drop: '📉', bestseller: '🏆' };
 
-/** MarkdownV2 reserves these; an unescaped one makes Telegram reject the whole message. */
-export function escapeMarkdown(text: string): string {
-  return String(text).replace(/[_*[\]()~`>#+=|{}.!-]/g, '\\$&');
+/** Telegram HTML mode only needs these three escaped. */
+export function escapeHtml(text: string): string {
+  return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 /** AliExpress titles are keyword soup; cut at a word so the post stays readable. */
@@ -75,56 +67,69 @@ export function shortTitle(title: string, max = 70): string {
   return (space > max * 0.6 ? cut.slice(0, space) : cut).trim() + '…';
 }
 
+export interface PickPost {
+  photo: string;
+  caption: string;
+  buttons: Array<{ text: string; url: string }>;
+}
+
 /**
- * Returns null when there is nothing worth sending. Posting a filler roundup
- * every day regardless is what made the old channel ignorable.
+ * One photo post per product, the way deal channels people actually follow
+ * look: picture, a few lines of facts, and buttons instead of raw links.
  */
-export function buildPicksMessage(
+export function buildPickPost(
   region: string,
-  picks: Pick[],
-  { currencySymbol = '', count = 5, reviews }: {
+  p: Pick,
+  { currencySymbol = '', reviews, buyLink, title }: {
     currencySymbol?: string;
-    count?: number;
-    /**
-     * Buyer review counts by product id (lib/review-store.ts, sourced from
-     * feedback.aliexpress.com). Optional: without it the post simply omits
-     * review counts rather than printing "0 reviews".
-     */
-    reviews?: Record<string, { writtenCount?: number }>;
+    /** Written-review count from lib/review-store.ts; omitted rather than printed as 0. */
+    reviews?: number;
+    /** A tracked s.click promotion link; without one the post has only the Shopli button. */
+    buyLink?: string;
+    /** Localised title (Hebrew for il) when we have one. */
+    title?: string;
   } = {}
-): string | null {
-  const chosen = picks.slice(0, count);
-  if (!chosen.length) return null;
+): PickPost {
+  const lang = LANG[region] === 'he' ? 'he' : 'en';
+  const c = COPY[lang];
+  const locale = lang === 'he' ? 'he-IL' : 'en-US';
+  const money = (n: number) => `${currencySymbol}${n.toFixed(2)}`;
 
-  const c = COPY[LANG[region] || 'en'] || COPY.en;
-  const locale = LANG[region] === 'he' ? 'he-IL' : 'en-US';
-  let msg = `${FLAG[region] || '🛍'} *${escapeMarkdown(c.header)}*\n\n`;
+  const lines = [
+    `${ICON[p.reason]} <b>${escapeHtml(c.reason[p.reason])}</b>`,
+    `<b>${escapeHtml(shortTitle(title || p.title, 75))}</b>`,
+    '',
+  ];
 
-  chosen.forEach((p, i) => {
-    const facts: string[] = [];
-    if (p.reason === 'surging') {
-      facts.push(c.perDay(Math.round(p.recentPerDay)));
-      facts.push(c.surge(p.surge.toFixed(1)));
-    } else if (p.reason === 'price_drop') {
-      facts.push(c.drop(p.dropPct, p.spanDays));
-    } else {
-      facts.push(c.perDay(Math.round(p.perDay)));
-    }
-    if (p.rating > 0) facts.push(c.rating(Math.round(p.rating)));
-    const written = reviews?.[p.productId]?.writtenCount ?? 0;
-    if (written > 0) facts.push(c.reviews(written.toLocaleString(locale)));
+  let priceLine = `💰 <b>${escapeHtml(money(p.price))}</b>`;
+  if (p.reason === 'price_drop' && p.priceMedian && p.priceMedian > p.price) {
+    priceLine += ` · ${escapeHtml(c.usually(money(p.priceMedian)))}`;
+  }
+  lines.push(priceLine);
 
-    msg += `${ICON[p.reason]} *${i + 1}\\. ${escapeMarkdown(shortTitle(p.title))}*\n`;
-    msg += `${escapeMarkdown(`${currencySymbol}${p.price.toFixed(2)}`)} · _${escapeMarkdown(c.reason[p.reason])}_\n`;
-    msg += `${escapeMarkdown(facts.join(' · '))}\n`;
-    // An inline link, not a bare URL: in MarkdownV2 every reserved character
-    // has to be escaped everywhere EXCEPT inside a link's parentheses, and a
-    // product URL is full of dots and dashes. One unescaped dot and Telegram
-    // rejects the entire message.
-    msg += `[${escapeMarkdown(c.see)}](${SITE_URL}/${region}/product/${p.productId})\n\n`;
-  });
+  if (p.reason === 'surging') {
+    lines.push(`🔥 ${escapeHtml(`${c.perDay(Math.round(p.recentPerDay).toLocaleString(locale))}, ${c.surge(p.surge.toFixed(1))}`)}`);
+  } else if (p.reason === 'price_drop') {
+    lines.push(`📉 ${escapeHtml(c.drop(p.dropPct, p.spanDays))}`);
+  } else if (p.perDay >= 1) {
+    lines.push(`🔥 ${escapeHtml(c.perDay(Math.round(p.perDay).toLocaleString(locale)))}`);
+  }
 
-  return msg + `_${escapeMarkdown(c.footer)}_`;
+  const social: string[] = [];
+  if (p.rating > 0) social.push(c.rating(Math.round(p.rating)));
+  if (reviews && reviews > 0) social.push(c.reviews(reviews.toLocaleString(locale)));
+  if (social.length) lines.push(`⭐ ${escapeHtml(social.join(' · '))}`);
+
+  if (region === 'il' && c.dutyFree) {
+    const landed = estimateLandedCost({ price: p.price, currency: p.currency });
+    if (landed?.dutyFree) lines.push(`🇮🇱 ${escapeHtml(c.dutyFree)}`);
+  }
+
+  const buttons: PickPost['buttons'] = [];
+  if (buyLink && isPromotionLink(buyLink)) buttons.push({ text: c.buy, url: buyLink });
+  buttons.push({ text: c.see, url: `${SITE_URL}/${region}/product/${p.productId}` });
+
+  return { photo: p.imageUrl, caption: lines.join('\n'), buttons };
 }
 
 /**
@@ -133,26 +138,35 @@ export function buildPicksMessage(
  * into the same channel — nine posts in eight languages, once a day, on a live
  * public channel.
  */
-export async function sendTelegramMessage(text: string, chatId: string): Promise<{ ok: boolean; error?: string }> {
+async function callTelegram(method: string, body: Record<string, unknown>): Promise<{ ok: boolean; error?: string }> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chat = chatId;
-  if (!token || !chat) return { ok: false, error: 'TELEGRAM_BOT_TOKEN or chat id not set' };
-
+  if (!token || !body.chat_id) return { ok: false, error: 'TELEGRAM_BOT_TOKEN or chat id not set' };
   try {
-    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    const res = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chat,
-        text,
-        parse_mode: 'MarkdownV2',
-        // The first link's preview is the product page's own OG card.
-        disable_web_page_preview: false,
-      }),
+      body: JSON.stringify(body),
     });
     const json = await res.json();
     return json?.ok ? { ok: true } : { ok: false, error: json?.description || 'telegram rejected the message' };
   } catch (e: any) {
     return { ok: false, error: e?.message || 'telegram request failed' };
   }
+}
+
+/** Sends the photo post; if Telegram can't fetch the image, the same post goes out as text. */
+export async function sendPickPost(post: PickPost, chatId: string): Promise<{ ok: boolean; error?: string }> {
+  const reply_markup = { inline_keyboard: post.buttons.map((b) => [b]) };
+  const photo = post.photo
+    ? await callTelegram('sendPhoto', { chat_id: chatId, photo: post.photo, caption: post.caption, parse_mode: 'HTML', reply_markup })
+    : { ok: false, error: 'no image' };
+  if (photo.ok) return photo;
+  const text = await callTelegram('sendMessage', {
+    chat_id: chatId,
+    text: post.caption,
+    parse_mode: 'HTML',
+    disable_web_page_preview: true,
+    reply_markup,
+  });
+  return text.ok ? text : { ok: false, error: `${photo.error}; text: ${text.error}` };
 }
