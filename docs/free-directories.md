@@ -1,6 +1,9 @@
 # Free directories for tryshopli.com
 
-Status 2026-11-22: the Telegram channel was submitted to TGStat (accepted, "appears within 10 minutes") and Telemetr (listed at telemetr.io/en/channel/2DicVp). Everything else needs a Shopli email address or an account and is not submitted yet.
+Status 2026-11-22:
+- Submitted: TGStat (channel), Telemetr (channel, listed at telemetr.io/en/channel/2DicVp), Launching Next (site, free queue ~4 months, submission id 185186, contact email is the one the site already publishes).
+- Needs an account first: Uneed (asks to register before saving), AlternativeTo, Telegramic, Startup Stash (wants a work email). These wait for a Shopli-owned email address.
+- SaaSHub asks that an AI agent hand the submission to a person, so a person submits it.
 
 Researched 2026-11-22. Canonical host is https://www.tryshopli.com (bare tryshopli.com redirects to it; `/` lands on `/eu`). `/il` and `/landed` return 200; `/il/landed`, `/collections`, `/compare` return 404, so do not link those.
 Evidence labels: [read] page text read live, [search] search-result snippet only, [UNREAD] blocked (Cloudflare/403) so a human must open it in a browser before submitting. Raw fetches are in `raw/`.
