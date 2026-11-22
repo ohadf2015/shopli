@@ -119,6 +119,15 @@ export default function MarketplaceHowTo({ marketplace }: { marketplace: Marketp
               </Link>{' '}
               (in Hebrew).
             </p>
+            {marketplace === 'aliexpress' && (
+              <p className="text-sm mt-2" style={{ color: GRAY }}>
+                Waiting for a sale? Our{' '}
+                <Link href="/il/blog/aliexpress-black-friday-real-deals-2026" className="font-semibold text-orange-700 hover:underline">
+                  AliExpress Black Friday guide
+                </Link>{' '}
+                (in Hebrew) has the 2026 sale dates and how to tell a real discount from a fake one.
+              </p>
+            )}
           </section>
 
           <section className="mb-10">
