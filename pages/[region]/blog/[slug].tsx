@@ -11,7 +11,7 @@ import { collectionLinks } from '../../../lib/related-links';
 import { collectionsForBlog } from '../../../lib/related-content';
 import { blogPostingJsonLd, breadcrumbJsonLd, faqJsonLd, itemListJsonLd, SITE_URL } from '../../../lib/seo';
 import ProductCard, { ProductCardProduct } from '../../../components/ProductCard';
-import { searchAliExpress } from '../../../lib/aliexpress';
+import { searchAliExpress, withProductPageOffers } from '../../../lib/aliexpress';
 import { filterQuality } from '../../../lib/quality';
 import { getReviewCounts } from '../../../lib/review-store';
 import { cacheIfNotEmpty } from '../../../lib/cache';
@@ -307,7 +307,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
       // sixth-most relevant listing. A pick with a price floor drops the
       // accessories under it first (lib/blog-picks.ts).
       const best = filterQuality(pickCandidates(products, pick.minPriceUsd, pick.titleIncludes).slice(0, 3))[0];
-      return best ? { pick, best } : null;
+      if (!best) return null;
+      const [priced] = await withProductPageOffers([best], region);
+      return { pick, best: priced };
     })
   );
 

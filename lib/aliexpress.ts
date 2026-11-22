@@ -327,7 +327,13 @@ export async function searchCollection(region: string, keywords: string[], limit
   //
   // Every card links to /product/<id>, which resolves by id. Search returns
   // some items the by-id lookup never does, and those cards were dead 404 links.
-  return keepLinkable(rankForFeature(all).slice(0, limit), (ids) => getProductsByIds(ids, region));
+  return withProductPageOffers(rankForFeature(all).slice(0, limit), region);
+}
+
+// Search quotes a different price than the by-id call each product page makes,
+// so every card that links to /product/<id> takes its price from that call.
+export function withProductPageOffers<T extends SearchProduct>(products: T[], region: string): Promise<T[]> {
+  return keepLinkable(products, (ids) => getProductsByIds(ids, region));
 }
 
 /**

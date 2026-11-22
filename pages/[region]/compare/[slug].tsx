@@ -295,11 +295,12 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
   let prod1Items: any[] = [];
   let prod2Items: any[] = [];
   try {
-    const { searchAliExpress } = await import('../../../lib/aliexpress');
-    const [p1, p2] = await Promise.all([
-      searchAliExpress(comparison.product1.keyword, region, 4),
-      searchAliExpress(comparison.product2.keyword, region, 4),
-    ]);
+    const { searchAliExpress, withProductPageOffers } = await import('../../../lib/aliexpress');
+    const [p1, p2] = await Promise.all(
+      [comparison.product1.keyword, comparison.product2.keyword].map(async (kw) =>
+        withProductPageOffers(await searchAliExpress(kw, region, 4), region)
+      )
+    );
     prod1Items = p1 || [];
     prod2Items = p2 || [];
   } catch {}
