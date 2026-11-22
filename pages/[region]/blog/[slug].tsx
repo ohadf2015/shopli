@@ -14,7 +14,7 @@ import ProductCard, { ProductCardProduct } from '../../../components/ProductCard
 import { searchAliExpress, withProductPageOffers } from '../../../lib/aliexpress';
 import { filterQuality } from '../../../lib/quality';
 import { getReviewCounts } from '../../../lib/review-store';
-import { cacheIfNotEmpty } from '../../../lib/cache';
+import { cacheIfNotEmpty, offersChecked } from '../../../lib/cache';
 
 interface PickProduct extends ProductCardProduct {
   /** What the card is captioned with, in the page's language. */
@@ -340,7 +340,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
   // result must not be frozen at the CDN for a day (lib/cache.ts).
   cacheIfNotEmpty(
     res,
-    pickProducts.length > 0 || picks.length === 0,
+    (pickProducts.length > 0 || picks.length === 0) && offersChecked(resolved.map((r) => r.best)),
     'public, s-maxage=3600, stale-while-revalidate=86400'
   );
 

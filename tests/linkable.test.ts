@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { keepLinkable } from '../lib/linkable';
+import { offersChecked } from '../lib/cache';
 
 const p = (id: string) => ({ id, title: `p${id}` });
 
@@ -61,4 +62,13 @@ test('every lookup failing keeps the search prices', async () => {
     throw new Error('rate limited');
   });
   assert.deepEqual(kept.map((x) => x.price), [5, 6]);
+});
+
+test('every lookup failing marks the cards unchecked; a resolved lookup does not', async () => {
+  const failed = await keepLinkable([card('1', 5)], async () => {
+    throw new Error('rate limited');
+  });
+  assert.equal(offersChecked(failed), false);
+  const ok = await keepLinkable([card('1', 5)], async (ids) => [{ id: ids[0], price: 6 }]);
+  assert.equal(offersChecked(ok), true);
 });

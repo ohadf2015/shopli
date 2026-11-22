@@ -17,7 +17,7 @@ import { getTrendCategories } from '../../lib/trend-calendar';
 import { computeVolumeVelocity, getVolumeBaselines } from '../../lib/trend-velocity';
 import { dedupeByTitle } from '../../lib/trending';
 import type { RegionConfig } from '../../lib/regions';
-import { cacheIfNotEmpty } from '../../lib/cache';
+import { cacheIfNotEmpty, offersChecked } from '../../lib/cache';
 
 interface TrendingProduct extends SearchProduct {
   trendReason: string;
@@ -366,7 +366,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
   // 6h stale window, not a day: this page emits Product offers.price, and a
   // day-old copy would serve stale prices in structured data; 1h left most
   // crawler visits rendering cold.
-  cacheIfNotEmpty(res, products.length > 0, 'public, s-maxage=3600, stale-while-revalidate=21600');
+  cacheIfNotEmpty(res, products.length > 0 && offersChecked(products), 'public, s-maxage=3600, stale-while-revalidate=21600');
 
   return {
     props: {

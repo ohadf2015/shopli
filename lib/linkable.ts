@@ -1,4 +1,4 @@
-type Offer = { price?: number; originalPrice?: number | null; currency?: string; discount?: string };
+type Offer = { price?: number; originalPrice?: number | null; currency?: string; discount?: string; offerUnchecked?: boolean };
 
 export function withLookupOffer<T extends Offer>(card: T, found: Offer): T {
   if (!(typeof found.price === 'number' && found.price > 0)) return card;
@@ -26,7 +26,7 @@ export async function keepLinkable<T extends { id: string } & Offer>(
   );
   // An empty answer looks the same as a throttled call, so drop misses only
   // when the API resolved at least one of the others.
-  if (!found.some(Boolean)) return products;
+  if (!found.some(Boolean)) return products.map((p) => ({ ...p, offerUnchecked: true }));
   // Search and by-id quote different prices for one item; the card takes the
   // by-id one so it matches the product page it links to.
   return products.flatMap((p, i) => (found[i] ? [withLookupOffer(p, found[i]!)] : []));

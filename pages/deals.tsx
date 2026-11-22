@@ -227,8 +227,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   // Fresh deals: revalidate hourly at the CDN, serve stale up to a day. Empty renders are
   // never cached long — one rate-limit window would freeze a zero-group page at the CDN.
-  const { cacheIfNotEmpty } = await import('../lib/cache');
-  cacheIfNotEmpty(res, groups.length > 0, 'public, s-maxage=3600, stale-while-revalidate=86400');
+  const { cacheIfNotEmpty, offersChecked } = await import('../lib/cache');
+  cacheIfNotEmpty(res, groups.length > 0 && offersChecked(groups.flatMap((g) => g.products)), 'public, s-maxage=3600, stale-while-revalidate=86400');
 
   return {
     props: {
