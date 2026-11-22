@@ -15,7 +15,7 @@ import { getComparison } from '../../../lib/comparisons';
 import { productImage } from '../../../lib/img';
 import { listingAggregateFields } from '../../../lib/pdp';
 import { articleJsonLd, breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
-import { cacheIfNotEmpty } from '../../../lib/cache';
+import { cacheIfNotEmpty, offersChecked } from '../../../lib/cache';
 
 export default function ComparisonPage({ region, config, comparison, prod1Items, prod2Items, rtl, error }: any) {
   if (error) {
@@ -305,7 +305,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
     prod2Items = p2 || [];
   } catch {}
 
-  cacheIfNotEmpty(res, prod1Items.length > 0 || prod2Items.length > 0, 'public, s-maxage=3600, stale-while-revalidate=21600');
+  cacheIfNotEmpty(res, (prod1Items.length > 0 || prod2Items.length > 0) && offersChecked([...prod1Items, ...prod2Items]), 'public, s-maxage=3600, stale-while-revalidate=21600');
 
   return {
     props: { region, config, comparison, prod1Items, prod2Items, rtl },

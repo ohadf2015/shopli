@@ -22,3 +22,9 @@ export function cacheIfNotEmpty(res: ServerResponse, hasContent: boolean, value:
   // This ensures empty responses cannot be long-cached even if a caller sets both headers.
   res.setHeader('Vercel-CDN-Cache-Control', cacheControl);
 }
+
+// A card whose by-id lookup failed still shows the search price, which can
+// disagree with its product page; such a render must not sit at the CDN.
+export function offersChecked(products: object[]): boolean {
+  return !products.some((p) => (p as { offerUnchecked?: boolean })?.offerUnchecked);
+}
