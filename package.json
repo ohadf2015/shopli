@@ -18,7 +18,6 @@
   "type": "commonjs",
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
-    "critters": "^0.0.23",
     "next": "^14.2.35",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

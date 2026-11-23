@@ -22,7 +22,6 @@ const config = {
   experimental: {
     // Constrained CI runner (shared pid/thread cgroup cap): keep workers low.
     cpus: 2,
-    optimizeCss: true,
   },
   images: {
     remotePatterns: [
