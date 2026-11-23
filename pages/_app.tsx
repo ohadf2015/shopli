@@ -10,6 +10,7 @@ import { installClickTracking } from '../lib/analytics';
 import { getRegion } from '../lib/regions';
 import Footer from '../components/Footer';
 import RouteProgress from '../components/RouteProgress';
+import FeedbackWidget from '../components/FeedbackWidget';
 
 // Self-hosted so there is no render-blocking round trip to fonts.googleapis.com,
 // and so Next can emit size-adjusted fallback metrics (swap without the shift).
@@ -87,6 +88,7 @@ export default function ShopliApp({ Component, pageProps }: AppProps) {
         }
       `}</style>
       <RouteProgress />
+      <FeedbackWidget />
       <Component {...pageProps} />
       {GA_ID && (
         <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="lazyOnload" />
