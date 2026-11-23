@@ -303,7 +303,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
 
   res.setHeader('Vary', 'Accept');
   const props = await loadHomeProps(region);
-  const found = props.drops.length + props.sellers.length > 0;
+  const found = props.drops.length + props.sellers.length > 0 && props.pricesChecked;
 
   cacheIfNotEmpty(res, found, 'public, s-maxage=600, stale-while-revalidate=86400');
 
