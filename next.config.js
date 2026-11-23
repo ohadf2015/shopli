@@ -1,11 +1,11 @@
 // 'unsafe-inline' on scripts: _document inlines the PostHog and GA bootstraps.
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.posthog.com https://growthradar.app https://company-brain-production-841e.up.railway.app",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.posthog.com https://growthradar.app https://company-brain-production-841e.up.railway.app https://server-production-14a9.up.railway.app https://cdn.jsdelivr.net",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://*.aliexpress-media.com https://*.alicdn.com https://oddities.app https://*.google-analytics.com https://*.googletagmanager.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://*.posthog.com https://growthradar.app https://company-brain-production-841e.up.railway.app https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
+  "connect-src 'self' https://*.posthog.com https://growthradar.app https://company-brain-production-841e.up.railway.app https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://server-production-14a9.up.railway.app",
   "worker-src 'self' blob:",
   "frame-src 'self'",
   "frame-ancestors 'none'",
