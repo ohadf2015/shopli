@@ -24,3 +24,9 @@ test('byline names Shopli and a readable date in the page language', () => {
 test('the date does not shift with the server time zone', () => {
   assert.match(collectionByline('2026-07-01', 'en').text, /\b1\b/);
 });
+
+test('comparison articles share one real ISO publish date', async () => {
+  const { COMPARISON_PUBLISHED } = await import('../lib/comparisons');
+  assert.match(COMPARISON_PUBLISHED, /^\d{4}-\d{2}-\d{2}$/);
+  assert.ok(!Number.isNaN(Date.parse(COMPARISON_PUBLISHED)));
+});

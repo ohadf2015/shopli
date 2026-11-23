@@ -21,6 +21,7 @@ export interface HomePageProps {
   sellers: HomeCard[];
   chips: Array<{ slug: string; name: string }>;
   asOf: string;
+  pricesChecked: boolean;
 }
 
 export type HomeCopy = {

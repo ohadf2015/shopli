@@ -3,6 +3,8 @@
 
 import { localizedSides } from './comparison-localized';
 
+export const COMPARISON_PUBLISHED = '2026-07-12';
+
 export interface ComparisonSide {
   name: string;
   keyword: string;

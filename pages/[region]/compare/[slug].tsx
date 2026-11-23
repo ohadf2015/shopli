@@ -11,7 +11,8 @@ import { collectionLinks } from '../../../lib/related-links';
 import { collectionsForComparison } from '../../../lib/related-content';
 import { trackCompareNextAction } from '../../../lib/analytics';
 import { compareT, makeTr } from '../../../lib/compare-i18n';
-import { getComparison } from '../../../lib/comparisons';
+import { COMPARISON_PUBLISHED, getComparison } from '../../../lib/comparisons';
+import { collectionByline } from '../../../lib/collection-content';
 import { productImage } from '../../../lib/img';
 import { listingAggregateFields } from '../../../lib/pdp';
 import { articleJsonLd, breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
@@ -42,6 +43,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
   const pageUrl = `${SITE_URL}/${region}/compare/${c.slug}`;
   const title = `${t(c.title)} | ${rtl ? 'שופלי' : 'Shopli'}`;
   const description = t(c.metaDesc);
+  const byline = collectionByline(COMPARISON_PUBLISHED, lang);
 
   const structuredData: Record<string, unknown>[] = [
     breadcrumbJsonLd([
@@ -53,6 +55,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
       headline: t(c.title),
       description,
       url: pageUrl,
+      datePublished: COMPARISON_PUBLISHED,
     }),
   ];
 
@@ -99,6 +102,9 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
         </div>
 
         <h1 className="text-2xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--shopli-navy)' }}>{t(c.title)}</h1>
+        <p className="text-sm font-semibold mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
+          <time dateTime={byline.iso}>{byline.text}</time>
+        </p>
         <p className="max-w-3xl text-base leading-relaxed mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>{t(c.intro)}</p>
         <div className="mb-6">
           <ShareBar
