@@ -1,7 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { trackConversion } from '../lib/analytics';
+import { landingContext, trackConversion } from '../lib/analytics';
+
+function memoryStorage() {
+  const m = new Map<string, string>();
+  return { getItem: (k: string) => m.get(k) ?? null, setItem: (k: string, v: string) => { m.set(k, v); } };
+}
 
 function fakeWindow() {
   const calls: Array<[string, string, Record<string, unknown>]> = [];
@@ -24,6 +29,8 @@ test('one conversion goes to PostHog, GA4 and Growth Radar under the same name w
     ['gr', 'growth:deal_alerts_signup_completed'],
   ]);
   assert.deepEqual(calls[2][2], {
+    landing_page: '/il/mood/cozy',
+    landing_referrer_host: 't.me',
     page: '/il/mood/cozy',
     utm_source: 'tg',
     utm_campaign: 'weekly',
@@ -53,4 +60,32 @@ test('a throwing or missing sink never breaks the others', () => {
   const noGtag = { ...win, gtag: undefined };
   assert.doesNotThrow(() => trackConversion('whatsapp_click', { link_host: 'wa.me' }, noGtag));
   assert.deepEqual(calls.map(([, e]) => e), ['growth:whatsapp_click']);
+});
+
+test('the first page of the visit, its referrer and utm survive a navigation', () => {
+  const { win, calls } = fakeWindow();
+  const visit = { ...win, sessionStorage: memoryStorage() };
+  landingContext(visit);
+  const next = {
+    ...visit,
+    location: { pathname: '/il/wishlist', search: '', hostname: 'www.tryshopli.com' },
+    document: { title: 'Wishlist', referrer: 'https://www.tryshopli.com/il/mood/cozy' },
+  };
+  landingContext(next);
+  trackConversion('wishlist_alerts_signup_completed', { form: 'wishlist_alerts' }, next);
+  const props = calls[0][2];
+  assert.equal(props.page, '/il/wishlist');
+  assert.equal(props.landing_page, '/il/mood/cozy');
+  assert.equal(props.landing_referrer_host, 't.me');
+  assert.equal(props.utm_source, 'tg');
+  assert.equal(props.utm_campaign, 'weekly');
+  assert.equal('referrer_host' in props, false);
+});
+
+test('landing_page falls back to the current page when storage is blocked', () => {
+  const { win, calls } = fakeWindow();
+  const blocked = { getItem: (): string | null => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); } };
+  trackConversion('telegram_click', {}, { ...win, sessionStorage: blocked });
+  assert.equal(calls[0][2].page, '/il/mood/cozy');
+  assert.equal(calls[0][2].landing_page, '/il/mood/cozy');
 });

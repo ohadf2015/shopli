@@ -7,7 +7,8 @@
 //   telegram_click / whatsapp_click { link_host, region }
 //   deal_alerts_signup_completed { form, source }
 //   wishlist_alerts_signup_completed { form, region, items_count }
-// Every one also carries page, page_title, referrer_host and utm_*.
+// Every one also carries page, page_title, referrer_host, utm_* and the visit's
+// landing_page / landing_referrer_host; utm_* fall back to the landing page's.
 
 export const POSTHOG_KEY = 'phc_m3X2YeaZ89r7m8yQYXfc6afyrygXmJG7TegJco5H9skD';
 export const POSTHOG_HOST = 'https://eu.i.posthog.com';
@@ -28,6 +29,7 @@ const PII_KEYS = new Set(['name', 'full_name', 'first_name', 'last_name', 'email
 type AnalyticsWindow = Pick<Window, 'posthog' | 'gr' | 'gtag'> & {
   location?: { pathname?: string; search?: string; hostname?: string };
   document?: { title?: string; referrer?: string };
+  sessionStorage?: Pick<Storage, 'getItem' | 'setItem'>;
 };
 
 export function stripPii(props: Record<string, unknown>): Record<string, unknown> {
@@ -38,21 +40,55 @@ export function stripPii(props: Record<string, unknown>): Record<string, unknown
   return safe;
 }
 
-export function pageContext(w: AnalyticsWindow): Record<string, string> {
+const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+const LANDING_KEY = 'landing_context';
+
+function utmFrom(search: string | undefined): Record<string, string> {
+  const ctx: Record<string, string> = {};
+  const qs = new URLSearchParams(search || '');
+  for (const k of UTM_KEYS) {
+    const v = qs.get(k);
+    if (v) ctx[k] = v;
+  }
+  return ctx;
+}
+
+function externalReferrerHost(w: AnalyticsWindow): string | undefined {
+  if (!w.document?.referrer) return undefined;
+  const host = new URL(w.document.referrer).hostname;
+  return host && host !== w.location?.hostname ? host : undefined;
+}
+
+/** The first page of this visit, stored once per tab session and never overwritten. */
+export function landingContext(w: AnalyticsWindow): Record<string, string> {
+  try {
+    const saved = w.sessionStorage?.getItem(LANDING_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch {
+    /* storage blocked: recompute below */
+  }
   const ctx: Record<string, string> = {};
   try {
-    const loc = w.location || {};
-    if (loc.pathname) ctx.page = loc.pathname;
-    const qs = new URLSearchParams(loc.search || '');
-    for (const k of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term']) {
-      const v = qs.get(k);
-      if (v) ctx[k] = v;
-    }
+    if (w.location?.pathname) ctx.landing_page = w.location.pathname;
+    const host = externalReferrerHost(w);
+    if (host) ctx.landing_referrer_host = host;
+    Object.assign(ctx, utmFrom(w.location?.search));
+    w.sessionStorage?.setItem(LANDING_KEY, JSON.stringify(ctx));
+  } catch {
+    /* context is best-effort */
+  }
+  return ctx;
+}
+
+export function pageContext(w: AnalyticsWindow): Record<string, string> {
+  const ctx: Record<string, string> = { ...landingContext(w) };
+  try {
+    if (w.location?.pathname) ctx.page = w.location.pathname;
+    if (ctx.page) ctx.landing_page ||= ctx.page;
+    Object.assign(ctx, utmFrom(w.location?.search));
     if (w.document?.title) ctx.page_title = String(w.document.title).slice(0, 120);
-    if (w.document?.referrer) {
-      const host = new URL(w.document.referrer).hostname;
-      if (host && host !== loc.hostname) ctx.referrer_host = host;
-    }
+    const host = externalReferrerHost(w);
+    if (host) ctx.referrer_host = host;
   } catch {
     /* context is best-effort */
   }
