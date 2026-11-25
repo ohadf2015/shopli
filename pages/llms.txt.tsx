@@ -55,6 +55,8 @@ function buildLlmsTxt(): string {
     '',
     ...guides.map((p) => `- [${en(p.title)}](${guideUrl(p)}): ${en(p.metaDesc)}`),
     '',
+    `- [Facts about Shopli](${SITE_URL}/entity-map): what Shopli is, how it earns money and how picks are made, each fact quoted from the page it comes from.`,
+    '',
     '## Israel (Hebrew, ILS)',
     '',
     `- [Shopli Israel](${SITE_URL}/il): Hebrew home page with live deals priced in shekels.`,

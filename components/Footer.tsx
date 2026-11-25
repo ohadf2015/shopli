@@ -43,6 +43,7 @@ const T: Record<Lang, Record<string, string>> = {
     privacy: 'Privacy Policy',
     terms: 'Terms of Service',
     contact: 'Contact',
+    facts: 'Facts',
   },
   he: {
     explore: 'לגלוש',
@@ -57,6 +58,7 @@ const T: Record<Lang, Record<string, string>> = {
     privacy: 'מדיניות פרטיות',
     terms: 'תנאי השימוש',
     contact: 'צור קשר',
+    facts: 'עובדות',
   },
   fr: {
     explore: 'Explorer',
@@ -71,6 +73,7 @@ const T: Record<Lang, Record<string, string>> = {
     privacy: 'Politique de confidentialité',
     terms: 'Conditions d\'utilisation',
     contact: 'Nous contacter',
+    facts: 'Faits',
   },
   de: {
     explore: 'Entdecken',
@@ -85,6 +88,7 @@ const T: Record<Lang, Record<string, string>> = {
     privacy: 'Datenschutzerklärung',
     terms: 'Nutzungsbedingungen',
     contact: 'Kontakt',
+    facts: 'Fakten',
   },
   es: {
     explore: 'Explorar',
@@ -99,6 +103,7 @@ const T: Record<Lang, Record<string, string>> = {
     privacy: 'Política de privacidad',
     terms: 'Términos de servicio',
     contact: 'Contacto',
+    facts: 'Datos',
   },
   it: {
     explore: 'Esplora',
@@ -113,6 +118,7 @@ const T: Record<Lang, Record<string, string>> = {
     privacy: 'Politica sulla privacy',
     terms: 'Termini di servizio',
     contact: 'Contatti',
+    facts: 'Fatti',
   },
   ru: {
     explore: 'Обзор',
@@ -127,6 +133,7 @@ const T: Record<Lang, Record<string, string>> = {
     privacy: 'Политика конфиденциальности',
     terms: 'Условия обслуживания',
     contact: 'Контакты',
+    facts: 'Факты',
   },
 };
 
@@ -150,6 +157,7 @@ export default function Footer({ currentRegion }: { currentRegion: RegionCode | 
     { href: `${base}/privacy`, label: t.privacy },
     { href: `${base}/terms`, label: t.terms },
     { href: `${base}/contact`, label: t.contact },
+    { href: '/entity-map', label: t.facts },
   ];
 
   return (
