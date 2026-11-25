@@ -717,23 +717,23 @@ export const blogPosts: BlogPost[] = [
     slug: 'aliexpress-israel-customs-vat',
     regions: ['il'],
     title: {
-      he: 'מכס ומע"מ על אליאקספרס: כמה באמת תשלמו (עדכון אוגוסט 2026)',
-      en: 'AliExpress Import Tax in Israel: What You Actually Pay (August 2026)',
+      he: 'מכס ומע"מ על אליאקספרס וטמו: כמה באמת תשלמו (עדכון נובמבר 2026)',
+      en: 'AliExpress and Temu Import Tax in Israel: What You Actually Pay (November 2026)',
     },
     metaDesc: {
-      he: 'הפטור חזר ל-75$ ב-2 ביוני 2026. מה פטור, מתי נכנס מע"מ 18%, ולמה החישוב של רשות המסים שונה מזה שבעגלה. כולל דוגמאות מספריות.',
-      en: 'Israel restored the $75 exemption on 2 June 2026. What is exempt, when 18% VAT applies, and why the tax authority does the sum differently than your cart does.',
+      he: 'האם יש מס על הזמנות מטמו ואליאקספרס לישראל? עד 75$ פטור, מעל זה מע"מ 18%. מה פטור, איך מחשבים, ולמה החישוב שונה מזה שבעגלה. כולל דוגמאות.',
+      en: 'Is there tax on Temu and AliExpress orders to Israel? Up to $75 is exempt; above it, 18% VAT. What is exempt, how it is calculated, and why the sum differs from your cart. With examples.',
     },
     intro: {
-      he: 'רוב האנשים שמוותרים על הזמנה מאליאקספרס עושים את זה כי הם לא בטוחים כמה יעלה המכס. התשובה הקצרה: מתחת ל-75 דולר שווי סחורה — לא תשלמו כלום. מעל זה — 18% מע"מ, ולא מכס. הבעיה היא שהסכום שממנו סופרים את ה-75$ והסכום שעליו גובים את המע"מ הם שני סכומים שונים, וזה בדיוק המקום שבו אנשים מופתעים.',
-      en: 'Most people who abandon an AliExpress cart do it because they cannot tell what the tax will be. Short answer: under $75 of goods, nothing. Above it, 18% VAT and no customs duty. The catch is that the figure used to test the $75 threshold and the figure the VAT is charged on are two different numbers — which is exactly where the surprises come from.',
+      he: 'כן, יש מס על הזמנות מטמו — אבל רק כשהחבילה עוברת 75 דולר שווי סחורה. עד הסכום הזה אין מע"מ ואין מכס, ומעליו משלמים מע"מ של 18% על כל הסכום. הכללים זהים לכל חבילה שמגיעה מחו"ל, ולכן הם חלים על טמו בדיוק כמו על אליאקספרס. רוב האנשים שמוותרים על הזמנה מאליאקספרס עושים את זה כי הם לא בטוחים כמה יעלה המכס. התשובה הקצרה: מתחת ל-75 דולר שווי סחורה — לא תשלמו כלום. מעל זה — 18% מע"מ, ולא מכס. הבעיה היא שהסכום שממנו סופרים את ה-75$ והסכום שעליו גובים את המע"מ הם שני סכומים שונים, וזה בדיוק המקום שבו אנשים מופתעים.',
+      en: 'Yes, Temu orders can be taxed, but only when a parcel goes over $75 of goods. Up to that figure there is no VAT and no duty; above it you pay 18% VAT on the whole amount. The rules are the same for any parcel arriving from abroad, so they apply to Temu exactly as they do to AliExpress. Most people who abandon an AliExpress cart do it because they cannot tell what the tax will be. Short answer: under $75 of goods, nothing. Above it, 18% VAT and no customs duty. The catch is that the figure used to test the $75 threshold and the figure the VAT is charged on are two different numbers — which is exactly where the surprises come from.',
     },
     sections: [
       {
         heading: { he: 'המצב נכון לאוגוסט 2026', en: 'Where the rules stand in August 2026' },
         body: {
-          he: 'הסף עלה ל-150$ בתחילת 2026 ואז הוחזר ל-75$ ב-2 ביוני 2026. כלומר: חבילות בשווי 75$–130$ שהיו פטורות לגמרי בחודשים שלפני כן חייבות היום ב-18% מע"מ. אם ראיתם מדריך שמדבר על 150$ — הוא לא מעודכן. הסף השתנה פעמיים בשנה אחת, אז לפני הזמנה גדולה שווה לוודא באתר רשות המסים.',
-          en: 'The threshold rose to $150 in early 2026 and was put back to $75 on 2 June 2026. Parcels worth $75–$130, fully exempt for the months in between, now carry 18% VAT. Any guide still quoting $150 is out of date — the figure moved twice in one year, so check the Tax Authority site before a large order.',
+          he: 'בין 25 בפברואר ל-1 ביוני 2026 הפטור חל על חבילות עד 130$, ואז הכנסת ביטלה את הצו והסף חזר ל-75$. כלומר: חבילות בשווי 75$–130$ שהיו פטורות לגמרי באותה תקופה חייבות היום ב-18% מע"מ. אם ראיתם מדריך שמדבר על 130$ או 150$ — הוא לא מעודכן. הסף השתנה כמה פעמים בתוך שנה, אז לפני הזמנה גדולה שווה לוודא באתר רשות המסים או בכל זכות.',
+          en: 'From 25 February to 1 June 2026 the exemption covered parcels up to $130; then the Knesset cancelled that order and the threshold went back to $75. Parcels worth $75–$130, fully exempt during that window, now carry 18% VAT. Any guide still quoting $130 or $150 is out of date. The figure has moved several times in a year, so check the Tax Authority or Kol Zchut before a large order.',
         },
       },
       {
@@ -744,10 +744,17 @@ export const blogPosts: BlogPost[] = [
         },
       },
       {
+        heading: { he: 'מה זה אומר להזמנות מטמו', en: 'What this means for Temu orders' },
+        body: {
+          he: 'המס תלוי בערך החבילה ולא בחנות שממנה היא הגיעה, ולכן אותן שלוש מדרגות חלים גם על טמו. הזמנה קטנה של כמה פריטים זולים בדרך כלל נשארת מתחת ל-75$ ולא נושאת מס. כשהסל גדול יותר, החבילה חייבת ב-18% מע"מ על הערך המלא, ואת התשלום גובים בדרך כלל דואר ישראל או חברת השילוח בעת המסירה, בתוספת עמלת טיפול. אם כמה חבילות מאותו ספק מגיעות בהפרש של עד 72 שעות, הן נבדקות יחד.',
+          en: 'Tax depends on the value of the parcel, not on the store it came from, so the same brackets apply to Temu. A small order of a few cheap items usually stays under $75 and carries no tax. A bigger basket is charged 18% VAT on its full value, normally collected by Israel Post or the courier at delivery along with a handling fee. If several parcels from the same seller arrive within 72 hours, they are assessed together.',
+        },
+      },
+      {
         heading: { he: 'הפרט שמפתיע: שני סכומים שונים', en: 'The detail that catches people out' },
         body: {
-          he: 'כדי לבדוק אם עברתם את ה-75$ סופרים רק את שווי הסחורה — בלי משלוח ובלי ביטוח. אבל ברגע שעברתם, המע"מ מחושב על ה-CIF: סחורה + משלוח + ביטוח. הזמנה של 72$ עם משלוח 10$ נשארת פטורה. הזמנה של 78$ עם אותו משלוח חייבת ב-18% על 88$, כלומר בערך 15.8$ — קפיצה של כמעט 16 דולר על הפרש של 6 דולר במחיר המוצר. אם אתם קרובים לסף, לפצל להזמנות נפרדות זה לרוב זול יותר.',
-          en: 'The $75 test looks only at the goods — shipping and insurance are excluded. Once you cross it, VAT is charged on the CIF value: goods plus shipping plus insurance. A $72 order with $10 shipping stays exempt. A $78 order with the same shipping is taxed 18% on $88, about $15.80 — nearly sixteen dollars triggered by a six-dollar difference in item price. Near the line, splitting into separate orders is usually cheaper.',
+          he: 'כדי לבדוק אם עברתם את ה-75$ סופרים רק את שווי הסחורה — בלי משלוח ובלי ביטוח. אבל ברגע שעברתם, המע"מ מחושב על ה-CIF: סחורה + משלוח + ביטוח. הזמנה של 72$ עם משלוח 10$ נשארת פטורה. הזמנה של 78$ עם אותו משלוח חייבת ב-18% על 88$, כלומר בערך 15.8$ — קפיצה של כמעט 16 דולר על הפרש של 6 דולר במחיר המוצר. שימו לב: שתי חבילות או יותר מאותו ספק לאותו לקוח בהפרש של עד 72 שעות נחשבות משלוח אחד שפוצל, והמס מחושב על הערך המצטבר.',
+          en: 'The $75 test looks only at the goods — shipping and insurance are excluded. Once you cross it, VAT is charged on the CIF value: goods plus shipping plus insurance. A $72 order with $10 shipping stays exempt. A $78 order with the same shipping is taxed 18% on $88, about $15.80 — nearly sixteen dollars triggered by a six-dollar difference in item price. Note that two or more parcels from the same seller to the same customer within 72 hours are treated as one split shipment, with tax calculated on the combined value.',
         },
       },
       {
@@ -767,6 +774,13 @@ export const blogPosts: BlogPost[] = [
     ],
     faq: [
       {
+        q: { he: 'האם יש מס על הזמנות מטמו לישראל?', en: 'Is there a tax on Temu orders into Israel?' },
+        a: {
+          he: 'כן, אם שווי הסחורה בחבילה עובר 75 דולר: אז משלמים מע"מ של 18% על הערך המלא, כולל משלוח וביטוח. עד 75 דולר החבילה פטורה מכל מס. הכללים זהים לכל חבילה מחו"ל, כך שאין הבדל בין טמו, אליאקספרס או חנות אחרת.',
+          en: 'Yes, if the goods in a parcel are worth more than $75: you then pay 18% VAT on the full value, shipping and insurance included. Up to $75 the parcel is exempt from all tax. The rules are the same for any parcel from abroad, so Temu, AliExpress and other stores are treated alike.',
+        },
+      },
+      {
         q: { he: 'האם המשלוח נספר לתוך ה-75 דולר?', en: 'Does shipping count toward the $75?' },
         a: {
           he: 'לא לצורך הפטור — הסף נבדק על שווי הסחורה בלבד. אבל אם עברתם את הסף, המע"מ כן מחושב על הסחורה יחד עם המשלוח והביטוח.',
@@ -776,8 +790,8 @@ export const blogPosts: BlogPost[] = [
       {
         q: { he: 'שתי הזמנות נפרדות באותו יום — זה נחשב לאחת?', en: 'Do two separate orders on the same day count as one?' },
         a: {
-          he: 'כל משלוח נבדק בנפרד. אבל אם שתי הזמנות מגיעות מאותו מוכר באותה חבילה פיזית, הן משלוח אחד לכל דבר. אם אתם מפצלים בכוונה, ודאו שהמוכר לא מאחד אותן.',
-          en: 'Each shipment is assessed on its own. But if two orders arrive from the same seller in one physical parcel, that is a single shipment. If you are splitting deliberately, make sure the seller does not consolidate them.',
+          he: 'לא תמיד. שתי חבילות או יותר מאותו ספק לאותו לקוח בהפרש של עד 72 שעות נחשבות משלוח אחד שפוצל, והמס מחושב לפי הערך הכולל של כולן.',
+          en: 'Not always. Two or more parcels from the same seller to the same customer within 72 hours are treated as one split shipment, and tax is calculated on their combined value.',
         },
       },
       {
@@ -790,12 +804,12 @@ export const blogPosts: BlogPost[] = [
       {
         q: { he: 'הפטור עוד ישתנה?', en: 'Will the threshold change again?' },
         a: {
-          he: 'ייתכן. הוא עלה ל-150$ ואז ירד חזרה ל-75$ בתוך חצי שנה, בלחץ של קמעונאים מקומיים. המספרים כאן נכונים לאוגוסט 2026 — לפני הזמנה גדולה בדקו באתר רשות המסים.',
-          en: 'Possibly. It went to $150 and back to $75 inside six months under pressure from local retailers. The figures here are current as of August 2026 — check the Tax Authority site before a large order.',
+          he: 'ייתכן. הוא עלה ל-130$ בפברואר 2026 וחזר ל-75$ ביוני, אחרי שהכנסת ביטלה את הצו. המספרים כאן נכונים לנובמבר 2026 — לפני הזמנה גדולה בדקו באתר רשות המסים או בכל זכות.',
+          en: 'Possibly. It went to $130 in February 2026 and back to $75 in June, after the Knesset cancelled the order. The figures here are current as of November 2026; check the Tax Authority or Kol Zchut before a large order.',
         },
       },
     ],
-    keywords: ['מכס אליאקספרס', 'מע"מ אליאקספרס', 'יבוא אישי פטור 75 דולר', 'כמה מכס משלמים על חבילה', 'aliexpress israel customs', 'israel import vat threshold'],
+    keywords: ['מכס אליאקספרס', 'מע"מ אליאקספרס', 'יבוא אישי פטור 75 דולר', 'כמה מכס משלמים על חבילה', 'מכס טמו', 'מס על הזמנות מטמו', 'temu israel customs tax', 'aliexpress israel customs', 'israel import vat threshold'],
     relatedProducts: [
       { name: 'Under $75 Picks', keyword: 'best value gadgets under 20' },
       { name: 'Phone Accessories', keyword: 'phone accessories bundle' },
