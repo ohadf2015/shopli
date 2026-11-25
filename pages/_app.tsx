@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { Assistant, Space_Grotesk } from 'next/font/google';
 import '../styles/globals.css';
 import { organizationJsonLd } from '../lib/seo';
-import { installClickTracking } from '../lib/analytics';
+import { installClickTracking, landingContext } from '../lib/analytics';
 import { getRegion } from '../lib/regions';
 import Footer from '../components/Footer';
 import RouteProgress from '../components/RouteProgress';
@@ -50,7 +50,10 @@ export default function ShopliApp({ Component, pageProps }: AppProps) {
 
   // Revenue analytics: one delegated listener fires affiliate_click for every
   // AliExpress CTA (and telegram_click / whatsapp_click) on every page.
-  useEffect(() => installClickTracking(), []);
+  useEffect(() => {
+    landingContext(window);
+    return installClickTracking();
+  }, []);
 
   // Keep the html lang/dir in sync after hydration and on client-side
   // navigations. Derive the region from the URL (not pageProps) so pages that
