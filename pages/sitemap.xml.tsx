@@ -103,6 +103,12 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     lastmod: today,
   });
 
+  urls.push({
+    loc: `${SITE_URL}/entity-map`,
+    changefreq: 'monthly',
+    priority: 0.5,
+  });
+
   // Israel import calculator and the per-store guides
   urls.push({
     loc: `${SITE_URL}/landed`,
