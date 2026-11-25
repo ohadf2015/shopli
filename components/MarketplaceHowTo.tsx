@@ -119,6 +119,13 @@ export default function MarketplaceHowTo({ marketplace }: { marketplace: Marketp
               </Link>{' '}
               (in Hebrew).
             </p>
+            <p className="text-sm mt-2" style={{ color: GRAY }}>
+              For the full rules, including how the threshold has changed this year, read our{' '}
+              <Link href="/il/blog/aliexpress-israel-customs-vat" className="font-semibold text-orange-700 hover:underline">
+                import tax guide
+              </Link>{' '}
+              (in Hebrew).
+            </p>
             {marketplace === 'aliexpress' && (
               <p className="text-sm mt-2" style={{ color: GRAY }}>
                 Waiting for a sale? Our{' '}
