@@ -7,7 +7,8 @@ import DealAlertsForm from '../../../components/DealAlertsForm';
 import CollectionGlance from '../../../components/CollectionGlance';
 import RelatedReads, { type RelatedLink } from '../../../components/RelatedReads';
 import { collectionFacts } from '../../../lib/collection-facts';
-import { relatedForCollection } from '../../../lib/related-content';
+import { moodsForCollection, relatedForCollection } from '../../../lib/related-content';
+import { getMoodBoard } from '../../../lib/moodboards';
 import { themeForCollection, themeName as themeLabel } from '../../../lib/collection-themes';
 import { getBlogPost, isBlogPostInRegion } from '../../../lib/blog';
 import { getComparison } from '../../../lib/comparisons';
@@ -448,6 +449,11 @@ function buildRelated(slug: string, region: string, lang: string) {
   for (const c of compare) {
     const cmp = getComparison(c);
     if (cmp) links.push({ href: `/${region}/compare/${c}`, title: pick(cmp.title), kind: 'compare' });
+  }
+  // Ready-made kits that use this kind of product fill the slots guides leave.
+  for (const m of moodsForCollection(slug)) {
+    const board = getMoodBoard(m);
+    if (board) links.push({ href: `/${region}/mood/${m}`, title: pick(board.h1), kind: 'mood' });
   }
   const theme = themeForCollection(slug);
   const siblings = (theme?.slugs || [])
