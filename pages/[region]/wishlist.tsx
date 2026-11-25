@@ -7,6 +7,7 @@ import SeoHead from '../../components/SeoHead';
 import { getRegion, RegionCode } from '../../lib/regions';
 import { useWishlist, WishlistItem } from '../../lib/useWishlist';
 import { productImage } from '../../lib/img';
+import { trackConversion } from '../../lib/analytics';
 import type { ProductCardProduct } from '../../components/ProductCard';
 
 /** Minimal product card rendering inside the wishlist page — avoids importing the full ProductCard component tree just for the wishlist page. */
@@ -158,7 +159,7 @@ export default function WishlistPage() {
         setEmailStatus(data);
         if (data.ok) {
           setEmail('');
-          window.gr && window.gr.capture('growth:lead_submitted', { source: 'wishlist' });
+          trackConversion('wishlist_alerts_signup_completed', { form: 'wishlist_alerts', region, items_count: sorted.length });
         }
       } catch {
         setEmailStatus({ ok: false, message: rtl ? 'שגיאה, נסו שוב' : 'Error, try again' });

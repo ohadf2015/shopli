@@ -1,11 +1,12 @@
-// Deal-alerts capture wired to the company-brain interest rail.
-// The form carries data-interest="shopli" and is handled entirely by the
-// delegated submit listener in https://company-brain-production-841e.up.railway.app/interest.js
-// (loaded once in pages/_app.tsx): it POSTs {product, kind, source, email, note, website}
-// to /interest and swaps in the data-done message on success.
+// Deal-alerts capture posting to the company-brain interest rail.
+// This form owns its submit (interest.js would show the thank-you on any response,
+// failed ones included) so the signup is counted only when /interest answers ok.
 // 'website' is the rail's honeypot — keep it invisible and empty.
 
 import { useEffect, useRef } from 'react';
+import { trackConversion } from '../lib/analytics';
+
+const INTEREST_URL = 'https://company-brain-production-841e.up.railway.app/interest';
 
 interface DealAlertsFormProps {
   source: string; // e.g. 'mood' | 'collection' — recorded on the interest row
@@ -30,18 +31,36 @@ const HONEYPOT_STYLE = {
 export default function DealAlertsForm({ source, rtl }: DealAlertsFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
 
-  // interest.js owns the submit and only signals success by swapping in .interest-done.
   useEffect(() => {
     const form = formRef.current;
     if (!form) return;
-    const observer = new MutationObserver(() => {
-      if (!form.querySelector('.interest-done')) return;
-      observer.disconnect();
-      window.gr && window.gr.capture('growth:lead_submitted', { source });
-    });
-    observer.observe(form, { childList: true });
-    return () => observer.disconnect();
-  }, [source]);
+    const say = (cls: string, msg: string, replace: boolean) => {
+      const p = document.createElement('p');
+      p.className = cls;
+      p.textContent = msg;
+      if (replace) form.textContent = '';
+      form.appendChild(p);
+    };
+    const onSubmit = async (e: SubmitEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const field = (name: string) => (form.elements.namedItem(name) as HTMLInputElement | null)?.value ?? '';
+      try {
+        const res = await fetch(INTEREST_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ product: 'shopli', kind: 'notify', source, email: field('email'), website: field('website') }),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        say('interest-done', form.getAttribute('data-done') || '', true);
+        trackConversion('deal_alerts_signup_completed', { form: 'deal_alerts', source });
+      } catch {
+        say('interest-error', rtl ? 'לא הצלחנו לשמור, נסו שוב' : 'Could not save that, try again?', false);
+      }
+    };
+    form.addEventListener('submit', onSubmit);
+    return () => form.removeEventListener('submit', onSubmit);
+  }, [source, rtl]);
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10">

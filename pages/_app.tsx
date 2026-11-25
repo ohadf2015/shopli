@@ -49,7 +49,7 @@ export default function ShopliApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
   // Revenue analytics: one delegated listener fires affiliate_click for every
-  // AliExpress CTA (and outbound_click for Telegram/WhatsApp) on every page.
+  // AliExpress CTA (and telegram_click / whatsapp_click) on every page.
   useEffect(() => installClickTracking(), []);
 
   // Keep the html lang/dir in sync after hydration and on client-side
