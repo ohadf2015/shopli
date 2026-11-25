@@ -2,9 +2,12 @@
 // The snippet itself is injected in pages/_document.tsx; this module provides
 // the typed capture helpers + a delegated click tracker for affiliate CTAs.
 //
-// Event schema (matches the old smart-shopping-il instrumentation):
-//   affiliate_click { product, product_id, category, price, currency, page, url, region? }
-//   outbound_click  { target, page, url }   (telegram / whatsapp)
+// Conversion events (trackConversion: PostHog, GA4 and the Growth Radar `growth:` twin):
+//   affiliate_click { product, product_id, category, price, currency, region, placement, link_host }
+//   telegram_click / whatsapp_click { link_host, region }
+//   deal_alerts_signup_completed { form, source }
+//   wishlist_alerts_signup_completed { form, region, items_count }
+// Every one also carries page, page_title, referrer_host and utm_*.
 
 export const POSTHOG_KEY = 'phc_m3X2YeaZ89r7m8yQYXfc6afyrygXmJG7TegJco5H9skD';
 export const POSTHOG_HOST = 'https://eu.i.posthog.com';
@@ -16,7 +19,54 @@ declare global {
       init?: (key: string, opts: Record<string, unknown>) => void;
     };
     gr?: { capture: (event: string, properties?: Record<string, unknown>) => void };
+    gtag?: (...args: unknown[]) => void;
   }
+}
+
+const PII_KEYS = new Set(['name', 'full_name', 'first_name', 'last_name', 'email', 'e-mail', 'mail', 'phone', 'tel', 'mobile', 'note', 'message', 'url', 'href']);
+
+type AnalyticsWindow = Pick<Window, 'posthog' | 'gr' | 'gtag'> & {
+  location?: { pathname?: string; search?: string; hostname?: string };
+  document?: { title?: string; referrer?: string };
+};
+
+export function stripPii(props: Record<string, unknown>): Record<string, unknown> {
+  const safe: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(props)) {
+    if (!PII_KEYS.has(key.toLowerCase()) && value !== undefined && value !== '') safe[key] = value;
+  }
+  return safe;
+}
+
+export function pageContext(w: AnalyticsWindow): Record<string, string> {
+  const ctx: Record<string, string> = {};
+  try {
+    const loc = w.location || {};
+    if (loc.pathname) ctx.page = loc.pathname;
+    const qs = new URLSearchParams(loc.search || '');
+    for (const k of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term']) {
+      const v = qs.get(k);
+      if (v) ctx[k] = v;
+    }
+    if (w.document?.title) ctx.page_title = String(w.document.title).slice(0, 120);
+    if (w.document?.referrer) {
+      const host = new URL(w.document.referrer).hostname;
+      if (host && host !== loc.hostname) ctx.referrer_host = host;
+    }
+  } catch {
+    /* context is best-effort */
+  }
+  return ctx;
+}
+
+/** One specific conversion event, same name in PostHog, GA4 and Growth Radar (`growth:<event>`). Never throws. */
+export function trackConversion(event: string, props: Record<string, unknown> = {}, win?: AnalyticsWindow) {
+  const w = win ?? (typeof window !== 'undefined' ? window : undefined);
+  if (!w) return;
+  const safe = stripPii({ ...pageContext(w), ...props });
+  try { w.posthog?.capture?.(event, safe); } catch { /* analytics must never break the page */ }
+  try { if (typeof w.gtag === 'function') w.gtag('event', event, safe); } catch { /* analytics must never break the page */ }
+  try { w.gr?.capture?.(`growth:${event}`, safe); } catch { /* analytics must never break the page */ }
 }
 
 function capture(event: string, properties: Record<string, unknown>) {
@@ -167,7 +217,7 @@ function numericPrice(raw: string | undefined | null): number | undefined {
 /**
  * Installs ONE delegated click listener on document that fires:
  *  - affiliate_click for any anchor pointing at AliExpress (incl. s.click short links)
- *  - outbound_click for Telegram / WhatsApp links
+ *  - telegram_click / whatsapp_click for Telegram / WhatsApp links
  * Product metadata is read from data-* attributes on the closest `[data-product-id]`
  * / `.product-card` ancestor (rendered by components/ProductCard.tsx) or the anchor
  * itself, so direct affiliate CTAs on compare/mood/PDP pages are all tracked.
@@ -202,10 +252,9 @@ export function installClickTracking(): () => void {
         // Which outbound button was used (e.g. collection_glance), when it says.
         placement: anchor.getAttribute('data-cta') || undefined,
         page,
-        url: anchor.href,
+        link_host: url.hostname,
       };
-      capture('affiliate_click', baseProps);
-      window.gr && window.gr.capture('growth:affiliate_click', { product_id: baseProps.product_id, region: baseProps.region });
+      trackConversion('affiliate_click', baseProps);
       if (card?.getAttribute('data-trending-hub') === 'true') {
         capture('trending_hub_click', baseProps);
       }
@@ -213,9 +262,9 @@ export function installClickTracking(): () => void {
     }
 
     if (url.hostname === 't.me' || url.hostname === 'telegram.me') {
-      capture('outbound_click', { target: 'telegram', page, url: anchor.href, region: regionFromPath(page) });
+      trackConversion('telegram_click', { link_host: url.hostname, region: regionFromPath(page) });
     } else if (url.hostname === 'wa.me' || url.hostname.endsWith('.whatsapp.com')) {
-      capture('outbound_click', { target: 'whatsapp', page, url: anchor.href, region: regionFromPath(page) });
+      trackConversion('whatsapp_click', { link_host: url.hostname, region: regionFromPath(page) });
     }
   };
 
