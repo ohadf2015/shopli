@@ -5,6 +5,7 @@ const T: Record<string, Record<Lang, string>> = {
   guide: { en: 'Buying guide', he: 'מדריך קנייה', fr: 'Guide d’achat', de: 'Kaufratgeber', es: 'Guía de compra', it: 'Guida all’acquisto', ru: 'Гид покупателя' },
   compare: { en: 'Head to head', he: 'השוואה', fr: 'Comparatif', de: 'Vergleich', es: 'Comparativa', it: 'Confronto', ru: 'Сравнение' },
   collection: { en: 'Shop the picks', he: 'לבחירות שלנו', fr: 'Notre sélection', de: 'Unsere Auswahl', es: 'Nuestra selección', it: 'La nostra selezione', ru: 'Подборка' },
+  mood: { en: 'Shop the look', he: 'ערכה מוכנה', fr: 'Le look complet', de: 'Komplettes Set', es: 'El look completo', it: 'Il look completo', ru: 'Готовый набор' },
   more: { en: 'More in', he: 'עוד ב', fr: 'Plus dans', de: 'Mehr in', es: 'Más en', it: 'Altro in', ru: 'Ещё в разделе' },
 };
 

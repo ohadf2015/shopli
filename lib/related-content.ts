@@ -57,6 +57,48 @@ export const COMPARISON_COLLECTIONS: Record<string, string[]> = {
   'usb-c-hub-vs-docking-station': ['home-office', 'phone-accessories'],
 };
 
+/**
+ * Mood board slug -> collection slugs that sell the same kind of thing.
+ * Guides and comparisons for a board are the ones that share a collection
+ * with it, so a new guide only needs its line in BLOG_COLLECTIONS above.
+ */
+export const MOOD_COLLECTIONS: Record<string, string[]> = {
+  'jack-sparrow': ['halloween'],
+  'sushi-night': ['kitchen'],
+  'mechanical-keyboard': ['gaming-gear', 'home-office'],
+  'study-corner': ['back-to-school', 'dorm-room', 'home-office'],
+  'beach-day': ['summer-essentials', 'travel', 'sun-care'],
+  'home-bar': ['home-bar'],
+  'morning-routine': ['coffee-ritual', 'sleep-sanctuary', 'aromatherapy'],
+  'camping-coffee': ['camping', 'coffee-ritual'],
+  'queen-esther': ['halloween'],
+  pikachu: ['halloween'],
+  'japandi-office': ['home-office', 'desk-wellness'],
+  'gamer-den': ['gaming-gear', 'lighting'],
+  'boho-bedroom': ['sleep-sanctuary', 'lighting'],
+  'scandinavian-reading-nook': ['lighting', 'sleep-sanctuary'],
+  'indoor-jungle': ['balcony-garden', 'microgreens'],
+  spiderman: ['halloween'],
+  'wonder-woman': ['halloween'],
+  'ninja-turtle': ['halloween'],
+  superman: ['halloween'],
+  'digital-nomad': ['travel', 'phone-accessories', 'home-office'],
+  'streaming-setup': ['content-creator', 'lighting'],
+  'dessert-baking': ['kitchen'],
+  'jewelry-making': ['jewelry-making', 'maker-lab'],
+  'home-gym-pro': ['home-gym'],
+  'kitchen-makeover': ['kitchen', 'zero-waste'],
+  'nursery-room': ['sleep-sanctuary', 'lighting'],
+  'craft-room': ['maker-lab', 'jewelry-making'],
+  'back-to-school': ['back-to-school', 'dorm-room'],
+  'wireless-audio': ['wireless-audio'],
+  'phone-accessories': ['phone-accessories', 'gadgets-under-10'],
+  'summer-essentials': ['summer-essentials', 'sun-care'],
+  'budget-gaming-setup': ['gaming-gear'],
+  'minimalist-desk': ['home-office', 'desk-wellness'],
+  'pet-corner': ['pet'],
+};
+
 const invert = (map: Record<string, string[]>, collectionSlug: string): string[] =>
   Object.keys(map).filter((k) => map[k].includes(collectionSlug));
 
@@ -74,4 +116,22 @@ export function collectionsForBlog(blogSlug: string): string[] {
 
 export function collectionsForComparison(comparisonSlug: string): string[] {
   return COMPARISON_COLLECTIONS[comparisonSlug] || [];
+}
+
+const overlaps = (map: Record<string, string[]>, collections: string[]): string[] =>
+  Object.keys(map).filter((k) => map[k].some((c) => collections.includes(c)));
+
+/** Collections, guides and comparisons that belong on a mood board page. */
+export function relatedForMood(moodSlug: string): { collections: string[]; blog: string[]; compare: string[] } {
+  const collections = MOOD_COLLECTIONS[moodSlug] || [];
+  return {
+    collections,
+    blog: overlaps(BLOG_COLLECTIONS, collections),
+    compare: overlaps(COMPARISON_COLLECTIONS, collections),
+  };
+}
+
+/** Mood boards to link from a collection page. */
+export function moodsForCollection(collectionSlug: string): string[] {
+  return invert(MOOD_COLLECTIONS, collectionSlug);
 }

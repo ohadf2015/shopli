@@ -3,7 +3,7 @@ import { getCollection } from './collections';
 export interface RelatedLink {
   href: string;
   title: string;
-  kind: 'guide' | 'compare' | 'collection';
+  kind: 'guide' | 'compare' | 'collection' | 'mood';
 }
 
 /** Collection slugs -> localized "Shop the picks" links for RelatedReads. */

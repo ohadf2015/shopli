@@ -5,28 +5,43 @@ import SeoHead from '../../../components/SeoHead';
 import ShareBar from '../../../components/ShareBar';
 import DealAlertsForm from '../../../components/DealAlertsForm';
 import KitAddBar from '../../../components/KitAddBar';
+import ProductCard from '../../../components/ProductCard';
+import RelatedReads, { type RelatedLink } from '../../../components/RelatedReads';
 import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
 import { getMoodBoard, getMoodBoardsByTag } from '../../../lib/moodboards';
-import { productImage } from '../../../lib/img';
-import { articleJsonLd, breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
+import { kitFacts, kitSummary, moodTitle, pickReason, reasonLine } from '../../../lib/mood-facts';
+import { relatedForMood } from '../../../lib/related-content';
+import { collectionLinks } from '../../../lib/related-links';
+import { getBlogPost, isBlogPostInRegion } from '../../../lib/blog';
+import { getComparison } from '../../../lib/comparisons';
+import { listingAggregateFields } from '../../../lib/pdp';
+import { articleJsonLd, breadcrumbJsonLd, itemListJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
 import { cacheIfNotEmpty, offersChecked } from '../../../lib/cache';
 
 interface Product { id: string; title: string; price: number; originalPrice: number | null; currency: string; imageUrl: string; affiliateLink: string; rating: number; reviewCount: number; volume: number; shopName: string; discount: string; category?: string; }
 interface ItemGroup { caption: string; note: string; products: Product[]; }
 
-function Stars({ rating, size = 10 }: { rating: number; size?: number }) {
-  const full = Math.round(rating / 20);
-  return <span style={{ color: 'oklch(70% 0.15 70)' }}>{'★'.repeat(Math.max(0, full))}{'☆'.repeat(Math.max(0, 5 - full))}</span>;
-}
+const METHOD: Record<'en' | 'he', string> = {
+  en: 'How we picked: for each piece we search live AliExpress listings, rank them on rating and order volume, and drop items under 90% positive feedback or 100 orders whenever better ones are available. Prices are refreshed about every hour and can change on AliExpress.',
+  he: 'איך בחרנו: לכל פריט אנחנו מחפשים מוצרים חיים באליאקספרס, ממיינים לפי דירוג וכמות הזמנות, ומורידים פריטים עם פחות מ-90% משוב חיובי או פחות מ-100 הזמנות כשיש חלופות טובות יותר. המחירים מתעדכנים בערך כל שעה ועשויים להשתנות באליאקספרס.',
+};
 
-export default function MoodPage({ region, config, board, itemGroups, related, rtl, error }: any) {
+export default function MoodPage({ region, config, board, itemGroups, related, links, rtl, error }: any) {
   if (error) return <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>Error: {error}</div>;
   const lang = config?.lang || 'en';
   const get = (o: any) => o?.[lang] || o?.en || '';
+  // Board copy exists in English and Hebrew; numbers are worded in the language of the copy around them.
+  const textLang: 'en' | 'he' = lang === 'he' && board?.h1?.he ? 'he' : 'en';
+  const sym = config?.currencySymbol || '€';
+  const money = (n: number) => `${sym}${n.toFixed(2)}`;
 
   const relatedBoards = related?.filter((r: any) => r.slug !== board?.slug)?.slice(0, 3) || [];
   const pageUrl = `${SITE_URL}/${region}/mood/${board.slug}`;
-  // Default kit = first SKU in each slot. Rollup vs $75 is on this set, not every alternative.
+  const name = get(board.h1);
+  const facts = kitFacts(itemGroups || []);
+  const title = `${facts ? moodTitle(name, textLang, facts, money) : get(board.metaTitle)} | ${rtl ? 'שופלי' : 'Shopli'}`;
+  const pdpUrl = (p: Product) => `${SITE_URL}/${region}/product/${encodeURIComponent(p.id)}`;
+  // Default kit = first SKU in each slot, the same set the summary prices.
   const kitSkus = (itemGroups || [])
     .map((group: ItemGroup) => group.products?.[0])
     .filter((p: Product | undefined): p is Product => {
@@ -36,38 +51,38 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
     })
     .map((p: Product) => ({ ...p, currency: p.currency || config?.currency || 'ILS' }));
 
-
+  const leads: Product[] = (itemGroups || []).map((g: ItemGroup) => g.products?.[0]).filter((p: Product | undefined) => p?.id && p?.title);
   const structuredData: Record<string, unknown>[] = [
     breadcrumbJsonLd([
       { name: rtl ? 'דף הבית' : 'Home', url: `${SITE_URL}/${region}` },
-      { name: rtl ? 'ערכות' : 'Mood Boards', url: `${SITE_URL}/${region}/mood/jack-sparrow` },
-      { name: get(board.h1), url: pageUrl },
+      { name, url: pageUrl },
     ]),
-    articleJsonLd({
-      headline: get(board.h1),
-      description: get(board.metaDesc),
-      url: pageUrl,
-    }),
+    articleJsonLd({ headline: name, description: get(board.metaDesc), url: pageUrl }),
   ];
-
-  // Product schema for the first product in each group (avoids bloating the page)
-  for (const group of itemGroups || []) {
-    const p = group.products?.[0];
-    if (p?.title) {
-      structuredData.push(
-        productJsonLd({
-          title: p.title,
-          description: p.title,
-          image: p.imageUrl,
-          url: p.affiliateLink || pageUrl,
-          brand: p.shopName,
-          price: p.price,
-          currency: config?.currency,
-          ratingValue: p.rating ? p.rating / 20 : undefined,
-          reviewCount: p.reviewCount,
-        })
-      );
-    }
+  if (leads.length > 0) {
+    structuredData.push(
+      itemListJsonLd(
+        name,
+        pageUrl,
+        leads.map((p, i) => ({ name: p.title, url: pdpUrl(p), image: p.imageUrl, position: i + 1 }))
+      )
+    );
+  }
+  for (const p of leads) {
+    structuredData.push(
+      productJsonLd({
+        title: p.title,
+        description: p.title,
+        image: p.imageUrl,
+        url: pdpUrl(p),
+        brand: p.shopName,
+        price: p.price,
+        currency: config?.currency,
+        ...listingAggregateFields(p, { ratingValue: p.rating ? p.rating / 20 : undefined, reviewCount: p.reviewCount }),
+        sku: p.id,
+        region,
+      })
+    );
   }
 
   return (
@@ -75,7 +90,7 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
       <SeoHead
         region={region as RegionCode}
         path={`/mood/${board.slug}`}
-        title={`${get(board.metaTitle)} | Shopli`}
+        title={title}
         description={get(board.metaDesc)}
         ogType="article"
         jsonLd={structuredData}
@@ -83,34 +98,90 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
       <Header currentRegion={region} dir={config?.direction} />
 
       <main className="pb-16" style={{ fontFamily: rtl ? "var(--font-assistant), system-ui, sans-serif" : undefined }}>
-        {/* HERO */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-8 md:pt-12">
-          <div className="flex items-center gap-2 text-xs mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-6 md:pt-12">
+          <nav className="flex items-center gap-2 text-xs mb-4" style={{ color: 'var(--shopli-warm-gray)' }} aria-label="Breadcrumb">
             <a href={`/${region}`}>{rtl ? 'דף הבית' : 'Home'}</a>
             <span>/</span>
-            <span style={{ color: 'var(--shopli-navy)' }}>{rtl ? 'ערכות' : 'Mood Boards'}</span>
-            <span>/</span>
-            <span style={{ color: 'var(--shopli-navy)' }}>{get(board.h1)}</span>
-          </div>
+            <span style={{ color: 'var(--shopli-navy)' }}>{name}</span>
+          </nav>
           <h1 className="text-2xl md:text-4xl font-extrabold leading-tight mb-3" style={{ color: 'var(--shopli-navy)' }}>
-            {get(board.h1)}
+            {name}
           </h1>
           <p className="max-w-2xl text-base leading-relaxed" style={{ color: 'var(--shopli-warm-gray)' }}>
             {get(board.intro)}
           </p>
-          {board.totalEstimate && (
-            <div className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-lg text-sm font-bold"
-              style={{ background: 'oklch(95% 0.05 45)', color: 'var(--shopli-orange)' }}>
-              <Icon name="tag" size={16} />
-              {get(board.totalEstimate)}
-            </div>
+          {facts && (
+            <p className="max-w-2xl text-sm leading-relaxed mt-3 font-semibold" style={{ color: 'var(--shopli-navy)' }} data-mood-glance>
+              {kitSummary(textLang, facts, money)}
+            </p>
           )}
-          <div className="mt-5 flex flex-wrap items-center gap-3">
+          <KitAddBar
+            region={region}
+            rtl={rtl}
+            currency={config?.currency || 'ILS'}
+            skus={kitSkus}
+          />
+        </section>
+
+        {board.tags?.includes('purim') && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-6">
+            <div className="rounded-xl p-4 text-sm" style={{ background: 'oklch(90% 0.08 25)', color: 'oklch(30% 0.1 25)' }}>
+              <strong>{rtl ? 'לפורים:' : 'For Purim:'}</strong>{' '}
+              {rtl
+                ? 'כל הפריטים בערכה הזו יחד יוצרים תחפושת שלמה.'
+                : 'Every item in this board combines into one complete costume.'}
+            </div>
+          </div>
+        )}
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          {itemGroups.map((group: ItemGroup, i: number) => {
+            const reason = pickReason(group.products);
+            const why = reason ? reasonLine(textLang, reason) : '';
+            return (
+              <section key={i} className="mb-10">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center"
+                    style={{ background: 'oklch(90% 0.06 45)', color: 'var(--shopli-orange)' }}>
+                    {i + 1}
+                  </span>
+                  <h2 className="text-lg font-bold" style={{ color: 'var(--shopli-navy)' }}>{group.caption}</h2>
+                </div>
+                {(group.note || why) && (
+                  <p className="text-sm mb-3" style={{ color: 'var(--shopli-warm-gray)' }}>
+                    {[group.note && `${group.note}.`.replace(/\.\.$/, '.'), why].filter(Boolean).join(' ')}
+                  </p>
+                )}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {group.products.slice(0, 4).map((p: Product) => (
+                    <ProductCard
+                      key={p.id}
+                      product={p}
+                      currencySymbol={sym}
+                      rtl={rtl}
+                      locale={lang}
+                      fallbackUrl={pageUrl}
+                      region={region}
+                      category={group.caption}
+                      compact
+                      dealButton
+                    />
+                  ))}
+                </div>
+              </section>
+            );
+          })}
+          {facts && (
+            <p className="text-xs max-w-3xl" style={{ color: 'var(--shopli-warm-gray)' }}>
+              {METHOD[textLang]}
+            </p>
+          )}
+          <div className="mt-6 flex flex-wrap items-center gap-3">
             <span className="text-xs font-semibold" style={{ color: 'var(--shopli-warm-gray)' }}>
               {rtl ? 'אהבתם את הערכה? שתפו:' : 'Like this look? Share it:'}
             </span>
             <ShareBar
-              title={get(board.h1)}
+              title={name}
               url={pageUrl}
               description={get(board.metaDesc)}
               pageType="mood"
@@ -120,98 +191,10 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
               size="md"
             />
           </div>
-          <KitAddBar
-            region={region}
-            rtl={rtl}
-            currency={config?.currency || 'ILS'}
-            skus={kitSkus}
-          />
-        </section>
-
-        {/* TAG INDICATOR */}
-        {board.tags?.includes('purim') && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-6">
-            <div className="rounded-xl p-4 text-sm" style={{ background: 'oklch(90% 0.08 25)', color: 'oklch(30% 0.1 25)' }}>
-              <strong>{rtl ? '🎭 לפורים' : '🎭 Purim Special'}</strong>
-              {' — '}
-              {rtl
-                ? 'כל הפריטים בערכה זו יוצרים תחפושת שלמה ומושלמת לחג הפורים'
-                : 'Every item in this board combines into a complete Purim costume'}
-            </div>
-          </div>
-        )}
-
-        {/* THE ITEMS */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          {itemGroups.map((group: ItemGroup, i: number) => (
-            <div key={i} className="mb-10">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center"
-                  style={{ background: 'oklch(90% 0.06 45)', color: 'var(--shopli-orange)' }}>
-                  {i + 1}
-                </span>
-                <h2 className="text-lg font-bold" style={{ color: 'var(--shopli-navy)' }}>{group.caption}</h2>
-              </div>
-              {group.note && (
-                <p className="text-xs mb-3" style={{ color: 'var(--shopli-warm-gray)' }}>
-                  <Icon name="info" size={12} /> {group.note}
-                </p>
-              )}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {group.products.slice(0, 4).map((p: Product) => (
-                  <a key={p.id} href={p.affiliateLink} target="_blank" rel="noopener noreferrer sponsored"
-                    className="bg-white rounded-lg border border-[#141414] overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all"
-                    data-product-id={p.id}
-                    data-product-title={p.title}
-                    data-price={p.price.toFixed(2)}
-                    data-currency={config?.currencySymbol || p.currency || ''}
-                    data-category={p.category || ''}
-                  >
-                    <div className="aspect-square bg-[#FFF4E4] overflow-hidden relative">
-                      {p.imageUrl ? (
-                        <img {...productImage(p.imageUrl, 400, '(max-width: 640px) 50vw, 400px')} alt={p.title} className="w-full h-full object-cover hover:scale-105 transition-transform" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center" style={{ color: 'var(--shopli-warm-gray)' }}>
-                          <Icon name="package" size={24} />
-                        </div>
-                      )}
-                      {p.discount && (
-                        <span className="absolute top-1 right-1 text-[9px] font-bold px-1.5 py-0.5 rounded"
-                          style={{ background: 'oklch(65% 0.2 45)', color: 'white' }}
-                        >-{p.discount.replace('%', '')}%</span>
-                      )}
-                    </div>
-                    <div className="p-2">
-                      <div className="text-[0.6rem] font-semibold leading-tight line-clamp-2 mb-1" style={{ color: 'var(--shopli-navy)' }}>
-                        {p.title}
-                      </div>
-                      <div className="flex items-baseline gap-1 mb-0.5">
-                        <span className="font-bold text-xs" style={{ color: 'var(--shopli-teal)' }}>
-                          {config?.currencySymbol || '€'}{p.price?.toFixed(2)}
-                        </span>
-                        {p.originalPrice && p.originalPrice > p.price && (
-                          <span className="text-[9px] line-through" style={{ color: 'var(--shopli-warm-gray)' }}>
-                            {config?.currencySymbol || '€'}{p.originalPrice.toFixed(2)}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Stars rating={p.rating} size={8} />
-                        <span className="text-[9px]" style={{ color: 'var(--shopli-warm-gray)' }}>
-                          {p.volume > 0 ? (p.volume > 1000 ? `${(p.volume/1000).toFixed(1)}k` : p.volume) + (rtl ? ' נמכרו' : ' sold') : ''}
-                        </span>
-                      </div>
-                    </div>
-                  </a>
-                ))}
-              </div>
-            </div>
-          ))}
         </div>
 
-        {/* FAQ */}
         {board.faq?.length > 0 && (
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 border-t border-[#141414]">
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 mt-8 border-t border-[#141414]">
             <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--shopli-navy)' }}>
               {rtl ? 'שאלות נפוצות' : 'FAQ'}
             </h2>
@@ -224,19 +207,22 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
           </section>
         )}
 
-        {/* RELATED BOARDS */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <RelatedReads links={links || []} region={region} lang={lang} />
+        </div>
+
         {relatedBoards.length > 0 && (
           <section className="border-t border-[#141414] py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
-              <h3 className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--shopli-orange)' }}>
-                {rtl ? 'ערכות דומות' : 'More Looks'}
-              </h3>
+              <h2 className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--shopli-orange)' }}>
+                {rtl ? 'ערכות דומות' : 'More looks'}
+              </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {relatedBoards.map((b: any) => (
                   <a key={b.slug} href={`/${region}/mood/${b.slug}`}
                     className="p-3 rounded-lg border border-[#141414] hover:border-orange-200 transition-all">
                     <div className="font-semibold text-sm mb-1" style={{ color: 'var(--shopli-navy)' }}>{get(b.h1)}</div>
-                    <p className="text-[0.6rem] leading-snug" style={{ color: 'var(--shopli-warm-gray)' }}>{get(b.metaDesc)}</p>
+                    <p className="text-xs leading-snug" style={{ color: 'var(--shopli-warm-gray)' }}>{get(b.metaDesc)}</p>
                   </a>
                 ))}
               </div>
@@ -244,11 +230,27 @@ export default function MoodPage({ region, config, board, itemGroups, related, r
           </section>
         )}
 
-        {/* Deal alerts — company-brain interest rail capture (data-interest="shopli") */}
         <DealAlertsForm source="mood" rtl={rtl} />
       </main>
     </>
   );
+}
+
+/** Collections, guides and comparisons on the same subject as a board. */
+function buildMoodLinks(slug: string, region: string, lang: string): RelatedLink[] {
+  const pick = (obj: any) => obj?.[lang] || obj?.en || '';
+  const { collections, blog, compare } = relatedForMood(slug);
+  const links: RelatedLink[] = [];
+  for (const b of blog) {
+    const post = getBlogPost(b);
+    if (post && isBlogPostInRegion(b, region)) links.push({ href: `/${region}/blog/${b}`, title: pick(post.title), kind: 'guide' });
+  }
+  for (const c of compare) {
+    const cmp = getComparison(c);
+    if (cmp) links.push({ href: `/${region}/compare/${c}`, title: pick(cmp.title), kind: 'compare' });
+  }
+  // Collections first: they sell the same kind of thing as the board.
+  return [...collectionLinks(collections, region, lang), ...links].slice(0, 6);
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ params, query, res }) => {
@@ -296,10 +298,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
         region, config,
         board: JSON.parse(JSON.stringify(board)),
         itemGroups, related: JSON.parse(JSON.stringify(relatedBoards)),
+        links: buildMoodLinks(slug, region, config.lang),
         rtl, error: null,
       },
     };
   } catch (e: any) {
-    return { props: { error: e?.message || String(e), region: 'eu', config: null, board: { slug: 'error', h1: { en: 'Error' }, metaTitle: { en: 'Error' }, metaDesc: { en: '' }, intro: { en: '' }, items: [], tags: [] }, itemGroups: [], related: [], rtl: false } };
+    return { props: { error: e?.message || String(e), region: 'eu', config: null, board: { slug: 'error', h1: { en: 'Error' }, metaTitle: { en: 'Error' }, metaDesc: { en: '' }, intro: { en: '' }, items: [], tags: [] }, itemGroups: [], related: [], links: [], rtl: false } };
   }
 };
