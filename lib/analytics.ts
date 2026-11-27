@@ -10,6 +10,8 @@
 // Every one also carries page, page_title, referrer_host, utm_* and the visit's
 // landing_page / landing_referrer_host; utm_* fall back to the landing page's.
 
+import { GO_PATH } from './out-link';
+
 export const POSTHOG_KEY = 'phc_m3X2YeaZ89r7m8yQYXfc6afyrygXmJG7TegJco5H9skD';
 export const POSTHOG_HOST = 'https://eu.i.posthog.com';
 
@@ -268,6 +270,9 @@ export function installClickTracking(): () => void {
     let url: URL;
     try {
       url = new URL(anchor.href, window.location.origin);
+      if (url.origin === window.location.origin && url.pathname === GO_PATH) {
+        url = new URL(url.searchParams.get('u') || '');
+      }
     } catch {
       return;
     }

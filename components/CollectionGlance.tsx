@@ -1,5 +1,6 @@
 import { collectionFacts, formatOrders, stars, type FactProduct } from '../lib/collection-facts';
 import { productImage } from '../lib/img';
+import { outHref } from '../lib/out-link';
 
 type Lang = 'he' | 'en' | 'fr' | 'de' | 'es' | 'it' | 'ru';
 
@@ -92,7 +93,7 @@ export default function CollectionGlance({
               </a>
               {p.affiliateLink && (
                 <a
-                  href={p.affiliateLink}
+                  href={outHref(p.affiliateLink)}
                   target="_blank"
                   rel="nofollow sponsored noopener noreferrer"
                   data-cta="collection_glance"

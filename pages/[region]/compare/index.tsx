@@ -33,6 +33,7 @@ import {
   productJsonLd,
   SITE_URL,
 } from '../../../lib/seo';
+import { outHref } from '../../../lib/out-link';
 
 interface ComparePageProps {
   region: RegionCode;
@@ -352,7 +353,7 @@ export default function ProductComparePage({
             <div className="flex flex-col gap-2 shrink-0 sm:w-48">
               {bestPick.product.affiliateLink && (
                 <a
-                  href={bestPick.product.affiliateLink}
+                  href={outHref(bestPick.product.affiliateLink)}
                   target="_blank"
                   rel="nofollow sponsored noopener noreferrer"
                   className="btn-primary text-sm text-center"
@@ -533,7 +534,7 @@ export default function ProductComparePage({
                           )}
                         </div>
                         <a
-                          href={p.affiliateLink || `/${region}/product/${encodeURIComponent(p.id)}`}
+                          href={p.affiliateLink ? outHref(p.affiliateLink) : `/${region}/product/${encodeURIComponent(p.id)}`}
                           target="_blank"
                           rel="nofollow sponsored noopener noreferrer"
                           className="btn-primary w-full text-xs py-2"

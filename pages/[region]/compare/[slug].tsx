@@ -17,6 +17,7 @@ import { productImage } from '../../../lib/img';
 import { listingAggregateFields } from '../../../lib/pdp';
 import { articleJsonLd, breadcrumbJsonLd, productJsonLd, SITE_URL } from '../../../lib/seo';
 import { cacheIfNotEmpty, offersChecked } from '../../../lib/cache';
+import { outHref } from '../../../lib/out-link';
 
 export default function ComparisonPage({ region, config, comparison, prod1Items, prod2Items, rtl, error }: any) {
   if (error) {
@@ -179,7 +180,7 @@ export default function ComparisonPage({ region, config, comparison, prod1Items,
                     <div className="grid grid-cols-2 gap-2">
                       {items.slice(0, 4).map((item: any, i: number) => (
                         <div key={i} className="bg-[#FFF4E4] rounded-lg p-2 hover:shadow transition">
-                          <a href={item.affiliateLink} target="_blank" rel="nofollow sponsored noopener noreferrer"
+                          <a href={outHref(item.affiliateLink)} target="_blank" rel="nofollow sponsored noopener noreferrer"
                             className="block"
                             data-product-id={item.id}
                             data-product-title={item.title}
