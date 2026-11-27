@@ -1,4 +1,5 @@
 import { getCollection } from './collections';
+import { localCurrency } from './regions';
 
 export interface RelatedLink {
   href: string;
@@ -8,7 +9,7 @@ export interface RelatedLink {
 
 /** Collection slugs -> localized "Shop the picks" links for RelatedReads. */
 export function collectionLinks(slugs: string[], region: string, lang: string): RelatedLink[] {
-  const pick = (obj: any) => obj?.[lang] || obj?.en || '';
+  const pick = (obj: any) => localCurrency(obj?.[lang] || obj?.en || '', region);
   return slugs
     .map((s) => getCollection(s))
     .filter(Boolean)

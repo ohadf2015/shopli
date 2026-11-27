@@ -4,8 +4,8 @@ import Icon from '../components/icons';
 import ProductCard from '../components/ProductCard';
 import WhatsAppShare from '../components/WhatsAppShare';
 import SeoHead from '../components/SeoHead';
-import { getRegion, RegionCode } from '../lib/regions';
-import { getAllCollections } from '../lib/collections';
+import { getRegion, isValidRegion, localCurrency, RegionCode } from '../lib/regions';
+import { getFeaturedCollections } from '../lib/collections';
 import { itemListJsonLd, SITE_URL } from '../lib/seo';
 import type { RegionConfig } from '../lib/regions';
 import type { Product } from '../lib/types';
@@ -176,18 +176,18 @@ export default function DealsPage({ region, config, lang, groups, updatedIso, up
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  const lang = detectDealsLang(req.headers['accept-language']);
-  const region = dealsLangToRegion(lang);
+export const getServerSideProps: GetServerSideProps = async ({ req, res, query }) => {
+  const asked = typeof query.region === 'string' && isValidRegion(query.region) ? query.region : null;
+  const region = asked || dealsLangToRegion(detectDealsLang(req.headers['accept-language']));
   const config = getRegion(region);
+  const lang: DealsLang = config.lang === 'he' ? 'he' : 'en';
   const rtl = config.direction === 'rtl';
   const copy = getDealsCopy(lang);
 
-  const t = (text?: Record<string, string> | null) => text?.[config.lang] || text?.en || '';
+  const t = (text?: Record<string, string> | null) => localCurrency(text?.[config.lang] || text?.en || '', region);
 
-  const collections = getAllCollections()
-    .filter((coll) => coll.keywords && coll.keywords.length > 0 && coll.name)
-    .slice(0, DEALS_COLLECTIONS_COUNT);
+  const collections = getFeaturedCollections(region, DEALS_COLLECTIONS_COUNT)
+    .filter((coll) => coll.keywords && coll.keywords.length > 0);
 
   const fetched = await Promise.all(
     collections.map(async (coll) => ({

@@ -1,4 +1,4 @@
-import { getRegion, type RegionCode } from './regions';
+import { getRegion, localCurrency, type RegionCode } from './regions';
 import { getFeaturedCollections } from './collections';
 import { getPicks, type Pick } from './picks';
 import { getReviewsBatch } from './review-store';
@@ -78,7 +78,7 @@ export async function loadHomeProps(region: RegionCode): Promise<HomePageProps> 
   const sellers = cards.slice(dropPicks.length);
   const chips = getFeaturedCollections(region, 10).map((c) => ({
     slug: c.slug,
-    name: c.name?.[lang] || c.name?.en || c.slug,
+    name: localCurrency(c.name?.[lang] || c.name?.en || c.slug, region),
   }));
   const asOf = [...dropPicks, ...sellerPicks].map((p) => p.asOf).sort().pop() ?? '';
   return { region, config, rtl, drops, sellers, chips, asOf, pricesChecked: checked };

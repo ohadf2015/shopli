@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Header from '../../../components/Header';
 import SeoHead from '../../../components/SeoHead';
 import ShareBar from '../../../components/ShareBar';
-import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
+import { getRegion, isValidRegion, localCurrency, RegionCode } from '../../../lib/regions';
 import { getBlogPost, isBlogPostInRegion } from '../../../lib/blog';
 import { pickCandidates, pickPageSize, BlogPick } from '../../../lib/blog-picks';
 import RelatedReads from '../../../components/RelatedReads';
@@ -107,7 +107,7 @@ export default function BlogPostPage({ region, config, post, rtl, regionOnly, pi
   }
 
   const lang = config?.lang || 'en';
-  const t = (obj: any) => obj?.[lang] || obj?.en || '';
+  const t = (obj: any) => localCurrency(obj?.[lang] || obj?.en || '', region);
 
   const p = post;
   if (!p) return null;
@@ -350,7 +350,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
       .filter((s) => isBlogPostInRegion(s, region))
       .map((s) => {
         const rp = getBlogPost(s)!;
-        return { href: `/${region}/blog/${s}`, label: rp.title[lang] || rp.title.en };
+        return { href: `/${region}/blog/${s}`, label: localCurrency(rp.title[lang] || rp.title.en, region) };
       }),
   ];
 

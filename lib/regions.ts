@@ -193,3 +193,9 @@ export const ALL_REGIONS = Object.entries(REGIONS).map(([code, config]) => ({
   direction: config.direction,
   localeLabel: LOCALE_LABELS[config.lang] || config.lang.toUpperCase(),
 }));
+/** English copy is written in euros; US and UK readers see their own symbol on the same round thresholds. */
+export function localCurrency(text: string, region: string): string {
+  const sym = getRegion(region).currencySymbol;
+  if (!text || sym === '€' || sym === '₪') return text;
+  return text.replace(/€\s?(\d)/g, `${sym}$1`).replace(/(\d+(?:[.,]\d+)?)\s?€/g, `${sym}$1`);
+}
