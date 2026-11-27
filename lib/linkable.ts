@@ -31,3 +31,18 @@ export async function keepLinkable<T extends { id: string } & Offer>(
   // by-id one so it matches the product page it links to.
   return products.flatMap((p, i) => (found[i] ? [withLookupOffer(p, found[i]!)] : []));
 }
+
+// For pages that wait on many lookups: past the cap, show search prices but mark them so the render isn't edge-cached.
+export async function keepLinkableWithin<T extends { id: string } & Offer>(
+  products: T[],
+  lookup: (ids: string[]) => Promise<({ id: string } & Offer)[]>,
+  ms: number
+): Promise<T[]> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const late = new Promise<null>((resolve) => {
+    timer = setTimeout(() => resolve(null), ms);
+  });
+  const kept = await Promise.race([keepLinkable(products, lookup), late]);
+  clearTimeout(timer);
+  return kept ?? products.map((p) => ({ ...p, offerUnchecked: true }));
+}

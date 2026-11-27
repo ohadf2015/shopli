@@ -9,7 +9,9 @@ import SeoHead from '../../components/SeoHead';
 import { getRegion, isValidRegion, RegionCode, RegionConfig } from '../../lib/regions';
 import { breadcrumbJsonLd, itemListJsonLd, productJsonLd, SITE_URL } from '../../lib/seo';
 import type { SearchProduct } from '../../lib/aliexpress';
-import { cacheIfNotEmpty } from '../../lib/cache';
+import { cacheIfNotEmpty, offersChecked } from '../../lib/cache';
+
+const SEARCH_PRICE_CAP_MS = 3000;
 
 interface SearchPageProps {
   region: RegionCode;
@@ -230,16 +232,16 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
 
   if (q) {
     try {
-      const { searchAliExpress } = await import('../../lib/aliexpress');
+      const { searchAliExpress, withProductPageOffers } = await import('../../lib/aliexpress');
       const { filterQuality } = await import('../../lib/quality');
       // Same floor as every other surface — a search result is a recommendation.
-      products = filterQuality(await searchAliExpress(q, region, 20));
+      products = await withProductPageOffers(filterQuality(await searchAliExpress(q, region, 20)), region, SEARCH_PRICE_CAP_MS);
     } catch (e: any) {
       error = e?.message || String(e);
     }
   }
 
-  cacheIfNotEmpty(res, products.length > 0, 'public, s-maxage=120, stale-while-revalidate=600');
+  cacheIfNotEmpty(res, products.length > 0 && offersChecked(products), 'public, s-maxage=120, stale-while-revalidate=600');
 
   return {
     props: {

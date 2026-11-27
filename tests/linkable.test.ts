@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { keepLinkable } from '../lib/linkable';
+import { keepLinkable, keepLinkableWithin } from '../lib/linkable';
 import { offersChecked } from '../lib/cache';
 
 const p = (id: string) => ({ id, title: `p${id}` });
@@ -71,4 +71,18 @@ test('every lookup failing marks the cards unchecked; a resolved lookup does not
   assert.equal(offersChecked(failed), false);
   const ok = await keepLinkable([card('1', 5)], async (ids) => [{ id: ids[0], price: 6 }]);
   assert.equal(offersChecked(ok), true);
+});
+
+test('within the time cap, cards take the by-id price', async () => {
+  const lookup = async (ids: string[]) => [{ id: ids[0], price: 102.61 }];
+  const [kept] = await keepLinkableWithin([card('1', 105.4)], lookup, 1000);
+  assert.equal(kept.price, 102.61);
+  assert.equal(offersChecked([kept]), true);
+});
+
+test('a lookup slower than the cap keeps the search price and marks it unchecked', async () => {
+  const lookup = (ids: string[]) => new Promise<{ id: string; price: number }[]>((r) => setTimeout(() => r([{ id: ids[0], price: 1 }]), 200));
+  const kept = await keepLinkableWithin([card('1', 105.4)], lookup, 20);
+  assert.equal(kept[0].price, 105.4);
+  assert.equal(offersChecked(kept), false);
 });
