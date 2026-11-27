@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import { rankForFeature } from './quality';
 import { getHebrewTitles } from './hebrew-titles';
 import { cleanTitle } from './titles';
-import { keepLinkable } from './linkable';
+import { keepLinkable, keepLinkableWithin } from './linkable';
 
 const REGION_MAP: Record<string, { language: string; currency: string; shipToCountry: string }> = {
   il: { language: 'HE', currency: 'ILS', shipToCountry: 'IL' },
@@ -332,8 +332,9 @@ export async function searchCollection(region: string, keywords: string[], limit
 
 // Search quotes a different price than the by-id call each product page makes,
 // so every card that links to /product/<id> takes its price from that call.
-export function withProductPageOffers<T extends SearchProduct>(products: T[], region: string): Promise<T[]> {
-  return keepLinkable(products, (ids) => getProductsByIds(ids, region));
+export function withProductPageOffers<T extends SearchProduct>(products: T[], region: string, capMs?: number): Promise<T[]> {
+  const lookup = (ids: string[]) => getProductsByIds(ids, region);
+  return capMs ? keepLinkableWithin(products, lookup, capMs) : keepLinkable(products, lookup);
 }
 
 /**
