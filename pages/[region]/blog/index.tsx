@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next';
 import Header from '../../../components/Header';
 import SeoHead from '../../../components/SeoHead';
-import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
+import { getRegion, isValidRegion, localCurrency, RegionCode } from '../../../lib/regions';
 import { getBlogPostsForRegion } from '../../../lib/blog';
 import Link from 'next/link';
 import { breadcrumbJsonLd, SITE_URL } from '../../../lib/seo';
@@ -79,7 +79,7 @@ export default function BlogIndexPage({ region, config, posts, rtl, hasWeekly }:
                   </div>
                   <Link href={`/${region}/blog/${post.slug}`}>
                     <h2 className="text-xl md:text-2xl font-bold mb-3 hover:text-orange-600 transition-colors" style={{ color: 'var(--shopli-navy)' }}>
-                      {post.title?.[lang] || post.title?.en || ''}
+                      {localCurrency(post.title?.[lang] || post.title?.en || '', region)}
                     </h2>
                   </Link>
                   <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--shopli-warm-gray)' }}>
@@ -89,7 +89,7 @@ export default function BlogIndexPage({ region, config, posts, rtl, hasWeekly }:
                     {rtl ? 'קראו עוד' : 'Read more'}
                     {/* "Read more" alone tells search engines and screen readers
                         nothing about the target; the title does. */}
-                    <span className="sr-only">: {post.title?.[lang] || post.title?.en || ''}</span>
+                    <span className="sr-only">: {localCurrency(post.title?.[lang] || post.title?.en || '', region)}</span>
                     <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                   </Link>
                 </div>

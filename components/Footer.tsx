@@ -148,7 +148,7 @@ export default function Footer({ currentRegion }: { currentRegion: RegionCode | 
     { href: `${base}/trending`, label: t.trending },
     { href: `${base}/compare`, label: t.compare },
     { href: `${base}/blog`, label: t.guides },
-    { href: '/deals', label: t.deals },
+    { href: `/deals?region=${currentRegion}`, label: t.deals },
     { href: `${base}/wishlist`, label: t.wishlist },
   ];
 

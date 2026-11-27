@@ -675,6 +675,8 @@ export const COLLECTIONS: CollectionDef[] = [
  * highest-CTR real estate on the page. Anything not listed for the month
  * falls back to declaration order after the prioritized slugs.
  */
+const SEASONAL = new Set(['halloween', 'back-to-school', 'summer-essentials']);
+
 const FEATURED_ORDER_GLOBAL: Record<number, string[]> = {
   0: ['home-gym', 'home-office', 'coffee-ritual', 'sleep-sanctuary', 'wireless-audio', 'gadgets-under-10'], // Jan: New Year fitness / resets
   1: ['travel', 'home-gym', 'coffee-ritual', 'sleep-sanctuary', 'wireless-audio', 'phone-accessories'], // Feb
@@ -719,7 +721,7 @@ export function getFeaturedCollections(region = 'eu', count = 6, now: Date = new
   }
   for (const c of COLLECTIONS) {
     if (out.length >= count) break;
-    if (c.name && !seen.has(c.slug)) { out.push(c); seen.add(c.slug); }
+    if (c.name && !seen.has(c.slug) && !SEASONAL.has(c.slug)) { out.push(c); seen.add(c.slug); }
   }
   return out.slice(0, count);
 }

@@ -45,7 +45,7 @@ export default function CompareAboveFoldExit({
         <Icon name="check" size={12} />
         {deadLanding
           ? tr('Live deals unavailable right now', 'דילים חיים לא זמינים כרגע')
-          : tr('Decide above the fold', 'החלטה מהירה — בלי לגלול')}
+          : tr('Quick pick', 'בחירה מהירה')}
       </p>
       <p
         className="text-sm font-medium mb-3 leading-snug"
@@ -93,7 +93,7 @@ export default function CompareAboveFoldExit({
           {tr('Trending now', 'טרנדים עכשיו')}
         </a>
         <a
-          href="/deals"
+          href={`/deals?region=${region}`}
           onClick={() =>
             trackCompareNextAction({ region, surface, target: 'deals' })
           }

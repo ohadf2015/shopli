@@ -39,7 +39,7 @@ export default function BrowseNext({ region, rtl, lang, surface }: BrowseNextPro
       sub: tr('Find any AliExpress product', 'מצאו כל מוצר מ-AliExpress'),
     },
     {
-      href: '/deals',
+      href: `/deals?region=${region}`,
       target: 'deals',
       icon: 'tag',
       title: tr("Today's deals", 'דילים של היום'),

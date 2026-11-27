@@ -13,7 +13,7 @@ import { themeForCollection, themeName as themeLabel } from '../../../lib/collec
 import { getBlogPost, isBlogPostInRegion } from '../../../lib/blog';
 import { getComparison } from '../../../lib/comparisons';
 import SeoHead from '../../../components/SeoHead';
-import { getRegion, isValidRegion, RegionCode } from '../../../lib/regions';
+import { getRegion, isValidRegion, localCurrency, RegionCode } from '../../../lib/regions';
 import { getCollection } from '../../../lib/collections';
 import { listingAggregateFields } from '../../../lib/pdp';
 import { COLLECTION_CONTENT, collectionByline } from '../../../lib/collection-content';
@@ -354,7 +354,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
     const slug = params?.collection as string;
     const config = getRegion(region);
     const lang = config?.lang || 'en';
-    const get = (obj: any) => obj?.[lang] || obj?.en || '';
+    const get = (obj: any) => localCurrency(obj?.[lang] || obj?.en || '', region);
     const coll = getCollection(slug);
     if (!coll) return { notFound: true };
 
