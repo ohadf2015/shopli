@@ -33,6 +33,7 @@ import {
 } from '../../../lib/pdp';
 import { breadcrumbJsonLd, productJsonLd, getProductOgImage, SITE_URL, productPageTitle } from '../../../lib/seo';
 import type { CollectionDef } from '../../../lib/collections';
+import { outHref } from '../../../lib/out-link';
 
 interface ProductPageProps {
   region: RegionCode;
@@ -296,7 +297,7 @@ export default function ProductPage({
 
             <div className="mb-6">
               <a
-                href={product.affiliateLink}
+                href={outHref(product.affiliateLink)}
                 target="_blank"
                 rel="nofollow sponsored noopener noreferrer"
                 data-cta="pdp_main"
@@ -505,7 +506,7 @@ export default function ProductPage({
             </span>
           </div>
           <a
-            href={product.affiliateLink}
+            href={outHref(product.affiliateLink)}
             target="_blank"
             rel="nofollow sponsored noopener noreferrer"
             data-cta="pdp_sticky"

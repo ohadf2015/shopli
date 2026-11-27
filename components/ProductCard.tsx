@@ -6,6 +6,7 @@ import { SITE_URL } from '../lib/seo';
 import { isInWishlist, syncAdd, syncRemove } from '../lib/useWishlist';
 import { productImage } from '../lib/img';
 import LandedCostBadge from './LandedCostBadge';
+import { outHref } from '../lib/out-link';
 
 export interface ProductCardProduct {
   id: string;
@@ -107,7 +108,7 @@ export default function ProductCard({
   const productPageUrl = region && product.id && !directAffiliate
     ? `/${region}/product/${encodeURIComponent(product.id)}`
     : undefined;
-  const externalHref = product.affiliateLink || fallbackUrl || '#';
+  const externalHref = outHref(product.affiliateLink || fallbackUrl || '#');
   const isExternal = !productPageUrl;
   const cardHref = productPageUrl || externalHref;
   // Shares always point at the on-site product page (canonical URL) so every
@@ -116,7 +117,7 @@ export default function ProductCard({
   const shareUrl =
     region && product.id
       ? `${SITE_URL}/${region}/product/${encodeURIComponent(product.id)}`
-      : externalHref;
+      : product.affiliateLink || fallbackUrl || '#';
 
   const toggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -295,7 +296,7 @@ export default function ProductCard({
       {(!compact || dealButton) && product.affiliateLink && (
         <div className="px-2 pb-2 relative z-10">
           <a
-            href={product.affiliateLink}
+            href={outHref(product.affiliateLink)}
             target="_blank"
             rel="noopener noreferrer sponsored"
             data-cta="card_button"
