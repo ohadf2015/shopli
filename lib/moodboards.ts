@@ -647,9 +647,11 @@ export interface MoodBoardLink {
   title: string;
 }
 
-/** A few year-round boards (no costumes), rotated by day so the row changes. */
+const SEASONAL_TAGS = ['costume', 'summer', 'school'];
+
+/** A few year-round boards, rotated by day so the row changes. */
 export function moodBoardLinks(lang: string, count: number, day = Math.floor(Date.now() / 86400000)): MoodBoardLink[] {
-  const boards = Object.values(MOOD_BOARDS).filter((b) => !b.tags.includes('costume'));
+  const boards = Object.values(MOOD_BOARDS).filter((b) => !b.tags.some((t) => SEASONAL_TAGS.includes(t)));
   const start = day % boards.length;
   return [...boards.slice(start), ...boards.slice(0, start)]
     .slice(0, count)
