@@ -263,17 +263,16 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
     const board = getMoodBoard(slug);
     if (!board) return { notFound: true };
 
-    const { searchCollection: sc } = await import('../../../lib/aliexpress');
+    const { searchMoodSlots } = await import('../../../lib/aliexpress');
     const itemGroups: ItemGroup[] = [];
 
-    // Run every item's search at once; one slow or failed search no longer
-    // holds up (or breaks) the whole board.
-    const results = await Promise.all(
-      board.items.map((item) => sc(region, item.keywords, 4).catch(() => []))
-    );
+    // Every slot searches at once; each keeps only listings its rule allows.
+    const results = await searchMoodSlots(region, board.items, 4).catch(() => board.items.map(() => []));
 
     board.items.forEach((item, i) => {
-      const products = results[i];
+      const products = results[i] || [];
+      // A slot with nothing that fits is left out rather than filled with something else.
+      if (products.length === 0) return;
       itemGroups.push({
         caption: item.caption?.[config.lang] || item.caption?.en || '',
         note: item.note?.[config.lang] || item.note?.en || '',

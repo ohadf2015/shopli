@@ -3,6 +3,7 @@ import { rankForFeature } from './quality';
 import { getHebrewTitles } from './hebrew-titles';
 import { cleanTitle } from './titles';
 import { keepLinkable, keepLinkableWithin } from './linkable';
+import { pickDistinct, slotMatches, type SlotRule } from './slot-match';
 
 const REGION_MAP: Record<string, { language: string; currency: string; shipToCountry: string }> = {
   il: { language: 'HE', currency: 'ILS', shipToCountry: 'IL' },
@@ -246,8 +247,9 @@ export interface SearchProduct {
   freeShipping: boolean;
 }
 
-export async function searchAliExpress(keywords: string, region: string, pageSize = 10): Promise<SearchProduct[]> {
-  const cfg = REGION_MAP[region] || REGION_MAP.eu;
+/** `language` overrides the region's title language; prices and shipping stay the region's. */
+export async function searchAliExpress(keywords: string, region: string, pageSize = 10, language?: string): Promise<SearchProduct[]> {
+  const cfg = { ...(REGION_MAP[region] || REGION_MAP.eu), ...(language ? { language } : {}) };
   const data = await callApi({
     app_key: ALIE_KEY,
     format: 'json',
@@ -332,6 +334,48 @@ export async function searchCollection(region: string, keywords: string[], limit
 
 // Search quotes a different price than the by-id call each product page makes,
 // so every card that links to /product/<id> takes its price from that call.
+/**
+ * Products for each mood board slot. Searches in English so `slotMatches`
+ * reads one language whatever the region, keeps only listings the slot's rule
+ * allows, shows a product in one slot at most, then takes each card's price
+ * and, outside English regions, its localized title from the by-id lookup the
+ * product page itself uses.
+ */
+export async function searchMoodSlots(region: string, slots: (SlotRule & { keywords: string[] })[], limit = 4): Promise<SearchProduct[][]> {
+  const candidates = await Promise.all(
+    slots.map(async (slot) => {
+      const batches = await Promise.all(
+        slot.keywords.slice(0, 3).map((kw) => searchAliExpress(kw, region, 20, 'EN').catch(() => [] as SearchProduct[]))
+      );
+      const seen = new Set<string>();
+      const all = batches.flat().filter((p) => {
+        if (seen.has(p.id) || !slotMatches(p.title, slot)) return false;
+        seen.add(p.id);
+        return true;
+      });
+      return rankForFeature(all);
+    })
+  );
+  const picked = pickDistinct(candidates, limit);
+  const english = (REGION_MAP[region] || REGION_MAP.eu).language === 'EN';
+  return Promise.all(
+    picked.map(async (list) => {
+      if (!list.length) return list;
+      const local = new Map<string, SearchProduct>();
+      const kept = await keepLinkable(list, async (ids) => {
+        const found = await getProductsByIds(ids, region);
+        for (const f of found) local.set(f.id, f);
+        return found;
+      });
+      if (english) return kept;
+      return kept.map((p) => {
+        const f = local.get(p.id);
+        return f ? { ...p, title: f.title, originalTitle: f.originalTitle } : p;
+      });
+    })
+  );
+}
+
 export function withProductPageOffers<T extends SearchProduct>(products: T[], region: string, capMs?: number): Promise<T[]> {
   const lookup = (ids: string[]) => getProductsByIds(ids, region);
   return capMs ? keepLinkableWithin(products, lookup, capMs) : keepLinkable(products, lookup);
