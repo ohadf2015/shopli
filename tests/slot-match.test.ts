@@ -31,6 +31,19 @@ test('titles seen on live boards land only in the slot they belong to', () => {
   assert.equal(slotMatches('Hard Shell Earbuds Case Carrying Box', earbuds), false);
 });
 
+test('loose matches seen live on Nov 28 stay out', () => {
+  const nori = slot('sushi-night', 'Nori Seaweed Sheets (50pk)');
+  assert.equal(slotMatches('48 PCS Sea Vegetables Algae Fish Food Nori Seaweed', nori), false);
+  assert.equal(slotMatches('VASTOCEAN 2 In 1 Seaweed Strong Magnetic Feeding Clip', nori), false);
+  assert.equal(slotMatches('14cm Rainbow Plum Blossom Ceramic Dish Cat Feeding Bowl', slot('sushi-night', 'Soy Sauce Dishes (2-4pk)')), false);
+  assert.equal(slotMatches('New Automatic Flower Watering Device Garden Adjustable Speed Dripping', slot('study-corner', 'Small Desk Plant')), false);
+  const bank = slot('digital-nomad', '20000mAh Power Bank');
+  assert.equal(slotMatches('Baseus 70W Fast Charger Type C USB Charger Support QC PD PPS 65W Portable Charger', bank), false);
+  assert.equal(slotMatches('Baseus Power Bank 20000mAh PD 22.5W Fast Charging', bank), true);
+  assert.equal(slotMatches('Gym Wire Rope Fitness Cable Pulley Machine System Heavy Duty Steel Rope', slot('home-gym-pro', 'Battle Ropes (10m)')), false);
+  assert.equal(slotMatches('Personalized Golden Halloween Masks Plastic Elastic Rope Animal Mask', slot('wonder-woman', 'Lasso of Truth')), false);
+});
+
 test('matching is at the start of a word, not inside one', () => {
   assert.equal(slotMatches('Chat Box Holder', { match: ['hat'] }), false);
   assert.equal(slotMatches('Sun Hat UV Protection', { match: ['hat'] }), true);
