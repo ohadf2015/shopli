@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import Header from '../../components/Header';
 import SeoHead from '../../components/SeoHead';
 import DealAlertsForm from '../../components/DealAlertsForm';
+import MoodBoardsRow from '../../components/MoodBoardsRow';
 import { isValidRegion, RegionCode } from '../../lib/regions';
 import type { RegionConfig } from '../../lib/regions';
 import { productImage } from '../../lib/img';
@@ -109,7 +110,7 @@ function Card({ c, region, sym, rtl, lead = false }: { c: HomeCard; region: stri
   );
 }
 
-export default function HomePage({ region, config, rtl, drops, sellers, chips, asOf }: HomePageProps) {
+export default function HomePage({ region, config, rtl, drops, sellers, chips, moodLinks, asOf }: HomePageProps) {
   const t = rtl ? COPY.he : COPY.en;
   const pageUrl = `${SITE_URL}/${region}`;
   const structuredData = [
@@ -281,6 +282,8 @@ export default function HomePage({ region, config, rtl, drops, sellers, chips, a
             </div>
           </section>
         )}
+
+        <MoodBoardsRow links={moodLinks} region={region} rtl={rtl} />
 
         <section
           className="rounded-2xl p-5 sm:p-6 flex flex-col gap-2"

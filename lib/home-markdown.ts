@@ -20,6 +20,7 @@ export interface HomePageProps {
   drops: HomeCard[];
   sellers: HomeCard[];
   chips: Array<{ slug: string; name: string }>;
+  moodLinks: Array<{ slug: string; title: string }>;
   asOf: string;
   pricesChecked: boolean;
 }

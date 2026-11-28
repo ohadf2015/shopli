@@ -1,5 +1,6 @@
 import { getRegion, localCurrency, type RegionCode } from './regions';
 import { getFeaturedCollections } from './collections';
+import { moodBoardLinks } from './moodboards';
 import { getPicks, type Pick } from './picks';
 import { getReviewsBatch } from './review-store';
 import { getProductsByIds } from './aliexpress';
@@ -81,5 +82,6 @@ export async function loadHomeProps(region: RegionCode): Promise<HomePageProps> 
     name: localCurrency(c.name?.[lang] || c.name?.en || c.slug, region),
   }));
   const asOf = [...dropPicks, ...sellerPicks].map((p) => p.asOf).sort().pop() ?? '';
-  return { region, config, rtl, drops, sellers, chips, asOf, pricesChecked: checked };
+  const moodLinks = moodBoardLinks(lang, 4);
+  return { region, config, rtl, drops, sellers, chips, moodLinks, asOf, pricesChecked: checked };
 }

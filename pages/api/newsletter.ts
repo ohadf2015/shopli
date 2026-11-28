@@ -6,10 +6,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ ok: false, message: 'Method not allowed' });
   }
 
-  const { email, region, wishlist, items } = req.body || {};
+  const { email, region, wishlist, items, source } = req.body || {};
   const result = await handleNewsletterSignup(email, region || 'eu', {
     wishlist: wishlist === true,
     items,
+    source: source === 'shopli_price_alert' ? source : undefined,
   });
   res.status(result.ok ? 200 : 400).json(result);
 }

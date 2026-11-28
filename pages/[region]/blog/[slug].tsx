@@ -11,6 +11,9 @@ import { collectionLinks } from '../../../lib/related-links';
 import { collectionsForBlog } from '../../../lib/related-content';
 import { blogPostingJsonLd, breadcrumbJsonLd, faqJsonLd, itemListJsonLd, SITE_URL } from '../../../lib/seo';
 import ProductCard, { ProductCardProduct } from '../../../components/ProductCard';
+import PriceDropAlert from '../../../components/PriceDropAlert';
+import MoodBoardsRow from '../../../components/MoodBoardsRow';
+import { moodBoardLinks } from '../../../lib/moodboards';
 import { searchAliExpress, withProductPageOffers } from '../../../lib/aliexpress';
 import { filterQuality } from '../../../lib/quality';
 import { getReviewCounts } from '../../../lib/review-store';
@@ -77,6 +80,7 @@ function ShopThePicks({
                 locale={lang}
                 region={region}
               />
+              <PriceDropAlert productId={product.id} region={region} rtl={rtl} placement="blog_picks" />
             </div>
           ))}
         </div>
@@ -101,7 +105,7 @@ function ShopThePicks({
   );
 }
 
-export default function BlogPostPage({ region, config, post, rtl, regionOnly, pickProducts, relatedLinks, error }: any) {
+export default function BlogPostPage({ region, config, post, rtl, regionOnly, pickProducts, relatedLinks, moodLinks, error }: any) {
   if (error) {
     return <div className="p-20 text-center" style={{ color: 'var(--shopli-warm-gray)' }}>Error: {error}</div>;
   }
@@ -271,6 +275,10 @@ export default function BlogPostPage({ region, config, post, rtl, regionOnly, pi
               region={region}
               lang={lang}
             />
+
+            <div className="pt-8">
+              <MoodBoardsRow links={moodLinks} region={region} rtl={rtl} />
+            </div>
           </div>
         </article>
       </main>
@@ -357,6 +365,6 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
   return {
     // regionOnly suppresses hreflang: the alternates would point at the eight
     // locales where this post 404s.
-    props: { region, config, post, rtl, regionOnly: !!post.regions, pickProducts, relatedLinks },
+    props: { region, config, post, rtl, regionOnly: !!post.regions, pickProducts, relatedLinks, moodLinks: moodBoardLinks(lang, 4) },
   };
 };

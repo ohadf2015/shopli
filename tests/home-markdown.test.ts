@@ -15,7 +15,7 @@ test('wantsMarkdown follows the Accept header', () => {
 test('homeMarkdown lists the day\'s picks and collections with product links', () => {
   const card = { productId: '123', title: 'Widget', imageUrl: '', price: 9.5, why: 'Usually ~€12.00', badge: '−20%', tone: 'drop' as const, stars: 4.5 };
   const md = homeMarkdown(
-    { region: 'eu', config: getRegion('eu'), rtl: false, drops: [card], sellers: [], chips: [{ slug: 'x', name: 'X' }], asOf: '2026-11-10', pricesChecked: true },
+    { region: 'eu', config: getRegion('eu'), rtl: false, drops: [card], sellers: [], chips: [{ slug: 'x', name: 'X' }], moodLinks: [], asOf: '2026-11-10', pricesChecked: true },
     { h1: 'H', sub: 'S', drops: 'D', dropsSub: 'ds', sellers: 'Se', sellersSub: 'ss', finds: 'Finds', findsSub: 'fs', browse: 'Browse', howTitle: 'How', how: 'Because', asOf: 'As of', empty: 'Empty' }
   );
   assert.match(md, /^# H/);

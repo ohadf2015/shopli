@@ -642,6 +642,20 @@ export function getMoodBoardsByTag(tag: string): MoodBoard[] {
   return Object.values(MOOD_BOARDS).filter(b => b.tags.includes(tag));
 }
 
+export interface MoodBoardLink {
+  slug: string;
+  title: string;
+}
+
+/** A few year-round boards (no costumes), rotated by day so the row changes. */
+export function moodBoardLinks(lang: string, count: number, day = Math.floor(Date.now() / 86400000)): MoodBoardLink[] {
+  const boards = Object.values(MOOD_BOARDS).filter((b) => !b.tags.includes('costume'));
+  const start = day % boards.length;
+  return [...boards.slice(start), ...boards.slice(0, start)]
+    .slice(0, count)
+    .map((b) => ({ slug: b.slug, title: b.h1[lang] || b.h1.en }));
+}
+
 export function getAllMoodboardSlugs(): string[] {
   return Object.keys(MOOD_BOARDS);
 }

@@ -235,7 +235,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query, re
       const { searchAliExpress, withProductPageOffers } = await import('../../lib/aliexpress');
       const { filterQuality } = await import('../../lib/quality');
       // Same floor as every other surface — a search result is a recommendation.
-      products = await withProductPageOffers(filterQuality(await searchAliExpress(q, region, 20)), region, SEARCH_PRICE_CAP_MS);
+      const { rankByQuery } = await import('../../lib/search-rank');
+      const found = rankByQuery(filterQuality(await searchAliExpress(q, region, 40)), q).slice(0, 20);
+      products = await withProductPageOffers(found, region, SEARCH_PRICE_CAP_MS);
     } catch (e: any) {
       error = e?.message || String(e);
     }

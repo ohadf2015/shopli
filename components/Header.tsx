@@ -5,6 +5,7 @@ import Icon from './icons';
 import { ALL_REGIONS, getRegion, RegionCode } from '../lib/regions';
 import { getThemeGroups } from '../lib/collection-themes';
 import { getWishlistSnapshot } from '../lib/useWishlist';
+import { isWeeklyRegion } from '../lib/weekly';
 
 export default function Header({ currentRegion, dir }: { currentRegion: RegionCode; dir?: string }) {
   const router = useRouter();
@@ -180,6 +181,16 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
             )}
           </div>
 
+          {isWeeklyRegion(currentRegion) && (
+            <Link
+              href={`/${currentRegion}/weekly`}
+              className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-[#FFF4E4] transition-colors"
+              style={{ color: 'var(--shopli-navy)' }}
+            >
+              {rtl ? 'השבועי' : 'Weekly'}
+            </Link>
+          )}
+
           <Link
             href={`/${currentRegion}/game`}
             className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-[#FFF4E4] transition-colors"
@@ -348,6 +359,15 @@ export default function Header({ currentRegion, dir }: { currentRegion: RegionCo
           >
             {rtl ? 'טרנדים' : 'Trending'}
           </Link>
+          {isWeeklyRegion(currentRegion) && (
+            <Link
+              href={`/${currentRegion}/weekly`}
+              className="block px-3 py-3 rounded-lg font-medium text-sm hover:bg-[#FFF4E4] min-h-[44px]"
+              onClick={() => setMenuOpen(false)}
+            >
+              {rtl ? 'שופלי השבועי' : 'The Weekly'}
+            </Link>
+          )}
           <Link
             href={`/${currentRegion}/game`}
             className="block px-3 py-3 rounded-lg font-medium text-sm hover:bg-[#FFF4E4] min-h-[44px]"

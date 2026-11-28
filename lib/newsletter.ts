@@ -15,6 +15,8 @@ export interface SignupOptions {
   /** AliExpress product ids the subscriber saved — the first-party data that
    *  makes a price-drop alert (and any re-engagement mail) possible. */
   items?: unknown;
+  /** Where the signup came from, when not the wishlist page or the generic form. */
+  source?: 'shopli_price_alert';
 }
 
 /** Keep only plausible AliExpress numeric ids, capped so the column stays small. */
@@ -72,7 +74,7 @@ export async function handleNewsletterSignup(
   }
 
   const wishlistIds = opts.wishlist ? sanitizeWishlistIds(opts.items) : [];
-  const source = opts.wishlist ? 'shopli_wishlist' : 'shopli_web';
+  const source = opts.source || (opts.wishlist ? 'shopli_wishlist' : 'shopli_web');
 
   try {
     const sql = neon(dbUrl);
@@ -86,9 +88,18 @@ export async function handleNewsletterSignup(
         ${wishlistIds.length ? JSON.stringify(wishlistIds) : null}
       )
       ON CONFLICT (email, region) DO UPDATE SET
-        wishlist_ids = COALESCE(EXCLUDED.wishlist_ids, shopli_newsletter.wishlist_ids),
+        wishlist_ids = CASE
+          WHEN EXCLUDED.wishlist_ids IS NULL THEN shopli_newsletter.wishlist_ids
+          WHEN shopli_newsletter.wishlist_ids IS NULL THEN EXCLUDED.wishlist_ids
+          ELSE (
+            SELECT jsonb_agg(DISTINCT v) FROM (
+              SELECT jsonb_array_elements(shopli_newsletter.wishlist_ids) AS v
+              UNION SELECT jsonb_array_elements(EXCLUDED.wishlist_ids)
+            ) ids
+          )
+        END,
         source = CASE
-          WHEN EXCLUDED.source = 'shopli_wishlist' THEN 'shopli_wishlist'
+          WHEN EXCLUDED.source IN ('shopli_wishlist', 'shopli_price_alert') THEN EXCLUDED.source
           ELSE shopli_newsletter.source
         END
     `;
