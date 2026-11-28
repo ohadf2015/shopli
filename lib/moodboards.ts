@@ -51,10 +51,10 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
     items: [
       { keywords: ['sushi maker kit', 'sushi making mold'], match: ['sushi maker', 'sushi mold', 'sushi mould', 'sushi making', 'sushi kit', 'sushi bazooka'], caption: { en: 'Sushi Maker / Mold', he: 'מכונת סושי / תבנית' } },
       { keywords: ['bamboo sushi mat', 'makisu'], match: ['sushi mat', 'rolling mat', 'makisu', 'bamboo mat', 'sushi roller', 'sushi rolling'], caption: { en: 'Bamboo Rolling Mat', he: 'מחצלת גלגול במבוק' } },
-      { keywords: ['nori seaweed sheets', 'sushi nori'], match: ['nori', 'seaweed'], not: ['punch', 'cutter', 'mold', 'mould', 'maker', 'press', 'packing', 'bag', 'wrapper', 'mat'], caption: { en: 'Nori Seaweed Sheets (50pk)', he: 'דפי נורי (50 יחידות)' } },
+      { keywords: ['nori seaweed sheets', 'sushi nori'], match: ['nori', 'seaweed'], not: ['punch', 'cutter', 'mold', 'mould', 'maker', 'press', 'packing', 'bag', 'wrapper', 'mat', 'aquarium', 'fish', 'algae', 'feeding', 'clip', 'magnetic'], caption: { en: 'Nori Seaweed Sheets (50pk)', he: 'דפי נורי (50 יחידות)' } },
       { keywords: ['sushi rice paddle', 'rice spatula'], match: ['rice paddle', 'rice spoon', 'rice spatula', 'shamoji', 'rice scoop', 'rice shovel'], not: ['holder', 'rest', 'rack'], caption: { en: 'Rice Paddle (Shamoji)', he: 'מצקת אורז' } },
       { keywords: ['sushi chopsticks set', 'reusable chopsticks'], match: ['chopstick'], not: ['rest', 'holder', 'rack', 'helper', 'hinge', 'training'], caption: { en: 'Reusable Chopsticks', he: 'מקלות אכילה רב-פעמיים' }, note: { en: 'Get the dishwasher-safe ones', he: 'קחו כאלה שמתאימים למדיח' } },
-      { keywords: ['soy sauce dish ceramic', 'dipping sauce bowl'], match: ['sauce dish', 'soy dish', 'dipping', 'sauce bowl', 'seasoning dish', 'soy sauce', 'sauce plate'], caption: { en: 'Soy Sauce Dishes (2-4pk)', he: 'צלוחיות סויה' } },
+      { keywords: ['soy sauce dish ceramic', 'dipping sauce bowl'], match: ['sauce dish', 'soy dish', 'dipping', 'sauce bowl', 'seasoning dish', 'soy sauce', 'sauce plate'], not: ['cat', 'dog', 'pet', 'feeding'], caption: { en: 'Soy Sauce Dishes (2-4pk)', he: 'צלוחיות סויה' } },
     ],
     faq: [
       { q: { en: 'Do I need a rice cooker too?', he: 'צריך גם סיר אורז?' }, a: { en: 'Not essential — any pot works. But a rice cooker makes perfect sushi rice every time.', he: 'לא חייב — כל סיר עובד. אבל סיר אורז עושה אורז סושי מושלם כל פעם.' } },
@@ -91,7 +91,7 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
       { keywords: ['desk storage caddy', 'pencil holder organizer'], match: ['caddy', 'organizer', 'organiser', 'pencil holder', 'pen holder', 'storage box'], not: ['cable', 'wire', 'lipstick', 'eyebrow'], caption: { en: 'Desk Organizer Caddy', he: 'מארגן שולחן' } },
       { keywords: ['desk pad mouse pad large', 'writing desk mat'], match: ['desk pad', 'desk mat', 'mouse pad', 'mousepad', 'mouse mat', 'writing mat'], caption: { en: 'Large Desk Pad / Mouse Mat', he: 'משטח שולחן גדול' } },
       { keywords: ['mechanical timer kitchen', 'focus timer'], match: ['timer'], caption: { en: 'Study Timer (Pomodoro)', he: 'טיימר לימוד (פומודורו)' } },
-      { keywords: ['small desk plant fake', 'succulent pot'], match: ['plant', 'succulent', 'planter', 'pot'], not: ['grow light', 'hanger', 'shelf', 'mister', 'mat', 'repotting'], caption: { en: 'Small Desk Plant', he: 'עציץ קטן לשולחן' } },
+      { keywords: ['small desk plant fake', 'succulent pot'], match: ['plant', 'succulent', 'planter', 'pot'], not: ['grow light', 'hanger', 'shelf', 'mister', 'mat', 'repotting', 'watering', 'dripping', 'irrigation'], caption: { en: 'Small Desk Plant', he: 'עציץ קטן לשולחן' } },
     ],
   },
 
@@ -316,7 +316,7 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
       { keywords: ['wonder woman skirt costume', 'gold armored skirt'], match: ['skirt'], caption: { en: 'Armored Skirt', he: 'חצאית שריון' } },
       { keywords: ['wonder woman tiara crown', 'gold headpiece warrior'], match: ['tiara', 'crown', 'headband', 'headpiece'], not: ['bodysuit', 'helmet', 'horn'], caption: { en: 'Golden Tiara Crown', he: 'נזר זהב/כתר' } },
       { keywords: ['wonder woman bracelets', 'gold gauntlets costume'], match: ['bracelet', 'gauntlet', 'bracer', 'cuff'], also: ['gold', 'golden', 'wonder', 'warrior', 'amazon', 'gauntlet'], caption: { en: 'Gauntlets / Bracelets', he: 'צמידי קרב' } },
-      { keywords: ['lasso of truth prop', 'golden rope costume'], match: ['lasso', 'rope'], also: ['lasso', 'gold', 'golden'], not: ['scorpion', 'dart', 'kombat'], caption: { en: 'Lasso of Truth', he: 'לאסו של האמת' } },
+      { keywords: ['lasso of truth prop', 'golden rope costume'], match: ['lasso', 'rope'], also: ['lasso', 'gold', 'golden'], not: ['scorpion', 'dart', 'kombat', 'mask'], caption: { en: 'Lasso of Truth', he: 'לאסו של האמת' } },
       { keywords: ['wonder woman boots costume', 'gladiator boots gold'], match: ['boot'], not: ['doll'], caption: { en: 'Gold Warrior Boots', he: 'מגפיים מוזהבים' } },
     ],
   },
@@ -367,7 +367,7 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
     tags: ['travel', 'desk', 'tech'],
     items: [
       { keywords: ['universal travel adapter', 'international power adapter'], match: ['adapter', 'adaptor', 'travel plug', 'converter'], caption: { en: 'Universal Travel Adapter', he: 'מתאם נסיעות אוניברסלי' } },
-      { keywords: ['power bank 20000mAh', 'fast charging portable charger'], match: ['power bank', 'powerbank', 'portable charger', 'battery pack'], not: ['car adapter', 'car charger', 'wall'], caption: { en: '20000mAh Power Bank', he: 'בנק כוח 20000mAh' } },
+      { keywords: ['power bank 20000mAh', 'fast charging portable charger'], match: ['power bank', 'powerbank', 'portable charger', 'battery pack'], also: ['mah'], not: ['car adapter', 'car charger', 'wall'], caption: { en: '20000mAh Power Bank', he: 'בנק כוח 20000mAh' } },
       { keywords: ['laptop stand portable', 'foldable laptop riser'], match: ['laptop stand', 'laptop holder', 'laptop riser', 'notebook stand'], caption: { en: 'Foldable Laptop Stand', he: 'מעמד מתקפל למחשב' } },
       { keywords: ['packing cubes set', 'travel organizer cubes'], match: ['packing cube', 'packing organizer', 'travel organizer', 'cube'], caption: { en: 'Packing Cubes (3-4 set)', he: 'קוביות אריזה (3-4 יחידות)' } },
       { keywords: ['cable organizer case', 'electronic organizer bag'], match: ['cable organizer', 'electronic organizer', 'electronics organizer', 'cable bag', 'cable case', 'organizer bag', 'storage bag', 'case', 'pouch'], caption: { en: 'Cable Organizer Case', he: 'מארגן כבלים' } },
@@ -437,7 +437,7 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
     items: [
       { keywords: ['adjustable dumbbells set', 'weight dumbbell pair'], match: ['dumbbell'], caption: { en: 'Adjustable Dumbbells (2kg-20kg)', he: 'משקולות מתכווננות (2-20 ק"ג)' } },
       { keywords: ['pull up bar doorway', 'doorway chin up bar'], match: ['pull up', 'pull-up', 'chin up', 'chin-up', 'pullup', 'horizontal bar', 'door bar', 'doorway bar'], caption: { en: 'Doorway Pull-Up Bar', he: 'מוט מתח לדלת' } },
-      { keywords: ['battle ropes', 'heavy workout ropes'], match: ['battle rope', 'training rope', 'rope'], not: ['jump', 'skipping', 'speed', 'handle', 'grip'], caption: { en: 'Battle Ropes (10m)', he: 'חבלי קרב (10 מטר)' } },
+      { keywords: ['battle ropes', 'heavy workout ropes'], match: ['battle rope', 'training rope', 'rope'], not: ['jump', 'skipping', 'speed', 'handle', 'grip', 'wire', 'steel', 'cable', 'pulley'], caption: { en: 'Battle Ropes (10m)', he: 'חבלי קרב (10 מטר)' } },
       { keywords: ['ab roller wheel', 'knee pad ab wheel'], match: ['ab roller', 'ab wheel', 'abdominal wheel', 'roller wheel', 'wheel'], caption: { en: 'Ab Roller Wheel', he: 'גלגל בטן' } },
       { keywords: ['foam roller high density', 'muscle massage roller'], match: ['foam roller', 'massage roller', 'roller'], not: ['wheel', 'ab '], caption: { en: 'Foam Roller', he: 'רולר עיסוי' } },
       { keywords: ['speed jump rope', 'weighted jump rope'], match: ['jump rope', 'skipping rope', 'speed rope', 'rope'], not: ['battle'], caption: { en: 'Speed Jump Rope', he: 'חבל קפיצה מהירות' } },
@@ -550,7 +550,7 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
       { keywords: ['phone case shockproof', 'silicone phone case'], match: ['case', 'cover'], not: ['earbud', 'airpod'], caption: { en: 'Shockproof Phone Case', he: 'כיסוי מגן מפני נפילות' } },
       { keywords: ['tempered glass screen protector', 'privacy screen protector'], match: ['screen protector', 'tempered glass', 'protective film', 'protector'], caption: { en: 'Tempered Glass Screen Protector', he: 'זכוכית מחוסמת למסך' }, note: { en: '2-pack recommended', he: 'חבילת 2 מומלצת' } },
       { keywords: ['car phone mount holder', 'car air vent phone holder'], match: ['car phone', 'car mount', 'car holder', 'vent', 'dashboard', 'car'], caption: { en: 'Car Phone Mount', he: 'אוחז לטלפון לרכב' } },
-      { keywords: ['power bank 10000mAh', 'portable charger fast charging'], match: ['power bank', 'powerbank', 'portable charger', 'battery pack'], not: ['car adapter', 'car charger', 'wall'], caption: { en: '10000mAh Power Bank', he: 'בנק כוח 10000mAh' } },
+      { keywords: ['power bank 10000mAh', 'portable charger fast charging'], match: ['power bank', 'powerbank', 'portable charger', 'battery pack'], also: ['mah'], not: ['car adapter', 'car charger', 'wall'], caption: { en: '10000mAh Power Bank', he: 'בנק כוח 10000mAh' } },
       { keywords: ['USB C braided cable', 'fast charging cable 2m'], match: ['cable'], caption: { en: 'Braided USB-C Cable (2m)', he: 'כבל USB-C קלוע (2 מטר)' } },
       { keywords: ['pop socket grip', 'phone stand grip'], match: ['grip', 'pop socket', 'popsocket', 'ring holder', 'phone stand', 'holder'], caption: { en: 'Pop Socket / Phone Grip', he: 'פופ סוקט / אחיזת טלפון' } },
     ],
@@ -611,7 +611,7 @@ export const MOOD_BOARDS: Record<string, MoodBoard> = {
       { keywords: ['cable management tray', 'under desk cable organizer'], match: ['cable tray', 'cable management', 'cable organizer', 'wire organizer', 'cable organiser', 'tray'], caption: { en: 'Under-Desk Cable Tray', he: 'תעלת כבלים מתחת לשולחן' } },
       { keywords: ['wooden pen holder', 'desk organizer bamboo'], match: ['pen holder', 'organizer', 'organiser', 'holder'], not: ['cable', 'wire'], caption: { en: 'Wooden Desk Organizer', he: 'מארגן שולחן מעץ' } },
       { keywords: ['LED desk lamp USB', 'minimalist desk lamp'], match: ['lamp', 'light'], caption: { en: 'Minimalist LED Desk Lamp', he: 'מנורת שולחן לד מינימליסטית' } },
-      { keywords: ['small desk plant', 'succulent pot ceramic'], match: ['plant', 'succulent', 'pot', 'planter'], not: ['mesh', 'pad', 'mat'], caption: { en: 'Small Desk Plant', he: 'עציץ קטן לשולחן' } },
+      { keywords: ['small desk plant', 'succulent pot ceramic'], match: ['plant', 'succulent', 'pot', 'planter'], not: ['mesh', 'pad', 'mat', 'watering', 'dripping', 'irrigation'], caption: { en: 'Small Desk Plant', he: 'עציץ קטן לשולחן' } },
     ],
     faq: [
       { q: { en: 'What colors work for a minimalist desk?', he: 'איזה צבעים מתאימים לשולחן מינימליסטי?' }, a: { en: 'White, black, warm wood tones, and a single accent color (green from a plant). Keep everything monochrome — the desk mat, organizer, lamp, and accessories should match.', he: 'לבן, שחור, גווני עץ חמים, וצבע מבטא אחד (ירוק מהצמח). שמרו הכל מונוכרומטי.' } },

@@ -20,8 +20,9 @@ export interface SlotRule {
 
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+// A digit counts as a boundary too, so "mah" matches "20000mAh".
 function hasWordStart(title: string, needle: string): boolean {
-  return new RegExp(`(^|[^a-z0-9])${escape(needle.toLowerCase())}`).test(title);
+  return new RegExp(`(^|[^a-z])${escape(needle.toLowerCase())}`).test(title);
 }
 
 export function slotMatches(title: string | undefined, rule: SlotRule): boolean {
